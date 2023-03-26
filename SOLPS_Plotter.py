@@ -217,6 +217,7 @@ class SOLPSPLOT(object):
         BASEDRT = self.KW['BASEDRT']
         TOPDRT = self.KW['TOPDRT']
         DEV = self.KW['DEV']
+        shift = self.KW['shift']
         ROOTSHOT = self.KW['ROOTSHOT']
         
         BASEDRT, TOPDRT = SET_WDIR(BASEDRT,TOPDRT)
@@ -229,8 +230,8 @@ class SOLPSPLOT(object):
         # Create Experiment Data Dictionary (ExpDict) -> d3d or cmod?
         
         # gdir = '{}/{}/{}'.format(TOPDRT, DEV, Shot)
-        gtr = glob.glob('{}/{}/{}/g{}*'.format(TOPDRT, DEV, Shot, Shot))
-        print(gtr)
+        # gtr = glob.glob('{}/{}/{}/g{}*'.format(TOPDRT, DEV, Shot, Shot))
+        # print(gtr)
         
         
         
@@ -359,7 +360,7 @@ class SOLPSPLOT(object):
         
         elif DEV=='mast':
             print(DEV)
-            BASEDRT = '{}/{}/{}'.format(BASEDRT,DEV,Shot)
+            BASEDRT = '{}/{}/{}/{}'.format(BASEDRT, DEV, Shot, shift)
             print(BASEDRT)
             gtr = glob.glob('{}/{}/{}/g{}*'.format(TOPDRT, DEV, Shot, Shot))
             print(gtr)
@@ -373,7 +374,7 @@ class SOLPSPLOT(object):
                 
         else:
             
-            BASEDRT = '{}/{}/{}'.format(BASEDRT,DEV,Shot)
+            BASEDRT = '{}/{}/{}/{}'.format(BASEDRT, DEV, Shot, shift)
             print(BASEDRT)
             gtr = glob.glob('{}/{}/g{}*'.format(TOPDRT, DEV, Shot))
             print(gtr)
