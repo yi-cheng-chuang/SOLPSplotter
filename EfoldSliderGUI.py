@@ -21,22 +21,23 @@ import json
 ### Input Fields ###
 
 Shot = '027205'
-Attempt = ['22']
+Attempt = ['9']
 DEV='mast'
 GasLvl = 0
 Balloon = 0
+shift ='org'
 
 PS=['.','.','.','.','.','x']
 
 plt.rc('lines',linewidth=5,markersize=15,markeredgewidth=2,linestyle='solid')
 
 ### Setting up Base Variables ###
-NeuDen = SOLPSPLOT(Shot,Attempt,['Ne','NeuDen'],DEV=DEV,EXP=False,AVG=False,PlotScheme='')#,ROOTSHOT='')
+NeuDen = SOLPSPLOT(Shot,Attempt,['Ne','NeuDen'],DEV=DEV, shift=shift, EXP=False,AVG=False,PlotScheme='')#,ROOTSHOT='')
 JXA = NeuDen.KW['JXA']
 JXI = NeuDen.KW['JXI']
 SEP = 18
 CoreBound = [24,71]
-PolLim=CoreBound
+PolLim= CoreBound
 Rmax = 0.01
 Rmin = -0.01
 Thresh=0.01
@@ -487,6 +488,7 @@ def wholefit(event):
     y_adj = np.array(sorted(efold_adj.items()))[:,1]
     y_adj_err = np.array(sorted(efold_adj_err.items()))[:,1]
     wholeAx.plot(dXP.loc[PolLim[0]:PolLim[1],PolCoords[0]].values,y_adj,'bv:')
+    print()
     wholeAx.fill_between(dXP.loc[PolLim[0]:PolLim[1],PolCoords[0]].values,y_adj-y_adj_err,y_adj+y_adj_err,alpha=0.2,edgecolor='k',facecolor='c')
     wholeAx.set_title('Shot {} Attempt {} neutral e-folding lengths'.format(Shot,Attempt[-1]))
     wholeAx.set_xlabel(PolCoords[0])
