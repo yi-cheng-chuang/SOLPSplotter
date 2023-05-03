@@ -21,11 +21,11 @@ import json
 ### Input Fields ###
 
 Shot = '027205'
-Attempt = ['10']
+Attempt = ['28']
 DEV='mast'
 GasLvl = 0
 Balloon = 0
-shift ='org'
+shift ='org_new_series'
 
 PS=['.','.','.','.','.','x']
 
