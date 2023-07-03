@@ -8,176 +8,221 @@ Collection of general Tools to perform oft-repeated SOLPS data analyis and post-
 """
 import os
 import numpy as np
-import paramiko
-from scipy import stats
+from scipy import interpolate
+import glob
 
-def SET_WDIR(BASEDRT,TOPDRT): #Function to set correct Working Directory Path depending on which machine is in use
+def set_wdir(): #Function to set correct Working Directory Path depending on which machine is in use
     if os.environ['OS'] == 'Windows_NT':
-        if os.environ['USERNAME'] == 'rmreksoatmodjo':
-            BASEDRT = r"C:/Users/rmreksoatmodjo/Desktop/WMGDrive/College of William and Mary/Research/SOLPS Stuff/SOLPS_2D_prof/"
-            TOPDRT = r"C:/Users/rmreksoatmodjo/Desktop/WMGDrive/College of William and Mary/Research/SOLPS Stuff/"
-        elif os.environ['USERNAME'] == '18313':
-            BASEDRT = r"G:/My Drive/College of William and Mary/Research/SOLPS Stuff/SOLPS_2D_prof/"
-            TOPDRT = r"G:/My Drive/College of William and Mary/Research/SOLPS Stuff/"
-        elif os.environ['USERNAME'] == 'Richard':
-            BASEDRT = r"C:/Users/Richard/WMGDrive/College of William and Mary/Research/SOLPS Stuff/SOLPS_2D_prof/"
-            TOPDRT = r"C:/Users/Richard/WMGDrive/College of William and Mary/Research/SOLPS Stuff/"
-        elif os.environ['USERNAME'] == 'Yi-Cheng':
-            BASEDRT = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Simulation_Data"
-            TOPDRT = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Experimental_Data"
+        if os.environ['USERNAME'] == 'Yi-Cheng':
+            basedrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Simulation_Data"
+            topdrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Experimental_Data"
+            tpdrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Experimental_Data"
         elif os.environ['USERNAME'] == 'user':
-            BASEDRT = r"C:/Users/user/Documents/SOLPS data/simulation data"
-            TOPDRT = r"C:/Users/user/Documents/SOLPS data/experiment data"
+            basedrt = r"C:/Users/user/Documents/SOLPS data/simulation data"
+            topdrt = r"C:/Users/user/Documents/SOLPS data/experiment data"
+            tpdrt = r"C:/Users/user/Documents/GitHub/load-plot/poster plot generator"
     else:
-        BASEDRT=BASEDRT
-        TOPDRT=TOPDRT
+        print('please add new directory in tools')
     
-    return BASEDRT, TOPDRT
+    return basedrt, topdrt, tpdrt
 
-def TANH(r,r0,h,d,b,m):
+def a_number(text):
+    name = text.split('\\',1)[1]
+    nu = int(name.split('_')[2])
+
+    return [nu, text]
+
+def ex1_number(text):
+    name = text.split('\\',1)[1]
+    nu = int(name.split('_')[3])
+
+    return [nu, text]
+
+def new_number(text):
+    name = text.split("/",-1)[-2]
+    nu = int(name.split('_')[2])
+
+    return [nu, text]
+
+def s_number(text):
+    name = text.split("/",-1)[-2]
+    nu = int(name.split('_')[0])
+
+    return [nu, text]
+
+
+def mast_tranco_dir(a_shift):
+    dev = 'mast'
+    shot = '027205'
+    shift = ['org_new_series', 'dot5', 'dot7', 'one_LS']
+    series = ['37_sh_nts5_a', '15_dn0.5hc0.05_ts5_dot5_a', '2_t1_dot7_a', 'lsts5_19_tw_one_a']
+
+    basedrt, topdrt, tpdrt= set_wdir()
+    
+    if a_shift == 'org':
+        a_list = glob.glob('{}/{}/{}/{}/{}/b2.transport.inputfile_new'.format(basedrt, dev, shot, shift[0], series[0]))
+        n = s_number(a_list)[0] + 1
+        print(n)
+    elif a_shift == 'dot5':
+        a_list = glob.glob('{}/{}/{}/{}/{}/b2.transport.inputfile_new'.format(basedrt, dev, shot, shift[1], series[1]))
+        n = s_number(a_list)[0] + 1
+        print(n)
+    elif a_shift == 'dot7':
+        a_list = glob.glob('{}/{}/{}/{}/{}/b2.transport.inputfile_new'.format(basedrt, dev, shot, shift[2], series[2]))
+        n = s_number(a_list)[0] + 1
+        print(n)
+    elif a_shift == 'one':
+        a_list = glob.glob('{}/{}/{}/{}/{}/b2.transport.inputfile_new'.format(basedrt, dev, shot, shift[3], series[3]))
+        n = s_number(a_list)[0] + 1
+        print(n)
+    
+    return a_list, n
+
+
+
+def unit_dic():
+    unit = {
+        'ne3da.last10': ['Electron density, midplane', 'Electron density: ${n_e}$ (m$^{-3}$)'],
+        'te3da.last10': ['Electron temperature, midplane', 'Electron temperature: ${T_e}$ (eV)'],
+        'an3da.last10':['Neutral density, midplane', 'Neutral density: ${n_D}$ (m$^{-3}$)'],
+        'ne3di.last10': ['Electron density, inboard midplane', 'Electron density: ${n_e}$ (m$^{-3}$)'],
+        'te3di.last10': ['Electron temperature, inboard midplane', 'Electron temperature: ${T_e}$ (eV)'],
+        'an3di.last10':['Neutral density, inboard midplane', 'Neutral density: ${n_D}$ (m$^{-3}$)'],
+        'ne3dl.last10':['Electron density, western midplane', 'Electron density: ${n_e}$ (m$^{-3}$)'],
+        'te3dl.last10': ['Electron temperature, western midplane', 'Electron temperature: ${T_e}$ (eV)'],
+        'an3dl.last10':['Neutral density, western midplane', 'Neutral density: ${n_D}$ (m$^{-3}$)'],
+        'ne3dr.last10':['Electron density, eastern midplane', 'Electron density: ${n_e}$ (m$^{-3}$)'],
+        'te3dr.last10': ['Electron temperature, eastern midplane', 'Electron temperature: ${T_e}$ (eV)'],
+        'an3dr.last10':['Neutral density, eastern midplane', 'Neutral density: ${n_D}$ (m$^{-3}$)'],
+        '1':['Particle density-driven diffusivity','Density-driven diffusivity: D (m$^{2}$/s)'],
+        '3':['Ion thermal anomalous diffusivity', 'Ion thermal diffusivity: ${\chi_i}$ (m$^{2}$/s)'],
+        '4':['Electron thermal anomalous diffusivity', 'Electron thermal diffusivity: ${\chi_e}$ (m$^{2}$/s)'],
+        
+        }
+    return unit
+
+psi_solps =[0.56591402, 0.59635553, 0.65365526, 0.70507622, 0.75083496,
+        0.79132874, 0.82698182, 0.85806206, 0.88490369, 0.90789432,
+        0.92738632, 0.94367313, 0.95706941, 0.96795829, 0.97677538,
+        0.9838775 , 0.98955578, 0.99415907, 0.99803803, 1.002408  ,
+        1.00753157, 1.01263476, 1.01772166, 1.02279374, 1.02785249,
+        1.03288158, 1.03794617, 1.04306613, 1.04817989, 1.05328886,
+        1.05838546, 1.06347049, 1.06855367, 1.07363646, 1.07872032,
+        1.08380671, 1.08889011, 1.09145489]
+
+dsa = [-0.10817856015924884,
+-0.09990042377111603,
+-0.0846133267035689,
+-0.0713664335482361,
+-0.05987293296951107,
+-0.049898929370704115,
+-0.04124897557162459,
+-0.03377954856336941,
+-0.02737025239404635,
+-0.02191068496806607,
+-0.017292192441575246,
+-0.013432437532237718,
+-0.01025503971802598,
+-0.00766848237493005,
+-0.005577570403317772,
+-0.0038936225714468614,
+-0.002540280074319473,
+-0.0014428354897131068,
+-0.0005202548013382713,
+0.0005202548013382852,
+0.0017412877642430796,
+0.0029587093458706415,
+0.004173484315468989,
+0.005385479979830576,
+0.0065946993526905945,
+0.007799836184615799,
+0.009009678339736343,
+0.010226892341373167,
+0.011443929068697442,
+0.012666850670040336,
+0.013891570075914711,
+0.015112086991656865,
+0.016332974621876967,
+0.0175550249181618,
+0.018778594838134655,
+0.020003969353135337,
+0.021230335606628042,
+0.021849669506929625]
+
+def psi_to_dsa(array):
+    psi_to_dsa_func = interpolate.interp1d(psi_solps, dsa, fill_value = 'extrapolate')
+    
+    return psi_to_dsa_func(array)
+
+def dsa_to_psi(array):
+    dsa_to_psi_func = interpolate.interp1d(dsa, psi_solps, fill_value = 'extrapolate')
+    
+    return dsa_to_psi_func(array)
+
+
+
+def read_mastfile(mastfile_loc):
+    with open(mastfile_loc, mode='r') as dfile:
+        lines = dfile.readlines()
+    
+    profiles = {}
+    nlines_tot = len(lines)
+    psi_n = np.zeros(nlines_tot)
+    ne = np.zeros(nlines_tot)
+    ne_er = np.zeros(nlines_tot)
+    te = np.zeros(nlines_tot)
+    te_er = np.zeros(nlines_tot)
+    
+    i = 0
+    
+    while i < nlines_tot:
+        r_line = lines[i].split()
+        psi_n[i] = float(r_line[0])
+        ne[i] = float(r_line[1])*pow(10, -20)
+        ne_er[i] = float(r_line[2])*pow(10, -20)
+        te[i] = float(r_line[3])/1000
+        te_er[i] = float(r_line[4])/1000
+        i += 1
+
+    profiles['psi_normal'] = psi_n
+    profiles['electron_density(10^20/m^3)'] = ne
+    profiles['density error(10^20/m^3)'] = ne_er
+    profiles['electron_temperature(KeV)'] = te
+    profiles['temperature error(10^20/m^3)'] = te_er
+    return profiles
+
+def read_fitfile(mastfile_loc):
+    with open(mastfile_loc, mode='r') as dfile:
+        lines = dfile.readlines()
+    
+    profiles = {}
+    nlines_tot = len(lines)
+    psi_n = np.zeros(nlines_tot)
+    ne = np.zeros(nlines_tot)
+    te = np.zeros(nlines_tot)
+    i = 0
+    
+    while i < nlines_tot:
+        r_line = lines[i].split()
+        psi_n[i] = float(r_line[0])
+        ne[i] = float(r_line[1])*pow(10, 20)
+        te[i] = float(r_line[2])*1000
+        i += 1
+
+    profiles['psi_normal'] = psi_n
+    profiles['electron_density(m^(-3))'] = ne
+    profiles['electron_temperature(eV)'] = te
+    return profiles
+
+def tanh(r,r0,h,d,b,m):
     return b+(h/2)*(np.tanh((r0-r)/d)+1) + m*(r0-r-d)*np.heaviside(r0-r-d, 1)
 
-def EXPFIT(x,A,l):  #Removed vertical displacement variable B; seemed to cause 'overfitting'
+def expfit(x,A,l):  #Removed vertical displacement variable B; seemed to cause 'overfitting'
     return A*np.exp(l*x)
 
-def WALL_INTERSECT(C0,C1,r):
-    '''
-    Calculate the intersection between a line or set of lines specified by points
-    C0 and C1, and a circle of radius r centered at the origin
-    
-    C0 : dict of floats or arrays
-        Starting coordinates of line(s), in the format C0={'X': ...,'Y': ...}
-    C1 : dict of floats or arrays
-        Ending coordinates of line(s), in the format C1={'X': ...,'Y': ...}
-    r : float
-        Radius of circle    
-    '''
-    dx=C1['X']-C0['X']
-    dy=C1['Y']-C0['Y']
-    dr=np.sqrt(dx**2+dy**2)
-    D=C0['X']*C1['Y']-C1['X']*C0['Y']
-    delta=(r**2)*(dr**2)-D**2
-    
-    X1=(D*dy+np.sign(dy)*dx*np.sqrt(delta))/dr**2
-    Y1=(-D*dx+np.abs(dy)*np.sqrt(delta))/dr**2
-    X2=(D*dy-np.sign(dy)*dx*np.sqrt(delta))/dr**2
-    Y2=(-D*dx-np.abs(dy)*np.sqrt(delta))/dr**2
-        
-    P1={'X':X1,'Y':Y1}
-    P2={'X':X2,'Y':Y2}
-    
-    return P1,P2  
+def flat_tanh(x,b,h,d):
+    return b+(h/2)*(np.tanh(-x/d)+1)
 
-def gaussian_shading(ax, x, y, y_unc, c='k', min_val=0.0):
-    ''' Plot profile with uncertainties displayed as a shading whose color intensity represents a 
-    gaussian PDF.
-    Adapted from Francesco's method in lyman_single.py
-    '''
-    norm_val = stats.norm.pdf(0)
-    
-    num=50  # discrete number of shades    
-    for ij in np.arange(num):
+def exp_wshift(x,A,l,c):  #Removed vertical displacement variable B; seemed to cause 'overfitting'
+    return A*np.exp(l*x- c)
 
-        # below mean
-        ax.fill_between(x,
-                        np.maximum(y - 5*y_unc*(ij-1)/num, min_val),
-                        np.maximum(y - 5*y_unc*ij/num, min_val),
-                        alpha=stats.norm.pdf(5*ij/num)/norm_val,
-                        linewidth=0.0,
-                        color=c)
-
-    # start looping from 2 to avoid overshading the same region
-    for ij in np.arange(2,num):
-        # above mean
-        ax.fill_between(x, 
-                        y + 5*y_unc*(ij-1.)/num,
-                        y + 5*y_unc*ij/num,
-                        alpha=stats.norm.pdf(5*ij/num)/norm_val,
-                        linewidth=0.0,
-                        color=c)
-
-def JumpConnect(host, user, ssh_home, jumphost,port=22):
-    client = paramiko.SSHClient()
-    client.load_system_host_keys(filename='{}known_hosts'.format(ssh_home))
-    if jumphost:
-        jh_client = paramiko.SSHClient()
-        jh_client.load_system_host_keys(filename='{}known_hosts'.format(ssh_home))
-        jh_client.connect(jumphost, username=user, key_filename='{}id_rsa'.format(ssh_home))
-        sock = jh_client.get_transport().open_channel(
-                'direct-tcpip', (host, 22), ('', 0)
-                )
-        kwargs = dict(
-            hostname=host,
-            port=port,
-            username=user,
-            key_filename='{}id_rsa'.format(ssh_home),
-            sock=sock,
-        )
-    else:
-        kwargs = dict(
-            hostname=host,
-            port=port,
-            username=user,
-            key_filename='{}id_rsa'.format(ssh_home),
-        )
-    client.connect(**kwargs)
-    return client
-
-def OpenRemoteFile(filepath, readtype='r',
-                   host='bora.sciclone.wm.edu', 
-                   user='rmreksoatmodjo', 
-                   ssh_home='C:/cygwin64/home/18313/.ssh/', 
-                   jumphost=None):
-    if jumphost:
-        client=JumpConnect(host, user, ssh_home, jumphost)
-    else:
-        client = paramiko.SSHClient()
-        client.load_system_host_keys(filename='{}known_hosts'.format(ssh_home))
-        client.connect(host,username=user,key_filename='{}id_rsa'.format(ssh_home))
-    sftp_client=client.open_sftp()
-    file=sftp_client.file(filepath, readtype)
-    return file
-
-def SSH_config(server):
-    if os.name == 'nt':
-        if os.environ['USERNAME'] == '18313':
-            if server == 'bora':
-                Kwargs = dict(
-                    host='bora.sciclone.wm.edu',
-                    user='rmreksoatmodjo',
-                    ssh_home='C:/cygwin64/home/18313/.ssh/',
-                    jumphost='stat.wm.edu')
-            elif server == 'cmod':
-                Kwargs = dict(
-                    host='mfews08.psfc.mit.edu',
-                    user='reksoatr',
-                    ssh_home='C:/cygwin64/home/18313/.ssh/',
-                    jumphost=None,
-                    port=9224)
-    return Kwargs
-            
-'''
-class FORT44(object): #Class of methods used to parse and organize SOLPS fort.44 data
-    
-    def __init__(self,Shot,Attempt,Parameter,**kwargs):
-        
-        self._reset_object()
-        
-        self.Shot=Shot
-        
-        self.Attempt=Attempt
-        
-        self.Parameter=Parameter
-        
-    def _reset_object(self):
-        self.Shot=None
-        self.Attempts=None
-        self.Parameter=None
-        
-    def _OpenFort44(self):
-        
-    def _FindParameter(self):
-        
-    def PlotWalls(self):
-'''        
-        
