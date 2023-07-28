@@ -5,30 +5,67 @@ Created on Thu Jul 13 12:38:48 2023
 @author: user
 """
 
+import os
+
 def Setting_dic():
-    setting_dic = {'DEV': 'mast', 'Shot': '027205', 'shift': shift,
-                   'series': series, 'Attempts': A, 'Parameters': P, 
-                   'loadDS': loadDS, 'DefaultSettings': DP}
-    return setting_dic
+    set_dic = {'DEV': 'mast',  'Parameters': P, 'DefaultSettings': DP}
+    return set_dic
 
-def helper_dic():
-    helper_dic = {'shiftlist': shift_list}
+def mast_comp_dic():
+    a_shift = 'org'
+    multi_shift = ['org', 'dot7', 'one']
+    shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
+    shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
+    tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
+            'one': 'one_a'}
+    series = ['39_noc_nts5_a', '1_n5_dot3_a', '15_dn0.5hc0.05_ts5_dot5_a', 
+              '8_t1_dot7_a', '27_lsts5_tw_one_a']
+    outputlist = ['Output', 'Output2', 'EirOutput']
     
-    return helper_dic
+    mast_dir_dic = {'Shot': '027205', 'shift': shift, 'series': series, 
+                  'multiAttempt': {}, 'a_shift': a_shift, 'multi_shift': multi_shift,
+                  'tails': tail, 'shiftdic': shift_dic, 'Output': outputlist}
     
+    return mast_dir_dic
 
+
+def set_wdir(): #Function to set correct Working Directory Path depending on which machine is in use
+    if os.environ['OS'] == 'Windows_NT':
+        if os.environ['USERNAME'] == 'Yi-Cheng':
+            basedrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Simulation_Data"
+            topdrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Experimental_Data"
+            tpdrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Experimental_Data"
+        elif os.environ['USERNAME'] == 'user':
+            basedrt = r"C:/Users/user/Documents/SOLPS data/simulation data"
+            topdrt = r"C:/Users/user/Documents/SOLPS data/experiment data"
+            tpdrt = r"C:/Users/user/Documents/GitHub/load-plot/poster_plot_generator"
+    else:
+        print('please add new directory in tools')
+    
+    return basedrt, topdrt, tpdrt
+
+def s_number(text):
+    name = text.split("/",-1)[-2]
+    nu = int(name.split('_')[0])
+
+    return [nu, name]
+
+def loadDS_dic(DEV):
+    "New DefaultSettings for loading experimental data"
+    
+    bload = {'TimeRange' : [1.10,1.30], 'AVG': False, 'multishift': False,
+             'EXP': False, 'fit': True, 'ROOTSHOT': ''}
+    if DEV == 'mast':
+        fndic = {'expfilename': 'yag_27205_275.dat', 'fitfname': 'wsh_027205_275.dat'}
+    else:
+        print('please add the experimental file name')
+    loadDS = bload | fndic
+    
+    return loadDS
+    
 
 A = ['39']
-shift_list = ['org', 'dot3', 'dot5', 'dot7', 'one']
-shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
-series = ['39_noc_nts5_a', '1_n5_dot3_a', '15_dn0.5hc0.05_ts5_dot5_a', '8_t1_dot7_a', '27_lsts5_tw_one_a']
 
-
-"New DefaultSettings for loading data"
-
-loadDS = {'TimeRange' : [1.10,1.30], 'EXP': False, 'fit': True,
-          'expfilename': 'yag_27205_275.dat', 'fitfname': 'wsh_027205_275.dat',
-          'ROOTSHOT': ''}
 
 """
 REQUIRED:
