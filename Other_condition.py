@@ -9,4 +9,8 @@ if 'gas' in Shot:
     BASEDRT = '{}gaspuff/'.format(BASEDRT)
 
 
+if AVG is True and 'AVG' not in Attempts:
+    Attempts.append('AVG')
+    print('Attempts {} Requested...'.format(Attempts))
+
         
