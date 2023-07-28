@@ -406,7 +406,7 @@ class SOLPSPLOT(object):
                                dims=['Radial_Location','Poloidal_Location','Attempt'], 
                                name = r'Vertical Coordinate $m$')
         
-        Core_Corners = xr.DataArray(np.zeros((YSurf+1,X_Core+1,N,2)), 
+        Core_Corners = xr.DataArray(data= np.zeros((YSurf+1,X_Core+1,N,2)), 
                                     coords=[np.concatenate(([0],Y)),np.linspace(CoreBound[0],CoreBound[1]+1,X_Core+1),Attempts,['X','Y']], 
                                     dims=['Radial Index','Poloidal Index','Attempt','Point Coordinates'], 
                                     name = r'Core Corner Coordinates $m$')
