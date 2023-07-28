@@ -8,20 +8,21 @@ import B2plotter_set as b2s
 import B2plotter_class as b2c
 
 d = b2s.Setting_dic()
+lex = b2s.loadDS_dic(d['DEV'])
+
+xl = b2c.load_data(DEV = d['DEV'], DefaultSettings = d['DefaultSettings']
+                   , loadDS = lex, Parameters= d['Parameters'])
+xl.load_mast_dir()
+xl.load_solpsgeo()
+xl.Calcpsi()
+xl.load_vessel()
+gd = xl.creat_grid()
+xl.load_output_geo(grid_dic= gd)
+xl.load_output_data('NeuDen')
+p = xl.data['dircomp']['Attempt']
+q = xl.data['gfile']['gcomp']['check']
+print(p)
+print(q)
 
 
-# xd = b2c.B2plotter(DEV= d['DEV'], Shot= d['Shot'], shift= d['shift'], 
-#                    series= d['series'], Attempts= d['Attempts'], 
-#                    Parameters= d['Parameters'], 
-#                    DefaultSettings= d['DefaultSettings'])
 
-
-xp = b2c.mastdata(DEV= d['DEV'], Shot= d['Shot'], shift= d['shift'], 
-                    series= d['series'], Attempts= d['Attempts'], 
-                    Parameters= d['Parameters'], loadDS= d['loadDS'], 
-                    DefaultSettings= d['DefaultSettings'])
-# print(type(xd.Parameters))
-xp.loadmastdata(a_shift='org')
-xp.mastcalcpsi(a_shift='org', geo=None, b2mn=None, dsa=None, shift= 0)
-xpp = xp.data['dirdic']['fitloc']
-print(xpp)
