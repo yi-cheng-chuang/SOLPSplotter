@@ -8,18 +8,19 @@ Created on Thu Jul 13 12:38:48 2023
 import os
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast',  'Parameters': P, 'DefaultSettings': DP}
+    set_dic = {'DEV': 'mast', 'withshift': True,  'Parameters': P, 'DefaultSettings': DP, 
+               'Publish': 'b2plottersetting'}
     return set_dic
 
 def mast_comp_dic():
     a_shift = 'org'
-    multi_shift = ['org', 'dot7', 'one']
+    multi_shift = ['org','dot3', 'dot5', 'dot7', 'one']
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
-    series = ['39_noc_nts5_a', '1_n5_dot3_a', '15_dn0.5hc0.05_ts5_dot5_a', 
-              '8_t1_dot7_a', '27_lsts5_tw_one_a']
+    series = ['39_noc_nts5_a', '10_inp_dot3_a', '21_inp_ts5_dot5_a', 
+              '8_t1_dot7_a', '28_inp_one_a']
     outputlist = ['Output', 'Output2', 'EirOutput']
     
     mast_dir_dic = {'Shot': '027205', 'shift': shift, 'series': series, 
