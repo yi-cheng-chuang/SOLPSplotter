@@ -20,7 +20,7 @@ def mast_comp_dic():
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
     series = ['39_noc_nts5_a', '10_inp_dot3_a', '21_inp_ts5_dot5_a', 
-              '8_t1_dot7_a', '28_inp_one_a']
+              '9_inp_dot7_a', '28_inp_one_a']
     outputlist = ['Output', 'Output2', 'EirOutput']
     
     mast_dir_dic = {'Shot': '027205', 'shift': shift, 'series': series, 
