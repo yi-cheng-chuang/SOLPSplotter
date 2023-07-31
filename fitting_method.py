@@ -29,13 +29,11 @@ def tanh_dsa_fit(dsa, ne, te):
     
     Ne = ne*pow(10, -20)
     Te = te/ 1000
-    
-    
+       
     popt_ne, pcov_ne = curve_fit(tanh_dsa, dsa, Ne, p0)
     print(popt_ne)
     popt_te, pcov_te = curve_fit(tanh_dsa, dsa, Te, p1)
     print(popt_te) 
-    # x_model = np.linspace(min(psi), solps_psi, n_tot)
     tanh_ne_fit = tanh_dsa(dsa, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3])
     tanh_te_fit = tanh_dsa(dsa, popt_te[0], popt_te[1], popt_te[2], popt_te[3])
     
