@@ -21,7 +21,7 @@ xl.calcpsi_1D(pol_loc= '57')
 # xl.load_vessel()
 # gd = xl.creat_grid()
 # xl.load_output_geo(grid_dic= gd)
-xl.plot_Ne_NeuDen_test(pol_loc= '57')
+xl.plot_Ne_NeuDen_withshift(pol_loc= '57')
 # p = xl.data['dircomp']['Attempt']
 q = xl.data['gfile']['gcomp']['check']
 # print(p)
