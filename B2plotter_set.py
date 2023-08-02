@@ -6,14 +6,27 @@ Created on Thu Jul 13 12:38:48 2023
 """
 
 import os
+import re
+re.findall(r'\d+', "hello 42 I'm a 32 string 30")
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': True,  'Parameters': P, 'DefaultSettings': DP, 
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries':True,
+               'Parameters': P, 'DefaultSettings': DP, 
                'Publish': 'b2plottersetting'}
     return set_dic
 
 def mast_comp_dic():
     a_shift = 'org'
+    shift = 0
+    series = '39_noc_nts5_a'
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    shift_filename = 'org_new_series'
+    mast_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
+                    'series': series, 'a_shift': a_shift, 'Output': outputlist}
+    
+    return mast_dir_dic
+
+def mast_comp_dic_withshift():
     multi_shift = ['org','dot3', 'dot5', 'dot7', 'one']
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
@@ -23,11 +36,23 @@ def mast_comp_dic():
               '10_inp_dot7_a', '29_inp_one_a']
     outputlist = ['Output', 'Output2', 'EirOutput']
     
-    mast_dir_dic = {'Shot': '027205', 'shift': shift, 'series': series, 
-                  'multiAttempt': {}, 'a_shift': a_shift, 'multi_shift': multi_shift,
-                  'tails': tail, 'shiftdic': shift_dic, 'Output': outputlist}
+    mast_withshift_dic = {'Shot': '027205', 'multi_shift': multi_shift, 'shift_dic': shift_dic, 
+                          'shift_filelist': shift, 'tail': tail, 'series': series,
+                          'Output': outputlist}
     
-    return mast_dir_dic
+    return mast_withshift_dic
+
+def mast_comp_dir_series():
+    a_shift = 'org'
+    shift = 0
+    tail = '_ca_nts5_a'
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    shift_filename = 'org_new_vd'
+    mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
+                    'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
+    
+    return mast_series_dir_dic
+    
 
 
 def set_wdir(): #Function to set correct Working Directory Path depending on which machine is in use
@@ -46,10 +71,29 @@ def set_wdir(): #Function to set correct Working Directory Path depending on whi
     return basedrt, topdrt, tpdrt
 
 def s_number(text):
-    name = text.split("/",-1)[-2]
-    nu = int(name.split('_')[0])
+    sd = Setting_dic()
+    if sd['withshift'] == False and sd['withseries'] == False:
+        name = text.split("/",-1)[-2]
+        nu = int(name.split('_')[0])
+    elif sd['withshift'] == False and sd['withseries'] == True:
+        name = text.split("\\",-1)[-1]
+        nu = re.findall('\d+\.\d+', name)
+        # print(type(den))
+        # nu = den
+        print(type(name.split('_')[0]))
+        nu.append(name.split('_')[0])
+    elif sd['withshift'] == True and sd['withseries'] == False:
+        name = text.split("/",-1)[-2]
+        nu = int(name.split('_')[0])
+    elif sd['withshift'] == True and sd['withseries'] == True:
+        print('unexpected situation, please check the parameter setting')
+    else:
+        print('There is a bug in s_number function')
 
     return [nu, name]
+        
+
+
 
 def loadDS_dic(DEV):
     "New DefaultSettings for loading experimental data"
