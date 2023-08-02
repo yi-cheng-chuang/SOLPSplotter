@@ -17,8 +17,8 @@ import numpy as np
 
 
 class simple_plot(load_data):
-    def __init__(self, DEV, withshift, DefaultSettings, loadDS, Parameters, Publish):
-        load_data.__init__(self, DEV, withshift, DefaultSettings, loadDS, Parameters)
+    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters, Publish):
+        load_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
         
         self.Publish = Publish
         self.data['DefaultSettings']['Publish'] = self.Publish
@@ -84,21 +84,15 @@ class simple_plot(load_data):
             dsa_cut = np.asarray(dsa_cut)
             an_cut = np.asarray(an_cut)
             
-            norm_an = an_cut/ max(an_cut)
             
-            pn = [1, 250]
-            
-            popt_an, pcov_an = curve_fit(fm.expfit, dsa_cut, norm_an, pn)
-            print(popt_an)
-            
-            exp_an_fit = fm.expfit(dsa_cut, popt_an[0]*max(an_cut), popt_an[1])
-            
-            efold = 1/popt_an[1]
+            fit_exp_dic = fm.exp_dsa_fit(dsa_cut, an_cut)
+            exp_an_fit = fit_exp_dic['exp_an_fit']
+            efold = 1/fit_exp_dic['popt_an'][1]
             
             
-            fit_dic = fm.tanh_dsa_fit(dsa_pol_loc, Ne, Te)
-            tanh_ne_fit = fit_dic['tanh_ne_fit']*pow(10, 20)
-            dn = fit_dic['popt_ne'][1]
+            fit_tanh_dic = fm.tanh_dsa_fit(dsa_pol_loc, Ne, Te)
+            tanh_ne_fit = fit_tanh_dic['tanh_ne_fit']
+            dn = fit_tanh_dic['popt_ne'][1]
             
             
             opq = 2*dn/efold
@@ -199,21 +193,14 @@ class simple_plot(load_data):
             dsa_cut = np.asarray(dsa_cut)
             an_cut = np.asarray(an_cut)
             
-            norm_an = an_cut/ max(an_cut)
-            
-            pn = [1, 250]
-            
-            popt_an, pcov_an = curve_fit(fm.expfit, dsa_cut, norm_an, pn)
-            print(popt_an)
-            
-            exp_an_fit = fm.expfit(dsa_cut, popt_an[0]*max(an_cut), popt_an[1])
-            
-            efold = 1/popt_an[1]
+            fit_exp_dic = fm.exp_dsa_fit(dsa_cut, an_cut)
+            exp_an_fit = fit_exp_dic['exp_an_fit']
+            efold = 1/fit_exp_dic['popt_an'][1]
             
             
-            fit_dic = fm.tanh_dsa_fit(dsa_pol_loc, Ne, Te)
-            tanh_ne_fit = fit_dic['tanh_ne_fit']*pow(10, 20)
-            dn = fit_dic['popt_ne'][1]
+            fit_tanh_dic = fm.tanh_dsa_fit(dsa_pol_loc, Ne, Te)
+            tanh_ne_fit = fit_tanh_dic['tanh_ne_fit']
+            dn = fit_tanh_dic['popt_ne'][1]
             
             
             opq = 2*dn/efold
@@ -298,25 +285,6 @@ class simple_plot(load_data):
                 Nd_dic[aa] = self.data['outputdata']['NeuDen'][aa][:, pol_index]
                 Ne_dic[aa] = self.data['outputdata']['Ne'][aa][:, pol_index]
                 Te_dic[aa] = self.data['outputdata']['Te'][aa][:, pol_index]
-            
-            # self.loadmastdata()
-            # fitpsi = self.data['fitprofile']['psi_normal']
-            # fitNe = self.data['fitprofile']['electron_density(m^(-3))']
-            
-                # psi_to_dsa_func = interpolate.interp1d(psi, dsa_pol_loc, fill_value = 'extrapolate')
-                  
-                # cutpsi = []
-                # cutNe = []
-                # n = len(fitpsi)
-                # for i in range(n):
-                #     if fitpsi[i] >= min(psi):
-                #         cutpsi.append(fitpsi[i])
-                #         cutNe.append(fitNe[i])
-                
-                # cutpsi = np.asarray(cutpsi)
-                # cutNe = np.asarray(cutNe)
-                
-                # fitdsa = psi_to_dsa_func(cutpsi)
                 
                 dsa_cut = []
                 an_cut = []
@@ -328,22 +296,15 @@ class simple_plot(load_data):
                 dsa_cut_dic[aa] = np.asarray(dsa_cut)
                 an_cut = np.asarray(an_cut)
                 
-                norm_an = an_cut/ max(an_cut)
-                
-                pn = [1, 250]
-                
-                popt_an, pcov_an = curve_fit(fm.expfit, dsa_cut, norm_an, pn)
-                print(popt_an)
-                
-                exp_an_fit_dic[aa] = fm.expfit(dsa_cut_dic[aa], popt_an[0]*max(an_cut), popt_an[1])
-                
-                efold_dic[aa] = 1/popt_an[1]
+                fit_exp_dic = fm.exp_dsa_fit(dsa= dsa_cut_dic[aa], neuden= an_cut)
+                exp_an_fit_dic[aa] = fit_exp_dic['exp_an_fit']
+                efold_dic[aa] = 1/fit_exp_dic['popt_an'][1]
                 
                 
-                fit_dic = fm.tanh_dsa_fit(dsa_pol_loc_dic[aa], Ne_dic[aa], Te_dic[aa])
-                tanh_ne_fit_dic[aa] = fit_dic['tanh_ne_fit']*pow(10, 20)
-                delta_dic[aa] = fit_dic['popt_ne'][1]
-                
+                fit_tanh_dic = fm.tanh_dsa_fit(dsa= dsa_pol_loc_dic[aa], 
+                                               ne= Ne_dic[aa], te= Te_dic[aa])
+                tanh_ne_fit_dic[aa] = fit_tanh_dic['tanh_ne_fit']
+                delta_dic[aa] = fit_tanh_dic['popt_ne'][1]
                 
                 opq_dic[aa] = 2*delta_dic[aa]/efold_dic[aa]
                 # print(opq)
@@ -354,16 +315,9 @@ class simple_plot(load_data):
                 plt.plot(dsa_pol_loc_dic[i], Nd_dic[i],'o-', label= 'solps neutral density_{}'.format(i))
                 # plt.plot(psi_RGI, Nd,'o-', color = 'b', label= 'RGI_solps neutral density')
                 plt.plot(dsa_cut_dic[i], exp_an_fit_dic[i], lw= 5, label= 'exponential fit_{}'.format(i))
-            # plt.axvline(x=max(dsa_cut), color='orange',lw=3)
-            # plt.plot(x,y, color='orange', lw=3, label= 'Neutral penetration length [m]: $\lambda_{n_D}$')
-            # plt.axvline(x=-efold + max(dsa_cut), color='orange',lw=3)
-            # plt.axvline(x=dn, color='black',lw=3, ls='--')
-            # plt.axvline(x=-dn, color='black',lw=3, ls='--')
-            # plt.text(0.1, 5*pow(10, 16), 'dimensionless opaqueness: {}'.format(opq))
             plt.xlabel('Radial coordinate: $R- R_{sep}$')
             plt.ylabel(self.data['Parameter']['NeuDen'])
             plt.title('Neutral density with fits')
-            # plt.title(plot_dic['an3da.last10'][0],fontdict={"family":"Calibri","size": 20})
             plt.legend()
                 
             # plt.subplot(211, sharex= ax1)
@@ -371,23 +325,15 @@ class simple_plot(load_data):
             # plt.plot(psi_xport, Ne,'o-', color = 'r', label= 'solps_electron density')
             for j in self.data['dircomp']['multi_shift']:
                 plt.plot(dsa_pol_loc_dic[i], Ne_dic[i],'o-', label= 'solps electron density_{}'.format(j))
-            # plt.plot(fitdsa, cutNe,'o-', color = 'g', label= 'experiment electron density')
-            # plt.plot(dsa_pol_loc_dic[i], tanh_ne_fit, color='r',lw= 3, label= 'exponential fit')
-            # plt.plot(xd, yd, color='black', lw=3, label= 'Pedestal width [m]: $\Delta n_e$')
-            # plt.axvline(x=dn, color='black',lw=3)
-            # plt.axvline(x=-dn, color='black',lw=3)
-            # plt.axvline(x=0, color='orange',lw=3, ls='--')
-            # plt.axvline(x=-efold, color='orange',lw=3, ls='--')
             plt.xlabel('Radial coordinate: $R- R_{sep}$')
             plt.ylabel(self.data['Parameter']['Ne'])
             plt.title('Electron density with fits')
-            # plt.title(plot_dic['ne3da.last10'][0],fontdict={"family":"Calibri","size": 20})
             plt.legend()
             
             
             shift_ar = {}
             for k in self.data['dircomp']['multi_shift']:
-                kk = float(self.data['dircomp']['shiftdic'][k])
+                kk = float(self.data['dircomp']['shift_dic'][k])
                 shift_ar[k] = kk
             
             plt.figure(3)
@@ -405,7 +351,7 @@ class simple_plot(load_data):
             plt.title('neutral penetration length verses shift distance')
      
         elif self.withshift == False:
-            print('please use plot_Ne_NeuDen_singe, this is for shift cases')
+            print('please use plot_Ne_NeuDen_single, this is for shift cases')
             
         else:
             print('plot_Ne_NeuDen_withshift function has a bug')
