@@ -25,10 +25,11 @@ from scipy.stats import binned_statistic
 
 
 class B2plotter:
-    def __init__(self, DEV, withshift, DefaultSettings):
+    def __init__(self, DEV, withshift, withseries, DefaultSettings):
         
         self.DEV = DEV
         self.withshift = withshift
+        self.withseries = withseries
                  
             
         "DefaultSettings"    
@@ -64,22 +65,40 @@ class B2plotter:
     
     def load_mast_dir(self):
         if self.DEV == 'mast':
-            self.data['dircomp'] = b2s.mast_comp_dic()
-            if self.withshift == False:
+            if self.withshift == False and self.withseries == False:
+                self.data['dircomp'] = b2s.mast_comp_dic()
                 mast_basedir, Attempt_dic = lmem.mast_base_dir()
                 self.data['dirdata'] = mast_basedir
                 self.data['dircomp']['Attempt'] = Attempt_dic
-            elif self.withshift == True:
-                mast_basedir, Attempt_dic = lmem.mast_base_dir()
-                shift_dir, att_dic = lmem.mast_shift_dir()
-                mast_basedir['adir'] = shift_dir
-                self.data['dirdata'] = mast_basedir
+                
+            elif self.withshift == True and self.withseries == False:
+                self.data['dircomp'] = b2s.mast_comp_dic_withshift()
+                shift_dir, att_dic = lmem.mast_withshift_dir()
+                self.data['dirdata'] = shift_dir
                 self.data['dircomp']['Attempt'] = att_dic
+            
+            elif self.withshift == False and self.withseries == True:
+                self.data['dircomp'] = b2s.mast_comp_dir_series()
+                series_dir, att_dic = lmem.mast_series_dir()
+                self.data['dirdata'] = series_dir
+                self.data['dircomp']['Attempt'] = att_dic
+            elif self.withshift == False and self.withseries == True:
+                print('load_mast_dir is not there yet, to be continue...')      
             else:
                 print('There is a bug')
 
         else:
             print('DEV setting is not mast')
+    
+    
+    def load_mast_dir_series(self):
+        if self.DEV == 'mast':
+            if self.withseries == True:
+                self.data['dircomp'] = b2s.mast_comp_dir_series()
+                mast_basedir, Attempt_dic = lmem.mast_base_dir()
+                self.data['dirdata'] = mast_basedir
+                self.data['dircomp']['Attempt'] = Attempt_dic
+        
         
         
  
@@ -89,14 +108,14 @@ class B2plotter:
         
         if self.withshift == False:
             try: 
-                geo = lcm.read_b2fgmtry(self.data['dirdata']['adir']['expdir'] 
+                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
                                        + '/baserun/b2fgmtry')
                 # print(type(geo))
             except:
                 print('can not generate geo')
             
             try:
-                b2mn = lcm.scrape_b2mn(self.data['dirdata']['adir']['simudir']
+                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
                                       + '/b2mn.dat')
             except:
                 print('can not generate b2mn')
@@ -105,45 +124,13 @@ class B2plotter:
             self.data['b2mn'] = b2mn
             self.data['b2fgeo'] = geo
             
-            
-        elif self.withshift == True:
-            b2mn_dic = {}
-            geo_dic = {}
-            for aa in self.data['dircomp']['multi_shift']:
-                try: 
-                    geo = lcm.read_b2fgmtry(self.data['dirdata']['adir'][aa]['expdir']  
-                                           + '/baserun/b2fgmtry')
-                    # print(type(geo))
-                except:
-                    print('can not generate geo')
-                
-                geo_dic[aa] = geo
-                
-                try:
-                    b2mn = lcm.scrape_b2mn(self.data['dirdata']['adir'][aa]['simudir']
-                                          + '/b2mn.dat')
-                except:
-                    print('can not generate b2mn')
-                
-                b2mn_dic[aa] = b2mn
-                
-                
-            self.data['b2mn'] = b2mn_dic
-            self.data['b2fgeo'] = geo_dic
-        else:
-            print('There is a bug')
-            
-        
-        if self.withshift == False:
             g = lcm.loadg(self.data['dirdata']['gdir'][0])
             psiN = (g['psirz'] - g['simag']) / (g['sibry'] - g['simag'])
     
             dR = g['rdim'] / (g['nw'] - 1)
             dZ = g['zdim'] / (g['nh'] - 1)
             
-            
-            ast = self.data['dircomp']['a_shift']
-            shift = self.data['dircomp']['shiftdic'][ast]
+            shift = self.data['dircomp']['shift_value']
             # print(shift)
     
             gR = np.zeros(g['nw'])
@@ -155,17 +142,9 @@ class B2plotter:
                 gZ[i] = g['zmid'] - 0.5 * g['zdim'] + i * dZ
             
             
-            
             psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
             psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
             psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
-            
-            # geo_points = np.stack([gR.ravel(), gZ.ravel()], -1)  # shape (N, 2) in 2d
-    
-            # psiNinterp = interpolate.RBFInterpolator(geo_points, psiN, smoothing=0, 
-            #                                     kernel='cubic')  
-            # explicit default smoothing=0 for interpolation
-            
             
             gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR, 'gZ': gZ,
                         'check': 'yeah'}
@@ -174,8 +153,32 @@ class B2plotter:
             self.data['gfile']['gcomp'] = gfiledic
         
             return psiNinterp_RGI, psiNinterp_2d, psiNinterp_RBS
+            
         
         elif self.withshift == True:
+            b2mn_dic = {}
+            geo_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                try: 
+                    geo = lcm.read_b2fgmtry(self.data['dirdata']['infolderdir'][aa]['simutop']  
+                                           + '/baserun/b2fgmtry')
+                    # print(type(geo))
+                except:
+                    print('can not generate geo')
+                
+                geo_dic[aa] = geo
+                
+                try:
+                    b2mn = lcm.scrape_b2mn(self.data['dirdata']['infolderdir'][aa]['simudir']
+                                          + '/b2mn.dat')
+                except:
+                    print('can not generate b2mn')
+                
+                b2mn_dic[aa] = b2mn
+                
+                
+            self.data['b2mn'] = b2mn_dic
+            self.data['b2fgeo'] = geo_dic
             
             g = lcm.loadg(self.data['dirdata']['gdir'][0])
             psiN = (g['psirz'] - g['simag']) / (g['sibry'] - g['simag'])
@@ -191,7 +194,7 @@ class B2plotter:
             gR_dic = {}
             interp_dic = {}
             for ab in self.data['dircomp']['multi_shift']:
-                shift = self.data['dircomp']['shiftdic'][ab]
+                shift = self.data['dircomp']['shift_dic'][ab]
                 # print(shift)
         
                 gR = np.zeros(g['nw'])
@@ -282,7 +285,7 @@ class B2plotter:
             else:
                 SEP = round(rad_range/ 2)
     
-            dsa = lcm.read_dsa(self.data['dirdata']['adir']['simudir'] + '/dsa')
+            dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
             
             
             psiNinterp_RGI, psiNinterp_2d, psiNinterp_RBS = self.load_solpsgeo()
@@ -409,7 +412,7 @@ class B2plotter:
                     SEP = round(rad_range/ 2)
                 SEP_dic[aa] = SEP
         
-                dsa = lcm.read_dsa(self.data['dirdata']['adir'][aa]['simudir'] + '/dsa')
+                dsa = lcm.read_dsa(self.data['dirdata']['infolderdir'][aa]['simudir'] + '/dsa')
             
             
             
@@ -802,8 +805,8 @@ class B2plotter:
 
 class load_expdata(B2plotter):
     
-    def __init__(self, DEV, withshift, DefaultSettings, loadDS):
-        B2plotter.__init__(self, DEV, withshift, DefaultSettings)
+    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS):
+        B2plotter.__init__(self, DEV, withshift, withseries, DefaultSettings)
         # Employee.__init__(self, first, last, pay)
         self.loadDS = loadDS
         
@@ -830,8 +833,8 @@ class load_expdata(B2plotter):
             
 class load_data(load_expdata):
     
-    def __init__(self, DEV, withshift, DefaultSettings, loadDS, Parameters):
-        load_expdata.__init__(self, DEV, withshift, DefaultSettings, loadDS)
+    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
+        load_expdata.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS)
         # Employee.__init__(self, first, last, pay)
         
         "Parameters"
@@ -889,18 +892,18 @@ class load_data(load_expdata):
     
     def load_output_data(self, param):
         if self.withshift == False:
-            BASEDRT = self.data['dirdata']['adir']['outputdir']['Output']
+            BASEDRT = self.data['dirdata']['outputdir']['Output']
             Attempt = self.data['dircomp']['Attempt']
-            Attempts = len([self.data['dircomp']['a_shift']])
-            N = len(self.data['dircomp']['a_shift'])
+            # Attempts = len([self.data['dircomp']['a_shift']])
+            # N = len(self.data['dircomp']['a_shift'])
             XGrid = int(self.data['b2fgeo']['nx'])
-            X = self.data['gridsettings']['X']
+            # X = self.data['gridsettings']['X']
             XMin= 1
             XMax= XGrid
             # print(XGrid)
             XDIM = int(self.data['DefaultSettings']['XDIM'])
-            YSurf = int(self.data['b2fgeo']['ny'])
-            Y = self.data['gridsettings']['Y']
+            # YSurf = int(self.data['b2fgeo']['ny'])
+            # Y = self.data['gridsettings']['Y']
             YDIM = int(self.data['DefaultSettings']['YDIM'])
             n = 0
             
@@ -934,7 +937,7 @@ class load_data(load_expdata):
         elif self.withshift == True:
             param_data_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                BASEDRT = self.data['dirdata']['adir'][aa]['outputdir']['Output']
+                BASEDRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
                 Attempt = self.data['dircomp']['Attempt'][aa]
                 XGrid = int(self.data['b2fgeo'][aa]['nx'])
                 # print(XGrid)
