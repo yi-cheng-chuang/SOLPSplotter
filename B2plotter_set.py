@@ -10,7 +10,7 @@ import re
 re.findall(r'\d+', "hello 42 I'm a 32 string 30")
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries':True,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
                'Parameters': P, 'DefaultSettings': DP, 
                'Publish': 'b2plottersetting'}
     return set_dic
@@ -32,7 +32,7 @@ def mast_comp_dic_withshift():
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
-    series = ['39_noc_nts5_a', '10_inp_dot3_a', '21_inp_ts5_dot5_a', 
+    series = ['39_noc_nts5_a', '11_inp_dot3_a', '22_inp_ts5_dot5_a', 
               '10_inp_dot7_a', '29_inp_one_a']
     outputlist = ['Output', 'Output2', 'EirOutput']
     
