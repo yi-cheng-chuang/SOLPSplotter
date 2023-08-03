@@ -18,6 +18,9 @@ def expfit(x,A,l):  #Removed vertical displacement variable B; seemed to cause '
 def tanh_dsa(r,h,d,b,m):
     return b+(h/2)*(np.tanh((-r)/d)+1) + m*(-r-d)*np.heaviside(-r-d, 1)
 
+def expfit_B(x, A, l, B):  #Removed vertical displacement variable B; seemed to cause 'overfitting'
+    return A*np.exp(l*x)+ B
+
 
 
 def tanh_dsa_fit(dsa, ne, te):
@@ -52,6 +55,22 @@ def exp_dsa_fit(dsa, neuden):
     print(popt_an)
     
     exp_an_fit = expfit(dsa, popt_an[0], popt_an[1])*max(neuden)
+    
+    fit_exp_dic = {'exp_an_fit': exp_an_fit, 'popt_an': popt_an}
+    
+    return fit_exp_dic
+
+def exp_dsa_fit_B(dsa, neuden):
+    
+    
+    NeuDen = neuden/ max(neuden)
+    
+    pn = [1.015, 500, min(NeuDen)]
+    
+    popt_an, pcov_an = curve_fit(expfit_B, dsa, NeuDen, pn)
+    print(popt_an)
+    
+    exp_an_fit = expfit_B(dsa, popt_an[0], popt_an[1], popt_an[2])*max(neuden)
     
     fit_exp_dic = {'exp_an_fit': exp_an_fit, 'popt_an': popt_an}
     
