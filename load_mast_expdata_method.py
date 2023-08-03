@@ -83,24 +83,22 @@ def mast_series_dir():
                                        mcds['shift'], mcds['tail']))
     tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], 
                                  mcds['Shot'], mcds['shift'])
-    
-    # for i in newbase:
-    #     print(b2s.s_number(i)[0])
-    
-    
+        
     attempt_list = []
     new_dic = {}
     for i in newbase:
         attempt_list.append(b2s.s_number(i)[0])
+        new_dic[b2s.s_number(i)[0][0]] = i
     print(attempt_list)
     
     adir = {}
-    for i in attempt_list:
+    for ii in attempt_list:
+        adir[ii[0]] = {}
         for j in mcds['Output']:
-            adir[i[0]] = '{}/{}'.format(newbase, j)
+            adir[ii[0]][j] = '{}/{}'.format(new_dic[ii[0]], j)
     
     mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
-                    'gdir': gdir, 'simudir': newbase, 'simutop': tbase, 
+                    'gdir': gdir, 'simudir': new_dic, 'simutop': tbase, 
                     'outputdir': adir}
 
     return mast_basedir, attempt_list
