@@ -82,7 +82,7 @@ class B2plotter:
                 series_dir, att_dic = lmem.mast_series_dir()
                 self.data['dirdata'] = series_dir
                 self.data['dircomp']['Attempt'] = att_dic
-            elif self.withshift == False and self.withseries == True:
+            elif self.withshift == True and self.withseries == True:
                 print('load_mast_dir is not there yet, to be continue...')      
             else:
                 print('There is a bug')
@@ -106,7 +106,7 @@ class B2plotter:
  
     def load_solpsgeo(self):
         
-        if self.withshift == False:
+        if self.withshift == False and self.withseries == False:
             try: 
                 geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
                                        + '/baserun/b2fgmtry')
@@ -155,7 +155,7 @@ class B2plotter:
             return psiNinterp_RGI, psiNinterp_2d, psiNinterp_RBS
             
         
-        elif self.withshift == True:
+        elif self.withshift == True and self.withseries == False:
             b2mn_dic = {}
             geo_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
@@ -221,13 +221,84 @@ class B2plotter:
         
             return interp_dic
         
+        elif self.withshift == False and self.withseries == True:
+            
+            b2mn_dic = {}
+            geo_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                try: 
+                    geo = lcm.read_b2fgmtry(self.data['dirdata']['infolderdir'][aa]['simutop']  
+                                           + '/baserun/b2fgmtry')
+                    # print(type(geo))
+                except:
+                    print('can not generate geo')
+                
+                geo_dic[aa] = geo
+                
+                try:
+                    b2mn = lcm.scrape_b2mn(self.data['dirdata']['infolderdir'][aa]['simudir']
+                                          + '/b2mn.dat')
+                except:
+                    print('can not generate b2mn')
+                
+                b2mn_dic[aa] = b2mn
+                
+                
+            self.data['b2mn'] = b2mn_dic
+            self.data['b2fgeo'] = geo_dic
+            
+            g = lcm.loadg(self.data['dirdata']['gdir'][0])
+            psiN = (g['psirz'] - g['simag']) / (g['sibry'] - g['simag'])
+    
+            dR = g['rdim'] / (g['nw'] - 1)
+            dZ = g['zdim'] / (g['nh'] - 1)
+            
+            
+            gZ = np.zeros(g['nh'])
+            for i in range(g['nh']):
+                gZ[i] = g['zmid'] - 0.5 * g['zdim'] + i * dZ
+            
+            gR_dic = {}
+            interp_dic = {}
+            for ab in self.data['dircomp']['multi_shift']:
+                shift = self.data['dircomp']['shift_dic'][ab]
+                # print(shift)
+        
+                gR = np.zeros(g['nw'])
+                for i in range(g['nw']):
+                    gR[i] = g['rleft'] + i * dR + float(shift)
+                
+                gR_dic[ab] = gR
+                
+                
+                psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
+                psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
+                psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
+                
+                interp_dic[ab] = {'psiNinterp_RBS': psiNinterp_RBS, 
+                                  'psiNinterp_2d': psiNinterp_2d,
+                                  'psiNinterp_RGI': psiNinterp_RGI}
+            
+            
+            gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR_dic, 'gZ': gZ,
+                        'check': 'oh_yeah'}
+            
+            self.data['gfile']['g'] = g
+            self.data['gfile']['gcomp'] = gfiledic
+        
+            return interp_dic
+            
+        
+        
+        elif self.withshift == True and self.withseries == True:
+            print('load_solpsgeo is not there yet, to be continue...')
+        
         else:
             print('There is a bug')
     
     
     def calcpsi(self):
     
-        
         geo = self.data['b2fgeo']
         pol_range = int(self.data['b2fgeo']['nx'] + 2)
         # print('xdim is {}'.format(pol_range))
