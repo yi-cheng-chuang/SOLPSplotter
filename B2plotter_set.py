@@ -7,22 +7,25 @@ Created on Thu Jul 13 12:38:48 2023
 
 import os
 import re
-re.findall(r'\d+', "hello 42 I'm a 32 string 30")
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
+    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
                'Parameters': P, 'DefaultSettings': DP, 
                'Publish': 'b2plottersetting'}
     return set_dic
 
 def mast_comp_dic():
     a_shift = 'org'
-    shift = 0
-    series = '39_noc_nts5_a'
+    shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
+    shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
+                      'dot7': 'dot7','one': 'one_LS'}
+    series_dic = {'org': '39_noc_nts5_a', 'dot3': '11_inp_dot3_a', 
+                  'dot5': '22_inp_ts5_dot5_a', 'dot7': '10_inp_dot7_a', 
+                  'one': '29_inp_one_a'}
     outputlist = ['Output', 'Output2', 'EirOutput']
-    shift_filename = 'org_new_series'
-    mast_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
-                    'series': series, 'a_shift': a_shift, 'Output': outputlist}
+    mast_dir_dic = {'Shot': '027205', 'shift_dic': shift_dic, 
+                    'shift_file_dic': shift_file_dic, 'series_dic': series_dic, 
+                    'a_shift': a_shift, 'Output': outputlist}
     
     return mast_dir_dic
 
@@ -80,7 +83,7 @@ def s_number(text):
         nu = re.findall('\d+\.\d+', name)
         # print(type(den))
         # nu = den
-        print(type(name.split('_')[0]))
+        # print(type(name.split('_')[0]))
         nu.append(name.split('_')[0])
     elif sd['withshift'] == True and sd['withseries'] == False:
         name = text.split("/",-1)[-2]
