@@ -54,12 +54,13 @@ class B2plotter:
 
         
     def _reset_object(self):
-        self.Shot=None
-        self.Attempts=None
-        self.Parameter=[]
-        self.PARAM={}
-        self.ExpDict={}
-        self.RadCoords={}
+        # self.Shot=None
+        # self.Attempts=None
+        # self.Parameter=[]
+        # self.PARAM={}
+        # self.ExpDict={}
+        # self.RadCoords={}
+        self.data = {}
         
 #-------------load-device-simulation-directory---------------------
     
@@ -67,9 +68,10 @@ class B2plotter:
         if self.DEV == 'mast':
             if self.withshift == False and self.withseries == False:
                 self.data['dircomp'] = b2s.mast_comp_dic()
-                mast_basedir, Attempt_dic = lmem.mast_base_dir()
+                mast_basedir, Attempt_dic, shift_value = lmem.mast_base_dir()
                 self.data['dirdata'] = mast_basedir
                 self.data['dircomp']['Attempt'] = Attempt_dic
+                self.data['dircomp']['shift_value'] = shift_value
                 
             elif self.withshift == True and self.withseries == False:
                 self.data['dircomp'] = b2s.mast_comp_dic_withshift()
@@ -205,12 +207,10 @@ class B2plotter:
                 
                 
                 psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
-                psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
-                psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
+                # psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
+                # psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
                 
-                interp_dic[ab] = {'psiNinterp_RBS': psiNinterp_RBS, 
-                                  'psiNinterp_2d': psiNinterp_2d,
-                                  'psiNinterp_RGI': psiNinterp_RGI}
+                interp_dic[ab] = psiNinterp_RBS
             
             
             gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR_dic, 'gZ': gZ,
@@ -224,28 +224,29 @@ class B2plotter:
         elif self.withshift == False and self.withseries == True:
             
             b2mn_dic = {}
-            geo_dic = {}
-            for aa in self.data['dircomp']['multi_shift']:
+            # series_list = []
+            # for aa in self.data['dircomp']['Attempt']:
+            #     series_list.append(aa[0])
+            # self.data['dircomp']['Attemptkey'] = series_list
+            for ab in self.data['dircomp']['Attempt'].keys():
                 try: 
-                    geo = lcm.read_b2fgmtry(self.data['dirdata']['infolderdir'][aa]['simutop']  
+                    geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop']  
                                            + '/baserun/b2fgmtry')
                     # print(type(geo))
                 except:
                     print('can not generate geo')
                 
-                geo_dic[aa] = geo
-                
                 try:
-                    b2mn = lcm.scrape_b2mn(self.data['dirdata']['infolderdir'][aa]['simudir']
+                    b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][ab]
                                           + '/b2mn.dat')
                 except:
                     print('can not generate b2mn')
                 
-                b2mn_dic[aa] = b2mn
+                b2mn_dic[ab] = b2mn
                 
                 
             self.data['b2mn'] = b2mn_dic
-            self.data['b2fgeo'] = geo_dic
+            self.data['b2fgeo'] = geo
             
             g = lcm.loadg(self.data['dirdata']['gdir'][0])
             psiN = (g['psirz'] - g['simag']) / (g['sibry'] - g['simag'])
@@ -258,38 +259,32 @@ class B2plotter:
             for i in range(g['nh']):
                 gZ[i] = g['zmid'] - 0.5 * g['zdim'] + i * dZ
             
-            gR_dic = {}
-            interp_dic = {}
-            for ab in self.data['dircomp']['multi_shift']:
-                shift = self.data['dircomp']['shift_dic'][ab]
-                # print(shift)
+
+            shift = self.data['dircomp']['shift_value']
+            
         
-                gR = np.zeros(g['nw'])
-                for i in range(g['nw']):
-                    gR[i] = g['rleft'] + i * dR + float(shift)
-                
-                gR_dic[ab] = gR
-                
-                
-                psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
-                psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
-                psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
-                
-                interp_dic[ab] = {'psiNinterp_RBS': psiNinterp_RBS, 
-                                  'psiNinterp_2d': psiNinterp_2d,
-                                  'psiNinterp_RGI': psiNinterp_RGI}
+            gR = np.zeros(g['nw'])
+            for i in range(g['nw']):
+                gR[i] = g['rleft'] + i * dR + float(shift)
             
             
-            gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR_dic, 'gZ': gZ,
-                        'check': 'oh_yeah'}
+            
+            psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
+            # psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
+            # psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
+            
+            interp_dic = psiNinterp_RBS
+            
+            
+            gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR, 'gZ': gZ,
+                        'check': 'hay_boy'}
             
             self.data['gfile']['g'] = g
             self.data['gfile']['gcomp'] = gfiledic
+            
         
             return interp_dic
             
-        
-        
         elif self.withshift == True and self.withseries == True:
             print('load_solpsgeo is not there yet, to be continue...')
         
@@ -298,6 +293,7 @@ class B2plotter:
     
     
     def calcpsi(self):
+        
     
         geo = self.data['b2fgeo']
         pol_range = int(self.data['b2fgeo']['nx'] + 2)
@@ -341,7 +337,7 @@ class B2plotter:
     
     def calcpsi_1D(self, pol_loc):
         
-        if self.withshift == False:
+        if self.withshift == False and self.withseries == False:
             geo = self.data['b2fgeo']
             pol_range = int(self.data['b2fgeo']['nx'] + 2)
             # print('xdim is {}'.format(str(pol_range)))
@@ -355,6 +351,8 @@ class B2plotter:
                 SEP = rad_range/ 2 + 1
             else:
                 SEP = round(rad_range/ 2)
+            
+            self.data['DefaultSettings']['SEP'] = SEP
     
             dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
             
@@ -442,27 +440,28 @@ class B2plotter:
                 psi_solps_RBS[i] = np.mean([psi_LL_RBS, psi_UL_RBS, 
                                             psi_LR_RBS, psi_UR_RBS])
             
-            GF = eq.equilibrium(gfile= self.data['dirdata']['gdir'][0])
+            "Only work for original case"
+            # GF = eq.equilibrium(gfile= self.data['dirdata']['gdir'][0])
             # print(type(GF.psiN._func))
-            psi_solps_GF = np.zeros(rad_range)
-            for i in range(rad_range):
-                psi_LL_GF = GF.psiN(crLowerLeft[i], czLowerLeft[i])
-                psi_UL_GF = GF.psiN(crUpperLeft[i], czUpperLeft[i])
-                psi_LR_GF = GF.psiN(crLowerRight[i], czLowerRight[i])
-                psi_UR_GF = GF.psiN(crUpperRight[i], czUpperRight[i])
-                psi_solps_GF[i] = np.mean([psi_LL_GF, psi_UL_GF, 
-                                            psi_LR_GF, psi_UR_GF])
+            # psi_solps_GF = np.zeros(rad_range)
+            # for i in range(rad_range):
+            #     psi_LL_GF = GF.psiN(crLowerLeft[i], czLowerLeft[i])
+            #     psi_UL_GF = GF.psiN(crUpperLeft[i], czUpperLeft[i])
+            #     psi_LR_GF = GF.psiN(crLowerRight[i], czLowerRight[i])
+            #     psi_UR_GF = GF.psiN(crUpperRight[i], czUpperRight[i])
+            #     psi_solps_GF[i] = np.mean([psi_LL_GF, psi_UL_GF, 
+            #                                 psi_LR_GF, psi_UR_GF])
             
-            psival = np.zeros((int(rad_range), 4))
+            psival = np.zeros((int(rad_range), 3))
             psival[:, 0] = psi_solps
             psival[:, 1] = psi_solps_2d
             psival[:, 2] = psi_solps_RBS
-            psival[:, 3] = psi_solps_GF
+            # psival[:, 3] = psi_solps_GF
                 
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
-            self.data['psi']['crz_LL'] = crz_LL
+            # self.data['psi']['crz_LL'] = crz_LL
         
-        elif self.withshift == True:
+        elif self.withshift == True and self.withseries == False:
             pol_range_dic = {}
             rad_range_dic = {}
             SEP_dic = {}
@@ -481,16 +480,10 @@ class B2plotter:
                     SEP = rad_range/ 2 + 1
                 else:
                     SEP = round(rad_range/ 2)
-                SEP_dic[aa] = SEP
-        
+                SEP_dic[aa] = SEP       
                 dsa = lcm.read_dsa(self.data['dirdata']['infolderdir'][aa]['simudir'] + '/dsa')
-            
-            
-            
-            
-                psiNinterp_RGI = self.load_solpsgeo()[aa]['psiNinterp_RGI']
-                psiNinterp_2d = self.load_solpsgeo()[aa]['psiNinterp_2d']
-                psiNinterp_RBS = self.load_solpsgeo()[aa]['psiNinterp_RBS']
+
+                psiNinterp_RBS = self.load_solpsgeo()[aa]
                 # print(type(psiNinterp_RBS))
                 psival = np.zeros((pol_range, rad_range))
                 
@@ -524,32 +517,7 @@ class B2plotter:
               
                 avag_rad_dic[aa] = avag_rad
               
-                
-                crz_LL = np.stack([crLowerLeft.ravel(), czLowerLeft.ravel()], -1)  # shape (N, 2) in 2d
-                crz_UL = np.stack([crUpperLeft.ravel(), czUpperLeft.ravel()], -1)
-                crz_LR = np.stack([crLowerRight.ravel(), czLowerRight.ravel()], -1)  # shape (N, 2) in 2d
-                crz_UR = np.stack([crUpperRight.ravel(), czUpperRight.ravel()], -1)
-                psi_solps_LL = psiNinterp_RGI(crz_LL)
-                psi_solps_UL = psiNinterp_RGI(crz_UL)
-                psi_solps_LR = psiNinterp_RGI(crz_LR)
-                psi_solps_UR = psiNinterp_RGI(crz_UR)
-                
-                
-                psi_solps = np.zeros(rad_range)
-                for i in range(rad_range):
-                    psi_solps[i] = np.mean([psi_solps_LL[i], psi_solps_UL[i], 
-                                            psi_solps_LR[i], psi_solps_UR[i]])
-                
-                psi_solps_2d = np.zeros(rad_range)
-                for i in range(rad_range):
-                    psi_LL_2d = psiNinterp_2d(crLowerLeft[i], czLowerLeft[i])
-                    psi_UL_2d = psiNinterp_2d(crUpperLeft[i], czUpperLeft[i])
-                    psi_LR_2d = psiNinterp_2d(crLowerRight[i], czLowerRight[i])
-                    psi_UR_2d = psiNinterp_2d(crUpperRight[i], czUpperRight[i])
-                    psi_solps_2d[i] = np.mean([psi_LL_2d, psi_UL_2d, 
-                                               psi_LR_2d, psi_UR_2d])
-                 
-                
+    
                 psi_solps_RBS = np.zeros(rad_range)
                 for i in range(rad_range):
                     psi_LL_RBS = psiNinterp_RBS(crLowerLeft[i], czLowerLeft[i])
@@ -559,22 +527,9 @@ class B2plotter:
                     psi_solps_RBS[i] = np.mean([psi_LL_RBS, psi_UL_RBS, 
                                                 psi_LR_RBS, psi_UR_RBS])
                 
-                GF = eq.equilibrium(gfile= self.data['dirdata']['gdir'][0])
-                # print(type(GF.psiN._func))
-                psi_solps_GF = np.zeros(rad_range)
-                for i in range(rad_range):
-                    psi_LL_GF = GF.psiN(crLowerLeft[i], czLowerLeft[i])
-                    psi_UL_GF = GF.psiN(crUpperLeft[i], czUpperLeft[i])
-                    psi_LR_GF = GF.psiN(crLowerRight[i], czLowerRight[i])
-                    psi_UR_GF = GF.psiN(crUpperRight[i], czUpperRight[i])
-                    psi_solps_GF[i] = np.mean([psi_LL_GF, psi_UL_GF, 
-                                                psi_LR_GF, psi_UR_GF])
                 
-                psival = np.zeros((int(rad_range), 4))
-                psival[:, 0] = psi_solps
-                psival[:, 1] = psi_solps_2d
-                psival[:, 2] = psi_solps_RBS
-                psival[:, 3] = psi_solps_GF
+                psival = np.zeros(int(rad_range))
+                psival = psi_solps_RBS
                 
                 psival_dic[aa] = psival
                     
@@ -584,6 +539,75 @@ class B2plotter:
             self.data['DefaultSettings']['SEP'] = SEP_dic
             self.data['psi']['dsa_{}_val'.format(pol_loc)] = avag_rad_dic
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival_dic
+            
+        elif self.withshift == False and self.withseries == True:
+            geo = self.data['b2fgeo']
+            pol_range = int(self.data['b2fgeo']['nx'] + 2)
+            # print('xdim is {}'.format(str(pol_range)))
+            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            # print('ydim is {}'.format(str(rad_range)))
+            # for aa in self.data['dircomp']['Attemptkey']:
+          
+            if rad_range % 2 == 0:
+                SEP = rad_range/ 2 + 1
+            else:
+                SEP = round(rad_range/ 2)
+            
+            self.data['DefaultSettings']['SEP'] = SEP
+            # dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+
+            psiNinterp_RBS = self.load_solpsgeo()
+            # print(type(psiNinterp_RBS))
+            
+            pol_index = int(pol_loc) + 1
+            
+            crLowerLeft = geo['crx'][pol_index,:,0]
+            crLowerRight = geo['crx'][pol_index,:,1]
+            crUpperLeft = geo['crx'][pol_index,:,2]
+            crUpperRight = geo['crx'][pol_index,:,3]
+            czLowerLeft = geo['cry'][pol_index,:,0]
+            czLowerRight = geo['cry'][pol_index,:,1]
+            czUpperLeft = geo['cry'][pol_index,:,2]
+            czUpperRight = geo['cry'][pol_index,:,3]
+                
+            
+            LLsep = np.mean([crLowerLeft[int(SEP)-1], crLowerLeft[int(SEP)-2]])
+            LRsep = np.mean([crLowerRight[int(SEP)-1], crLowerRight[int(SEP)-2]])
+            ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
+            URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
+            
+            LLdsa = crLowerLeft - LLsep
+            LRdsa = crLowerRight - LRsep
+            ULdsa = crUpperLeft - ULsep
+            URdsa = crUpperRight - URsep
+            avag_rad = np.zeros(rad_range)
+            for j in range(rad_range):
+                avag_rad[j] = np.mean([LLdsa[j], ULdsa[j], URdsa[j], LRdsa[j]])
+          
+         
+            psi_solps_RBS = np.zeros(rad_range)
+            for i in range(rad_range):
+                psi_LL_RBS = psiNinterp_RBS(crLowerLeft[i], czLowerLeft[i])
+                psi_UL_RBS = psiNinterp_RBS(crUpperLeft[i], czUpperLeft[i])
+                psi_LR_RBS = psiNinterp_RBS(crLowerRight[i], czLowerRight[i])
+                psi_UR_RBS = psiNinterp_RBS(crUpperRight[i], czUpperRight[i])
+                psi_solps_RBS[i] = np.mean([psi_LL_RBS, psi_UL_RBS, 
+                                            psi_LR_RBS, psi_UR_RBS])
+            
+            
+            psival = np.zeros(int(rad_range))
+            psival = psi_solps_RBS
+        
+            
+            self.data['DefaultSettings']['XDIM'] = pol_range
+            self.data['DefaultSettings']['YDIM'] = rad_range
+            self.data['DefaultSettings']['SEP'] = SEP
+            self.data['psi']['dsa_{}_val'.format(pol_loc)] = avag_rad
+            self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
+        
+        elif self.withshift == True and self.withseries == True:
+            print('calcpsi_1D is not there yet, to be continue...')
+            
         else:
             print('There is a bug')
         
@@ -962,7 +986,7 @@ class load_data(load_expdata):
 
     
     def load_output_data(self, param):
-        if self.withshift == False:
+        if self.withshift == False and self.withseries == False:
             BASEDRT = self.data['dirdata']['outputdir']['Output']
             Attempt = self.data['dircomp']['Attempt']
             # Attempts = len([self.data['dircomp']['a_shift']])
@@ -1005,7 +1029,7 @@ class load_data(load_expdata):
                 print('we have a problem loading rawdata')
         
         
-        elif self.withshift == True:
+        elif self.withshift == True and self.withseries == False:
             param_data_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 BASEDRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
@@ -1042,6 +1066,49 @@ class load_data(load_expdata):
                     print('we have a problem loading rawdata')
         
             self.data['outputdata'][param] = param_data_dic
+            
+            
+        elif self.withshift == False and self.withseries == True:
+            param_data_dic = {}
+            for aa in self.data['dircomp']['Attempt'].keys():
+                BASEDRT = self.data['dirdata']['outputdir'][aa]['Output']
+                Attempt = self.data['dircomp']['Attempt'][aa]
+                XGrid = int(self.data['b2fgeo']['nx'])
+                # print(XGrid)
+                XDIM = int(self.data['DefaultSettings']['XDIM'])
+                YDIM = int(self.data['DefaultSettings']['YDIM'])
+            
+            
+                # DRT = '{}/Attempt{}'.format(BASEDRT, str(Attempt))   #Generate path
+                test = param in self.Parameters.keys()
+                param_data_dic[aa] = np.zeros([YDIM, XDIM], dtype= np.float32)
+                # self.data['outputdata'][param] = xr.DataArray(np.zeros((YSurf,XGrid,N)), 
+                #                                  coords=[Y,X,Attempts], 
+                # dims=['Radial_Location','Poloidal_Location','Attempt'], name = param)
+                if test:
+                    # print('yes, {} is in parameter'.format(param))
+                    RawData = np.loadtxt('{}/{}{}'.format(BASEDRT, param, str(Attempt)),usecols = (3))
+                elif test == False:
+                    print('no, {} is not in parameter'.format(param))
+                else:
+                    print('there might be a bug')
+                
+                if len(RawData) > 0:        
+                    if RawData.size == XDIM*YDIM:
+                        # self.data['outputdata'][param].values[:,:,n] = RawData.reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
+                        param_data_dic[aa] = RawData.reshape((YDIM,XDIM))
+                    elif RawData.size != XDIM*YDIM:
+                        print('rawdata size is not equal to {}'.format(str(XDIM*YDIM)))
+                    # elif RawData.size == XDIM*YDIM*2:
+                    #     self.data['outputdata'][param].values[:,:,n] = RawData.reshape((2*YDIM,XDIM))[1+YDIM:2*YDIM-1,XMin:XMax+1]
+                else:
+                    print('we have a problem loading rawdata')
+        
+            self.data['outputdata'][param] = param_data_dic
+        
+        elif self.withshift == True and self.withseries == True:
+            print('load_output_data is not there yet, to be continue...')
+        
         else:
             print('There is a bug')
             
