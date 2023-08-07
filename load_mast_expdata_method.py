@@ -18,21 +18,29 @@ def mast_base_dir():
     basedrt, topdrt, tpdrt= b2s.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
-    filename = d['series']
-    newbase = '{}/{}/{}/{}/{}'.format(basedrt,od['DEV'], d['Shot'], d['shift']
-                                      , filename)
-    tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], d['Shot'], d['shift'])
-    adir = {}
-    for i in d['Output']:
-        adir[i] = '{}/{}'.format(newbase, i)
+    
+    shift_list = list(d['shift_dic'].keys())
+    # print(type(shift_list))
+    a_shift = d['a_shift']
+    for aa in shift_list:
+        if aa == a_shift:  
+            filename = d['series_dic'][aa]
+            shift = d['shift_file_dic'][aa]
+            newbase = '{}/{}/{}/{}/{}'.format(basedrt, od['DEV'], 
+                                            d['Shot'], shift, filename)
+            tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], d['Shot'], shift)
+            adir = {}
+            for i in d['Output']:
+                adir[i] = '{}/{}'.format(newbase, i)
      
     attempt = str(b2s.s_number(adir['Output'])[0])
+    shift_value = d['shift_dic'][a_shift]
     
     mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
                     'gdir': gdir, 'simudir': newbase, 'simutop': tbase, 
                     'outputdir': adir}
 
-    return mast_basedir, attempt
+    return mast_basedir, attempt, shift_value
 
 mwd = b2s.mast_comp_dic_withshift()
 
@@ -83,25 +91,25 @@ def mast_series_dir():
                                        mcds['shift'], mcds['tail']))
     tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], 
                                  mcds['Shot'], mcds['shift'])
-        
-    attempt_list = []
+
+    attempt_dic = {}
     new_dic = {}
     for i in newbase:
-        attempt_list.append(b2s.s_number(i)[0])
+        attempt_dic[b2s.s_number(i)[0][0]] = b2s.s_number(i)[0][1]
         new_dic[b2s.s_number(i)[0][0]] = i
-    print(attempt_list)
+    # print(attempt_list)
     
     adir = {}
-    for ii in attempt_list:
-        adir[ii[0]] = {}
+    for ii in attempt_dic.keys():
+        adir[ii] = {}
         for j in mcds['Output']:
-            adir[ii[0]][j] = '{}/{}'.format(new_dic[ii[0]], j)
+            adir[ii][j] = '{}/{}'.format(new_dic[ii], j)
     
     mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
                     'gdir': gdir, 'simudir': new_dic, 'simutop': tbase, 
                     'outputdir': adir}
 
-    return mast_basedir, attempt_list
+    return mast_basedir, attempt_dic
 
 
 def read_mastfile(mastfile_loc):
