@@ -15,7 +15,7 @@ def Setting_dic():
     return set_dic
 
 def mast_comp_dic():
-    a_shift = 'org'
+    a_shift = 'one'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
@@ -30,7 +30,7 @@ def mast_comp_dic():
     return mast_dir_dic
 
 def mast_comp_dic_withshift():
-    multi_shift = ['org','dot3', 'dot5', 'dot7', 'one']
+    multi_shift = ['org', 'dot3', 'dot5', 'dot7', 'one']
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
