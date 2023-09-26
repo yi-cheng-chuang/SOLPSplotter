@@ -22,6 +22,7 @@ import fitting_method as fm
 from scipy import interpolate
 from scipy.optimize import curve_fit
 from scipy.stats import binned_statistic
+import matplotlib.pyplot as plt
 
 
 class B2plotter:
@@ -49,8 +50,9 @@ class B2plotter:
         
         "Useful data"
         self.data = {'defaultkey':keylist,'dircomp':{}, 'DefaultSettings': {},
-                     'grid':{}, 'dirdata':{}, 'ExpDict': {}, 'RadCoords':{},
-                     'gfile':{}, 'gridsettings': {}, 'psi':{}, 'outputdata':{}}
+                     'grid':{}, 'dirdata':{}, 'ExpDict': {}, 'dsa':{},
+                     'gfile':{}, 'gridsettings': {}, 'psi':{}, 
+                     'outputdata':{}}
 
         
     def _reset_object(self):
@@ -148,13 +150,19 @@ class B2plotter:
             psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
             psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
             
+            interp_dic = {}
+            interp_dic['RBS'] = psiNinterp_RBS
+            interp_dic['2d'] = psiNinterp_2d
+            interp_dic['RGI'] = psiNinterp_RGI
+            
+            
             gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR, 'gZ': gZ,
-                        'check': 'yeah'}
+                        'check': 'yeah', 'interp_dic': interp_dic}
             
             self.data['gfile']['g'] = g
             self.data['gfile']['gcomp'] = gfiledic
         
-            return psiNinterp_RGI, psiNinterp_2d, psiNinterp_RBS
+            # return psiNinterp_RGI, psiNinterp_2d, psiNinterp_RBS
             
         
         elif self.withshift == True and self.withseries == False:
@@ -214,12 +222,12 @@ class B2plotter:
             
             
             gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR_dic, 'gZ': gZ,
-                        'check': 'oh_yeah'}
+                        'check': 'oh_yeah', 'interp_dic': interp_dic}
             
             self.data['gfile']['g'] = g
             self.data['gfile']['gcomp'] = gfiledic
         
-            return interp_dic
+            # return interp_dic
         
         elif self.withshift == False and self.withseries == True:
             
@@ -273,17 +281,17 @@ class B2plotter:
             # psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
             # psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
             
-            interp_dic = psiNinterp_RBS
+            interp = psiNinterp_RBS
             
             
             gfiledic = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR, 'gZ': gZ,
-                        'check': 'hay_boy'}
+                        'check': 'hay_boy', 'interp': interp}
             
             self.data['gfile']['g'] = g
             self.data['gfile']['gcomp'] = gfiledic
             
         
-            return interp_dic
+            # return interp_dic
             
         elif self.withshift == True and self.withseries == True:
             print('load_solpsgeo is not there yet, to be continue...')
@@ -293,8 +301,7 @@ class B2plotter:
     
     
     def calcpsi(self):
-        
-    
+            
         geo = self.data['b2fgeo']
         pol_range = int(self.data['b2fgeo']['nx'] + 2)
         # print('xdim is {}'.format(pol_range))
@@ -306,34 +313,64 @@ class B2plotter:
         # gR = self.data['gfile']['gcomp']['gR']
         # gZ = self.data['gfile']['gcomp']['gZ']
         # psiN = self.data['gfile']['gcomp']['psiN']
-        psiNinterp = self.load_solpsgeo()
-        psival = np.zeros((pol_range, rad_range))
-        for pol_loc in range(pol_range):
-            crLowerLeft = geo['crx'][pol_loc,:,0]
-            crUpperLeft = geo['crx'][pol_loc,:,2]
-            czLowerLeft = geo['cry'][pol_loc,:,0]
-            czUpperLeft = geo['cry'][pol_loc,:,2]
+        
+        if self.withshift == False and self.withseries == False:
+        
+            psiNinterp_RGI = self.data['interp_dic']['RGI'] 
+            psiNinterp_2d = self.data['interp_dic']['2d']
+            psiNinterp_RBS = self.data['interp_dic']['RBS']
+            psival = np.zeros((pol_range, rad_range))
             
-            # self.data['psi']['crLowerLeft'] = crLowerLeft
-            # self.data['psi']['czLowerLeft'] = czLowerLeft
-            # self.data['psi']['crUpperLeft'] = crUpperLeft
-            # self.data['psi']['czUpperLeft'] = czUpperLeft
-            
-            crz_LL = np.stack([crLowerLeft.ravel(), czLowerLeft.ravel()], -1)  # shape (N, 2) in 2d
-            crz_UL = np.stack([crUpperLeft.ravel(), crUpperLeft.ravel()], -1)
+            Attempt = self.data['dircomp']['Attempt']
+            DRT = self.data['dirdata']['outputdir']['Output']
+            DRT2 = self.data['dirdata']['outputdir']['Output2']
+            XDIM = self.data['b2fgeo']['nx'] + 2
+            YDIM = self.data['b2fgeo']['ny'] + 2
             
             
-            psi_solps = np.zeros(rad_range)
-            for i in range(rad_range):
-                # psi_solps_LL = psiNinterp(crLowerLeft[i], czLowerLeft[i])
-                # psi_solps_UL = psiNinterp(crUpperLeft[i], czUpperLeft[i])
-                psi_solps_LL = psiNinterp(crz_LL)
-                psi_solps_UL = psiNinterp(crz_UL)
-                psi_solps[i] = np.mean([psi_solps_LL,psi_solps_UL])
+            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                        usecols = (3)).reshape((YDIM, XDIM))
+            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                          usecols = (3)).reshape((YDIM,XDIM))
             
-            psival[pol_loc, :] = psi_solps
+            coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
+            
+            self.data['grid'] = coord_dic
+            
+            for pol_loc in range(pol_range):
+                for i in range(rad_range):
+                    # print(i)
+                    psival[pol_loc, i] = psiNinterp_RBS(RadLoc[i, pol_loc], 
+                                                          VertLoc[i, pol_loc])
+        
+       
+        # for pol_loc in range(pol_range):
+        #     crLowerLeft = geo['crx'][pol_loc,:,0]
+        #     crUpperLeft = geo['crx'][pol_loc,:,2]
+        #     czLowerLeft = geo['cry'][pol_loc,:,0]
+        #     czUpperLeft = geo['cry'][pol_loc,:,2]
+            
+        #     self.data['psi']['crLowerLeft'] = crLowerLeft
+        #     self.data['psi']['czLowerLeft'] = czLowerLeft
+        #     self.data['psi']['crUpperLeft'] = crUpperLeft
+        #     self.data['psi']['czUpperLeft'] = czUpperLeft
+            
+        #     crz_LL = np.stack([crLowerLeft.ravel(), czLowerLeft.ravel()], -1)  # shape (N, 2) in 2d
+        #     crz_UL = np.stack([crUpperLeft.ravel(), crUpperLeft.ravel()], -1)
+            
+            
+        #     psi_solps = np.zeros(rad_range)
+        #     for i in range(rad_range):
+        #         psi_solps_LL = psiNinterp(crLowerLeft[i], czLowerLeft[i])
+        #         psi_solps_UL = psiNinterp(crUpperLeft[i], czUpperLeft[i])
+        #         psi_solps_LL = psiNinterp(crz_LL)
+        #         psi_solps_UL = psiNinterp(crz_UL)
+        #         psi_solps[i] = np.mean([psi_solps_LL,psi_solps_UL])
+            
+        #     psival[pol_loc, :] = psi_solps
             
         self.data['psi']['psival'] = psival
+    
     
     def calcpsi_1D(self, pol_loc):
         
@@ -354,10 +391,11 @@ class B2plotter:
             
             self.data['DefaultSettings']['SEP'] = SEP
     
-            dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
             
             
-            psiNinterp_RGI, psiNinterp_2d, psiNinterp_RBS = self.load_solpsgeo()
+            psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
+            psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
             # print(type(psiNinterp_RBS))
             psival = np.zeros((pol_range, rad_range))
             
@@ -379,17 +417,9 @@ class B2plotter:
             ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
             URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
             
-            weight = dsa[int(SEP)-1]/ (dsa[int(SEP)-1] - dsa[int(SEP)-2])
+            # weight = dsa[int(SEP)-1]/ (dsa[int(SEP)-1] - dsa[int(SEP)-2])
             # print(weight)
             
-            LLdsa = crLowerLeft - LLsep
-            LRdsa = crLowerRight - LRsep
-            ULdsa = crUpperLeft - ULsep
-            URdsa = crUpperRight - URsep
-            avag_rad = np.zeros(rad_range)
-            for j in range(rad_range):
-                avag_rad[j] = np.mean([LLdsa[j], ULdsa[j], URdsa[j], LRdsa[j]])
-          
             
             "dsa check"
             # kk = np.zeros((int(rad_range),3))
@@ -401,9 +431,7 @@ class B2plotter:
             #     del_dsa[ia] = avag_rad[ia] - dsa[ia]
             
             # kk[:, 2] = del_dsa
-            
-            
-            self.data['psi']['dsa_{}_val'.format(pol_loc)] = avag_rad
+            # self.data['psi']['dsa_{}_val'.format(pol_loc)] = avag_rad
             
             
             crz_LL = np.stack([crLowerLeft.ravel(), czLowerLeft.ravel()], -1)  # shape (N, 2) in 2d
@@ -452,11 +480,32 @@ class B2plotter:
             #     psi_solps_GF[i] = np.mean([psi_LL_GF, psi_UL_GF, 
             #                                 psi_LR_GF, psi_UR_GF])
             
-            psival = np.zeros((int(rad_range), 3))
+            
+            Attempt = self.data['dircomp']['Attempt']
+            DRT = self.data['dirdata']['outputdir']['Output']
+            XDIM = self.data['b2fgeo']['nx'] + 2
+            YDIM = self.data['b2fgeo']['ny'] + 2
+            
+            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                        usecols = (3)).reshape((YDIM, XDIM))
+            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                          usecols = (3)).reshape((YDIM,XDIM))
+                 
+            crloc = RadLoc[:, pol_index]
+            czloc = VertLoc[:, pol_index]
+            
+            
+            psi_solps_cp = np.zeros(rad_range)
+            # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
+            for i in range(rad_range):
+                psi_CP = psiNinterp_RBS(crloc[i], czloc[i])
+                psi_solps_cp[i] = psi_CP
+            
+            psival = np.zeros((int(rad_range), 4))
             psival[:, 0] = psi_solps
             psival[:, 1] = psi_solps_2d
             psival[:, 2] = psi_solps_RBS
-            # psival[:, 3] = psi_solps_GF
+            psival[:, 3] = psi_solps_cp
                 
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
             # self.data['psi']['crz_LL'] = crz_LL
@@ -465,8 +514,9 @@ class B2plotter:
             pol_range_dic = {}
             rad_range_dic = {}
             SEP_dic = {}
-            avag_rad_dic = {}
+            dsa_dic = {}
             psival_dic = {}
+            solps_dsa_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 geo = self.data['b2fgeo'][aa]
                 pol_range = int(self.data['b2fgeo'][aa]['nx'] + 2)
@@ -481,11 +531,10 @@ class B2plotter:
                 else:
                     SEP = round(rad_range/ 2)
                 SEP_dic[aa] = SEP       
-                dsa = lcm.read_dsa(self.data['dirdata']['infolderdir'][aa]['simudir'] + '/dsa')
+                solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['infolderdir'][aa]['simudir'] + '/dsa')
 
-                psiNinterp_RBS = self.load_solpsgeo()[aa]
+                psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
                 # print(type(psiNinterp_RBS))
-                psival = np.zeros((pol_range, rad_range))
                 
                 pol_index = int(pol_loc) + 1
                 
@@ -499,25 +548,11 @@ class B2plotter:
                 czUpperRight = geo['cry'][pol_index,:,3]
                     
                 
-                LLsep = np.mean([crLowerLeft[int(SEP)-1], crLowerLeft[int(SEP)-2]])
-                LRsep = np.mean([crLowerRight[int(SEP)-1], crLowerRight[int(SEP)-2]])
-                ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
-                URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
-                
-                weight = dsa[int(SEP)-1]/ (dsa[int(SEP)-1] - dsa[int(SEP)-2])
+                # weight = dsa[int(SEP)-1]/ (dsa[int(SEP)-1] - dsa[int(SEP)-2])
                 # print(weight)
                 
-                LLdsa = crLowerLeft - LLsep
-                LRdsa = crLowerRight - LRsep
-                ULdsa = crUpperLeft - ULsep
-                URdsa = crUpperRight - URsep
-                avag_rad = np.zeros(rad_range)
-                for j in range(rad_range):
-                    avag_rad[j] = np.mean([LLdsa[j], ULdsa[j], URdsa[j], LRdsa[j]])
-              
-                avag_rad_dic[aa] = avag_rad
-              
-    
+                
+                
                 psi_solps_RBS = np.zeros(rad_range)
                 for i in range(rad_range):
                     psi_LL_RBS = psiNinterp_RBS(crLowerLeft[i], czLowerLeft[i])
@@ -533,12 +568,12 @@ class B2plotter:
                 
                 psival_dic[aa] = psival
                     
-                
+            
             self.data['DefaultSettings']['XDIM'] = pol_range_dic
             self.data['DefaultSettings']['YDIM'] = rad_range_dic
             self.data['DefaultSettings']['SEP'] = SEP_dic
-            self.data['psi']['dsa_{}_val'.format(pol_loc)] = avag_rad_dic
-            self.data['psi']['psi_{}_val'.format(pol_loc)] = psival_dic
+            self.data['dsa']['dsa_{}'.format(pol_loc)] = dsa_dic
+            self.data['psi']['psi_{}_val'.format(pol_loc)] = psival_dic 
             
         elif self.withshift == False and self.withseries == True:
             geo = self.data['b2fgeo']
@@ -554,9 +589,12 @@ class B2plotter:
                 SEP = round(rad_range/ 2)
             
             self.data['DefaultSettings']['SEP'] = SEP
-            # dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+            
+            solps_dsa_dic = {}
+            for aa in self.data['dircomp']['Attempt'].keys():
+                solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
 
-            psiNinterp_RBS = self.load_solpsgeo()
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp']
             # print(type(psiNinterp_RBS))
             
             pol_index = int(pol_loc) + 1
@@ -571,20 +609,8 @@ class B2plotter:
             czUpperRight = geo['cry'][pol_index,:,3]
                 
             
-            LLsep = np.mean([crLowerLeft[int(SEP)-1], crLowerLeft[int(SEP)-2]])
-            LRsep = np.mean([crLowerRight[int(SEP)-1], crLowerRight[int(SEP)-2]])
-            ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
-            URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
             
-            LLdsa = crLowerLeft - LLsep
-            LRdsa = crLowerRight - LRsep
-            ULdsa = crUpperLeft - ULsep
-            URdsa = crUpperRight - URsep
-            avag_rad = np.zeros(rad_range)
-            for j in range(rad_range):
-                avag_rad[j] = np.mean([LLdsa[j], ULdsa[j], URdsa[j], LRdsa[j]])
-          
-         
+            
             psi_solps_RBS = np.zeros(rad_range)
             for i in range(rad_range):
                 psi_LL_RBS = psiNinterp_RBS(crLowerLeft[i], czLowerLeft[i])
@@ -602,7 +628,7 @@ class B2plotter:
             self.data['DefaultSettings']['XDIM'] = pol_range
             self.data['DefaultSettings']['YDIM'] = rad_range
             self.data['DefaultSettings']['SEP'] = SEP
-            self.data['psi']['dsa_{}_val'.format(pol_loc)] = avag_rad
+            self.data['dsa']['dsa_{}'.format(pol_loc)] = dsa_dic
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
         
         elif self.withshift == True and self.withseries == True:
@@ -610,6 +636,43 @@ class B2plotter:
             
         else:
             print('There is a bug')
+
+
+    def RR_cal_dsa(self, pol_loc):
+        geo = self.data['b2fgeo']
+        pol_range = int(self.data['b2fgeo']['nx'] + 2)
+        # print('xdim is {}'.format(str(pol_range)))
+        rad_range = int(self.data['b2fgeo']['ny'] + 2)
+        
+        pol_index = int(pol_loc) + 1
+        
+        crLowerLeft = geo['crx'][pol_index,:,0]
+        
+        Attempt = self.data['dircomp']['Attempt']
+        DRT = self.data['dirdata']['infolderdir']['outputdir']['Output']
+        DRT2 = self.data['dirdata']['infolderdir']['outputdir']['Output2']
+        XDIM = self.data['b2fgeo']['nx'] + 2
+        YDIM = self.data['b2fgeo']['ny'] + 2
+        
+        
+        
+        Rad0Cor = np.loadtxt('{}/Rad0Cor{}'.format(DRT2, str(Attempt)),
+                    usecols = (3)).reshape((YDIM, XDIM))
+        Vert0Cor = np.loadtxt('{}/Vert0Cor{}'.format(DRT2, str(Attempt)), 
+                      usecols = (3)).reshape((YDIM,XDIM))
+        
+        comp = np.zeros((int(rad_range), 2))
+        comp[:, 0] = Rad0Cor[:, pol_index]
+        comp[:, 1] = crLowerLeft
+        
+        RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                    usecols = (3)).reshape((YDIM, XDIM))
+        VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                      usecols = (3)).reshape((YDIM,XDIM))
+        
+        crloc = RadLoc[:, pol_index]
+        czloc = VertLoc[:, pol_index]
+
         
 
     def load_vessel(self):
@@ -622,281 +685,25 @@ class B2plotter:
         VVFILE = np.loadtxt('{}/vvfile.ogr'.format(self.data['dirdata']['tbase']))
         
         self.data['vessel'] = VVFILE
-        
-        
-    def creat_grid(self):
-        N = len([self.data['dircomp']['a_shift']])
-        print(N)
-        ast = self.data['dircomp']['a_shift']
-        shift = self.data['dircomp']['shiftdic'][ast]
-        Attempts = [str(shift)]
-        XGrid = self.data['b2fgeo']['nx']
-        print(XGrid)
-        XMin= 1
-        XMax= XGrid
-        X_Core = int(self.data['b2fgeo']['rightcut'] - self.data['b2fgeo']['leftcut'])
-        
-        CoreBound = []
-        CoreBound.append(int(self.data['b2fgeo']['leftcut']))
-        CoreBound.append(int(self.data['b2fgeo']['rightcut'] -1))
-        
-        YSurf = int(self.data['b2fgeo']['ny'])
-    
-        # Create X and Y mesh grid arrays
-        
-        X = np.linspace(XMin,XMax,XGrid)
-        Y = np.linspace(1,YSurf,YSurf)
-        Xx, Yy = np.meshgrid(X,Y)
-        
-        self.data['gridsettings']['CoreBound'] = CoreBound
-        self.data['gridsettings']['XMin'] = XMin
-        self.data['gridsettings']['XMax'] = XMax
-        self.data['gridsettings']['X'] = X
-        self.data['gridsettings']['Y'] = Y
-        self.data['gridsettings']['Xx'] = Xx
-        self.data['gridsettings']['Yy'] = Yy
-        
-        Ya = YSurf + 1
-        Xa = X_Core + 1
-        
-        
-        RadLoc = xr.DataArray(np.zeros((YSurf,XGrid,N)), 
-                              coords=[Y,X,Attempts], 
-                        dims=['Radial_Location','Poloidal_Location','Attempt'], 
-                              name = r'Radial Coordinate $m$')
-        VertLoc = xr.DataArray(np.zeros((YSurf,XGrid,N)), 
-                               coords=[Y,X,Attempts], 
-                        dims=['Radial_Location','Poloidal_Location','Attempt'], 
-                               name = r'Vertical Coordinate $m$')
-        
-        Core_Corners = xr.DataArray(np.zeros((Ya, Xa, N,2)), 
-                                    coords=[np.concatenate(([0],Y)), np.linspace(CoreBound[0],CoreBound[1]+1,X_Core+1),Attempts,['X','Y']], 
-                                    dims=['Radial Index','Poloidal Index','Attempt','Point Coordinates'], 
-                                    name = r'Core Corner Coordinates $m$')
-        Div1_Corners = xr.DataArray(np.zeros((YSurf+1,CoreBound[0]+1,N,2)), 
-                                    coords=[np.concatenate(([0],Y)), 
-                np.linspace(0,CoreBound[0],CoreBound[0]+1),Attempts,['X','Y']], 
-          dims=['Radial Index','Poloidal Index','Attempt','Point Coordinates'], 
-                              name = r'Inner Divertor Corner Coordinates $m$')
-        Div2_Corners = xr.DataArray(np.zeros((YSurf+1,XMax-CoreBound[1],N,2)), 
-                                    coords=[np.concatenate(([0],Y)), 
-        np.linspace(CoreBound[1]+1,XMax,XMax-CoreBound[1]),Attempts,['X','Y']], 
-        dims=['Radial Index','Poloidal Index','Attempt','Point Coordinates'], 
-                              name = r'Outer Divertor Corner Coordinates $m$')
 
-        YYLoc = xr.DataArray(np.zeros((YSurf,XGrid,N)), coords=[Y,X,Attempts], 
-                        dims=['Radial_Location','Poloidal_Location','Attempt'], 
-                             name = r'Radial Grid Point $N$')
         
-        PsinLoc = xr.DataArray(np.zeros((YSurf,XGrid,N)), coords=[Y,X,Attempts], 
-                        dims=['Radial_Location','Poloidal_Location','Attempt'], 
-                               name = r'Normalized Psi $\psi_N$')
+    def calc_flux_expansion(self, polpos):
+        if self.withshift == False and self.withseries == False:
+            self.calcpsi_1D(pol_loc='57')
+            psi_jxa = psi = self.data['psi']['psi_{}_val'.format('57')][:, 2]
+            dsa_jxa = self.data['dsa']['dsa_{}_val'.format('57')]
+            psi = self.data['psi']['psi_{}_val'.format(polpos)][:, 2]
+            dsa_polpos = self.data['psi']['dsa_{}_val'.format(polpos)]
+            psn_jxa = np.polyfit( dsa_jxa, psi_jxa, 1 , cov=True)
+            fluxpsn = fm.flux_expansion_fit(psi= psi, dsa= dsa_polpos, 
+                                            flux_expansion_jxa= psn_jxa)
+            print(fluxpsn)
         
-        PolLbl = ['XXLoc', 'Theta', 'dXP','dXP_norm']
-        
-        PolVec = xr.DataArray(np.zeros((YSurf,XGrid,N,4)), 
-                              coords=[Y,X,Attempts,PolLbl], 
-        dims=['Radial_Location','Poloidal_Location','Attempt','Poloidal Metric'], 
-                              name = 'Poloidal Coordinate Data')
-        
-        grid_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc, 
-                    'Core_Corners': Core_Corners, 'Div1_Corners': Div1_Corners,
-                    'Div2_Corners': Div2_Corners, 'YYLoc': YYLoc,
-                    'PsinLoc': PsinLoc, 'PolLbl': PolLbl, 'PolVec': PolVec}
-        
-        # self.data['grid'] = grid_dic
-        return grid_dic
-        
-        
-    def load_output_geo(self, grid_dic):
-        n = 0
-        DRT = self.data['dirdata']['adir']['outputdir']['Output']
-        DRT2 = self.data['dirdata']['adir']['outputdir']['Output2']
-        XDIM = self.data['b2fgeo']['nx'] + 2
-        YDIM = self.data['b2fgeo']['ny'] + 2
-        Attempt = self.data['dircomp']['Attempt']
-        
-        self.data['DefaultSettings']['XDIM'] = XDIM
-        self.data['DefaultSettings']['YDIM'] = YDIM
-        XMin = self.data['gridsettings']['XMin']
-        XMax = self.data['gridsettings']['XMax']
-        CoreBound = self.data['gridsettings']['CoreBound']
-        Yy = self.data['gridsettings']['Yy']
-        Core_Corners = grid_dic['Core_Corners']
-        YYLoc = grid_dic['YYLoc']
-        RadLoc = grid_dic['RadLoc']
-        VertLoc = grid_dic['VertLoc']
-        Div1_Corners = grid_dic['Div1_Corners']
-        Div2_Corners = grid_dic['Div2_Corners']
-        
-                    
-        YYLoc.values[:,:, n] = Yy
-        RadLoc.values[:,:,n] = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
-                    usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        VertLoc.values[:,:,n] = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
-                      usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        
-        Rad0Cor = np.loadtxt('{}/Rad0Cor{}'.format(DRT2, str(Attempt)), 
-                    usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        Vert0Cor = np.loadtxt('{}/Vert0Cor{}'.format(DRT2, str(Attempt)), 
-                    usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        
-        Rad1Cor = np.loadtxt('{}/Rad1Cor{}'.format(DRT2, str(Attempt)), 
-              usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        Vert1Cor = np.loadtxt('{}/Vert1Cor{}'.format(DRT2, str(Attempt)), 
-              usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-
-        Rad2Cor = np.loadtxt('{}/Rad2Cor{}'.format(DRT2, str(Attempt)), 
-              usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        Vert2Cor = np.loadtxt('{}/Vert2Cor{}'.format(DRT2, str(Attempt)), 
-              usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-
-        Rad3Cor = np.loadtxt('{}/Rad3Cor{}'.format(DRT2, str(Attempt)), 
-              usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        Vert3Cor = np.loadtxt('{}/Vert3Cor{}'.format(DRT2, str(Attempt)), 
-              usecols = (3)).reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-        
-        Core_Corners.values[:-1,:-1,n,0] = Rad0Cor[:,CoreBound[0]:CoreBound[1]+1]
-        Core_Corners.values[:-1,-1,n,0] = Rad1Cor[:,CoreBound[1]]
-        Core_Corners.values[-1,:-1,n,0] = Rad2Cor[-1,CoreBound[0]:CoreBound[1]+1]
-        Core_Corners.values[-1,-1,n,0] = Rad3Cor[-1,CoreBound[1]]
-        
-        Core_Corners.values[:-1,:-1,n,1] = Vert0Cor[:,CoreBound[0]:CoreBound[1]+1]
-        Core_Corners.values[:-1,-1,n,1] = Vert1Cor[:,CoreBound[1]]
-        Core_Corners.values[-1,:-1,n,1] = Vert2Cor[-1,CoreBound[0]:CoreBound[1]+1]
-        Core_Corners.values[-1,-1,n,1] = Vert3Cor[-1,CoreBound[1]]
-        
-        Div1_Corners.values[:-1,:-1,n,0] = Rad0Cor[:,XMin-1:CoreBound[0]]
-        Div1_Corners.values[:-1,-1,n,0] = Rad1Cor[:,CoreBound[0]-1]
-        Div1_Corners.values[-1,:-1,n,0] = Rad2Cor[-1,XMin-1:CoreBound[0]]
-        Div1_Corners.values[-1,-1,n,0] = Rad3Cor[-1,CoreBound[0]-1]
-        
-        Div1_Corners.values[:-1,:-1,n,1] = Vert0Cor[:,XMin-1:CoreBound[0]]
-        Div1_Corners.values[:-1,-1,n,1] = Vert1Cor[:,CoreBound[0]-1]
-        Div1_Corners.values[-1,:-1,n,1] = Vert2Cor[-1,XMin-1:CoreBound[0]]
-        Div1_Corners.values[-1,-1,n,1] = Vert3Cor[-1,CoreBound[0]-1]
-        
-        Div2_Corners.values[:-1,:-1,n,0] = Rad0Cor[:,CoreBound[1]+1:]
-        Div2_Corners.values[:-1,-1,n,0] = Rad1Cor[:,-1]
-        Div2_Corners.values[-1,:-1,n,0] = Rad2Cor[-1,CoreBound[1]+1:]
-        Div2_Corners.values[-1,-1,n,0] = Rad3Cor[-1,-1]
-        
-        Div2_Corners.values[:-1,:-1,n,1] = Vert0Cor[:,CoreBound[1]+1:]
-        Div2_Corners.values[:-1,-1,n,1] = Vert1Cor[:,-1]
-        Div2_Corners.values[-1,:-1,n,1] = Vert2Cor[-1,CoreBound[1]+1:]
-        Div2_Corners.values[-1,-1,n,1] = Vert3Cor[-1,-1]
-        
-        # self.data['grid']['Core_Corners'] = Core_Corners.values[:, :, 0, :]
-        # self.data['grid']['YYLoc'] = YYLoc.values[:, :, 0]
-        # self.data['grid']['RadLoc'] = RadLoc.values[:, :, 0]
-        # self.data['grid']['VertLoc'] = VertLoc.values[:, :, 0]
-        # self.data['grid']['Div1_Corners'] = Div1_Corners.values[:, :, 0, :] 
-        # self.data['grid']['Div2_Corners'] = Div2_Corners[:, :, 0, :]
-        
-        self.data['grid']['Core_Corners'] = Core_Corners
-        self.data['grid']['YYLoc'] = YYLoc
-        self.data['grid']['RadLoc'] = RadLoc
-        self.data['grid']['VertLoc'] = VertLoc
-        self.data['grid']['Div1_Corners'] = Div1_Corners 
-        self.data['grid']['Div2_Corners'] = Div2_Corners
-        
-        
-    
-    def pop_pol_coord(self, grid_dic):
-        #Populate Poloidal Coordinate Data array
-        n = 0
-        Attempt = len([self.data['dircomp']['a_shift']])
-        # print(Attempt)
-        Xx = self.data['gridsettings']['Xx']
-        PolVec = grid_dic['PolVec']
-        X = self.data['gridsettings']['X']
-        RadLoc = self.data['grid']['RadLoc'] 
-        VertLoc = self.data['grid']['VertLoc'] 
-        PolVec.loc[:,:, 0,'XXLoc'] = Xx
-        JXA = self.data['b2mn']['jxa']
-        CoreBound = self.data['DefaultSettings']['CoreBound']
-        YDIM = int(self.data['DefaultSettings']['YDIM'])
-        
-        if YDIM % 2 == 0:
-            SEP = YDIM/ 2 + 1
         else:
-            SEP = round(YDIM/ 2)
-        
-        YVector=np.zeros((len(X),2))
-        YVector[:,0] = RadLoc.values[1,:,n] - RadLoc.values[0,:,n]
-        YVector[:,1] = VertLoc.values[1,:,n] - VertLoc.values[0,:,n]
-                    
+            print('need more work')
     
-        for i in range(len(X)):
-            PolVec.loc[:,X[i],Attempt,'Theta'] = np.degrees(np.math.atan2(np.linalg.det([YVector[JXA-1,:],YVector[i,:]]),np.dot(YVector[JXA-1,:],YVector[i,:])))
-            if PolVec.loc[:,X[i],Attempt,'Theta'].values[0] < 0 and X[i] < JXA:
-                PolVec.loc[:,X[i],Attempt,'Theta'] = PolVec.loc[:,X[i],Attempt,'Theta'] + 360          
-        
-        XP_range=np.array([CoreBound[0]-1,CoreBound[0],CoreBound[1],CoreBound[1]+1])
-        X_xp=np.mean(RadLoc.loc[SEP,XP_range,Attempt].values)
-        Y_xp=np.mean(VertLoc.loc[SEP,XP_range,Attempt].values)
-        Xpoint=np.array([X_xp,Y_xp])
-        
-        for index in np.arange(CoreBound[0],CoreBound[1]+1):
-            if index == CoreBound[0]:
-                PolVec.loc[:,index,Attempt,'dXP'] = round(np.sqrt((RadLoc.loc[SEP,index,Attempt].values-X_xp)**2 + (VertLoc.loc[SEP,index,Attempt].values-Y_xp)**2),5)
-            else:
-                NL = np.sqrt((RadLoc.loc[SEP,index,Attempt].values-RadLoc.loc[SEP,index-1,Attempt].values)**2 + (VertLoc.loc[SEP,index,Attempt].values-VertLoc.loc[SEP,index-1,Attempt].values)**2)
-                PolVec.loc[:,index,Attempt,'dXP']= PolVec.loc[:,index-1,Attempt,'dXP']+NL
-     
-        PolVec.loc[:,:,Attempt,'dXP_norm'] = PolVec.loc[:,:,Attempt,'dXP'].values/np.max(PolVec.loc[:,:,Attempt,'dXP'].values)
-        
-        self.data['grid']['PolVec'] = PolVec
-
-
-
-    def data_dense(self):
-        
-        if AddNew is not None:
-            if AddNew not in self.Parameter:
-                self.Parameter.append(AddNew)
-                P = len(self.Parameter)
-        
-        for p in self.Parameter:
-            if p not in self.PARAM.keys() or 'AVG' in Attempts: 
-                self.PARAM[p] = xr.DataArray(np.zeros((YSurf,XGrid,N)), coords=[Y,X,Attempts], dims=['Radial_Location','Poloidal_Location','Attempt'], name = self.PARAMDICT[p])
-                for n in range(N):
-                    Attempt = Attempts[n]
-                    if Attempt == 'AVG':
-                        self.PARAM[p].values[:,:,n] = self.PARAM[p].values[:,:,:-1].mean(2)
-                    else:    
-                        DRT = '{}/Attempt{}'.format(BASEDRT, str(Attempt))   #Generate path
-                        try:
-                            RawData = np.loadtxt('{}/Output/{}{}'.format(DRT, p, str(Attempt)),usecols = (3))
-                        except Exception as err:
-                            print(err)
-                            try:
-                                 RawData = np.loadtxt('{}/Output2/{}{}'.format(DRT, p, str(Attempt)),usecols = (3))
-                            except Exception as err:
-                                print(err)
-                                print('Parameter {} not found for Attempt {}. Creating NAN Array'.format(p, str(Attempt)))
-                                self.PARAM[p].values[:,:,n] = np.nan
-                                RawData=[]
-                        
-                        if len(RawData) > 0:        
-                            if RawData.size == XDIM*YDIM:
-                                self.PARAM[p].values[:,:,n] = RawData.reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
-                            elif RawData.size == XDIM*YDIM*2:
-                                self.PARAM[p].values[:,:,n] = RawData.reshape((2*YDIM,XDIM))[1+YDIM:2*YDIM-1,XMin:XMax+1]
-                                
-                                
-    def set_rad_pol(self):
-        if RadSlc == 'all':
-            RadSlc = self.PARAM.coords['Radial_Location'].values
-        if RadSlc == None:
-            RadSlc = SEP
-            
-        if PolSlc == 'all':
-            PolSlc = self.PARAM.coords['Poloidal_Location'].values
-        if PolSlc == None:
-            PolSlc = JXA
-            
-            
+    
+    
 
 class load_expdata(B2plotter):
     
