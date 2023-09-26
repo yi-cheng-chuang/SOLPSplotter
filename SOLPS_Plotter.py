@@ -127,7 +127,7 @@ class SOLPSPLOT(object):
                      'ELEV' : 75,
                      'AZIM' : 270,
                      'JXI' : 37,
-                     'JXA' : 55,
+                     'JXA' : 57,
                      'SEP' : 20,
                      'XDIM' : 98,
                      'YDIM' : 38,
