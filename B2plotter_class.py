@@ -310,9 +310,6 @@ class B2plotter:
         
         self.data['DefaultSettings']['XDIM'] = pol_range
         self.data['DefaultSettings']['YDIM'] = rad_range
-        # gR = self.data['gfile']['gcomp']['gR']
-        # gZ = self.data['gfile']['gcomp']['gZ']
-        # psiN = self.data['gfile']['gcomp']['psiN']
         
         if self.withshift == False and self.withseries == False:
         
@@ -323,7 +320,6 @@ class B2plotter:
             
             Attempt = self.data['dircomp']['Attempt']
             DRT = self.data['dirdata']['outputdir']['Output']
-            DRT2 = self.data['dirdata']['outputdir']['Output2']
             XDIM = self.data['b2fgeo']['nx'] + 2
             YDIM = self.data['b2fgeo']['ny'] + 2
             
@@ -342,34 +338,83 @@ class B2plotter:
                     # print(i)
                     psival[pol_loc, i] = psiNinterp_RBS(RadLoc[i, pol_loc], 
                                                           VertLoc[i, pol_loc])
+                  
+            self.data['psi']['psival'] = psival
         
-       
-        # for pol_loc in range(pol_range):
-        #     crLowerLeft = geo['crx'][pol_loc,:,0]
-        #     crUpperLeft = geo['crx'][pol_loc,:,2]
-        #     czLowerLeft = geo['cry'][pol_loc,:,0]
-        #     czUpperLeft = geo['cry'][pol_loc,:,2]
+        elif self.withshift == True and self.withseries == False:
+        
+            psiNinterp_RBS = self.data['interp_dic']['RBS']
+            psival = np.zeros((pol_range, rad_range))
             
-        #     self.data['psi']['crLowerLeft'] = crLowerLeft
-        #     self.data['psi']['czLowerLeft'] = czLowerLeft
-        #     self.data['psi']['crUpperLeft'] = crUpperLeft
-        #     self.data['psi']['czUpperLeft'] = czUpperLeft
-            
-        #     crz_LL = np.stack([crLowerLeft.ravel(), czLowerLeft.ravel()], -1)  # shape (N, 2) in 2d
-        #     crz_UL = np.stack([crUpperLeft.ravel(), crUpperLeft.ravel()], -1)
+            Attempt = self.data['dircomp']['Attempt']
+            DRT = self.data['dirdata']['outputdir']['Output']
+            XDIM = self.data['b2fgeo']['nx'] + 2
+            YDIM = self.data['b2fgeo']['ny'] + 2
             
             
-        #     psi_solps = np.zeros(rad_range)
-        #     for i in range(rad_range):
-        #         psi_solps_LL = psiNinterp(crLowerLeft[i], czLowerLeft[i])
-        #         psi_solps_UL = psiNinterp(crUpperLeft[i], czUpperLeft[i])
-        #         psi_solps_LL = psiNinterp(crz_LL)
-        #         psi_solps_UL = psiNinterp(crz_UL)
-        #         psi_solps[i] = np.mean([psi_solps_LL,psi_solps_UL])
+            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                        usecols = (3)).reshape((YDIM, XDIM))
+            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                          usecols = (3)).reshape((YDIM,XDIM))
             
-        #     psival[pol_loc, :] = psi_solps
+            coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
             
-        self.data['psi']['psival'] = psival
+            self.data['grid'] = coord_dic
+            
+            for pol_loc in range(pol_range):
+                for i in range(rad_range):
+                    # print(i)
+                    psival[pol_loc, i] = psiNinterp_RBS(RadLoc[i, pol_loc], 
+                                                          VertLoc[i, pol_loc])
+                  
+            self.data['psi']['psival'] = psival
+    
+    def plot_seperatrix(self):
+        psi_1d = self.data['psi']['psival'][0, :]
+        # self.data['psi']['psi1d'] = psi_1d
+        
+        pol_range = int(self.data['b2fgeo']['nx'] + 2)
+        rad_range = int(self.data['b2fgeo']['ny'] + 2)
+        
+        
+        index_low = []
+        index_high = []
+        index = np.zeros(2)
+        for y in range(rad_range):
+            if psi_1d[y] <= 1:
+                index_low.append(y)
+            if psi_1d[y] >= 1:
+                index_high.append(y)
+    
+        
+        index[0] = index_low[-1]
+        index[1] = index_high[0]
+        
+        index_dic = {'index_low': index_low, 'index_high': index_high, 
+                     'index': index}
+        self.data['index'] = index_dic
+        
+        
+        
+    
+    def calc_sep_index(self, psi, rad_range):
+        index_low = []
+        index_high = []
+        index = np.zeros(2)
+        for y in range(rad_range):
+            if psi[y] <= 1:
+                index_low.append(y)
+            if psi[y] >= 1:
+                index_high.append(y)
+    
+        
+        index[0] = index_low[-1]
+        index[1] = index_high[0]
+        
+        index_dic = {'index_low': index_low, 'index_high': index_high, 
+                     'index': index}
+        return index_dic
+    
     
     
     def calcpsi_1D(self, pol_loc):
@@ -384,15 +429,7 @@ class B2plotter:
             self.data['DefaultSettings']['XDIM'] = pol_range
             self.data['DefaultSettings']['YDIM'] = rad_range
             
-            if rad_range % 2 == 0:
-                SEP = rad_range/ 2 + 1
-            else:
-                SEP = round(rad_range/ 2)
-            
-            self.data['DefaultSettings']['SEP'] = SEP
     
-            
-            
             psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
             psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
             psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
@@ -412,10 +449,10 @@ class B2plotter:
                 
             
             
-            LLsep = np.mean([crLowerLeft[int(SEP)-1], crLowerLeft[int(SEP)-2]])
-            LRsep = np.mean([crLowerRight[int(SEP)-1], crLowerRight[int(SEP)-2]])
-            ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
-            URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
+            # LLsep = np.mean([crLowerLeft[int(SEP)-1], crLowerLeft[int(SEP)-2]])
+            # LRsep = np.mean([crLowerRight[int(SEP)-1], crLowerRight[int(SEP)-2]])
+            # ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
+            # URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
             
             # weight = dsa[int(SEP)-1]/ (dsa[int(SEP)-1] - dsa[int(SEP)-2])
             # print(weight)
@@ -506,9 +543,12 @@ class B2plotter:
             psival[:, 1] = psi_solps_2d
             psival[:, 2] = psi_solps_RBS
             psival[:, 3] = psi_solps_cp
-                
+            
+            index_dic = self.calc_sep_index(psi = psi_solps_RBS, 
+                                            rad_range = rad_range)
+            
+            self.data['DefaultSettings']['SEP'] = index_dic['index'][0]             
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
-            # self.data['psi']['crz_LL'] = crz_LL
         
         elif self.withshift == True and self.withseries == False:
             pol_range_dic = {}
@@ -526,11 +566,11 @@ class B2plotter:
                 pol_range_dic[aa] = pol_range
                 rad_range_dic[aa] = rad_range
           
-                if rad_range % 2 == 0:
-                    SEP = rad_range/ 2 + 1
-                else:
-                    SEP = round(rad_range/ 2)
-                SEP_dic[aa] = SEP       
+                # if rad_range % 2 == 0:
+                #     SEP = rad_range/ 2 + 1
+                # else:
+                #     SEP = round(rad_range/ 2)
+                # SEP_dic[aa] = SEP       
                 solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['infolderdir'][aa]['simudir'] + '/dsa')
 
                 psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
@@ -567,6 +607,14 @@ class B2plotter:
                 psival = psi_solps_RBS
                 
                 psival_dic[aa] = psival
+                
+                
+                
+                index_dic = self.calc_sep_index(psi = psival, 
+                                                rad_range = rad_range)
+                SEP_dic[aa] = index_dic['index'][0]
+                
+                
                     
             
             self.data['DefaultSettings']['XDIM'] = pol_range_dic
@@ -582,13 +630,6 @@ class B2plotter:
             rad_range = int(self.data['b2fgeo']['ny'] + 2)
             # print('ydim is {}'.format(str(rad_range)))
             # for aa in self.data['dircomp']['Attemptkey']:
-          
-            if rad_range % 2 == 0:
-                SEP = rad_range/ 2 + 1
-            else:
-                SEP = round(rad_range/ 2)
-            
-            self.data['DefaultSettings']['SEP'] = SEP
             
             solps_dsa_dic = {}
             for aa in self.data['dircomp']['Attempt'].keys():
@@ -621,14 +662,18 @@ class B2plotter:
                                             psi_LR_RBS, psi_UR_RBS])
             
             
-            psival = np.zeros(int(rad_range))
+            # psival = np.zeros(int(rad_range))
             psival = psi_solps_RBS
+        
+        
+            index_dic = self.calc_sep_index(psi = psival, 
+                                            rad_range = rad_range)
+            SEP = index_dic['index'][0]
         
             
             self.data['DefaultSettings']['XDIM'] = pol_range
             self.data['DefaultSettings']['YDIM'] = rad_range
             self.data['DefaultSettings']['SEP'] = SEP
-            self.data['dsa']['dsa_{}'.format(pol_loc)] = dsa_dic
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
         
         elif self.withshift == True and self.withseries == True:
