@@ -9,19 +9,19 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
                'Parameters': P, 'DefaultSettings': DP, 
                'Publish': 'b2plottersetting'}
     return set_dic
 
 def mast_comp_dic():
-    a_shift = 'one'
+    a_shift = 'org'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
-    series_dic = {'org': '39_noc_nts5_a', 'dot3': '11_inp_dot3_a', 
-                  'dot5': '22_inp_ts5_dot5_a', 'dot7': '10_inp_dot7_a', 
-                  'one': '29_inp_one_a'}
+    series_dic = {'org': '39_noc_nts5_a', 'dot3': '13_r1_full3e5_sol9e5_adjinp_dot3_a', 
+                  'dot5': '24_r1_full3e5_sol9e5_ts5_dot5_a', 'dot7': '11_full3e5_sol9e5_dot7_a', 
+                  'one': '30_full3e5_sol9e5_one_a'}
     outputlist = ['Output', 'Output2', 'EirOutput']
     mast_dir_dic = {'Shot': '027205', 'shift_dic': shift_dic, 
                     'shift_file_dic': shift_file_dic, 'series_dic': series_dic, 
@@ -35,8 +35,8 @@ def mast_comp_dic_withshift():
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
-    series = ['39_noc_nts5_a', '11_inp_dot3_a', '22_inp_ts5_dot5_a', 
-              '10_inp_dot7_a', '29_inp_one_a']
+    series = ['45_r1_full3e5_sol9e5_nts5_a', '13_r1_full3e5_sol9e5_adjinp_dot3_a', '24_r1_full3e5_sol9e5_ts5_dot5_a', 
+              '11_full3e5_sol9e5_dot7_a', '30_full3e5_sol9e5_one_a']
     outputlist = ['Output', 'Output2', 'EirOutput']
     
     mast_withshift_dic = {'Shot': '027205', 'multi_shift': multi_shift, 'shift_dic': shift_dic, 
@@ -48,7 +48,7 @@ def mast_comp_dic_withshift():
 def mast_comp_dir_series():
     a_shift = 'org'
     shift = 0
-    tail = '_ca_nts5_a'
+    tail = '_full3e5_sol9e5_nts5_a'
     outputlist = ['Output', 'Output2', 'EirOutput']
     shift_filename = 'org_new_vd'
     mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
@@ -96,8 +96,6 @@ def s_number(text):
     return [nu, name]
         
 
-
-
 def loadDS_dic(DEV):
     "New DefaultSettings for loading experimental data"
     
@@ -113,6 +111,22 @@ def loadDS_dic(DEV):
     
 
 A = ['39']
+
+def opacity_study_unit():
+    unit = {'efold_length': 'efold length: $\lambda_{n_D}$: [m]',
+            'pedestal_width': 'Pedestal width: $\Delta n$: [m]',
+              'dimensionless_opaqueness': 'dimensionless opaqueness', 
+              'neutral_density': 'neutral density ${n_D}$ (m$^{-3}$)', 
+              'electron_pedestal_density': 'electron pedestal density: $n_{ped}$ (m$^{-3}$)',
+              'temperature_pedestal_width': 'temperature pedestal width: $\Delta T$: [m]',
+              
+              'efold_length_method2': 'efold length: $\lambda_{n_D}$: [m]',
+              'dimensionless_opaqueness_method2': 'dimensionless opaqueness',
+              'method2_fitting_width': 'method2_fitting_width'
+              
+              }
+    return unit
+
 
 
 """
