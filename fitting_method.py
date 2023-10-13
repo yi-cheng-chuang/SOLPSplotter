@@ -57,14 +57,11 @@ def tanh_fit(x_choice, x_coord, ne, te):
     
     fit_tanh_dic = {'tanh_ne_fit': tanh_ne_fit, 'tanh_te_fit': tanh_te_fit, 
                'popt_ne': popt_ne, 'popt_te': popt_te}
-    
-    
-    
-    
+       
     return fit_tanh_dic
 
 
-def exp_fit_sp(x_choice, x_coord, neuden):
+def exp_fit(x_choice, x_coord, neuden):
     
     
     NeuDen = neuden/ neuden[0]
@@ -77,6 +74,15 @@ def exp_fit_sp(x_choice, x_coord, neuden):
         # print(popt_an)
         
         exp_an_fit = expfit(x_sh, popt_an[0], popt_an[1])*neuden[0]
+        
+        # plt.figure(figsize=(7,7))
+        # plt.yscale('log')
+        # plt.plot(x_coord, neuden,'o-', color = 'green', label= 'solps neutral density')
+        # plt.plot(x_coord, exp_an_fit, color='r',lw= 5, label= 'exponential fit')
+        # plt.xlabel('psiN')
+        # plt.ylabel('Neutral Atom (D) Density $(m^{-3})$')
+        # plt.title('Neutral density with fits')
+        # plt.legend()
         
     elif x_choice == 'RRsep':
         pn = [1.015, 200.5]
@@ -89,33 +95,6 @@ def exp_fit_sp(x_choice, x_coord, neuden):
     fit_exp_dic = {'exp_an_fit': exp_an_fit, 'popt_an': popt_an}
     
     return fit_exp_dic
-
-
-
-def exp_fit(x_choice, x_coord, neuden):
-    NeuDen = neuden/ neuden[0]
-    
-    if x_choice == 'psiN':
-        # pn = [1, 1.015, 200.5]
-        pn = [1.015, 200.5]
-        x_sh = x_coord - x_coord[0]
-        popt_an, pcov_an = curve_fit(expfit, x_sh, NeuDen, pn)
-        # print(popt_an)
-        
-        exp_an_fit = expfit(x_sh, popt_an[0], popt_an[1])*neuden[0]
-    
-    fit_exp_dic = {'exp_an_fit': exp_an_fit, 'popt_an': popt_an}
-    
-    # plt.figure(figsize=(7,7))
-    # plt.plot(dsa, neuden,'o-', color = 'green', label= 'solps neutral density')
-    # plt.plot(dsa, exp_an_fit, color='r',lw= 5, label= 'exponential fit')
-    # plt.xlabel('psiN')
-    # plt.ylabel('Neutral Atom (D) Density $(m^{-3})$')
-    # plt.title('Neutral density with fits')
-    # plt.legend()
-    
-    return fit_exp_dic
-
 
 
 def flux_expansion_fit(psi, dsa, flux_expansion_jxa):
@@ -136,8 +115,47 @@ def flux_expansion_fit(psi, dsa, flux_expansion_jxa):
 # print('Poloidal Slice {:0.0f}: Raw e-folding length={:.1f}mm, std error={:.1f}'.format(PolPos,efold[PolPos],efold_err[PolPos]))
 # print('Slope={:.3f}, Flux Expansion={:.1f}, Adjusted e-folding length={:.1f}, std error={:.1f}'.format(fluxpsnparam[PolPos][0][0],fluxpsn[PolPos],efold_adj[PolPos],efold_adj_err[PolPos]))
 
-def line(x, m, b):
-    return m*x+b
+def linefit(x, m):
+    return m*x
+
+
+def linear_fit(x_choice, x_coord, neuden):
+    
+    NeuDen = np.log(neuden)
+    x_sh = x_coord - x_coord[0]
+    # new_neuden = np.log(neuden / neuden[0])
+    # print(x_sh)
+    # print(new_neuden)
+    
+    if x_choice == 'psiN':
+        # pn = [1, 1.015, 200.5]
+        pn = [20]
+        # popt_an, pcov_an = curve_fit(linefit, x_sh, new_neuden, pn)
+        # print(popt_an)
+        
+        # exp_line_fit = np.exp(linefit(x_sh, popt_an[0]))*neuden[0]
+        # print(popt_an[0])
+        
+        ln_exp_fitcoe = np.polyfit(x_sh, NeuDen, 1 , cov=True)
+        # print(ln_exp_fitcoe[0])
+        ln_exp_fitpoly = np.poly1d(ln_exp_fitcoe[0])
+        
+        # print(ln_exp_fitpoly)
+        exp_ln_fit = np.exp(ln_exp_fitpoly(x_sh))
+        
+        # plt.figure(figsize=(7,7))
+        # plt.yscale('log')
+        # plt.plot(x_coord, neuden,'o-', color = 'green', label= 'solps neutral density')
+        # plt.plot(x_coord, exp_line_fit, color='r',lw= 5, label= 'exponential fit')
+        # plt.xlabel('psiN')
+        # plt.ylabel('Neutral Atom (D) Density $(m^{-3})$')
+        # plt.title('Neutral density with fits')
+        # plt.legend()
+        
+    fit_exp_dic = {'exp_line_fit': exp_ln_fit, 'popt_an': ln_exp_fitcoe[0]}
+    
+    return fit_exp_dic 
+
 
 
 "fit dsa with psi"
@@ -202,11 +220,16 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         "fitting choice 1: in the width, symmetry point +- width/2"
         xcoord_exp = []
         an_cut = []
+        index_cut = []
         sym_pt = fit_tanh_dic['popt_ne'][0]
-        for j in range(len(x_coord)):
-            if x_coord[j] <= sym_pt + dn and x_coord[j] >= sym_pt - dn:
-                xcoord_exp.append(x_coord[j])
-                an_cut.append(neuden[j])
+        x_coord_rev = list(reversed(x_coord))
+        # print(type(x_coord_rev))
+        neuden_rev = list(reversed(neuden))
+        # print(type(x_coord_rev))
+        for j in range(len(x_coord_rev)):
+            if x_coord_rev[j] <= sym_pt + dn and x_coord_rev[j] >= sym_pt - dn:
+                xcoord_exp.append(x_coord_rev[j])
+                an_cut.append(neuden_rev[j])
         
         "plot to check the tanh fit result"
         # plt.figure(figsize=(7,7))
@@ -226,12 +249,12 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         "fitting choice 2: find the point before the kink"
         xcoord_k = []
         an_k_cut = []
-        for af in range(len(x_coord)):
-            if x_coord[af] <= sym_pt + dn:
-                xcoord_k.append(x_coord[af])
-                an_k_cut.append(neuden[af])
+        for af in range(len(x_coord_rev)):
+            if x_coord_rev[af] <= sym_pt + dn:
+                xcoord_k.append(x_coord_rev[af])
+                an_k_cut.append(neuden_rev[af])
         
-        pen_try = []
+        
         
         "create try and error list"
         n_list = []
@@ -245,15 +268,17 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         
         an_tmp_dic = {}
         x_tmp_dic = {}
-        # pen_try = []
-        
+        pen_try = []
+        len_try = []
+        lne = []
+
         for ak in n_list:
             x_tmp = []
             an_tmp = []
             # print(ak)
             for ah in range(ak):
-                x_tmp.append(xcoord_k[-ah - 1])
-                an_tmp.append(an_k_cut[-ah - 1])
+                x_tmp.append(xcoord_k[ah])
+                an_tmp.append(an_k_cut[ah])
             x_tmp = np.asarray(x_tmp)
             an_tmp = np.asarray(an_tmp)
             x_tmp_dic[str(ak)] = x_tmp
@@ -261,10 +286,13 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
             # print(ak)
             # print(x_tmp)
             # print(an_tmp)
-            fitexp_tmp = exp_fit_sp(x_choice, x_tmp, an_tmp)
+            fitexp_tmp = exp_fit(x_choice, x_tmp, an_tmp)
+            fitlnexp_tmp = linear_fit(x_choice, x_tmp, an_tmp)
             pen_try.append(1/fitexp_tmp['popt_an'][1])
+            len_try.append(1/fitlnexp_tmp['popt_an'][0])
+            lne.append(fitlnexp_tmp['popt_an'][0])
             
-        diff_pen = np.diff(pen_try)
+        diff_len = np.diff(len_try)
         
         
         "print to check fit method 2 result"
@@ -278,21 +306,35 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         # plt.figure(figsize=(7,7))
         # plt.errorbar(x_tmp_dic.keys(), pen_try, yerr= stdev(pen_try), fmt = 'o-', color = 'b', label= 'efold_length')
         # plt.xlabel('number of fitting points')
-        # # plt.ylabel('efold_length')
-        # plt.title('efold length for fitting method 2')
+        # plt.title('efold length exp fit')
+        # plt.legend()
+        
+        # plt.figure(figsize=(7,7))
+        # plt.errorbar(x_tmp_dic.keys(), len_try, yerr= stdev(len_try), fmt = 'o-', color = 'b', label= 'efold_length')
+        # plt.xlabel('number of fitting points')
+        # plt.title('efold length log fit')
+        # plt.legend()
+        
+    
+        # print(len_try)
+        
+        # plt.figure(figsize=(7,7))
+        # plt.plot(x_tmp_dic.keys(), lne, 'o-', color = 'b', label= 'efold_length')
+        # plt.xlabel('number of fitting points')
+        # plt.title('log fit slope')
         # plt.legend()
         
            
-        dis_pen = []
-        stable_pen = []
-        for i_diff in diff_pen:
-            dis_pen.append(abs(i_diff))
-            if abs(i_diff) <= 0.001:
-                stable_pen.append(abs(i_diff))
+        dis_len = []
+        stable_len = []
+        for i_diff in diff_len:
+            dis_len.append(abs(i_diff))
+            if abs(i_diff) <= 0.003:
+                stable_len.append(abs(i_diff))
         
         # print(dis_pen)
         
-        p = list(dis_pen).index(stable_pen[0])
+        p = list(dis_len).index(stable_len[0])
         # print(diff_pen)
         ind = n_list[p]
         # if p + 1 < len(n_list):
@@ -311,73 +353,27 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         # print(x_m2)
         
         
-        fit_m2_dic = exp_fit_sp(x_choice, x_m2, an_m2)
+        fit_m2_dic = linear_fit(x_choice, x_m2, an_m2)
         
-        exp_fit_m2 = fit_m2_dic['exp_an_fit']
-        efold_m2 = 1/fit_m2_dic['popt_an'][1]
-        std_m2 = stdev(pen_try)/np.sqrt(len(pen_try))
+        exp_fit_m2 = fit_m2_dic['exp_line_fit']
+        efold_m2 = 1/fit_m2_dic['popt_an'][0]
+        std_m2 = stdev(len_try)/np.sqrt(len(len_try))
+        del_x = x_m2[0] - x_m2[-1]
         
         opq_m2 = 2*dn/efold_m2
         
         
-        x_m3 = []
-        an_m3 = []
-        
-        # i_nd = 1
-        # for i in range(len(x_tmp_dic[str(n_list[-1])]) - 1):
-        #     if i_nd >= ind - 1:
-        #         x_m3.append(x_tmp_dic[str(n_list[-1])][i_nd])
-        #         an_m3.append(an_tmp_dic[str(n_list[-1])][i_nd])
-        #     i_nd = i_nd + 1
-        
-        # print(x_tmp_dic[str(n_list[-1])])
-        
-        diff_val = np.diff(np.log10(an_tmp_dic[str(n_list[-1])]))
-        diff_val = np.insert(diff_val, 0, 0)
-              
-        dis_val = []
-        for i_val in diff_val:
-            dis_val.append(abs(i_val))
-        
-        "plot to check the result of fitting method 3"
-        # plt.figure(figsize=(7,7))
-        # plt.plot(x_tmp_dic[str(n_list[-1])], dis_val,'o-', color = 'b', label= 'neutral density')
-        # plt.xlabel('magnetic flux coordinate: psiN')
-        # # plt.ylabel('neutral density difference')
-        # plt.title('log neutral density difference for method 3')
-        # plt.legend()
-        
-                      
-        qth = list(dis_val).index(max(dis_val))
-        # qin = n_list[qth]
-        # print(qin)
-        
-        
-        if qth >= 4:
-            x_m3 = np.asarray(x_tmp_dic[str(qth)])
-            an_m3 = np.asarray(an_tmp_dic[str(qth)])
-        elif qth < 4:
-            x_m3 = np.asarray(x_tmp_dic[str(4)])
-            an_m3 = np.asarray(an_tmp_dic[str(4)])
-        
-        
-        fit_m3_dic = exp_fit_sp(x_choice, x_m3, an_m3)
-
-        
-        exp_fit_m3 = fit_m3_dic['exp_an_fit']
-        efold_m3 = 1/fit_m3_dic['popt_an'][1]
-        
-        opq_m3 = 2*dn/efold_m3
         
         
         xcoord_exp = np.asarray(xcoord_exp)
         an_cut = np.asarray(an_cut)
         
-        fit_exp_dic = exp_fit_sp(x_choice, xcoord_exp, an_cut)
+        fit_exp_dic = linear_fit(x_choice, xcoord_exp, an_cut)
 
         
-        exp_an_fit = fit_exp_dic['exp_an_fit']
-        efold = 1/fit_exp_dic['popt_an'][1]
+        exp_an_fit = fit_exp_dic['exp_line_fit']
+        efold = 1/fit_exp_dic['popt_an'][0]
+        n_sep_fit = np.exp(fit_exp_dic['popt_an'][1])
         
         opq = 2*dn/efold
         
@@ -414,17 +410,15 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
                       'efold_length': efold, 'dimensionless_opaqueness': opq,
                       'ne_symmetry_point': sym_pt, 'te_symmetry_point': sym_pt_te,
                       'penetration_length_change': pen_try, 'an_tmp_dic': an_tmp_dic,
-                      'diff_pen': diff_pen,
+                      'diff_len': diff_len, 'n_sep_fit': n_sep_fit,
                       
                       'exp_fit_m2': exp_fit_m2, 
                       'efold_length_method2': efold_m2, 
                       'dimensionless_opaqueness_method2': opq_m2,
                       'x_m2': x_m2, 'std_m2': std_m2,
+                      'method2_fitting_width': del_x
                       
-                      'exp_fit_m3': exp_fit_m3, 
-                      'efold_length_method3': efold_m3, 
-                      'dimensionless_opaqueness_method3': opq_m3, 
-                      'x_m3': x_m3}
+                      }
         
         
         return result_dic
@@ -459,3 +453,53 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
 
 
 #--------------------spare-zone--------------------------------------------
+
+
+"exp fitting method3"
+# x_m3 = []
+# an_m3 = []
+
+# i_nd = 1
+# for i in range(len(x_tmp_dic[str(n_list[-1])]) - 1):
+#     if i_nd >= ind - 1:
+#         x_m3.append(x_tmp_dic[str(n_list[-1])][i_nd])
+#         an_m3.append(an_tmp_dic[str(n_list[-1])][i_nd])
+#     i_nd = i_nd + 1
+
+# print(x_tmp_dic[str(n_list[-1])])
+
+# diff_val = np.diff(np.log10(an_tmp_dic[str(n_list[-1])]))
+# diff_val = np.insert(diff_val, 0, 0)
+      
+# dis_val = []
+# for i_val in diff_val:
+#     dis_val.append(abs(i_val))
+
+"plot to check the result of fitting method 3"
+# plt.figure(figsize=(7,7))
+# plt.plot(x_tmp_dic[str(n_list[-1])], dis_val,'o-', color = 'b', label= 'neutral density')
+# plt.xlabel('magnetic flux coordinate: psiN')
+# # plt.ylabel('neutral density difference')
+# plt.title('log neutral density difference for method 3')
+# plt.legend()
+
+              
+# qth = list(dis_val).index(max(dis_val))
+# qin = n_list[qth]
+# print(qin)
+      
+# if qth >= 4:
+#     x_m3 = np.asarray(x_tmp_dic[str(qth)])
+#     an_m3 = np.asarray(an_tmp_dic[str(qth)])
+# elif qth < 4:
+#     x_m3 = np.asarray(x_tmp_dic[str(4)])
+#     an_m3 = np.asarray(an_tmp_dic[str(4)])
+
+
+# fit_m3_dic = exp_fit(x_choice, x_m3, an_m3)
+
+
+# exp_fit_m3 = fit_m3_dic['exp_an_fit']
+# efold_m3 = 1/fit_m3_dic['popt_an'][1]
+
+# opq_m3 = 2*dn/efold_m3
