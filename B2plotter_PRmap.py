@@ -16,9 +16,10 @@ from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 import numpy as np
 import xarray as xr
+import math
 
 
-class mapping_RRsep_to_psi(load_data):
+class RP_mapping(load_data):
     def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
         load_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
     
@@ -29,7 +30,8 @@ class mapping_RRsep_to_psi(load_data):
         
             pol_range = int(self.data['b2fgeo']['nx'] + 2)
             rad_range = int(self.data['b2fgeo']['ny'] + 2)
-            
+            mag_axis_z = self.data['gfile']['g']['zmaxis']
+            print(mag_axis_z)
             
             Attempt = self.data['dircomp']['Attempt']
             DRT = self.data['dirdata']['outputdir']['Output']
@@ -48,17 +50,17 @@ class mapping_RRsep_to_psi(load_data):
             
             "Calculate weight"
             
-            crup = RadLoc[:, 53]
-            crlow = RadLoc[:, 55]
-            czup = VertLoc[:, 53]
-            czlow = VertLoc[:, 55]
+            crup = RadLoc[:, 58]
+            crlow = RadLoc[:, 60]
+            czup = VertLoc[:, 58]
+            czlow = VertLoc[:, 60]
             
             pol_list = [52, 53, 54, 55, 56, 57]
             
 
             weight_mid = np.zeros(rad_range)
             for x in range(rad_range):
-                weight_mid[x] = czup[x]/ (czup[x] - czlow[x])
+                weight_mid[x] = (mag_axis_z - czlow[x])/ (czup[x] - czlow[x])
             
             mid_choice = np.zeros((rad_range, 4))
             mid_choice[:, 0] = czup
@@ -70,13 +72,13 @@ class mapping_RRsep_to_psi(load_data):
             
             mid_R = np.zeros(rad_range)
             for xa in range(rad_range):
-                mid_R[xa] = (1 - weight_mid[xa])*crup[xa] + weight_mid[xa]*crlow[xa]
+                mid_R[xa] = weight_mid[xa]*crup[xa] + (1 - weight_mid[xa])*crlow[xa]
             
             mid_Z = np.zeros(rad_range)
             for xb in range(rad_range):
-                mid_Z[xb] = (1 - weight_mid[xb])*czup[xb] + weight_mid[xb]*czlow[xb]
+                mid_Z[xb] = weight_mid[xb]*czup[xb] + (1 - weight_mid[xb])*czlow[xb]
                 
-            pol_list = [52, 53, 54, 55, 56, 57]
+            pol_list = [57, 58, 59, 60]
             
             # plt.figure(figsize=(7,7))
             # for in_pol in pol_list:
@@ -102,7 +104,7 @@ class mapping_RRsep_to_psi(load_data):
             
                     
             sep_index = sep[0]
-            print(sep)
+            # print(sep)
             
             weight_psi = (psi_solps_mid[sep_index] - 1)/(psi_solps_mid[sep_index] -psi_solps_mid[sep_index -1])
             
@@ -131,6 +133,8 @@ class mapping_RRsep_to_psi(load_data):
                 pol_range_dic[aa] = pol_range
                 rad_range_dic[aa] = rad_range
                 
+                mag_axis_z = self.data['gfile']['g']['zmaxis']
+                # print(mag_axis_z)
                 
                 Attempt = self.data['dircomp']['Attempt'][aa]
                 DRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
@@ -146,21 +150,22 @@ class mapping_RRsep_to_psi(load_data):
                 "Calculate midplane R for Z=0"
                 
                 "Calculate weight"
+                
                 if aa == 'one':
-                    crup = RadLoc[:, 53]
-                    crlow = RadLoc[:, 55]
-                    czup = VertLoc[:, 53]
-                    czlow = VertLoc[:, 55]
+                    crup = RadLoc[:, 57]
+                    crlow = RadLoc[:, 59]
+                    czup = VertLoc[:, 57]
+                    czlow = VertLoc[:, 59]
                 else:
-                    crup = RadLoc[:, 53]
-                    crlow = RadLoc[:, 55]
-                    czup = VertLoc[:, 53]
-                    czlow = VertLoc[:, 55]
+                    crup = RadLoc[:, 57]
+                    crlow = RadLoc[:, 59]
+                    czup = VertLoc[:, 57]
+                    czlow = VertLoc[:, 59]
                 
                 
                 weight_mid = np.zeros(rad_range)
                 for x in range(rad_range):
-                    weight_mid[x] = czup[x]/ (czup[x] - czlow[x])
+                    weight_mid[x] = (czup[x] - mag_axis_z)/ (czup[x] - czlow[x])
                 
                 mid_choice = np.zeros((rad_range, 4))
                 mid_choice[:, 0] = czup
@@ -179,7 +184,7 @@ class mapping_RRsep_to_psi(load_data):
                     mid_Z[xb] = (1 - weight_mid[xb])*czup[xb] + weight_mid[xb]*czlow[xb]
                     
                 
-                pol_list = [52, 53, 54, 55, 56, 57]
+                pol_list = [57, 58, 59, 60]
                 
                 # plt.figure(figsize=(7,7))
                 # for in_pol in pol_list:
@@ -191,8 +196,7 @@ class mapping_RRsep_to_psi(load_data):
                 # plt.ylabel('Z: [m]')
                 # plt.title('{} R-Z plot'.format(aa))
                 
-                
-                
+                               
                 psi_solps_mid = np.zeros(rad_range)
                 psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
                 # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
@@ -225,7 +229,7 @@ class mapping_RRsep_to_psi(load_data):
             self.data['DefaultSettings']['YDIM'] = rad_range_dic
             self.data['DefaultSettings']['SEP'] = SEP_dic
             
-        if self.withshift == False and self.withseries == True:
+        elif self.withshift == False and self.withseries == True:
         
             pol_range = self.data['b2fgeo']['nx'] + 2
             rad_range = self.data['b2fgeo']['ny'] + 2
@@ -238,6 +242,8 @@ class mapping_RRsep_to_psi(load_data):
             den_list = list(self.data['dircomp']['Attempt'].keys())
             aa = den_list[0]
             
+            mag_axis_z = self.data['gfile']['g']['zmaxis']
+            print(mag_axis_z)
             
             Attempt = self.data['dircomp']['Attempt'][aa]
             DRT = self.data['dirdata']['outputdir'][aa]['Output']
@@ -255,14 +261,14 @@ class mapping_RRsep_to_psi(load_data):
             "Calculate midplane R for Z=0"
             
             "Calculate weight"
-            crup = RadLoc[:, 53]
-            crlow = RadLoc[:, 55]
-            czup = VertLoc[:, 53]
-            czlow = VertLoc[:, 55]
+            crup = RadLoc[:, 58]
+            crlow = RadLoc[:, 60]
+            czup = VertLoc[:, 58]
+            czlow = VertLoc[:, 60]
             
             weight_mid = np.zeros(rad_range)
             for x in range(rad_range):
-                weight_mid[x] = czup[x]/ (czup[x] - czlow[x])
+                weight_mid[x] = (czup[x] - mag_axis_z)/ (czup[x] - czlow[x])
             
             mid_choice = np.zeros((rad_range, 4))
             mid_choice[:, 0] = czup
@@ -281,7 +287,7 @@ class mapping_RRsep_to_psi(load_data):
                 mid_Z[xb] = (1 - weight_mid[xb])*czup[xb] + weight_mid[xb]*czlow[xb]
                 
             
-            pol_list = [52, 53, 54, 55, 56, 57]
+            pol_list = [57, 58, 59, 60]
             
             # plt.figure(figsize=(7,7))
             # for in_pol in pol_list:
@@ -322,6 +328,188 @@ class mapping_RRsep_to_psi(load_data):
                 
             self.data['midplane_calc'] = midplane_dic
             
+    
+    
+    
+    def calc_pol_angle(self, pol_list):
+        
+        if self.withshift == False and self.withseries == False: 
+            Attempt = self.data['dircomp']['Attempt']
+            DRT = self.data['dirdata']['outputdir']['Output']
+            XDIM = self.data['b2fgeo']['nx'] + 2
+            YDIM = self.data['b2fgeo']['ny'] + 2
+            
+            
+            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                        usecols = (3)).reshape((YDIM, XDIM))
+            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                          usecols = (3)).reshape((YDIM,XDIM))
+            
+            mag_axis_z = self.data['gfile']['g']['zmaxis']
+            print(mag_axis_z)
+            mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_value']
+            print(mag_axis_r)
+            
+            angle_list = []
+            
+            for pol_index in pol_list:
+                rloc = RadLoc[:, int(pol_index)][0]
+                zloc = VertLoc[:, int(pol_index)][0]
+                
+                x = rloc - mag_axis_r
+                y = zloc - mag_axis_z
+                
+                
+                angle = np.arctan2(y, x)*180 / np.pi
+                if angle <= -90:
+                    angle = angle + 360
+                angle_list.append(angle)
+                
+            ln = len(pol_list)
+            pol_loc = np.zeros(ln)
+            i = 0
+            
+            for ii in pol_list:
+                pol_loc[i] = int(ii)
+                i = i + 1
+            
+            
+            plt.figure(figsize=(7,7))
+            plt.plot(pol_loc, angle_list, 'o-', color = 'r', label= 'poloidal angle')
+            plt.xlabel('poloidal index')
+            plt.title('poloidal angle verses poloidal index')
+            plt.legend()
+            
+            self.data['angle'] = angle_list
+            
+        elif self.withshift == True and self.withseries == False:        
+            angle_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                pol_range = int(self.data['b2fgeo'][aa]['nx'] + 2)
+                # print('xdim is {}'.format(str(pol_range)))
+                rad_range = int(self.data['b2fgeo'][aa]['ny'] + 2)
+                # print('ydim is {}'.format(str(rad_range)))
+                
+                mag_axis_z = self.data['gfile']['g']['zmaxis']
+                mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_dic'][aa]
+                # print(mag_axis_z)
+                
+                Attempt = self.data['dircomp']['Attempt'][aa]
+                DRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
+                
+                          
+                RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                            usecols = (3)).reshape((rad_range, pol_range))
+                VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                              usecols = (3)).reshape((rad_range, pol_range))
+                
+                angle_list = []
+                
+                for pol_index in pol_list:
+                    rloc = RadLoc[:, int(pol_index)][0]
+                    zloc = VertLoc[:, int(pol_index)][0]
+                    
+                    x = rloc - mag_axis_r
+                    y = zloc - mag_axis_z
+                    
+                    
+                    angle = np.arctan2(y, x)*180 / np.pi
+                    if angle <= -90:
+                        angle = angle + 360
+                    angle_list.append(angle)
+                    
+                ln = len(pol_list)
+                pol_loc = np.zeros(ln)
+                i = 0
+                
+                for ii in pol_list:
+                    pol_loc[i] = int(ii)
+                    i = i + 1
+                
+                pol_rev = list(reversed(pol_loc))
+                angle_rev = list(reversed(angle_list))
+                
+                plt.figure(figsize=(7,7))
+                plt.plot(pol_rev, angle_rev, 'o-', color = 'r', label= 'angle')
+                plt.xlabel('poloidal index')
+                plt.ylabel('angle')
+                plt.title('modify {} m poloidal angle verses poloidal index'.format(self.data['dircomp']['shift_dic'][aa]))
+                
+                # print(pol_rev)
+                # print(angle_rev)
+                              
+                angle_dic[aa] = angle_list
+                
+            
+                
+            self.data['angle'] = angle_dic
+            
+           
+        elif self.withshift == False and self.withseries == True:
+        
+            pol_range = self.data['b2fgeo']['nx'] + 2
+            rad_range = self.data['b2fgeo']['ny'] + 2
+            
+            
+            solps_dsa_dic = {}
+            for aa in self.data['dircomp']['Attempt'].keys():
+                solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+            
+            den_list = list(self.data['dircomp']['Attempt'].keys())
+            aa = den_list[0]
+            
+            mag_axis_z = self.data['gfile']['g']['zmaxis']
+            print(mag_axis_z)
+            
+            Attempt = self.data['dircomp']['Attempt'][aa]
+            DRT = self.data['dirdata']['outputdir'][aa]['Output']
+            
+            
+            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                        usecols = (3)).reshape((rad_range, pol_range))
+            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                          usecols = (3)).reshape((rad_range, pol_range))
+            
+            mag_axis_z = self.data['gfile']['g']['zmaxis']
+            print(mag_axis_z)
+            mag_axis_r = self.data['gfile']['g']['rmaxis']
+            print(mag_axis_r)
+            
+            angle_list = []
+            
+            for pol_index in pol_list:
+                rloc = RadLoc[:, int(pol_index)][0]
+                zloc = VertLoc[:, int(pol_index)][0]
+                
+                x = rloc - mag_axis_r
+                y = zloc - mag_axis_z
+                
+                
+                angle = np.arctan2(y, x)*180 / np.pi
+                if angle <= -90:
+                    angle = angle + 360
+                angle_list.append(angle)
+                
+            ln = len(pol_list)
+            pol_loc = np.zeros(ln)
+            i = 0
+            
+            for ii in pol_list:
+                pol_loc[i] = int(ii)
+                i = i + 1
+            
+            
+            # plt.figure(figsize=(7,7))
+            # plt.plot(pol_loc, angle_list, color = 'r', label= 'angle')
+            # plt.xlabel('poloidal index')
+            # plt.ylabel('angle')
+            # plt.title('angle verses poloidal index')
+            
+            self.data['angle'] = angle_list
+                
+            
+    
+    
     
     
     """
