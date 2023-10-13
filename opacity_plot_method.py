@@ -12,74 +12,167 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
     withshift = charactor['withshift']
     withseries = charactor['withseries']
     # j = 1
-    for i in result_dic.keys():
-        if i == 'std_m2':
-            pass
-        else:
-            plt.figure(figsize=(7,7))
+    adj_list = list(result_dic.keys())
+    # print(adj_list)
+    adj_list.append('method2_fitting_width_error')
+    # adj_list.append('width_relation')
+    # print(adj_list)
+    for i in adj_list:
+        plt.figure(figsize=(7,7))
         if log_flag:
             plt.yscale('log')
         else:
             pass
         if withshift == False and withseries == False:
             if i == 'efold_length_method2':
-                plt.errorbar(pol_loc, result_dic[i], yerr = result_dic['std_m2'], fmt = 'o--', 
+                plt.plot(pol_loc, result_dic['efold_length_method2'], 'o--', 
                          label= '{}'.format(i))
-                plt.title('{} verses poloidal index from {} to {} for different core electron density'.format(i, 
+                plt.title('{} verses poloidal index from {} to {}'.format(i, 
                                                          pol_loc[0], pol_loc[-1]))
+                plt.xlabel('poloidal angle')
+                
             elif i == 'std_m2':
-                pass
+                plt.errorbar(pol_loc, result_dic['efold_length_method2'], yerr = result_dic[i], fmt = 'o--', 
+                         label= '{} with error'.format('efold_length_method2'))
+                plt.title('{} verses poloidal index from {} to {}'.format('efold_length_method2', 
+                                                          pol_loc[0], pol_loc[-1]))
+                plt.xlabel('poloidal angle')
+                
+            elif i == 'electron_pedestal_density':
+                plt.scatter(result_dic['electron_pedestal_density'], result_dic['efold_length_method2'], 
+                         label= '{}'.format('efold_length_method2'))
+                plt.scatter(result_dic['electron_pedestal_density'], result_dic['pedestal_width'], 
+                         label= '{}'.format('pedestal_width'))
+                plt.xlabel('electron_pedestal_density: $n_{ped}$ (m$^{-3}$)')
+            
+            
+            elif i == 'method2_fitting_width_error':
+                plt.scatter(result_dic['method2_fitting_width'], result_dic['std_m2'], 
+                         label= '{}'.format('method2_fitting_width'))
+                plt.xlabel('method2_fitting_width')
+                plt.title('{} verses {} from {} to {} for different modified distances'.format('method2_fitting_error', 
+                                                         'method2_fitting_width', pol_loc[0], pol_loc[-1]))
+                      
             else:
                 plt.plot(pol_loc, result_dic[i],'o--', 
                      label= '{}'.format(i))
                 plt.title('{} verses poloidal index from {} to {}'.format(i, 
                                                      pol_loc[0], pol_loc[-1]))
-            plt.xlabel('poloidal index')
+                plt.xlabel('poloidal angle')
             # plt.ylabel('{}'.format(unit_dic[i]))
+            if max(pol_loc) > 90 and i != 'electron_pedestal_density' and i != 'method2_fitting_width_error' and i != 'width_relation':
+                plt.axvline(x= 90, color='black',lw=3, ls='--')
+            else:
+                pass
         
         elif withshift == True and withseries == False:
             for aa in iter_list:
                 if i == 'efold_length_method2':
-                    plt.errorbar(pol_loc, result_dic[i][aa], yerr = result_dic['std_m2'][aa], fmt = 'o--', 
+                    plt.plot(pol_loc[aa], result_dic['efold_length_method2'][aa], 'o--', 
                              label= '{}'.format(i))
-                    plt.title('{} verses poloidal index from {} to {} for different core electron density'.format(i, 
-                                                             pol_loc[0], pol_loc[-1]))
+                    plt.title('{} verses poloidal index from {} to {} for different modified distances'.format(i, 
+                                                             pol_loc[aa][0], pol_loc[aa][-1]))
+                    plt.xlabel('poloidal angle')
+                    
+                    # print(pol_loc[aa])
+                    # print(result_dic['efold_length_method2'][aa])
+                    
                 elif i == 'std_m2':
-                    pass
+                    plt.errorbar(pol_loc[aa], result_dic['efold_length_method2'][aa], yerr = result_dic[i][aa], fmt = 'o--', 
+                             label= '{} with error'.format('efold_length_method2'))
+                    plt.title('{} verses poloidal index from {} to {} for different modified distances'.format('efold_length_method2', 
+                                                             pol_loc[aa][0], pol_loc[aa][-1]))
+                    plt.xlabel('poloidal angle')
+                    
+                elif i == 'electron_pedestal_density':
+                    plt.scatter(result_dic['electron_pedestal_density'][aa], result_dic['efold_length_method2'][aa], 
+                             label= '{} {}'.format(aa, 'efold_length_method2'))
+                    plt.scatter(result_dic['electron_pedestal_density'][aa], result_dic['pedestal_width'][aa], 
+                             label= '{} {}'.format(aa, 'pedestal_width'))
+                    plt.xlabel('electron_pedestal_density: $n_{ped}$ (m$^{-3}$)')
+                    plt.title('{} and {} verses {} from {} to {} for different modified distances'.format('efold_length_method2', 
+                                                             'pedestal_width', 'electron_pedestal_density', pol_loc[aa][0], pol_loc[aa][-1]))
+                
+                elif i == 'method2_fitting_width_error':
+                    plt.scatter(result_dic['method2_fitting_width'][aa], result_dic['std_m2'][aa], 
+                             label= '{} {}'.format(aa, 'method2_fitting_width'))
+                    plt.xlabel('method2_fitting_width')
+                    plt.title('{} verses {} from {} to {} for different modified distances'.format('method2_fitting_error', 
+                                                             'method2_fitting_width', pol_loc[aa][0], pol_loc[aa][-1]))                    
+                
+                
+                # elif i == 'width_relation':
+                #     a_w = result_dic['method2_fitting_width'][aa]
+                #     x = [min(a_w), max(a_w)]
+                #     plt.scatter(result_dic['method2_fitting_width'][aa], result_dic['pedestal_width'][aa], 
+                #              label= '{} {}'.format(aa, 'width_relation'))
+                #     # plt.plot(x, x, label= 'x=y straight line')
+                #     plt.xlabel('method2_fitting_width')
+                #     plt.title('{} verses {} from {} to {} for different modified distances'.format('method2_fitting_width', 
+                #                                                 'pedestal_width', pol_loc[0], pol_loc[-1]))    
+                    
                 else:
-                    plt.plot(pol_loc, result_dic[i][aa], 'o--',
+                    plt.plot(pol_loc[aa], result_dic[i][aa], 'o--',
                          label= '{} for modified {} m case'.format(i, change_ver_dic[aa]))
-                    plt.title('{} verses poloidal index from {} to {} for different modified distances '.format(i, 
-                                                     pol_loc[0], pol_loc[-1]))
-            plt.xlabel('poloidal index')
+                    plt.title('{} verses poloidal index from {} to {} for different modified distances'.format(i, 
+                                                     pol_loc[aa][0], pol_loc[aa][-1]))
+                    plt.xlabel('poloidal angle')
+            if max(pol_loc[aa]) > 90 and i != 'electron_pedestal_density' and i != 'method2_fitting_width_error' and i != 'width_relation':
+                plt.axvline(x= 90, color='black',lw=3, ls='--')
+            else:
+                pass
             # plt.ylabel('{}'.format(unit_dic[i]))
             
         elif withshift == False and withseries == True:
             for aa in iter_list:
                 if i == 'efold_length_method2':
-                    plt.errorbar(pol_loc, result_dic[i][aa], yerr = result_dic['std_m2'][aa], fmt = 'o--', 
+                    plt.plot(pol_loc, result_dic['efold_length_method2'][aa], 'o--', 
                              label= '{}'.format(i))
                     plt.title('{} verses poloidal index from {} to {} for different core electron density'.format(i, 
                                                              pol_loc[0], pol_loc[-1]))
+                    plt.xlabel('poloidal angle')
+                    
                 elif i == 'std_m2':
-                    pass
+                    plt.errorbar(pol_loc, result_dic['efold_length_method2'][aa], yerr = result_dic[i][aa], fmt = 'o--', 
+                             label= '{} with error'.format('efold_length_method2'))
+                    plt.title('{} verses poloidal index from {} to {} for different core electron density'.format('efold_length_method2', 
+                                                             pol_loc[0], pol_loc[-1]))
+                    plt.xlabel('poloidal angle')
+                
+                elif i == 'electron_pedestal_density':
+                    plt.scatter(result_dic['electron_pedestal_density'][aa], result_dic['efold_length_method2'][aa], 
+                              label= '{} {}'.format(aa, 'efold_length_method2'))
+                    plt.scatter(result_dic['electron_pedestal_density'][aa], result_dic['pedestal_width'][aa], 
+                              label= '{} {}'.format(aa, 'pedestal_width'))
+                    plt.xlabel('electron_pedestal_density: $n_{ped}$ (m$^{-3}$)')
+                    plt.title('{} and {} verses {} from {} to {} for different core electron density'.format('efold_length_method2', 
+                                                             'pedestal_width', 'electron_pedestal_density', pol_loc[0], pol_loc[-1]))
+                
+                elif i == 'method2_fitting_width_error':
+                    plt.scatter(result_dic['method2_fitting_width'][aa], result_dic['std_m2'][aa], 
+                             label= '{} {}'.format(aa, 'method2_fitting_width'))
+                    plt.xlabel('method2_fitting_width')
+                    plt.title('{} verses {} from {} to {} for different core electron density'.format('method2_fitting_error', 
+                                                             'method2_fitting_width', pol_loc[0], pol_loc[-1]))                    
+                    
                 else:
                     plt.plot(pol_loc, result_dic[i][aa],'o--', 
                          label= '{} and electron density is {}'.format(i, change_ver_dic[aa]))
                     plt.title('{} verses poloidal index from {} to {} for different core electron density'.format(i, 
                                                      pol_loc[0], pol_loc[-1]))
-            plt.xlabel('poloidal index')
+                    plt.xlabel('poloidal angle')
             # plt.ylabel('{}'.format(unit_dic[i]))
+            if max(pol_loc) > 90 and i != 'electron_pedestal_density' and i != 'method2_fitting_width_error' and i != 'width_relation':
+                plt.axvline(x= 90, color='black',lw=3, ls='--')
+            else:
+                pass
         
         elif withshift == True and withseries == True:
             print('opacity_plot is not there yet, to be continue...')
         
         else:
             print('opacity_plot has a bug')
-        if max(pol_loc) > 46:
-            plt.axvline(x= 46, color='black',lw=3, ls='--')
-        else:
-            pass
+        
         
         
         plt.legend()
@@ -153,18 +246,7 @@ def opacity_radial_method_single(result_dic, SEP, x_choice, x_coord, Nd, Ne, Te,
     opq_m2 = result_dic['dimensionless_opaqueness_method2']
     # print(x_m2)
        
-    exp_fit_m3 = result_dic['exp_fit_m3']
-    x_m3 = result_dic['x_m3']
-    efold_m3 = result_dic['efold_length_method3']
-    opq_m3 = result_dic['dimensionless_opaqueness_method3']
-    
-    # dsa_cut = result_dic['dsa_cut']
-    # dsa_psn = result_dic['dsa_psn']
-    # psi_psn = result_dic['psi_psn']
-    # exp_dsa = result_dic['dsa_expfn']
-    # exp_an_fit = result_dic['exp_fit']
-    
-    
+       
     x = [-efold_m2 + max(xcoord_cut), max(xcoord_cut)]
     y = [min(exp_fit_m2), min(exp_fit_m2)]
     xd = [-dn + sym_pt, dn + sym_pt]
@@ -182,7 +264,7 @@ def opacity_radial_method_single(result_dic, SEP, x_choice, x_coord, Nd, Ne, Te,
     plt.plot(x_coord, Nd,'o-', color = 'green', label= 'solps neutral density')
     # plt.plot(psi_RGI, Nd,'o-', color = 'b', label= 'RGI_solps neutral density')
     plt.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, label= 'exponential fit')
-    plt.plot(x_m2, exp_fit_m2, color='b',lw= 5, label= 'exponential fit m2')
+    # plt.plot(x_m2, exp_fit_m2, color='b',lw= 5, label= 'exponential fit m2')
     # plt.plot(x_m3, exp_fit_m3, color='cyan',lw= 5, label= 'exponential fit m3')
     # plt.plot(exp_dsa, exp_fit, color='r',lw= 3, label= 'exponential fit')
     plt.axvline(x=max(xcoord_cut), color='orange',lw=3)
@@ -191,9 +273,9 @@ def opacity_radial_method_single(result_dic, SEP, x_choice, x_coord, Nd, Ne, Te,
     plt.axvline(x=dn + sym_pt, color='black',lw=3, ls='--', 
                 label= 'Pedestal width [m]: $\Delta n_e$')
     plt.axvline(x=-dn + sym_pt, color='black',lw=3, ls='--')
-    plt.axvline(x= x_m2[0], color='purple',lw=3, ls='--', 
-                label= 'exp fitting width')
-    plt.axvline(x= x_m2[-1], color='purple',lw=3, ls='--')
+    # plt.axvline(x= x_m2[0], color='purple',lw=3, ls='--', 
+    #             label= 'exp fitting width')
+    # plt.axvline(x= x_m2[-1], color='purple',lw=3, ls='--')
     if x_choice == 'psiN':
         plt.xlabel('psiN')
     elif x_choice == 'RRsep':
@@ -288,17 +370,8 @@ def opacity_radial_method_multi(x_choice, result_dic, SEP, iter_list,
     exp_fit_m2_dic = result_dic['exp_fit_m2']
     x_m2_dic = result_dic['x_m2']
     efold_m2_dic = result_dic['efold_length_method2']
-    opq_m2_dic = result_dic['dimensionless_opaqueness_method2']
     
-    exp_fit_m3_dic = result_dic['exp_fit_m3']
-    x_m3_dic = result_dic['x_m3']
-    efold_m3_dic = result_dic['efold_length_method3']
-    opq_m3_dic = result_dic['dimensionless_opaqueness_method3']
     
-    # psi_psn_dic = result_dic['psi_psn']
-    # dsa_psn_dic = result_dic['dsa_psn']
-    
-
     withshift = char['withshift']
     withseries = char['withseries'] 
     
@@ -312,7 +385,7 @@ def opacity_radial_method_multi(x_choice, result_dic, SEP, iter_list,
         if x_choice == 'psiN':
             plt.plot(psi_dic[i], Nd_dic[i],'o-', color = 'green', label= 'solps neutral density')
             plt.plot(xcoord_cut_dic[i], exp_an_fit_dic[i], color='r',lw= 5, label= 'exponential fit')
-            plt.plot(x_m2_dic[i], exp_fit_m2_dic[i], color='blue',lw= 5, label= 'exponential fit m2')
+            # plt.plot(x_m2_dic[i], exp_fit_m2_dic[i], color='blue',lw= 5, label= 'exponential fit m2')
             # plt.plot(x_m3_dic[i], exp_fit_m3_dic[i], color='cyan',lw= 5, label= 'exponential fit m3')
         elif x_choice == 'RRsep':
             plt.plot(dsa_dic[i], Nd_dic[i],'o-', color = 'green', label= 'solps neutral density')
@@ -322,8 +395,8 @@ def opacity_radial_method_multi(x_choice, result_dic, SEP, iter_list,
         plt.axvline(x = xp[0], color='orange',lw=3)
         plt.axvline(x= delta_dic[i] + ne_sym_pt_dic[i], color='black',lw=3, ls='--', label= 'Pedestal width')
         plt.axvline(x=-delta_dic[i] + ne_sym_pt_dic[i], color='black',lw=3, ls='--')
-        plt.axvline(x= x_m2_dic[i][0], color='purple',lw=3, ls='--', label= 'exp fitting width')
-        plt.axvline(x= x_m2_dic[i][-1], color='purple',lw=3, ls='--')
+        # plt.axvline(x= x_m2_dic[i][0], color='purple',lw=3, ls='--', label= 'exp fitting width')
+        # plt.axvline(x= x_m2_dic[i][-1], color='purple',lw=3, ls='--')
         if x_choice == 'psiN':
             plt.xlabel('psiN')
         elif x_choice == 'RRsep':
