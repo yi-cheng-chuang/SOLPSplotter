@@ -23,7 +23,7 @@ import tools as tl
 d= tl.mast_dir_dic()
 basedrt, topdrt, tpdrt= tl.set_wdir()
 
-newbase, drt, n, i = tl.mast_eir_dir('one')
+newbase, drt, n, i = tl.mast_eir_dir('org')
 
 dev = d['dev']
 shot = d['shot']
