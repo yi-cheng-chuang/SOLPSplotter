@@ -99,8 +99,10 @@ def s_number(text):
 def loadDS_dic(DEV):
     "New DefaultSettings for loading experimental data"
     
-    bload = {'TimeRange' : [1.10,1.30], 'AVG': False, 'multishift': False,
-             'EXP': False, 'fit': True, 'ROOTSHOT': ''}
+    bload = {'TimeRange' : [1.10,1.30], 'AVG': False, 'ROOTSHOT': ''}
+    
+    # bload = {'TimeRange' : [1.10,1.30], 'AVG': False, 'multishift': False,
+    #          'EXP': False, 'fit': True, 'ROOTSHOT': ''}
     if DEV == 'mast':
         fndic = {'expfilename': 'yag_27205_275.dat', 'fitfname': 'wsh_027205_275.dat'}
     else:
