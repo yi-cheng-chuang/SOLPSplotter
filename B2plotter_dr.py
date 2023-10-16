@@ -21,14 +21,16 @@ xl = b2p.Opacity_study(DEV = d['DEV'], withshift= d['withshift'], withseries= d[
 xl.load_mast_dir()
 xl.load_solpsgeo()
 xl.calc_RRsep()
+xl.fitmastexp()
 # xl.calcpsi()
 # xl.calc_RRsep()
-xl.calcpsi_1D(pol_loc= '27')
+PL = '27'
+xl.calcpsi_1D(pol_loc= PL)
 # xl.calc_flux_expansion(polpos= '55')
 # xl.load_vessel()
 xl.set_plot()
 # xl.Opacity_study_radial_plot_dsa(pol_loc= '57')
-xl.Opacity_study_radial_plot(pol_loc= '27', x_choice= 'psiN')
+xl.Opacity_study_radial_plot(pol_loc= PL, x_choice= 'psiN')
 
 
 # poloidal_index_list = []
