@@ -103,20 +103,6 @@ def flux_expansion_fit(psi, dsa, flux_expansion_jxa):
     slope = flux_expansion[0][0]
     
     return slope
-    
-#     fluxpsnparam[PolPos] = np.polyfit(RR_exp,Psin_avg[PolPos][RR_i],1,cov=True)
-#     fluxpsn[PolPos] = fluxpsnparam[PolPos][0][0]/fluxpsnparam[JXA][0][0]
-#     fluxpsn_err[PolPos] = np.sqrt(np.diag(fluxpsnparam[PolPos][1]))[0]
-#     efold_adj[PolPos] = fluxpsn[PolPos]*efold[PolPos]
-#     efold_adj_err[PolPos] = efold_adj[PolPos]*np.sqrt((efold_err[PolPos]/efold[PolPos])**2 + (fluxpsn_err[PolPos]/fluxpsn[PolPos])**2)
-            
-# print('Exponential fit from r-r_sep={:.1e}m to r-r_sep={:.1e}m'.format(RR_exp[0],RR_exp[-1]))
-# print('A0={:.3e}, lambda={:.1f}'.format(*eparam[PolPos]))
-# print('Poloidal Slice {:0.0f}: Raw e-folding length={:.1f}mm, std error={:.1f}'.format(PolPos,efold[PolPos],efold_err[PolPos]))
-# print('Slope={:.3f}, Flux Expansion={:.1f}, Adjusted e-folding length={:.1f}, std error={:.1f}'.format(fluxpsnparam[PolPos][0][0],fluxpsn[PolPos],efold_adj[PolPos],efold_adj_err[PolPos]))
-
-def linefit(x, m):
-    return m*x
 
 
 def linear_fit(x_choice, x_coord, neuden):
@@ -162,29 +148,6 @@ def linear_fit(x_choice, x_coord, neuden):
 def dsa_psi_fit(dsa, psi, dsa_cut):
     
     dsa_psi_fitcoe = np.polyfit(dsa, psi, 1 , cov=True)
-    # print(dsa_psi_fitcoe[1])
-    dsa_psi_fitpoly = np.poly1d(dsa_psi_fitcoe[0])
-    
-    
-    dsa_psi_fit = dsa_psi_fitpoly(dsa_cut)
-   
-    fit_dp_dic = {'dsa_psi_fit': dsa_psi_fit, 'dsa_psi_fitcoe': dsa_psi_fitcoe[0]}
-    
-    # plt.figure(figsize=(7,7))
-    # plt.plot(dsa, psi,'o-', color = 'green', label= 'solps neutral density')
-    # plt.plot(dsa_cut, psi_cut, color='r',lw= 5, label= 'exponential fit')
-    # plt.xlabel('RR_sep')
-    # plt.ylabel('psiN')
-    # plt.title('dsa_psi_fit')
-    # plt.legend()
-    
-    return fit_dp_dic
-
-
-
-def dsa_psi_fit_sp(dsa, psi, dsa_cut, psi_cut):
-    
-    dsa_psi_fitcoe = np.polyfit( dsa_cut, psi_cut, 1 , cov=True)
     # print(dsa_psi_fitcoe[1])
     dsa_psi_fitpoly = np.poly1d(dsa_psi_fitcoe[0])
     
