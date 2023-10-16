@@ -5,7 +5,7 @@ Created on Tue Sep 26 17:27:01 2023
 @author: user
 """
 
-from B2plotter_class import load_data
+from B2plotter_load_data import load_data
 import opacity_plot_method as opm
 import matplotlib.pyplot as plt
 import load_mast_expdata_method as lmem
@@ -705,9 +705,3 @@ class RP_mapping(load_data):
             
             dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
                         'dsa_{}_val'.format(pol_loc): RR_sep}
-
-
-     
-            
-    def Opacity_study_poloidal_plot(self, pol_list, x_choice):
-        self.data['poloidal_index'] = pol_list
