@@ -40,7 +40,7 @@ class load_expdata(B2plotter):
             self.data['fitprofile'] = fitdic
             self.data['dirdata']['fitloc'] = fitloc
             
-    def fitmastexp(self):
+    def fitmastexp(self, writefile):
         n_tot = 200
         # solps_psi = 1.09145489
         solps_psi = 1.1
@@ -63,7 +63,7 @@ class load_expdata(B2plotter):
         tanh_ne_fit = fm.tanh(x_model, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         tanh_te_fit = fm.tanh(x_model, popt_te[0], popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
-        shift = 0.002
+        shift = -0.004
         psi_sh = psi + shift
         
         sh_opt_ne, sh_cov_ne = curve_fit(fm.tanh, psi_sh, ne, p0)
@@ -78,16 +78,26 @@ class load_expdata(B2plotter):
         
         
         gnexp = np.gradient(tanh_ne_fit)
+        dn = popt_ne[2]
+        sh_dn = sh_opt_ne[2]
+        sym_pt = popt_ne[0]
+        sh_sym_pt = sh_opt_ne[0]
+        dtn = popt_te[2]
+        te_sym_pt = popt_te[0]
+        print(sym_pt + 0.5*np.log(2 + np.sqrt(3))*dn)
+        print(sh_sym_pt + 0.5*np.log(2 + np.sqrt(3))*sh_dn)
         
         "experimental data and tanh fit"
         "electron density"
         plt.figure(figsize=(7,7))
         plt.plot(x_model, tanh_ne_fit, color='r', label= 'electron density fit')
-        plt.errorbar(psi, ne, ne_er,fmt="o", label= 'electron density experiment data')
-        
+        plt.errorbar(psi, ne, ne_er,fmt= "o", label= 'electron density experiment data')
+        plt.axvline(x=dn + sym_pt, color= 'black',lw= 3, ls= '--', 
+                    label= 'Pedestal width [m]: $\Delta n_e$')
+        plt.axvline(x=-dn + sym_pt, color= 'black',lw= 3, ls= '--')
         plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
-        plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
-        plt.title('Electron density')
+        # plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
+        plt.title('Electron density: ${n_e}$ (10$^{20}$m$^{-3}$)')
         plt.legend()
         
         
@@ -96,6 +106,32 @@ class load_expdata(B2plotter):
         plt.figure(figsize=(7,7))
         plt.plot(x_model, tanh_te_fit, color='r', label= 'electron temperature fit')
         plt.errorbar(psi, te, te_er, fmt= "o", label= 'electron temperature experiment data')
+        plt.axvline(x=dtn + te_sym_pt, color='black',lw=3, ls='--', 
+                    label= 'temperature pedestal width [m]: $\Delta T_e$')
+        plt.axvline(x=-dtn + te_sym_pt, color='black',lw=3, ls= '--')
+        plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
+        # plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
+        plt.title('Electron temperature: ${T_e}$ (KeV)')
+        plt.legend()
+        
+        
+        "fit profile and shift profile"
+        "electron density"
+        
+        plt.figure(figsize=(7,7))
+        plt.plot(x_sh, sh_ne_fit,'-o', color='r', label= 'electron density fit with shift')
+        plt.plot(x_model, tanh_ne_fit,'-o', color='b', label= 'electron density fit')
+        
+        plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
+        plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
+        plt.title('Electron density')
+        plt.legend()
+        
+        "electron tempurature"
+        
+        plt.figure(figsize=(7,7))
+        plt.plot(x_sh, sh_te_fit,'-o', color='r', label= 'electron temperature fit with shift')
+        plt.plot(x_model, tanh_te_fit,'-o', color='b', label= 'electron temperature fit')
         
         plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
         plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
@@ -103,50 +139,32 @@ class load_expdata(B2plotter):
         plt.legend()
         
         
-        "fit profile and shift profile"
-        "electron density"
-        
-        # plt.figure(figsize=(7,7))
-        # plt.plot(x_sh, sh_ne_fit,'-o', color='r', label= 'electron density fit with shift')
-        # plt.plot(x_model, tanh_ne_fit,'-o', color='b', label= 'electron density fit')
-        
-        # plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
-        # plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
-        # plt.title('Electron density')
-        # plt.legend()
-        
-        "electron tempurature"
-        
-        # plt.figure(figsize=(7,7))
-        # plt.plot(x_sh, sh_te_fit,'-o', color='r', label= 'electron temperature fit with shift')
-        # plt.plot(x_model, tanh_te_fit,'-o', color='b', label= 'electron temperature fit')
-        
-        # plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
-        # plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
-        # plt.title('Electron temperature')
-        # plt.legend()
-        
-        
         plt.show()
         
+        exp_fit_dic = {'psiN': x_sh, 'ne': sh_ne_fit, 'te': sh_te_fit,
+                       'ne_fit_coe': sh_opt_ne, 'te_fit_coe': sh_opt_te}
         
-        w_datalist = []
-        filename = 'wsh_027205_275.dat'
-        fdir = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
-                                self.DEV, self.loadDS['fitfname'])
-        for j in range(n_tot):
-            w_list =[]
-            w_list.append("{: .6f}".format(x_sh[j]))
-            w_list.append("{: .6f}".format(sh_ne_fit[j]))
-            w_list.append("{: .6f}".format(sh_te_fit[j]))
-            w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
-            w_datalist.append(w_writelist)
-       
-        with open(fdir, 'w') as f:
-            for l,w_line in enumerate(w_datalist):   
-                f.writelines(w_line + "\n")
         
+        self.data['experimental_fit'] = exp_fit_dic
+        
+        if writefile == True:
+            w_datalist = []
+            filename = 'wsh_027205_275.dat'
+            fdir = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
+                                    self.DEV, self.loadDS['fitfname'])
+            for j in range(n_tot):
+                w_list =[]
+                w_list.append("{: .6f}".format(x_sh[j]))
+                w_list.append("{: .6f}".format(sh_ne_fit[j]))
+                w_list.append("{: .6f}".format(sh_te_fit[j]))
+                w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
+                w_datalist.append(w_writelist)
+           
+            with open(fdir, 'w') as f:
+                for l,w_line in enumerate(w_datalist):   
+                    f.writelines(w_line + "\n")
             
+        
             
 class load_data(load_expdata):
     
@@ -232,19 +250,38 @@ class load_data(load_expdata):
             #                                  coords=[Y,X,Attempts], 
             # dims=['Radial_Location','Poloidal_Location','Attempt'], name = param)
             if test:
-                print('yes, {} is in parameter'.format(param))
+                # print('yes, {} is in parameter'.format(param))
                 RawData = np.loadtxt('{}/{}{}'.format(BASEDRT, param, str(Attempt)),usecols = (3))
+                # temp_dic = {param: RawData}
+                # self.data['temp'] = temp_dic
             elif test == False:
                 print('no, {} is not in parameter'.format(param))
             else:
                 print('there might be a bug')
+                
+                
+            # def chunks(xs, n):
+            #     n = max(1, n)
+            #     return (xs[i:i+n] for i in range(0, len(xs), n))
+            
+            # sep_test = np.array_split(range(11), 3)
+            # self.data['sep_test'] = sep_test
+            # print(sep_test[0])
             
             if len(RawData) > 0:        
                 if RawData.size == XDIM*YDIM:
                     # self.data['outputdata'][param].values[:,:,n] = RawData.reshape((YDIM,XDIM))[1:YDIM-1,XMin:XMax+1]
                     self.data['outputdata'][param] = RawData.reshape((YDIM,XDIM))
+                elif RawData.size == XDIM*YDIM*2:
+                    raw_split = np.array_split(RawData, 2)
+                    param_dic = {'D_0': raw_split[0].reshape((YDIM,XDIM)), 
+                                 'D_1': raw_split[1].reshape((YDIM,XDIM))}
+                    self.data['outputdata'][param] = param_dic
+                    # print('let work on it')
+                    
+                    
                 elif RawData.size != XDIM*YDIM:
-                    print('rawdata size is not equal to {}'.format(str(XDIM*YDIM)))
+                    print('rawdata size is not equal to {}, it is {}'.format(str(XDIM*YDIM), str(RawData.size)))
                 # elif RawData.size == XDIM*YDIM*2:
                 #     self.data['outputdata'][param].values[:,:,n] = RawData.reshape((2*YDIM,XDIM))[1+YDIM:2*YDIM-1,XMin:XMax+1]
             else:
