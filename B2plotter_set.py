@@ -14,14 +14,17 @@ def Setting_dic():
                'Publish': 'b2plottersetting'}
     return set_dic
 
+DP = {'series_flag': 'eireneN'}
+
+
 def mast_comp_dic():
     a_shift = 'org'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
-    series_dic = {'org': '39_noc_nts5_a', 'dot3': '13_r1_full3e5_sol9e5_adjinp_dot3_a', 
-                  'dot5': '24_r1_full3e5_sol9e5_ts5_dot5_a', 'dot7': '11_full3e5_sol9e5_dot7_a', 
-                  'one': '30_full3e5_sol9e5_one_a'}
+    series_dic = {'org': '47_n100000_1_nts5_a', 'dot3': '13_n100000_2_dot3_a', 
+                  'dot5': '24_n100000_2_dot5_a', 'dot7': '12_n100000_2_dot7_a', 
+                  'one': '31_n100000_2_one_a'}
     outputlist = ['Output', 'Output2', 'EirOutput']
     mast_dir_dic = {'Shot': '027205', 'shift_dic': shift_dic, 
                     'shift_file_dic': shift_file_dic, 'series_dic': series_dic, 
@@ -56,6 +59,19 @@ def mast_comp_dir_series():
     
     return mast_series_dir_dic
     
+def mast_comp_dir_eireneN():
+    a_shift = 'org'
+    shift = 0
+    tail = '_nts5_a'
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    shift_filename = 'org_change_particle_number'
+    mast_eireneN_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
+                    'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
+    
+    return mast_eireneN_dir_dic
+
+
+
 
 
 def set_wdir(): #Function to set correct Working Directory Path depending on which machine is in use
@@ -73,18 +89,22 @@ def set_wdir(): #Function to set correct Working Directory Path depending on whi
     
     return basedrt, topdrt, tpdrt
 
-def s_number(text):
+def s_number(text, series_flag):
     sd = Setting_dic()
     if sd['withshift'] == False and sd['withseries'] == False:
         name = text.split("/",-1)[-2]
         nu = int(name.split('_')[0])
     elif sd['withshift'] == False and sd['withseries'] == True:
-        name = text.split("\\",-1)[-1]
-        nu = re.findall('\d+\.\d+', name)
-        # print(type(den))
-        # nu = den
-        # print(type(name.split('_')[0]))
-        nu.append(name.split('_')[0])
+        if series_flag == 'change_den':
+            name = text.split("\\",-1)[-1]
+            nu = re.findall('\d+\.\d+', name)
+            nu.append(name.split('_')[0])
+            # print(nu)
+        elif series_flag == 'eireneN':
+            name = text.split("\\",-1)[-1]
+            nu = re.findall('\d+', name)
+            nu.append(name.split('_')[0])
+            # print(nu)
     elif sd['withshift'] == True and sd['withseries'] == False:
         name = text.split("/",-1)[-2]
         nu = int(name.split('_')[0])
@@ -115,16 +135,15 @@ def loadDS_dic(DEV):
 A = ['39']
 
 def opacity_study_unit():
-    unit = {'efold_length': 'efold length: $\lambda_{n_D}$: [m]',
-            'pedestal_width': 'Pedestal width: $\Delta n$: [m]',
+    unit = {'efold_length_psiN': 'efold length psiN',
+            'pedestal_width_psiN': 'Pedestal width psiN',
               'dimensionless_opaqueness': 'dimensionless opaqueness', 
               'neutral_density': 'neutral density ${n_D}$ (m$^{-3}$)', 
               'electron_pedestal_density': 'electron pedestal density: $n_{ped}$ (m$^{-3}$)',
               'temperature_pedestal_width': 'temperature pedestal width: $\Delta T$: [m]',
-              
-              'efold_length_method2': 'efold length: $\lambda_{n_D}$: [m]',
-              'dimensionless_opaqueness_method2': 'dimensionless opaqueness',
-              'method2_fitting_width': 'method2_fitting_width'
+              'flux_expansion': 'flux_expansion',
+              'efold_length': 'efold length: $\lambda_{n_D}$: [mm]',
+              'pedestal_width': 'Pedestal width: $\Delta n$: [mm]',
               
               }
     return unit
@@ -224,7 +243,7 @@ P = {'Ne': r'Electron Density $n_e\;(m^{-3})$',
         'LyaEmissW' : r'Converted Lyman-alpha Emissivity $(W*m^{-3})$',
         'LyaEmissW_IE' : r'Ion-Electron Reaction Lyman-alpha Emissivity $(W*m^{-3})$'}
 
-DP = {'LOG10' : 0,
+DP_backup = {'LOG10' : 0,
         'GRAD' : False,
         'ELEV' : 75,
         'AZIM' : 270,
@@ -253,6 +272,7 @@ DP = {'LOG10' : 0,
         'TC_Flux' : [], 
         'TC_Psin' : [],
         'GRID': False,
+        'series_flag': 'change_den',
         'AX' : None} #1160718
 
 # for key, value in DP.items():
