@@ -23,6 +23,7 @@ from scipy import interpolate
 from scipy.optimize import curve_fit
 from scipy.stats import binned_statistic
 import matplotlib.pyplot as plt
+import B2TransportParser as b2tp
 
 
 class B2plotter:
@@ -82,10 +83,17 @@ class B2plotter:
                 self.data['dircomp']['Attempt'] = att_dic
             
             elif self.withshift == False and self.withseries == True:
-                self.data['dircomp'] = b2s.mast_comp_dir_series()
-                series_dir, att_dic = lmem.mast_series_dir()
-                self.data['dirdata'] = series_dir
-                self.data['dircomp']['Attempt'] = att_dic
+                series_flag = self.DefaultSettings['series_flag']
+                if series_flag == 'change_den':
+                    self.data['dircomp'] = b2s.mast_comp_dir_series()
+                    series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
+                    self.data['dirdata'] = series_dir
+                    self.data['dircomp']['Attempt'] = att_dic
+                elif series_flag == 'eireneN':
+                    self.data['dircomp'] = b2s.mast_comp_dir_eireneN()
+                    series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
+                    self.data['dirdata'] = series_dir
+                    self.data['dircomp']['Attempt'] = att_dic
             elif self.withshift == True and self.withseries == True:
                 print('load_mast_dir is not there yet, to be continue...')      
             else:
@@ -94,17 +102,6 @@ class B2plotter:
         else:
             print('DEV setting is not mast')
     
-    
-    def load_mast_dir_series(self):
-        if self.DEV == 'mast':
-            if self.withseries == True:
-                self.data['dircomp'] = b2s.mast_comp_dir_series()
-                mast_basedir, Attempt_dic = lmem.mast_base_dir()
-                self.data['dirdata'] = mast_basedir
-                self.data['dircomp']['Attempt'] = Attempt_dic
-        
-        
-        
  
 #-------------------------------------------------------------------       
  
@@ -397,26 +394,6 @@ class B2plotter:
         
         
     
-    def calc_sep_index(self, psi, rad_range):
-        index_low = []
-        index_high = []
-        index = np.zeros(2)
-        for y in range(rad_range):
-            if psi[y] <= 1:
-                index_low.append(y)
-            if psi[y] >= 1:
-                index_high.append(y)
-    
-        
-        index[0] = index_low[-1]
-        index[1] = index_high[0]
-        
-        index_dic = {'index_low': index_low, 'index_high': index_high, 
-                     'index': index}
-        return index_dic
-    
-    
-    
     def calcpsi_1D(self, pol_loc):
         
         if self.withshift == False and self.withseries == False:
@@ -436,7 +413,7 @@ class B2plotter:
             # print(type(psiNinterp_RBS))
             psival = np.zeros((pol_range, rad_range))
             
-            pol_index = int(pol_loc) + 1
+            pol_index = int(pol_loc)
             
             crLowerLeft = geo['crx'][pol_index,:,0]
             crLowerRight = geo['crx'][pol_index,:,1]
@@ -576,7 +553,7 @@ class B2plotter:
                 psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
                 # print(type(psiNinterp_RBS))
                 
-                pol_index = int(pol_loc) + 1
+                pol_index = int(pol_loc)
                 
                 crLowerLeft = geo['crx'][pol_index,:,0]
                 crLowerRight = geo['crx'][pol_index,:,1]
@@ -615,8 +592,6 @@ class B2plotter:
                 SEP_dic[aa] = index_dic['index'][0]
                 
                 
-                    
-            
             self.data['DefaultSettings']['XDIM'] = pol_range_dic
             self.data['DefaultSettings']['YDIM'] = rad_range_dic
             self.data['DefaultSettings']['SEP'] = SEP_dic
@@ -638,7 +613,7 @@ class B2plotter:
             psiNinterp_RBS = self.data['gfile']['gcomp']['interp']
             # print(type(psiNinterp_RBS))
             
-            pol_index = int(pol_loc) + 1
+            pol_index = int(pol_loc)
             
             crLowerLeft = geo['crx'][pol_index,:,0]
             crLowerRight = geo['crx'][pol_index,:,1]
@@ -689,7 +664,7 @@ class B2plotter:
         # print('xdim is {}'.format(str(pol_range)))
         rad_range = int(self.data['b2fgeo']['ny'] + 2)
         
-        pol_index = int(pol_loc) + 1
+        pol_index = int(pol_loc)
         
         crLowerLeft = geo['crx'][pol_index,:,0]
         
@@ -718,34 +693,109 @@ class B2plotter:
         crloc = RadLoc[:, pol_index]
         czloc = VertLoc[:, pol_index]
 
+                
+    def calc_flux_expansion(self, pol_loc, ped_index, iter_index):
         
-
-    def load_vessel(self):
-        # try:
-        #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
-        # except:
-        #     print('mesh.extra file not found! Using vvfile.ogr instead')
-        #     WallFile=None
-            
-        VVFILE = np.loadtxt('{}/vvfile.ogr'.format(self.data['dirdata']['tbase']))
-        
-        self.data['vessel'] = VVFILE
-
-        
-    def calc_flux_expansion(self, polpos):
         if self.withshift == False and self.withseries == False:
-            self.calcpsi_1D(pol_loc='57')
-            psi_jxa = psi = self.data['psi']['psi_{}_val'.format('57')][:, 2]
-            dsa_jxa = self.data['dsa']['dsa_{}_val'.format('57')]
-            psi = self.data['psi']['psi_{}_val'.format(polpos)][:, 2]
-            dsa_polpos = self.data['psi']['dsa_{}_val'.format(polpos)]
-            psn_jxa = np.polyfit( dsa_jxa, psi_jxa, 1 , cov=True)
-            fluxpsn = fm.flux_expansion_fit(psi= psi, dsa= dsa_polpos, 
-                                            flux_expansion_jxa= psn_jxa)
-            print(fluxpsn)
+            
+            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+            RR_sep = self.data['midplane_calc']['R_Rsep']
+            
+            arcR_inv = list(reversed(arcR))
+            RRsep_inv = list(reversed(RR_sep))
+                       
+            arcR_cut = []
+            RRsep_cut = []
+            
+            for p_in in ped_index:
+                arcR_cut.append(arcR_inv[p_in])
+                RRsep_cut.append(RRsep_inv[p_in])
+                
+                       
+            flux_fit_dic = fm.flux_expand_fit(RRsep = RRsep_cut, arclength = arcR_cut)
+            
+            flux_expand = flux_fit_dic['flux_fitcoe'][0]
+            
+            return flux_expand
         
+        elif self.withshift == True and self.withseries == False:
+            
+            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)][iter_index]['dsa_{}_val'.format(pol_loc)]
+            RR_sep = self.data['midplane_calc'][iter_index]['R_Rsep']
+            
+            arcR_inv = list(reversed(arcR))
+            RRsep_inv = list(reversed(RR_sep))
+            
+            
+            arcR_cut = []
+            RRsep_cut = []
+            
+            for p_in in ped_index:
+                arcR_cut.append(arcR_inv[p_in])
+                RRsep_cut.append(RRsep_inv[p_in])
+                
+                       
+            flux_fit_dic = fm.flux_expand_fit(RRsep = RRsep_cut, arclength = arcR_cut)
+            
+            flux_expand = flux_fit_dic['flux_fitcoe'][0]
+            
+            return flux_expand
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+            RR_sep = self.data['midplane_calc']['R_Rsep']
+            
+            arcR_inv = list(reversed(arcR))
+            RRsep_inv = list(reversed(RR_sep))
+            
+            arcR_cut = []
+            RRsep_cut = []
+            
+            for p_in in ped_index:
+                arcR_cut.append(arcR_inv[p_in])
+                RRsep_cut.append(RRsep_inv[p_in])
+                
+                       
+            flux_fit_dic = fm.flux_expand_fit(RRsep = RRsep_cut, arclength = arcR_cut)
+            
+            flux_expand = flux_fit_dic['flux_fitcoe'][0]
+            
+            return flux_expand
+        
+        elif self.withshift == True and self.withseries == True:
+            print('calc_flux_expansion is not there yet, to be continue...')
+            
         else:
-            print('need more work')
+            print('There is a bug')
+    
+    
+
+'Way to generate align transport coefficient'
+    
+"""
+m = len(yd)
+
+one_trans = b2tp.InputfileParser(one_list[0], plot= False)
+ond = one_trans['1'].T
+onki = one_trans['3'].T
+onke = one_trans['4'].T
+onx= ond[:,0]  #the coordinate here is R-R_sep
+fd = ond[:,1]
+fki = onki[:,1]
+fke = onke[:,1]
+
+d_func = interpolate.interp1d(x, yd, fill_value = 'extrapolate')
+ond[:,1] = d_func(onx)
+ki_func = interpolate.interp1d(x, yki, fill_value = 'extrapolate')
+onki[:,1] = ki_func(onx)
+ke_func = interpolate.interp1d(x, yke, fill_value = 'extrapolate')
+onke[:,1] = ke_func(onx)
+
+
+b = b2tp.Generate(cod, CoeffID=1, SpeciesID=2, M=[1])
+c = b2tp.WriteInputfile(file='b2.transport.inputfile_align_{}_{}'.format(shift_a, n), points= one_trans ,M_1 = True, M=[1])
+"""
             
             
 
