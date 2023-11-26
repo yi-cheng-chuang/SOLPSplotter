@@ -41,17 +41,17 @@ def tanh_fit(x_choice, x_coord, ne, te):
                                popt_te[2], popt_te[3], popt_te[4])*pow(10, 3)
     
     
-    elif x_choice == 'RRsep':
-        p0 = [0.4, 0.005, 0.05, 0.5]
-        p1 = [2.2, 0.005, 0.05, 3.5]
-        popt_ne, pcov_ne = curve_fit(tanh_dsa, x_coord, Ne, p0)
-        print(popt_ne)
-        popt_te, pcov_te = curve_fit(tanh_dsa, x_coord, Te, p1)
-        # print(popt_te) 
-        tanh_ne_fit = tanh_dsa(x_coord, popt_ne[0], popt_ne[1], 
-                               popt_ne[2], popt_ne[3])*max(ne)
-        tanh_te_fit = tanh_dsa(x_coord, popt_te[0], popt_te[1], 
-                               popt_te[2], popt_te[3])*max(te)
+    # elif x_choice == 'RRsep':
+    #     p0 = [0.4, 0.005, 0.05, 0.5]
+    #     p1 = [2.2, 0.005, 0.05, 3.5]
+    #     popt_ne, pcov_ne = curve_fit(tanh_dsa, x_coord, Ne, p0)
+    #     print(popt_ne)
+    #     popt_te, pcov_te = curve_fit(tanh_dsa, x_coord, Te, p1)
+    #     # print(popt_te) 
+    #     tanh_ne_fit = tanh_dsa(x_coord, popt_ne[0], popt_ne[1], 
+    #                            popt_ne[2], popt_ne[3])*max(ne)
+    #     tanh_te_fit = tanh_dsa(x_coord, popt_te[0], popt_te[1], 
+    #                            popt_te[2], popt_te[3])*max(te)
     
     
     
@@ -97,13 +97,6 @@ def exp_fit(x_choice, x_coord, neuden):
     return fit_exp_dic
 
 
-def flux_expansion_fit(psi, dsa, flux_expansion_jxa):
-    flux_expansion = np.polyfit( dsa, psi,1,cov=True)
-    fluxpsn = flux_expansion[0][0]/flux_expansion_jxa[0][0]
-    slope = flux_expansion[0][0]
-    
-    return slope
-
 
 def linear_fit(x_choice, x_coord, neuden):
     
@@ -145,26 +138,50 @@ def linear_fit(x_choice, x_coord, neuden):
 
 
 "fit dsa with psi"
-def dsa_psi_fit(dsa, psi, dsa_cut):
-    
-    dsa_psi_fitcoe = np.polyfit(dsa, psi, 1 , cov=True)
+def dsa_psi_fit(dsa, psi):
+    dsa_psi_fitcoe = np.polyfit(psi, dsa, 1 , cov=True)
     # print(dsa_psi_fitcoe[1])
     dsa_psi_fitpoly = np.poly1d(dsa_psi_fitcoe[0])
     
     
-    dsa_psi_fit = dsa_psi_fitpoly(dsa_cut)
+    psi_dsa_fit = dsa_psi_fitpoly(psi)
    
-    fit_dp_dic = {'dsa_psi_fit': dsa_psi_fit, 'dsa_psi_fitcoe': dsa_psi_fitcoe[0]}
+    fit_dp_dic = {'dsa_psi_fit': psi_dsa_fit, 'dsa_psi_fitcoe': dsa_psi_fitcoe[0]}
     
     # plt.figure(figsize=(7,7))
-    # plt.plot(dsa, psi,'o-', color = 'green', label= 'solps neutral density')
-    # plt.plot(dsa_cut, psi_cut, color='r',lw= 5, label= 'exponential fit')
-    # plt.xlabel('RR_sep')
-    # plt.ylabel('psiN')
-    # plt.title('dsa_psi_fit')
+    # plt.plot(psi, dsa,'o-', color = 'green', label= 'psi_dsa')
+    # plt.plot(psi, psi_dsa_fit, color='r',lw= 5, label= 'psi_dsa_fit')
+    # plt.xlabel('psiN')
+    # plt.ylabel('R-Rsep')
+    # plt.title('psi_dsa_fit')
     # plt.legend()
     
+    # print(dsa_psi_fitcoe[0])
+
     return fit_dp_dic
+
+
+def flux_expand_fit(RRsep, arclength):
+    flux_fitcoe = np.polyfit(RRsep, arclength, 1 , cov=True)
+    # print(dsa_psi_fitcoe[1])
+    flux_fitpoly = np.poly1d(flux_fitcoe[0])
+          
+    flux_fit = flux_fitpoly(RRsep)     
+    flux_fit_dic = {'flux_fit': flux_fit, 'flux_fitcoe': flux_fitcoe[0]}
+    
+    # plt.figure(figsize=(7,7))
+    # plt.plot(RRsep, arclength,'o-', color = 'green', label= 'psi_dsa')
+    # plt.xlabel('R-Rsep')
+    # plt.ylabel('arclength')
+    # plt.title('flux_expansion_fit')
+    # plt.legend()
+    
+    # print(flux_fitcoe[0])
+    
+    
+    
+    return flux_fit_dic
+
 
 
 
@@ -172,13 +189,13 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
     if x_choice == 'psiN':
         fit_tanh_dic = tanh_fit(x_choice, x_coord, ne, te)
         tanh_ne_fit = fit_tanh_dic['tanh_ne_fit']
-        # dn = fit_tanh_dic['popt_ne'][2]
-        dn = fit_tanh_dic['popt_ne'][2]
+        dn = round(fit_tanh_dic['popt_ne'][2], 2)
         tanh_te_fit = fit_tanh_dic['tanh_te_fit']
-        # dtn = fit_tanh_dic['popt_te'][2]
-        dtn = fit_tanh_dic['popt_te'][2]   
+        dtn = round(fit_tanh_dic['popt_te'][2], 2)   
         ne_ped = (fit_tanh_dic['popt_ne'][1] + fit_tanh_dic['popt_ne'][3])*pow(10, 19)
         sym_pt_te = fit_tanh_dic['popt_te'][0]
+        sym_pt_ne = fit_tanh_dic['popt_ne'][0]
+        # print(sym_pt_te + dn)
         
         "fitting choice 1: in the width, symmetry point +- width/2"
         xcoord_exp = []
@@ -190,9 +207,13 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         neuden_rev = list(reversed(neuden))
         # print(type(x_coord_rev))
         for j in range(len(x_coord_rev)):
-            if x_coord_rev[j] <= sym_pt + dn and x_coord_rev[j] >= sym_pt - dn:
+            if x_coord_rev[j] <= sym_pt_ne + dn and x_coord_rev[j] >= sym_pt_ne - dn:
                 xcoord_exp.append(x_coord_rev[j])
                 an_cut.append(neuden_rev[j])
+                index_cut.append(j)
+        
+        # print(sym_pt, dn)
+        # print(xcoord_exp)
         
         "plot to check the tanh fit result"
         # plt.figure(figsize=(7,7))
@@ -209,125 +230,6 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         # print(xcoord_exp)
         # print(an_cut)
         
-        "fitting choice 2: find the point before the kink"
-        xcoord_k = []
-        an_k_cut = []
-        for af in range(len(x_coord_rev)):
-            if x_coord_rev[af] <= sym_pt + dn:
-                xcoord_k.append(x_coord_rev[af])
-                an_k_cut.append(neuden_rev[af])
-        
-        
-        
-        "create try and error list"
-        n_list = []
-        # nn_i = len(xcoord_exp)
-        nn_i = 4
-        # print(len(xcoord_k))
-        while nn_i < len(xcoord_k) + 1:
-            n_list.append(nn_i)
-            nn_i = nn_i + 1
-        # print(n_list)
-        
-        an_tmp_dic = {}
-        x_tmp_dic = {}
-        pen_try = []
-        len_try = []
-        lne = []
-
-        for ak in n_list:
-            x_tmp = []
-            an_tmp = []
-            # print(ak)
-            for ah in range(ak):
-                x_tmp.append(xcoord_k[ah])
-                an_tmp.append(an_k_cut[ah])
-            x_tmp = np.asarray(x_tmp)
-            an_tmp = np.asarray(an_tmp)
-            x_tmp_dic[str(ak)] = x_tmp
-            an_tmp_dic[str(ak)] = an_tmp   
-            # print(ak)
-            # print(x_tmp)
-            # print(an_tmp)
-            fitexp_tmp = exp_fit(x_choice, x_tmp, an_tmp)
-            fitlnexp_tmp = linear_fit(x_choice, x_tmp, an_tmp)
-            pen_try.append(1/fitexp_tmp['popt_an'][1])
-            len_try.append(1/fitlnexp_tmp['popt_an'][0])
-            lne.append(fitlnexp_tmp['popt_an'][0])
-            
-        diff_len = np.diff(len_try)
-        
-        
-        "print to check fit method 2 result"
-        # print(n_list)
-        # print(n_list[-1])
-        # print(x_tmp_dic[str(n_list[-1])])
-        # print(pen_try)
-        # print(diff_val)
-        
-        "plot the method 2 result"
-        # plt.figure(figsize=(7,7))
-        # plt.errorbar(x_tmp_dic.keys(), pen_try, yerr= stdev(pen_try), fmt = 'o-', color = 'b', label= 'efold_length')
-        # plt.xlabel('number of fitting points')
-        # plt.title('efold length exp fit')
-        # plt.legend()
-        
-        # plt.figure(figsize=(7,7))
-        # plt.errorbar(x_tmp_dic.keys(), len_try, yerr= stdev(len_try), fmt = 'o-', color = 'b', label= 'efold_length')
-        # plt.xlabel('number of fitting points')
-        # plt.title('efold length log fit')
-        # plt.legend()
-        
-    
-        # print(len_try)
-        
-        # plt.figure(figsize=(7,7))
-        # plt.plot(x_tmp_dic.keys(), lne, 'o-', color = 'b', label= 'efold_length')
-        # plt.xlabel('number of fitting points')
-        # plt.title('log fit slope')
-        # plt.legend()
-        
-           
-        dis_len = []
-        stable_len = []
-        for i_diff in diff_len:
-            dis_len.append(abs(i_diff))
-            if abs(i_diff) <= 0.003:
-                stable_len.append(abs(i_diff))
-        
-        # print(dis_pen)
-        
-        p = list(dis_len).index(stable_len[0])
-        # print(diff_pen)
-        ind = n_list[p]
-        # if p + 1 < len(n_list):
-        #     # print(len(n_list))
-        #     # print(p)
-        #     ind = n_list[p + 1]
-        #     # print(ind)
-        # elif p + 1 >= len(n_list):
-        #     # print(len(n_list))
-        #     # print(p)
-        #     ind = n_list[p]
-        #     # print(ind)
-        x_m2 = np.asarray(x_tmp_dic[str(ind)])
-        an_m2 = np.asarray(an_tmp_dic[str(ind)])
-        
-        # print(x_m2)
-        
-        
-        fit_m2_dic = linear_fit(x_choice, x_m2, an_m2)
-        
-        exp_fit_m2 = fit_m2_dic['exp_line_fit']
-        efold_m2 = 1/fit_m2_dic['popt_an'][0]
-        std_m2 = stdev(len_try)/np.sqrt(len(len_try))
-        del_x = x_m2[0] - x_m2[-1]
-        
-        opq_m2 = 2*dn/efold_m2
-        
-        
-        
-        
         xcoord_exp = np.asarray(xcoord_exp)
         an_cut = np.asarray(an_cut)
         
@@ -340,31 +242,6 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
         
         opq = 2*dn/efold
         
-        "fit_dsa_psi"
-        # xcoord_cut_dn = []
-        # for j in range(len(xcoord)):
-        #     if x_coord[j] <= fit_tanh_dic['popt_ne'][0] + dn and x_coord[j] >= fit_tanh_dic['popt_ne'][0] - dn:
-        #         xcoord_cut_dn.append(xcoord[j])
-        
-        # psi_cut_dn = []
-        # for j in range(len(psi)): 
-        #     if psi[j] <= 2*dn + 1 and psi[j] >= -2*dn + 1:
-        #         psi_cut_dn.append(psi[j])
-        
-        # # print(len(dsa_cut_dn))
-        # # print(len(psi_cut_dn))
-        # ir = min(len(dsa_cut_dn), len(psi_cut_dn))
-        
-        # psi_cut = np.zeros(ir)
-        # dsa_cut = np.zeros(ir)
-        # for i in range(ir):
-        #     psi_cut[i] = psi_cut_dn[i]
-        #     dsa_cut[i] = dsa_cut_dn[i]
-        
-        
-        # dp_dic = dsa_psi_fit(dsa = dsa, psi = psi, dsa_cut = dsa_cut)
-        # slope = dp_dic['dsa_psi_fitcoe'][0]
-        # dp_fit = dp_dic['dsa_psi_fit']
         
         result_dic = {'tanh_ne_fit': tanh_ne_fit, 'exp_fit': exp_an_fit,
                       'electron_pedestal_density': ne_ped, 'x_coord_cut': xcoord_exp,
@@ -372,15 +249,8 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
                       'temperature_pedestal_width': dtn,
                       'efold_length': efold, 'dimensionless_opaqueness': opq,
                       'ne_symmetry_point': sym_pt, 'te_symmetry_point': sym_pt_te,
-                      'penetration_length_change': pen_try, 'an_tmp_dic': an_tmp_dic,
-                      'diff_len': diff_len, 'n_sep_fit': n_sep_fit,
-                      
-                      'exp_fit_m2': exp_fit_m2, 
-                      'efold_length_method2': efold_m2, 
-                      'dimensionless_opaqueness_method2': opq_m2,
-                      'x_m2': x_m2, 'std_m2': std_m2,
-                      'method2_fitting_width': del_x
-                      
+                      'n_sep_fit': n_sep_fit, 'sep_index': index_cut
+                                        
                       }
         
         
@@ -417,52 +287,118 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
 
 #--------------------spare-zone--------------------------------------------
 
-
-"exp fitting method3"
-# x_m3 = []
-# an_m3 = []
-
-# i_nd = 1
-# for i in range(len(x_tmp_dic[str(n_list[-1])]) - 1):
-#     if i_nd >= ind - 1:
-#         x_m3.append(x_tmp_dic[str(n_list[-1])][i_nd])
-#         an_m3.append(an_tmp_dic[str(n_list[-1])][i_nd])
-#     i_nd = i_nd + 1
-
-# print(x_tmp_dic[str(n_list[-1])])
-
-# diff_val = np.diff(np.log10(an_tmp_dic[str(n_list[-1])]))
-# diff_val = np.insert(diff_val, 0, 0)
-      
-# dis_val = []
-# for i_val in diff_val:
-#     dis_val.append(abs(i_val))
-
-"plot to check the result of fitting method 3"
-# plt.figure(figsize=(7,7))
-# plt.plot(x_tmp_dic[str(n_list[-1])], dis_val,'o-', color = 'b', label= 'neutral density')
-# plt.xlabel('magnetic flux coordinate: psiN')
-# # plt.ylabel('neutral density difference')
-# plt.title('log neutral density difference for method 3')
-# plt.legend()
-
-              
-# qth = list(dis_val).index(max(dis_val))
-# qin = n_list[qth]
-# print(qin)
-      
-# if qth >= 4:
-#     x_m3 = np.asarray(x_tmp_dic[str(qth)])
-#     an_m3 = np.asarray(an_tmp_dic[str(qth)])
-# elif qth < 4:
-#     x_m3 = np.asarray(x_tmp_dic[str(4)])
-#     an_m3 = np.asarray(an_tmp_dic[str(4)])
+# "fitting choice 2: find the point before the kink"
+# xcoord_k = []
+# an_k_cut = []
+# for af in range(len(x_coord_rev)):
+#     if x_coord_rev[af] <= sym_pt + dn:
+#         xcoord_k.append(x_coord_rev[af])
+#         an_k_cut.append(neuden_rev[af])
 
 
-# fit_m3_dic = exp_fit(x_choice, x_m3, an_m3)
+
+# "create try and error list"
+# n_list = []
+# # nn_i = len(xcoord_exp)
+# nn_i = 4
+# # print(len(xcoord_k))
+# while nn_i < len(xcoord_k) + 1:
+#     n_list.append(nn_i)
+#     nn_i = nn_i + 1
+# # print(n_list)
+
+# an_tmp_dic = {}
+# x_tmp_dic = {}
+# pen_try = []
+# len_try = []
+# lne = []
+
+# for ak in n_list:
+#     x_tmp = []
+#     an_tmp = []
+#     # print(ak)
+#     for ah in range(ak):
+#         x_tmp.append(xcoord_k[ah])
+#         an_tmp.append(an_k_cut[ah])
+#     x_tmp = np.asarray(x_tmp)
+#     an_tmp = np.asarray(an_tmp)
+#     x_tmp_dic[str(ak)] = x_tmp
+#     an_tmp_dic[str(ak)] = an_tmp   
+#     # print(ak)
+#     # print(x_tmp)
+#     # print(an_tmp)
+#     fitexp_tmp = exp_fit(x_choice, x_tmp, an_tmp)
+#     fitlnexp_tmp = linear_fit(x_choice, x_tmp, an_tmp)
+#     pen_try.append(1/fitexp_tmp['popt_an'][1])
+#     len_try.append(1/fitlnexp_tmp['popt_an'][0])
+#     lne.append(fitlnexp_tmp['popt_an'][0])
+    
+# diff_len = np.diff(len_try)
 
 
-# exp_fit_m3 = fit_m3_dic['exp_an_fit']
-# efold_m3 = 1/fit_m3_dic['popt_an'][1]
+# "print to check fit method 2 result"
+# # print(n_list)
+# # print(n_list[-1])
+# # print(x_tmp_dic[str(n_list[-1])])
+# # print(pen_try)
+# # print(diff_val)
 
-# opq_m3 = 2*dn/efold_m3
+# "plot the method 2 result"
+# # plt.figure(figsize=(7,7))
+# # plt.errorbar(x_tmp_dic.keys(), pen_try, yerr= stdev(pen_try), fmt = 'o-', color = 'b', label= 'efold_length')
+# # plt.xlabel('number of fitting points')
+# # plt.title('efold length exp fit')
+# # plt.legend()
+
+# # plt.figure(figsize=(7,7))
+# # plt.errorbar(x_tmp_dic.keys(), len_try, yerr= stdev(len_try), fmt = 'o-', color = 'b', label= 'efold_length')
+# # plt.xlabel('number of fitting points')
+# # plt.title('efold length log fit')
+# # plt.legend()
+
+
+# # print(len_try)
+
+# # plt.figure(figsize=(7,7))
+# # plt.plot(x_tmp_dic.keys(), lne, 'o-', color = 'b', label= 'efold_length')
+# # plt.xlabel('number of fitting points')
+# # plt.title('log fit slope')
+# # plt.legend()
+
+   
+# dis_len = []
+# stable_len = []
+# for i_diff in diff_len:
+#     dis_len.append(abs(i_diff))
+#     if abs(i_diff) <= 0.003:
+#         stable_len.append(abs(i_diff))
+
+# # print(dis_pen)
+
+# p = list(dis_len).index(stable_len[0])
+# # print(diff_pen)
+# ind = n_list[p]
+# # if p + 1 < len(n_list):
+# #     # print(len(n_list))
+# #     # print(p)
+# #     ind = n_list[p + 1]
+# #     # print(ind)
+# # elif p + 1 >= len(n_list):
+# #     # print(len(n_list))
+# #     # print(p)
+# #     ind = n_list[p]
+# #     # print(ind)
+# x_m2 = np.asarray(x_tmp_dic[str(ind)])
+# an_m2 = np.asarray(an_tmp_dic[str(ind)])
+
+# # print(x_m2)
+
+
+# fit_m2_dic = linear_fit(x_choice, x_m2, an_m2)
+
+# exp_fit_m2 = fit_m2_dic['exp_line_fit']
+# efold_m2 = 1/fit_m2_dic['popt_an'][0]
+# std_m2 = stdev(len_try)/np.sqrt(len(len_try))
+# del_x = x_m2[0] - x_m2[-1]
+
+# opq_m2 = 2*dn/efold_m2
