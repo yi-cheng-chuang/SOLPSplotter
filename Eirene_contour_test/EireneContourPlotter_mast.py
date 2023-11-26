@@ -41,7 +41,7 @@ LOG=True
 Pressure=True
 Param='PDENA'
 B2=True
-B2_Param='Ne'
+B2_Param='NeuDen'
 
 TeVAC=0.02 #Hard-wired Electron Temperature in EIRENE vacuum cells
 NeVAC=1e8 #Hard-wired Electron Density in EIRENE vacuum cells
