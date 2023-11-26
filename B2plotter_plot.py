@@ -14,7 +14,7 @@ import fitting_method as fm
 from scipy import interpolate
 from scipy.optimize import curve_fit
 import numpy as np
-import xarray as xr
+import B2TransportParser as b2tp
 
 
 class Opacity_study(RP_mapping):
@@ -29,7 +29,7 @@ class Opacity_study(RP_mapping):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
             plt.rc('lines', linewidth=5, markersize=9)
-            plt.rcParams.update({'font.size': 16})
+            plt.rcParams.update({'font.size': 20})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
   
@@ -42,6 +42,7 @@ class Opacity_study(RP_mapping):
         
         for j in pol_list:
             self.calcpsi_1D(pol_loc= j)
+            self.calc_dsa(pol_loc= j)
         
         self.load_output_data(param= 'NeuDen')
         self.load_output_data(param= 'Ne')
@@ -113,18 +114,13 @@ class Opacity_study(RP_mapping):
             char = {}
             char['withshift'] = self.withshift
             char['withseries'] = self.withseries
+            char['series_flag'] = self.DefaultSettings['series_flag']
 
             opm.data_reorder(iter_list = pol_list, change_var = shift_list,
                              data_collect = data_collect_opq, char = char)
             
             unit = b2s.opacity_study_unit()
-            
-            # char = {}
-            # char['withshift'] = self.withshift
-            # char['withseries'] = self.withseries
-            
-            # log_flag = False
-            
+                       
             shift_dic = {}
             for k in self.data['dircomp']['multi_shift']:
                 p = str(self.data['dircomp']['shift_dic'][k])
@@ -155,8 +151,9 @@ class Opacity_study(RP_mapping):
             
             data_collect_opq = np.zeros((mm, ll))
             i = 0
+            variable = 'dimensionless_opaqueness'
             for la in self.data['dircomp']['Attempt'].keys():
-                lb = np.asarray(result['dimensionless_opaqueness'][la])
+                lb = np.asarray(result[variable][la])
                 data_collect_opq[:, i] = lb
                 i = i + 1
             
@@ -171,14 +168,14 @@ class Opacity_study(RP_mapping):
             char = {}
             char['withshift'] = self.withshift
             char['withseries'] = self.withseries
+            char['series_flag'] = self.DefaultSettings['series_flag']
+            char['variable'] = variable
 
             opm.data_reorder(iter_list = pol_list, change_var = density_list,
                              data_collect = data_collect_opq, char = char)
             
             unit = b2s.opacity_study_unit()
             
-            
-            # log_flag = False
             
             density_dic = {}
             for k in self.data['dircomp']['Attempt'].keys():
@@ -202,17 +199,15 @@ class Opacity_study(RP_mapping):
         i = 0
         ln = len(pol_list)
         efold = np.zeros(ln)
+        efold_l = np.zeros(ln)
         delta = np.zeros(ln)
+        delta_l = np.zeros(ln)
         opq = np.zeros(ln)
         # pol_loc = np.zeros(ln)
         neu_den = np.zeros(ln)
         ne_ped = np.zeros(ln)
         tdelta = np.zeros(ln)
-        
-        efold_m2 = np.zeros(ln)
-        opq_m2 = np.zeros(ln)
-        std_m2 = np.zeros(ln)
-        del_x_m2 = np.zeros(ln)
+        fluxexp = np.zeros(ln)
         
         
         for k in pol_list:
@@ -221,7 +216,7 @@ class Opacity_study(RP_mapping):
             # psi_RGI = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 0]
             # SEP = int(self.data['DefaultSettings']['SEP'])
             
-            pol_in = int(k) + 1
+            pol_in = int(k)
             Nd = self.data['outputdata']['NeuDen'][:, pol_in]
             Ne = self.data['outputdata']['Ne'][:, pol_in]
             Te = self.data['outputdata']['Te'][:, pol_in]
@@ -229,6 +224,11 @@ class Opacity_study(RP_mapping):
             if x_choice == 'psiN':
                 rd = fm.Opacity_calculator(x_choice= 'psiN', x_coord= psi, ne = Ne, te = Te, 
                                        neuden = Nd)
+                ped_index = rd['sep_index']
+                
+                fe = self.calc_flux_expansion(pol_loc= k, 
+                                ped_index= ped_index, iter_index= None)
+                pd = self.data['DefaultSettings']['psi_dsa']
                 
                 # Opacity_calculator(x_choice, x_coord, ne, te, neuden)
                 
@@ -244,72 +244,58 @@ class Opacity_study(RP_mapping):
             neu_den[i] = rd['n_sep_fit']
             ne_ped[i] = rd['electron_pedestal_density']
             tdelta[i] = rd['temperature_pedestal_width']
-            
-            efold_m2[i] = rd['efold_length_method2']
-            opq_m2[i] = rd['dimensionless_opaqueness_method2']
-            std_m2[i] = rd['std_m2']
-            del_x_m2[i] = rd['method2_fitting_width']
+            fluxexp[i] = fe
+            efold_l[i] = rd['efold_length']*pd*fe
+            delta_l[i] = rd['pedestal_width']*pd*fe
             
             
             # pol_loc[i] = int(k)
             i = i + 1
         
-        result = {'efold_length': efold, 'pedestal_width': delta,
+        result = {'efold_length_psiN': efold, 'pedestal_width_psiN': delta,
                   'dimensionless_opaqueness': opq, 
                   'neutral_density': neu_den, 
                   'electron_pedestal_density': ne_ped,
                   'temperature_pedestal_width': tdelta,
-                  
-                  'efold_length_method2': efold_m2, 
-                  'dimensionless_opaqueness_method2': opq_m2,
-                  'std_m2': std_m2,
-                  'method2_fitting_width': del_x_m2
-                  
-                  
+                  'flux_expansion': fluxexp,
+                  'efold_length': efold_l, 'pedestal_width': delta_l,
+                                  
                   }
         
         return result
 
     def opacity_data_method_multi(self, pol_list, iter_list):
         efold_dic = {}
+        efold_leng_dic = {}
         delta_dic = {}
+        delta_leng_dic = {}
         opq_dic = {}
         neu_den_dic = {}
         ne_ped_dic = {}
         tdelta_dic = {}
-        
-        efold_m2_dic = {}
-        opq_m2_dic = {}
-        std_m2_dic = {}
-        del_x_m2_dic = {}
-        
-
+        flux_expand_dic = {}
         
         for aa in iter_list:
             i = 0
             ln = len(pol_list)
             efold = np.zeros(ln)
+            efold_l = np.zeros(ln)
             delta = np.zeros(ln)
+            delta_l = np.zeros(ln)
             opq = np.zeros(ln)
-            # pol_loc = np.zeros(ln)
             neu_den = np.zeros(ln)
             ne_ped = np.zeros(ln)
             tdelta = np.zeros(ln)
-            
-            efold_m2 = np.zeros(ln)
-            opq_m2 = np.zeros(ln)
-            std_m2 = np.zeros(ln)
-            del_x_m2 = np.zeros(ln)
+            flux_exp = np.zeros(ln)
+        
             
             
             for k in pol_list:
                 
                 if self.withshift == True and self.withseries == False:
                     psi = self.data['psi']['psi_{}_val'.format(k)][aa]
-                    # dsa_pol_loc = self.data['dsa']['dsa_{}'.format(k)][aa]['dsa_{}_val'.format(k)]
                 elif self.withshift == False and self.withseries == True:
                     psi = self.data['psi']['psi_{}_val'.format(k)]
-                    # dsa_pol_loc = self.data['dsa']['dsa_{}'.format(k)]['dsa_{}_val'.format(k)]
                 else:
                     print('out of expectation')
                 
@@ -317,7 +303,7 @@ class Opacity_study(RP_mapping):
                 # psi_RGI = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 0]
                 # SEP = int(self.data['DefaultSettings']['SEP'])
                 
-                pol_in = int(k) + 1
+                pol_in = int(k)
                 Nd = self.data['outputdata']['NeuDen'][aa][:, pol_in]
                 Ne = self.data['outputdata']['Ne'][aa][:, pol_in]
                 Te = self.data['outputdata']['Te'][aa][:, pol_in]
@@ -325,47 +311,54 @@ class Opacity_study(RP_mapping):
                 rd = fm.Opacity_calculator(x_choice= 'psiN', x_coord = psi, ne = Ne, te = Te,
                                            neuden = Nd)
                 
-                # Opacity_calculator(x_choice, x_coord, ne, te, neuden)
+                ped_index = rd['sep_index']
+                
+                fe = self.calc_flux_expansion(pol_loc= k, 
+                                ped_index= ped_index, iter_index= aa)
+                
+                if self.withshift == True and self.withseries == False:
+                    pd = self.data['DefaultSettings']['psi_dsa'][aa]
+                elif self.withshift == False and self.withseries == True:
+                    pd = self.data['DefaultSettings']['psi_dsa']
+                else:
+                    print('there is a bug')
+
                 
                 
                 efold[i] = rd['efold_length']
+                efold_l[i] = rd['efold_length']*fe*pd
                 delta[i] = rd['pedestal_width']
+                delta_l[i] = rd['pedestal_width']*fe*pd
                 opq[i] = rd['dimensionless_opaqueness']
                 neu_den[i] = rd['n_sep_fit']
                 ne_ped[i] = rd['electron_pedestal_density']
                 tdelta[i] = rd['temperature_pedestal_width']
-                efold_m2[i] = rd['efold_length_method2']
-                opq_m2[i] = rd['dimensionless_opaqueness_method2']
-                std_m2[i] = rd['std_m2']
-                del_x_m2[i] = rd['method2_fitting_width']
+                flux_exp[i] = fe
 
                 # pol_loc[i] = int(k)
                 i = i + 1
             
             efold_dic[aa] = efold
+            efold_leng_dic[aa] = efold_l
             delta_dic[aa] = delta
+            delta_leng_dic[aa] = delta_l
             opq_dic[aa] = opq
             neu_den_dic[aa] = neu_den
             ne_ped_dic[aa] = ne_ped
             tdelta_dic[aa] = tdelta
+            flux_expand_dic[aa] = flux_exp
             
-            efold_m2_dic[aa] = efold_m2
-            opq_m2_dic[aa] = opq_m2
-            std_m2_dic[aa] = std_m2
-            del_x_m2_dic[aa] = del_x_m2
             
         
-        result = {'efold_length': efold_dic, 'pedestal_width': delta_dic,
+        result = {'efold_length_psiN': efold_dic, 
+                  'pedestal_width_psiN': delta_dic,
+                  'efold_length': efold_leng_dic, 
+                  'pedestal_width': delta_leng_dic,
                   'dimensionless_opaqueness': opq_dic, 
                   'neutral_density': neu_den_dic, 
                   'electron_pedestal_density': ne_ped_dic,
                   'temperature_pedestal_width': tdelta_dic,
-                  
-                  'efold_length_method2': efold_m2_dic, 
-                  'dimensionless_opaqueness_method2': opq_m2_dic,
-                  'std_m2': std_m2_dic,
-                  'method2_fitting_width': del_x_m2_dic
-                  
+                  'flux_expansion': flux_expand_dic               
                   }
         
         return result
@@ -382,7 +375,7 @@ class Opacity_study(RP_mapping):
             # psi_RGI = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 0]
             SEP = int(self.data['DefaultSettings']['SEP'])
             
-            pol_index = int(pol_loc) + 1
+            pol_index = int(pol_loc)
             Nd = self.data['outputdata']['NeuDen'][:, pol_index]
             Ne = self.data['outputdata']['Ne'][:, pol_index]
             Te = self.data['outputdata']['Te'][:, pol_index]
@@ -392,10 +385,19 @@ class Opacity_study(RP_mapping):
             result_dic = fm.Opacity_calculator(x_choice = x_choice, x_coord = psi, 
                                            ne = Ne, te = Te, neuden = Nd)
             
-            self.data['opacity_study'] = result_dic
+            ped_index = result_dic['sep_index']
+            flux_expand = self.calc_flux_expansion(pol_loc= pol_loc, 
+                                    ped_index= ped_index, iter_index= None)
+            
+            
+            flux_expand_dic = {'flux_expansion': flux_expand}
+            opac_dic = result_dic | flux_expand_dic
+            
+            self.data['opacity_study'] = opac_dic
+            
             
             P = self.data['Parameter']
-            opm.opacity_radial_method_single(result_dic, SEP, x_choice = x_choice, 
+            opm.opacity_radial_method_single(result_dic = result_dic, SEP = SEP, x_choice = x_choice, 
                                              x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, 
                                                   P = P, log_flag = True)
         
@@ -422,11 +424,8 @@ class Opacity_study(RP_mapping):
             exp_an_fit_dic = {}
             tanh_ne_fit_dic = {}
             tanh_te_fit_dic = {}
+            flux_expand_dic = {}
             
-            exp_fit_m2_dic = {}
-            x_m2_dic = {}
-            efold_m2_dic = {}
-            opq_m2_dic = {}
             
             
             for aa in self.data['dircomp']['multi_shift']:
@@ -436,7 +435,7 @@ class Opacity_study(RP_mapping):
                 # if x_choice == 'psiN':
                 #     xcoord_dic[aa] = psi_dic[aa]
                 
-                pol_index = int(pol_loc) + 1
+                pol_index = int(pol_loc)
                 Nd_dic[aa] = self.data['outputdata']['NeuDen'][aa][:, pol_index]
                 Ne_dic[aa] = self.data['outputdata']['Ne'][aa][:, pol_index]
                 Te_dic[aa] = self.data['outputdata']['Te'][aa][:, pol_index]
@@ -445,7 +444,15 @@ class Opacity_study(RP_mapping):
                 result_dic = fm.Opacity_calculator(x_choice = x_choice, x_coord = psi_dic[aa], 
                             ne = Ne_dic[aa], te = Te_dic[aa], neuden = Nd_dic[aa])
                 
+                ped_index = result_dic['sep_index']
                 
+                flux_expand = self.calc_flux_expansion(pol_loc= pol_loc, 
+                                    ped_index = ped_index, iter_index= aa)
+                
+                
+
+                
+                flux_expand_dic[aa] = flux_expand
                 tanh_ne_fit_dic[aa] = result_dic['tanh_ne_fit']
                 tanh_te_fit_dic[aa] = result_dic['tanh_te_fit']
                 exp_an_fit_dic[aa] = result_dic['exp_fit']
@@ -456,11 +463,6 @@ class Opacity_study(RP_mapping):
                 xcoord_cut_dic[aa] = result_dic['x_coord_cut']
                 sym_pt_dic[aa] = result_dic['ne_symmetry_point']
                 te_sym_pt_dic[aa] = result_dic['te_symmetry_point']
-                
-                exp_fit_m2_dic[aa] = result_dic['exp_fit_m2']
-                x_m2_dic[aa] = result_dic['x_m2']
-                efold_m2_dic[aa] = result_dic['efold_length_method2']
-                opq_m2_dic[aa] = result_dic['dimensionless_opaqueness_method2']
                 
                 
             
@@ -478,12 +480,7 @@ class Opacity_study(RP_mapping):
                       'psiN': psi_dic,'dsa': dsa_pol_loc_dic,
                       'te_symmetry_point': te_sym_pt_dic,
                       'ne_symmetry_point': sym_pt_dic,
-                      
-                      'exp_fit_m2': exp_fit_m2_dic,
-                      'x_m2': x_m2_dic,
-                      'efold_length_method2': efold_m2_dic,
-                      'dimensionless_opaqueness_method2': opq_m2_dic,
-                      
+                      'flux_expand': flux_expand_dic               
                       }
             
             
@@ -496,6 +493,7 @@ class Opacity_study(RP_mapping):
             char = {}
             char['withshift'] = self.withshift
             char['withseries'] = self.withseries
+            char['series_flag'] = self.DefaultSettings['series_flag']
             
             shift_dic = {}
             for k in self.data['dircomp']['multi_shift']:
@@ -534,11 +532,7 @@ class Opacity_study(RP_mapping):
             exp_an_fit_dic = {}
             tanh_ne_fit_dic = {}
             tanh_te_fit_dic = {}
-            
-            exp_fit_m2_dic = {}
-            x_m2_dic = {}
-            efold_m2_dic = {}
-            opq_m2_dic = {}
+            flux_expand_dic = {}
             
             
             for aa in self.data['dircomp']['Attempt'].keys():
@@ -547,7 +541,7 @@ class Opacity_study(RP_mapping):
                 # psi_RGI = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 0]
                 
                 
-                pol_index = int(pol_loc) + 1
+                pol_index = int(pol_loc)
                 Nd_dic[aa] = self.data['outputdata']['NeuDen'][aa][:, pol_index]
                 Ne_dic[aa] = self.data['outputdata']['Ne'][aa][:, pol_index]
                 Te_dic[aa] = self.data['outputdata']['Te'][aa][:, pol_index]
@@ -557,7 +551,12 @@ class Opacity_study(RP_mapping):
                     x_coord = psi_dic[aa], ne = Ne_dic[aa], te = Te_dic[aa], 
                     neuden = Nd_dic[aa])
                 
+                ped_index = result_dic['sep_index']
                 
+                flux_expand = self.calc_flux_expansion(pol_loc= pol_loc, 
+                                    ped_index = ped_index, iter_index= aa)
+                
+                flux_expand_dic[aa] = flux_expand           
                 tanh_ne_fit_dic[aa] = result_dic['tanh_ne_fit']
                 tanh_te_fit_dic[aa] = result_dic['tanh_te_fit']
                 exp_an_fit_dic[aa] = result_dic['exp_fit']
@@ -568,12 +567,8 @@ class Opacity_study(RP_mapping):
                 opq_dic[aa] = result_dic['dimensionless_opaqueness']
                 sym_pt_dic[aa] = result_dic['ne_symmetry_point']
                 te_sym_pt_dic[aa] = result_dic['te_symmetry_point']
-                
-                exp_fit_m2_dic[aa] = result_dic['exp_fit_m2']
-                x_m2_dic[aa] = result_dic['x_m2']
-                efold_m2_dic[aa] = result_dic['efold_length_method2']
-                opq_m2_dic[aa] = result_dic['dimensionless_opaqueness_method2']
-                
+            
+            
             
             result = {'efold_length': efold_dic, 'pedestal_width': delta_dic,
                       'dimensionless_opaqueness': opq_dic, 
@@ -588,11 +583,7 @@ class Opacity_study(RP_mapping):
                       'psiN': psi_dic, 'dsa': dsa_pol_loc_dic,
                       'te_symmetry_point': te_sym_pt_dic,
                       'ne_symmetry_point': sym_pt_dic,
-                      
-                      'exp_fit_m2': exp_fit_m2_dic,
-                      'x_m2': x_m2_dic,
-                      'efold_length_method2': efold_m2_dic,
-                      'dimensionless_opaqueness_method2': opq_m2_dic,
+                      'flux_expand': flux_expand_dic
                       
                       }
             
@@ -603,11 +594,17 @@ class Opacity_study(RP_mapping):
             char = {}
             char['withshift'] = self.withshift
             char['withseries'] = self.withseries
+            char['series_flag'] = self.DefaultSettings['series_flag']
             
             density_dic = {}
-            for k in self.data['dircomp']['Attempt'].keys():
-                kk = float(k)*pow(10, 19)
-                density_dic[k] = kk
+            if self.DefaultSettings['series_flag'] == 'change_den':
+                for k in self.data['dircomp']['Attempt'].keys():
+                    kk = float(k)*pow(10, 19)
+                    density_dic[k] = kk
+            elif self.DefaultSettings['series_flag'] == 'eireneN':
+                for k in self.data['dircomp']['Attempt'].keys():
+                    density_dic[k] = k
+                
             
             
             P = self.data['Parameter']
@@ -623,6 +620,50 @@ class Opacity_study(RP_mapping):
             
         else:
             print('Opacity_study_radial_plot_psi has a bug')
+    
+    
+    
+    def transport_coe_align_plot(self):
+        if self.withshift == True and self.withseries == False:
+            trans_dic = {}
+            jxa = self.data['b2mn']['org']['jxa']
+            self.calcpsi_1D(pol_loc= jxa)
+            for aa in self.data['dircomp']['multi_shift']:
+                trans_file_dir = self.data['dirdata']['infolderdir'][aa]['simudir'] + '/b2.transport.inputfile'
+                
+                trans_list = b2tp.InputfileParser(trans_file_dir, plot= False)
+                cod = trans_list['1'].T
+                coki = trans_list['3'].T
+                coke = trans_list['4'].T
+                x= cod[:,0]  #the coordinate here is R-R_sep
+                
+                trans_dic[aa] = np.zeros([len(x), 4])
+                trans_dic[aa][:, 0] = self.data['psi']['psi_{}_val'.format(jxa)][aa]
+                trans_dic[aa][:, 1] = cod[:, 1]
+                trans_dic[aa][:, 2] = coki[:, 1]
+                trans_dic[aa][:, 3] = coke[:, 1]
+    
+   
+            log_flag = False
+            coe_label_dic = {'1': 'particle diffusivity', '2': 'ion thermal diffusivity'
+                             ,'3': 'electron thermal diffusivity'}
+    
+            for k in coe_label_dic.keys():
+                if log_flag:
+                    plt.yscale('log')
+                plt.figure(figsize=(7,7))
+                color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                             'dot7': 'blue', 'one': 'purple'}
+                for ab in self.data['dircomp']['multi_shift']: 
+                    # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
+                    #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
+                    plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab] )
+                    plt.xlabel('psiN')
+                    plt.title('radial {} coefficient'.format(coe_label_dic[k]))
+                    # plt.legend() 
+            plt.show()
+        else:
+            print('transport_coe_align_plot is not there yet')
     
             
 
