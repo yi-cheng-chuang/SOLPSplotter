@@ -24,14 +24,14 @@ class RP_mapping(load_data):
         load_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
     
         
-    def calc_RRsep(self):
+    def calc_RRsep(self, plotRR):
         
         if self.withshift == False and self.withseries == False:
         
             pol_range = int(self.data['b2fgeo']['nx'] + 2)
             rad_range = int(self.data['b2fgeo']['ny'] + 2)
             mag_axis_z = self.data['gfile']['g']['zmaxis']
-            print(mag_axis_z)
+            # print(mag_axis_z)
             
             Attempt = self.data['dircomp']['Attempt']
             DRT = self.data['dirdata']['outputdir']['Output']
@@ -80,16 +80,8 @@ class RP_mapping(load_data):
                 
             pol_list = [57, 58, 59, 60]
             
-            # plt.figure(figsize=(7,7))
-            # for in_pol in pol_list:
-            #     crloc = RadLoc[:, int(in_pol)]
-            #     czloc = VertLoc[:, int(in_pol)]
-            #     plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
-            # plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
-            # plt.xlabel('R: [m]')
-            # plt.ylabel('Z: [m]')
             
-                       
+            
             psi_solps_mid = np.zeros(rad_range)
             psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
             # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
@@ -115,8 +107,23 @@ class RP_mapping(load_data):
                             'mid_R': mid_R, 'mid_Z': mid_Z, 
                             'psi_solps_mid': psi_solps_mid, 
                             'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
-                
+            
+            psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
+            
+            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic['dsa_psi_fitcoe'][0]
+                        
             self.data['midplane_calc'] = midplane_dic
+            
+            if plotRR:
+                plt.figure(figsize=(7,7))
+                for in_pol in pol_list:
+                    crloc = RadLoc[:, int(in_pol)]
+                    czloc = VertLoc[:, int(in_pol)]
+                    plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
+                plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
+                plt.xlabel('R: [m]')
+                plt.ylabel('Z: [m]')
+            
             
                
         
@@ -125,6 +132,7 @@ class RP_mapping(load_data):
             rad_range_dic = {}
             SEP_dic = {}
             midplane_dic = {}
+            psi_dsa_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 pol_range = int(self.data['b2fgeo'][aa]['nx'] + 2)
                 # print('xdim is {}'.format(str(pol_range)))
@@ -186,17 +194,7 @@ class RP_mapping(load_data):
                 
                 pol_list = [57, 58, 59, 60]
                 
-                # plt.figure(figsize=(7,7))
-                # for in_pol in pol_list:
-                #     crloc = RadLoc[:, int(in_pol)]
-                #     czloc = VertLoc[:, int(in_pol)]
-                #     plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
-                # plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
-                # plt.xlabel('R: [m]')
-                # plt.ylabel('Z: [m]')
-                # plt.title('{} R-Z plot'.format(aa))
                 
-                               
                 psi_solps_mid = np.zeros(rad_range)
                 psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
                 # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
@@ -222,8 +220,37 @@ class RP_mapping(load_data):
                                 'mid_R': mid_R, 'mid_Z': mid_Z, 
                                 'psi_solps_mid': psi_solps_mid, 
                                 'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
-                    
+                
+                pd_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
+                
+                psi_dsa_dic[aa] = pd_dic['dsa_psi_fitcoe'][0]
+                
+                
+                
+                if plotRR:
+                    plt.figure(figsize=(7,7))
+                    for in_pol in pol_list:
+                        crloc = RadLoc[:, int(in_pol)]
+                        czloc = VertLoc[:, int(in_pol)]
+                        plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
+                    plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
+                    plt.xlabel('R: [m]')
+                    plt.ylabel('Z: [m]')
+                    plt.title('{} R-Z plot'.format(aa))
             
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            plt.figure(figsize=(7,7))
+            for in_sh in self.data['dircomp']['multi_shift']:
+                # plt.plot(midplane_dic[in_sh]['psi_solps_mid'], midplane_dic[in_sh]['R_Rsep'], 'o-', 
+                #   label= 'R-Rsep:[m] with modify {} m'.format(self.data['dircomp']['shift_dic'][in_sh]))
+                plt.plot(midplane_dic[in_sh]['psi_solps_mid'], midplane_dic[in_sh]['R_Rsep'], 'o-', 
+                  color= color_dic[in_sh])
+            plt.xlabel('psiN')
+            plt.title('psiN R-Rsep plot')
+            # plt.legend()
+                    
+            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
             self.data['midplane_calc'] = midplane_dic
             self.data['DefaultSettings']['XDIM'] = pol_range_dic
             self.data['DefaultSettings']['YDIM'] = rad_range_dic
@@ -289,16 +316,6 @@ class RP_mapping(load_data):
             
             pol_list = [57, 58, 59, 60]
             
-            # plt.figure(figsize=(7,7))
-            # for in_pol in pol_list:
-            #     crloc = RadLoc[:, int(in_pol)]
-            #     czloc = VertLoc[:, int(in_pol)]
-            #     plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
-            # plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
-            # plt.xlabel('R: [m]')
-            # plt.ylabel('Z: [m]')
-            # plt.title('{} R-Z plot'.format(aa))
-            
             
             psi_solps_mid = np.zeros(rad_range)
             psiNinterp_RBS = self.data['gfile']['gcomp']['interp']
@@ -321,6 +338,9 @@ class RP_mapping(load_data):
             R_sep = (1 - weight_psi)*mid_R[sep_index] + weight_psi*mid_R[sep_index -1]
             R_Rsep = mid_R - R_sep
             
+            psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)           
+            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic['dsa_psi_fitcoe'][0]
+            
             midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
                             'mid_R': mid_R, 'mid_Z': mid_Z, 
                             'psi_solps_mid': psi_solps_mid, 
@@ -328,12 +348,25 @@ class RP_mapping(load_data):
                 
             self.data['midplane_calc'] = midplane_dic
             
+            if plotRR:
+                plt.figure(figsize=(7,7))
+                for in_pol in pol_list:
+                    crloc = RadLoc[:, int(in_pol)]
+                    czloc = VertLoc[:, int(in_pol)]
+                    plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
+                plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
+                plt.xlabel('R: [m]')
+                plt.ylabel('Z: [m]')
+                plt.title('{} R-Z plot'.format(aa))
+            
+    
     
     
     
     def calc_pol_angle(self, pol_list):
         
-        if self.withshift == False and self.withseries == False: 
+        if self.withshift == False and self.withseries == False:
+            
             Attempt = self.data['dircomp']['Attempt']
             DRT = self.data['dirdata']['outputdir']['Output']
             XDIM = self.data['b2fgeo']['nx'] + 2
@@ -418,27 +451,27 @@ class RP_mapping(load_data):
                         angle = angle + 360
                     angle_list.append(angle)
                     
-                ln = len(pol_list)
-                pol_loc = np.zeros(ln)
-                i = 0
-                
-                for ii in pol_list:
-                    pol_loc[i] = int(ii)
-                    i = i + 1
-                
-                pol_rev = list(reversed(pol_loc))
-                angle_rev = list(reversed(angle_list))
-                
-                plt.figure(figsize=(7,7))
-                plt.plot(pol_rev, angle_rev, 'o-', color = 'r', label= 'angle')
+                    
+                                  
+                    angle_dic[aa] = angle_list
+                    
+            ln = len(pol_list)
+            pol_loc = np.zeros(ln)
+            i = 0
+            
+            for ii in pol_list:
+                pol_loc[i] = int(ii)
+                i = i + 1
+            
+            plt.figure(figsize=(7,7))
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            for ab in self.data['dircomp']['multi_shift']: 
+                plt.plot(pol_loc, angle_dic[ab], 'o-', color = color_dic[ab])
                 plt.xlabel('poloidal index')
-                plt.ylabel('angle')
-                plt.title('modify {} m poloidal angle verses poloidal index'.format(self.data['dircomp']['shift_dic'][aa]))
+                plt.title('poloidal angle verses poloidal index'.format(self.data['dircomp']['shift_dic'][ab]))
                 
-                # print(pol_rev)
-                # print(angle_rev)
-                              
-                angle_dic[aa] = angle_list
+                
                 
             
                 
@@ -520,7 +553,7 @@ class RP_mapping(load_data):
 
     """
 
-    def RR_sep_calculator(cr, cz):
+    def RR_sep_calculator(self, cr, cz):
         # Define some points:
         p = len(cr)
         points = np.zeros((p, 2))
@@ -561,22 +594,88 @@ class RP_mapping(load_data):
         return arclength, interpolated_points       
     
     
+    def calc_sep_index(self, psi, rad_range):
+        index_low = []
+        index_high = []
+        index = []
+        # print(psi)
+        for y in range(len(psi)):
+            if psi[y] <= 1:
+                index_low.append(y)
+            elif psi[y] > 1:
+                index_high.append(y)
+            else:
+                pass
+
+        
+        # print(type(index_high))
+        index.append(index_low[-1])
+        index.append(index_high[0])
+        # print('the following is index_low')
+        # print(index_low)
+        
+        index_dic = {'index_low': index_low, 'index_high': index_high, 
+                     'index': index}
+        return index_dic
     
     
-    def calc_dsa(self, pol_list):
+    def calc_dsa(self, pol_loc):
         
         if self.withshift == False and self.withseries == False:
-        
+            # pol_range = int(self.data['b2fgeo']['nx'] + 2)
+            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            
+            
+            Attempt = self.data['dircomp']['Attempt']
+            DRT = self.data['dirdata']['outputdir']['Output']
+            XDIM = self.data['b2fgeo']['nx'] + 2
+            YDIM = self.data['b2fgeo']['ny'] + 2
             dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
             
+            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                        usecols = (3)).reshape((YDIM, XDIM))
+            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                          usecols = (3)).reshape((YDIM,XDIM))
             
-            LLdsa = crLowerLeft - LLsep
-            LRdsa = crLowerRight - LRsep
-            ULdsa = crUpperLeft - ULsep
-            URdsa = crUpperRight - URsep
-            avag_rad = np.zeros(rad_range)
-            for j in range(rad_range):
-                avag_rad[j] = np.mean([LLdsa[j], ULdsa[j], URdsa[j], LRdsa[j]])
+            pol_index = int(pol_loc)
+            crloc = RadLoc[:, pol_index]
+            czloc = VertLoc[:, pol_index]
+            # print(crloc)
+            
+            arclength, interpfunc_dic = self.RR_sep_calculator(cr = crloc, cz = czloc)
+            
+            SEP = self.data['DefaultSettings']['SEP']
+            
+            sep_dist = np.mean([arclength[int(SEP)+ 1], arclength[int(SEP)]])
+            # print(sep_dist)
+            
+            
+            RR_sep = arclength - sep_dist
+            
+            dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
+                        'dsa_{}_val'.format(pol_index): RR_sep}
+            
+            self.data['dsa']['dsa_{}'.format(pol_index)] = dsa_dic
+            
+            
+            "Debug tool"
+            # comp_dsa = np.zeros((int(rad_range), 2))
+            # comp_dsa[:, 0] = dsa
+            # comp_dsa[:, 1] = RR_sep
+            
+            # dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
+            #            'RadLoc': RadLoc, 'VertLoc': VertLoc,
+            #            'dsa_{}_val'.format(pol_index): RR_sep, 'comp_dsa': comp_dsa}
+            
+            
+            "Test for left only result"
+            # LLdsa = crLowerLeft - LLsep
+            # LRdsa = crLowerRight - LRsep
+            # ULdsa = crUpperLeft - ULsep
+            # URdsa = crUpperRight - URsep
+            # avag_rad = np.zeros(rad_range)
+            # for j in range(rad_range):
+            #     avag_rad[j] = np.mean([LLdsa[j], ULdsa[j], URdsa[j], LRdsa[j]])
           
             # crzsum, points = fm.RR_sep_calculator(cr = crLowerLeft, cz = czLowerLeft)
             
@@ -589,119 +688,83 @@ class RP_mapping(load_data):
             # comp[:, 0] = Rad0Cor[:, pol_index]
             # comp[:, 1] = crLowerLeft
             
+            
+        
+        elif self.withshift == True and self.withseries == False:
+            dsa_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                pol_range = int(self.data['b2fgeo'][aa]['nx'] + 2)
+                # print('xdim is {}'.format(str(pol_range)))
+                rad_range = int(self.data['b2fgeo'][aa]['ny'] + 2)
+                # print('ydim is {}'.format(str(rad_range)))
+                
+                Attempt = self.data['dircomp']['Attempt'][aa]
+                DRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
+            
+                RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                            usecols = (3)).reshape((rad_range, pol_range))
+                VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                              usecols = (3)).reshape((rad_range, pol_range))
+            
+                pol_index = int(pol_loc)
+                crloc = RadLoc[:, pol_index]
+                czloc = VertLoc[:, pol_index]
+                # print(crloc)
+            
+                arclength, interpfunc_dic = self.RR_sep_calculator(cr = crloc, cz = czloc)
+                
+                SEP = self.data['DefaultSettings']['SEP'][aa]
+                
+                sep_dist = np.mean([arclength[int(SEP)+ 1], arclength[int(SEP)]])
+                # print(sep_dist)
+            
+            
+                RR_sep = arclength - sep_dist
+            
+                dsa_dic[aa] = {'arclength': arclength, 'interpfunc': interpfunc_dic,
+                            'dsa_{}_val'.format(pol_index): RR_sep}
+            
+            self.data['dsa']['dsa_{}'.format(pol_index)] = dsa_dic
+    
+    
+    
+        elif self.withshift == False and self.withseries == True:
+            
+            den_list = list(self.data['dircomp']['Attempt'].keys())
+            aa = den_list[0] 
+            
+            # pol_range = int(self.data['b2fgeo']['nx'] + 2)
+            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            
+            
+                       
+            Attempt = self.data['dircomp']['Attempt'][aa]
+            DRT = self.data['dirdata']['outputdir'][aa]['Output']
+            XDIM = self.data['b2fgeo']['nx'] + 2
+            YDIM = self.data['b2fgeo']['ny'] + 2
+            # dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
+            
             RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
                         usecols = (3)).reshape((YDIM, XDIM))
             VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
                           usecols = (3)).reshape((YDIM,XDIM))
             
+            pol_index = int(pol_loc)
             crloc = RadLoc[:, pol_index]
             czloc = VertLoc[:, pol_index]
+            # print(crloc)
             
+            arclength, interpfunc_dic = self.RR_sep_calculator(cr = crloc, cz = czloc)
             
-            arclength, interpfunc_dic = fm.RR_sep_calculator(cr = crloc, cz = czloc)
+            SEP = self.data['DefaultSettings']['SEP']
             
-            
-            sep_dist = np.mean([arclength[int(SEP)-1], arclength[int(SEP)-2]])
+            sep_dist = np.mean([arclength[int(SEP)+ 1], arclength[int(SEP)]])
             # print(sep_dist)
             
             
             RR_sep = arclength - sep_dist
-            
-            
-            comp_dsa = np.zeros((int(rad_range), 2))
-            comp_dsa[:, 0] = dsa
-            comp_dsa[:, 1] = RR_sep
             
             dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
-                       'RadLoc': RadLoc, 'VertLoc': VertLoc,
-                       'dsa_{}_val'.format(pol_loc): RR_sep, 'comp_dsa': comp_dsa}
-            self.data['dsa']['dsa_{}'.format(pol_loc)] = dsa_dic
-        
-        elif self.withshift == True and self.withseries == False:
-        
-            crloc = np.mean([crLowerLeft, crLowerRight, 
-                               crUpperLeft, crUpperRight], axis= 0)
+                        'dsa_{}_val'.format(pol_index): RR_sep}
             
-            czloc = np.mean([czLowerLeft, czLowerRight, 
-                               czUpperLeft, czUpperRight], axis= 0)
-            
-            # comp_cr = np.zeros((int(rad_range), 5))
-            # comp_cr[:, 0] = crloc
-            # comp_cr[:, 1] = crLowerLeft
-            # comp_cr[:, 2] = crLowerRight
-            # comp_cr[:, 3] = crUpperLeft
-            # comp_cr[:, 4] = crUpperRight
-            
-            # comp_cz = np.zeros((int(rad_range), 5))
-            # comp_cz[:, 0] = czloc
-            # comp_cz[:, 1] = czLowerLeft
-            # comp_cz[:, 2] = czLowerRight
-            # comp_cz[:, 3] = czUpperLeft
-            # comp_cz[:, 4] = czUpperRight
-            
-            
-            arclength, interpfunc_dic = fm.RR_sep_calculator(cr = crloc, cz = czloc)
-               
-            sep_dist = np.mean([arclength[int(SEP)-1], arclength[int(SEP)-2]])
-            # print(sep_dist)
-            
-            
-            RR_sep = arclength - sep_dist
-            
-            comp = np.zeros((int(rad_range), 2))
-            comp[:, 0] = solps_dsa_dic[aa]
-            comp[:, 1] = RR_sep
-            
-            
-            dsa_dic[aa] = {'arclength': arclength, 'interpfunc': interpfunc_dic,
-                           'comp': comp,
-                           'dsa_{}_val'.format(pol_loc): RR_sep}
-
-    
-    
-    
-        elif self.withshift == False and self.withseries == True:
-            crloc = np.mean([crLowerLeft, crLowerRight, 
-                               crUpperLeft, crUpperRight], axis= 0)
-            
-            czloc = np.mean([czLowerLeft, czLowerRight, 
-                               czUpperLeft, czUpperRight], axis= 0)
-            
-            # comp_cr = np.zeros((int(rad_range), 5))
-            # comp_cr[:, 0] = crloc
-            # comp_cr[:, 1] = crLowerLeft
-            # comp_cr[:, 2] = crLowerRight
-            # comp_cr[:, 3] = crUpperLeft
-            # comp_cr[:, 4] = crUpperRight
-            
-            # comp_cz = np.zeros((int(rad_range), 5))
-            # comp_cz[:, 0] = czloc
-            # comp_cz[:, 1] = czLowerLeft
-            # comp_cz[:, 2] = czLowerRight
-            # comp_cz[:, 3] = czUpperLeft
-            # comp_cz[:, 4] = czUpperRight
-            
-            arclength, interpfunc_dic = fm.RR_sep_calculator(cr = crloc, cz = czloc)
-            
-            
-            sep_dist = np.mean([arclength[int(SEP)-1], arclength[int(SEP)-2]])
-            # print(sep_dist)
-            
-            
-            RR_sep = arclength - sep_dist
-            
-            
-            # lk = len(self.data['dircomp']['Attempt'].keys())
-            # comp_dsa = np.zeros((int(rad_range), lk + 1))
-            # ii = 0
-            # for i in self.data['dircomp']['Attempt'].keys():
-            #     comp_dsa[:, ii] = solps_dsa_dic[i]
-            #     ii = ii + 1
-            # comp_dsa[:, ii] = RR_sep
-            
-            # dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
-            #         'comp_cr': comp_cr, 'comp_cz': comp_cz, 'comp_dsa': comp_dsa,
-            #             'dsa_{}_val'.format(pol_loc): RR_sep}
-            
-            dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
-                        'dsa_{}_val'.format(pol_loc): RR_sep}
+            self.data['dsa']['dsa_{}'.format(pol_index)] = dsa_dic
