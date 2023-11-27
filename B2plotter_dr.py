@@ -7,7 +7,7 @@ Created on Thu Jul 13 12:45:19 2023
 import B2plotter_set as b2s
 import SOLPSplotter_geoRR as sgr
 import B2plotter_plot as b2p
-import B2plotter_flux as b2f
+import B2plotter_contour as b2c
 import B2plotter_mid_calc as b2mc
 
 d = b2s.Setting_dic()
@@ -16,14 +16,14 @@ lex = b2s.loadDS_dic(d['DEV'])
 
 
 
-xl = b2f.flux_adjustment(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
+xl = b2c.PlotContour(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
             DefaultSettings = d['DefaultSettings'], loadDS = lex, 
             Parameters= d['Parameters'], Publish= d['Publish'])
 xl.set_plot()
 xl.load_mast_dir()
 xl.load_solpsgeo()
 xl.calc_RRsep(plotRR= False)
-xl.fitmastexp(writefile= False)
+xl.fitmastexp(writefile= True)
 xl.transport_coe_align_plot()
 xl.load_vessel()
 # xl.flux_comparison_plot()
@@ -36,6 +36,7 @@ if plot_flag == 'radial':
     PL = '59'
     xl.calcpsi_1D(pol_loc= PL)
     xl.calc_dsa(pol_loc= PL)
+    xl.flux_expansion_map(pol_loc= PL, iter_index= None)
     xl.Opacity_study_radial_plot(pol_loc= PL, x_choice= 'psiN')
 elif plot_flag == 'poloidal':
     # xl.set_plot()
@@ -49,6 +50,7 @@ elif plot_flag == 'skip':
 else:
     print('check plot_flag')
 
+xl.plot_all_radial()
 
 # p = xl.data['dircomp']['Attempt']
 # q = xl.data['gfile']['gcomp']['check']
