@@ -177,9 +177,7 @@ def flux_expand_fit(RRsep, arclength):
     # plt.legend()
     
     # print(flux_fitcoe[0])
-    
-    
-    
+        
     return flux_fit_dic
 
 
@@ -249,8 +247,7 @@ def Opacity_calculator(x_choice, x_coord, ne, te, neuden):
                       'temperature_pedestal_width': dtn,
                       'efold_length': efold, 'dimensionless_opaqueness': opq,
                       'ne_symmetry_point': sym_pt, 'te_symmetry_point': sym_pt_te,
-                      'n_sep_fit': n_sep_fit, 'sep_index': index_cut
-                                        
+                      'n_sep_fit': n_sep_fit, 'sep_index': index_cut                                  
                       }
         
         
