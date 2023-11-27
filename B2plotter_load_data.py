@@ -63,29 +63,39 @@ class load_expdata(B2plotter):
         tanh_ne_fit = fm.tanh(x_model, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         tanh_te_fit = fm.tanh(x_model, popt_te[0], popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
-        shift = -0.004
-        psi_sh = psi + shift
+        shift = 0.0005
+        # psi_sh = psi + shift
         
-        sh_opt_ne, sh_cov_ne = curve_fit(fm.tanh, psi_sh, ne, p0)
-        print(sh_opt_ne)
-        sh_opt_te, sh_cov_te = curve_fit(fm.tanh, psi_sh, te, p1)
-        print(sh_opt_te)
+        # sh_opt_ne, sh_cov_ne = curve_fit(fm.tanh, psi_sh, ne, p0)
+        # print(sh_opt_ne)
+        # sh_opt_te, sh_cov_te = curve_fit(fm.tanh, psi_sh, te, p1)
+        # print(sh_opt_te)
+               
+        # x_sh = np.linspace(min(psi_sh), max(psi_sh), n_tot)
         
+        sh_ne_fit = fm.tanh(x_model, popt_ne[0] + shift, popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
+        sh_te_fit = fm.tanh(x_model, popt_te[0] + shift, popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
-        x_sh = np.linspace(min(psi_sh), max(psi_sh), n_tot)
-        sh_ne_fit = fm.tanh(x_sh, sh_opt_ne[0], sh_opt_ne[1], sh_opt_ne[2], sh_opt_ne[3], sh_opt_ne[4])
-        sh_te_fit = fm.tanh(x_sh, sh_opt_te[0], sh_opt_te[1], sh_opt_te[2], sh_opt_te[3], sh_opt_te[4])
+        coe_len = len(popt_ne) 
         
-        
+        sh_popt_ne = np.zeros(coe_len)
+        sh_popt_te = np.zeros(coe_len)
+        for i in range(len(popt_ne)):
+            if i == 0:
+                sh_popt_ne[i] = popt_ne[i] + shift
+                sh_popt_te[i] = popt_te[i] + shift
+            else:
+                sh_popt_ne[i] = popt_ne[i]
+                sh_popt_te[i] = popt_te[i]
+                
+                      
         gnexp = np.gradient(tanh_ne_fit)
         dn = popt_ne[2]
-        sh_dn = sh_opt_ne[2]
         sym_pt = popt_ne[0]
-        sh_sym_pt = sh_opt_ne[0]
         dtn = popt_te[2]
         te_sym_pt = popt_te[0]
-        print(sym_pt + 0.5*np.log(2 + np.sqrt(3))*dn)
-        print(sh_sym_pt + 0.5*np.log(2 + np.sqrt(3))*sh_dn)
+        print(te_sym_pt + 0.5*np.log(2 + np.sqrt(3))*dtn)
+        print(te_sym_pt + 0.5*np.log(2 + np.sqrt(3))*dtn + shift)
         
         "experimental data and tanh fit"
         "electron density"
@@ -119,7 +129,7 @@ class load_expdata(B2plotter):
         "electron density"
         
         plt.figure(figsize=(7,7))
-        plt.plot(x_sh, sh_ne_fit,'-o', color='r', label= 'electron density fit with shift')
+        plt.plot(x_model, sh_ne_fit,'-o', color='r', label= 'electron density fit with shift')
         plt.plot(x_model, tanh_ne_fit,'-o', color='b', label= 'electron density fit')
         
         plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
@@ -130,7 +140,7 @@ class load_expdata(B2plotter):
         "electron tempurature"
         
         plt.figure(figsize=(7,7))
-        plt.plot(x_sh, sh_te_fit,'-o', color='r', label= 'electron temperature fit with shift')
+        plt.plot(x_model, sh_te_fit,'-o', color='r', label= 'electron temperature fit with shift')
         plt.plot(x_model, tanh_te_fit,'-o', color='b', label= 'electron temperature fit')
         
         plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
@@ -141,11 +151,29 @@ class load_expdata(B2plotter):
         
         plt.show()
         
-        exp_fit_dic = {'psiN': x_sh, 'ne': sh_ne_fit, 'te': sh_te_fit,
-                       'ne_fit_coe': sh_opt_ne, 'te_fit_coe': sh_opt_te}
+        if self.data['b2mn']['jxa'] == None:
+            b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
+                                  + '/b2mn.dat')
+            self.data['b2mn'] = b2mn
+        else:
+            pass
+        jxa = self.data['b2mn']['jxa']
+        self.calcpsi_1D(pol_loc= str(jxa))
+        psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
+        
+        ne_fit_solps = fm.tanh(psi_solps[:, 2], popt_ne[0] + shift, popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
+        te_fit_solps = fm.tanh(psi_solps[:, 2], popt_te[0] + shift, popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
         
-        self.data['experimental_fit'] = exp_fit_dic
+        if self.withshift == False and self.withseries == False:
+            exp_fit_dic = {'psiN': psi_solps[:, 2], 'ne': ne_fit_solps, 'te': te_fit_solps,
+                           'ne_coe': sh_popt_ne, 'te_coe': sh_popt_te}
+            
+            self.data['experimental_fit'] = exp_fit_dic
+        elif self.withshift == True and self.withseries == False:
+            print('load experimental fit to be continue...')
+        else:
+            print('load experimental fit is not there yet...')
         
         if writefile == True:
             w_datalist = []
@@ -154,7 +182,7 @@ class load_expdata(B2plotter):
                                     self.DEV, self.loadDS['fitfname'])
             for j in range(n_tot):
                 w_list =[]
-                w_list.append("{: .6f}".format(x_sh[j]))
+                w_list.append("{: .6f}".format(x_model[j]))
                 w_list.append("{: .6f}".format(sh_ne_fit[j]))
                 w_list.append("{: .6f}".format(sh_te_fit[j]))
                 w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
