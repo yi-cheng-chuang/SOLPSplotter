@@ -22,35 +22,44 @@ xl = b2c.PlotContour(DEV = d['DEV'], withshift= d['withshift'], withseries= d['w
 xl.set_plot()
 xl.load_mast_dir()
 xl.load_solpsgeo()
-xl.calc_RRsep(plotRR= False)
+xl.calcpsi()
+xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
 xl.fitmastexp(writefile= True)
-xl.transport_coe_align_plot()
-xl.load_vessel()
+xl.transport_coe_align_plot(plot_transcoe= False)
+# xl.load_vessel()
 # xl.flux_comparison_plot()
 
 # xl.calcpsi()
 
-plot_flag = 'radial'
+plot_flag = 'skip'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
     xl.calcpsi_1D(pol_loc= PL)
     xl.calc_dsa(pol_loc= PL)
     xl.flux_expansion_map(pol_loc= PL, iter_index= None)
-    xl.Opacity_study_radial_plot(pol_loc= PL, x_choice= 'psiN')
+    xl.Opacity_study_radial_plot(pol_loc= PL)
 elif plot_flag == 'poloidal':
     # xl.set_plot()
     poloidal_index_list = []
-    for i in range(47):
-        poloidal_index_list.append('{}'.format(25 + i))
-    xl.calc_pol_angle(pol_list = poloidal_index_list)
-    xl.Opacity_study_poloidal_plot(pol_list= poloidal_index_list, x_choice= 'psiN')
+    for i in range(40):
+        poloidal_index_list.append('{}'.format(28 + i))
+    xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= True)
+    xl.Opacity_study_poloidal_plot(pol_list= poloidal_index_list)
 elif plot_flag == 'skip':
     pass
 else:
     print('check plot_flag')
 
-xl.plot_all_radial()
+
+radial_plot_flag = True
+if radial_plot_flag:
+    xl.plot_all_radial()
+else:
+    pass
+        
+
+
 
 # p = xl.data['dircomp']['Attempt']
 # q = xl.data['gfile']['gcomp']['check']
