@@ -63,7 +63,7 @@ class load_expdata(B2plotter):
         tanh_ne_fit = fm.tanh(x_model, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         tanh_te_fit = fm.tanh(x_model, popt_te[0], popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
-        shift = 0.0005
+        shift = 0
         # psi_sh = psi + shift
         
         # sh_opt_ne, sh_cov_ne = curve_fit(fm.tanh, psi_sh, ne, p0)
@@ -94,6 +94,14 @@ class load_expdata(B2plotter):
         sym_pt = popt_ne[0]
         dtn = popt_te[2]
         te_sym_pt = popt_te[0]
+        
+        ro_popt_te = np.round_(popt_te, 2)
+        print(ro_popt_te)
+        sep_pos = ro_popt_te[0] - 0.5*np.log(2 - np.sqrt(3))*ro_popt_te[2]
+        print(sep_pos)
+        print(round(sep_pos, 2))
+        
+        
         print(te_sym_pt + 0.5*np.log(2 + np.sqrt(3))*dtn)
         print(te_sym_pt + 0.5*np.log(2 + np.sqrt(3))*dtn + shift)
         
@@ -128,44 +136,44 @@ class load_expdata(B2plotter):
         "fit profile and shift profile"
         "electron density"
         
-        plt.figure(figsize=(7,7))
-        plt.plot(x_model, sh_ne_fit,'-o', color='r', label= 'electron density fit with shift')
-        plt.plot(x_model, tanh_ne_fit,'-o', color='b', label= 'electron density fit')
+        # plt.figure(figsize=(7,7))
+        # plt.plot(x_model, sh_ne_fit,'-o', color='r', label= 'electron density fit with shift')
+        # plt.plot(x_model, tanh_ne_fit,'-o', color='b', label= 'electron density fit')
         
-        plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
-        plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
-        plt.title('Electron density')
-        plt.legend()
+        # plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
+        # plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
+        # plt.title('Electron density')
+        # plt.legend()
         
         "electron tempurature"
         
-        plt.figure(figsize=(7,7))
-        plt.plot(x_model, sh_te_fit,'-o', color='r', label= 'electron temperature fit with shift')
-        plt.plot(x_model, tanh_te_fit,'-o', color='b', label= 'electron temperature fit')
+        # plt.figure(figsize=(7,7))
+        # plt.plot(x_model, sh_te_fit,'-o', color='r', label= 'electron temperature fit with shift')
+        # plt.plot(x_model, tanh_te_fit,'-o', color='b', label= 'electron temperature fit')
         
-        plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
-        plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
-        plt.title('Electron temperature')
-        plt.legend()
+        # plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
+        # plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
+        # plt.title('Electron temperature')
+        # plt.legend()
         
         
         plt.show()
         
-        if self.data['b2mn']['jxa'] == None:
-            b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
-                                  + '/b2mn.dat')
-            self.data['b2mn'] = b2mn
-        else:
-            pass
-        jxa = self.data['b2mn']['jxa']
-        self.calcpsi_1D(pol_loc= str(jxa))
-        psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
-        
-        ne_fit_solps = fm.tanh(psi_solps[:, 2], popt_ne[0] + shift, popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
-        te_fit_solps = fm.tanh(psi_solps[:, 2], popt_te[0] + shift, popt_te[1], popt_te[2], popt_te[3], popt_te[4])
-        
         
         if self.withshift == False and self.withseries == False:
+            if self.data['b2mn']['jxa'] == None:
+                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
+                                      + '/b2mn.dat')
+                self.data['b2mn'] = b2mn
+            else:
+                pass
+            jxa = self.data['b2mn']['jxa']
+            self.calcpsi_1D(pol_loc= str(jxa))
+            psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
+            
+            ne_fit_solps = fm.tanh(psi_solps[:, 2], popt_ne[0] + shift, popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
+            te_fit_solps = fm.tanh(psi_solps[:, 2], popt_te[0] + shift, popt_te[1], popt_te[2], popt_te[3], popt_te[4])
+            
             exp_fit_dic = {'psiN': psi_solps[:, 2], 'ne': ne_fit_solps, 'te': te_fit_solps,
                            'ne_coe': sh_popt_ne, 'te_coe': sh_popt_te}
             
