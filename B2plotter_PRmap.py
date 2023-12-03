@@ -24,7 +24,7 @@ class RP_mapping(load_data):
         load_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
     
         
-    def calc_RRsep(self, plotRR):
+    def calc_RRsep(self, plotRR, plot_psi_dsa_align):
         
         if self.withshift == False and self.withseries == False:
         
@@ -238,17 +238,18 @@ class RP_mapping(load_data):
                     plt.ylabel('Z: [m]')
                     plt.title('{} R-Z plot'.format(aa))
             
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                         'dot7': 'blue', 'one': 'purple'}
-            plt.figure(figsize=(7,7))
-            for in_sh in self.data['dircomp']['multi_shift']:
-                # plt.plot(midplane_dic[in_sh]['psi_solps_mid'], midplane_dic[in_sh]['R_Rsep'], 'o-', 
-                #   label= 'R-Rsep:[m] with modify {} m'.format(self.data['dircomp']['shift_dic'][in_sh]))
-                plt.plot(midplane_dic[in_sh]['psi_solps_mid'], midplane_dic[in_sh]['R_Rsep'], 'o-', 
-                  color= color_dic[in_sh])
-            plt.xlabel('psiN')
-            plt.title('psiN R-Rsep plot')
-            # plt.legend()
+            if plot_psi_dsa_align:
+                color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                             'dot7': 'blue', 'one': 'purple'}
+                plt.figure(figsize=(7,7))
+                for in_sh in self.data['dircomp']['multi_shift']:
+                    # plt.plot(midplane_dic[in_sh]['psi_solps_mid'], midplane_dic[in_sh]['R_Rsep'], 'o-', 
+                    #   label= 'R-Rsep:[m] with modify {} m'.format(self.data['dircomp']['shift_dic'][in_sh]))
+                    plt.plot(midplane_dic[in_sh]['psi_solps_mid'], midplane_dic[in_sh]['R_Rsep'], 'o-', 
+                      color= color_dic[in_sh])
+                plt.xlabel('psiN')
+                plt.title('psiN R-Rsep plot')
+                # plt.legend()
                     
             self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
             self.data['midplane_calc'] = midplane_dic
@@ -318,7 +319,7 @@ class RP_mapping(load_data):
             
             
             psi_solps_mid = np.zeros(rad_range)
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
             # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
             for i in range(rad_range):
                 psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
@@ -363,7 +364,7 @@ class RP_mapping(load_data):
     
     
     
-    def calc_pol_angle(self, pol_list):
+    def calc_pol_angle(self, pol_list, plot_angle):
         
         if self.withshift == False and self.withseries == False:
             
@@ -383,18 +384,27 @@ class RP_mapping(load_data):
             mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_value']
             print(mag_axis_r)
             
+            xprloc = RadLoc[:, 72][19]
+            xpzloc = VertLoc[:, 72][19]
+            
+            xpoint_R = xprloc - mag_axis_r
+            xpoint_Z = xpzloc - mag_axis_z
+            xpoint_angle = np.arctan2(xpoint_Z, xpoint_R)*180 / np.pi
+            print('xpoint angle is {}'.format(str(xpoint_angle)))
+            
+                     
             angle_list = []
             
             for pol_index in pol_list:
-                rloc = RadLoc[:, int(pol_index)][0]
-                zloc = VertLoc[:, int(pol_index)][0]
+                rloc = RadLoc[:, int(pol_index)][19]
+                zloc = VertLoc[:, int(pol_index)][19]
                 
                 x = rloc - mag_axis_r
                 y = zloc - mag_axis_z
                 
                 
                 angle = np.arctan2(y, x)*180 / np.pi
-                if angle <= -90:
+                if angle <= xpoint_angle:
                     angle = angle + 360
                 angle_list.append(angle)
                 
@@ -406,17 +416,20 @@ class RP_mapping(load_data):
                 pol_loc[i] = int(ii)
                 i = i + 1
             
+            if plot_angle: 
+                plt.figure(figsize=(7,7))
+                plt.plot(pol_loc, angle_list, 'o', color = 'r', label= 'poloidal angle')
+                plt.xlabel('poloidal index')
+                plt.title('poloidal angle verses poloidal index')
+                plt.legend()
             
-            plt.figure(figsize=(7,7))
-            plt.plot(pol_loc, angle_list, 'o-', color = 'r', label= 'poloidal angle')
-            plt.xlabel('poloidal index')
-            plt.title('poloidal angle verses poloidal index')
-            plt.legend()
-            
-            self.data['angle'] = angle_list
+            angle_dic = {'angle_list': angle_list, 'xpoint_angle': xpoint_angle}
+            self.data['angle'] = angle_dic
             
         elif self.withshift == True and self.withseries == False:        
             angle_dic = {}
+            angle_list_dic = {}
+            xpoint_angle_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 pol_range = int(self.data['b2fgeo'][aa]['nx'] + 2)
                 # print('xdim is {}'.format(str(pol_range)))
@@ -436,24 +449,34 @@ class RP_mapping(load_data):
                 VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
                               usecols = (3)).reshape((rad_range, pol_range))
                 
+                xprloc = RadLoc[:, 72][19]
+                xpzloc = VertLoc[:, 72][19]
+                
+                xpoint_R = xprloc - mag_axis_r
+                xpoint_Z = xpzloc - mag_axis_z
+                xpoint_angle = np.arctan2(xpoint_Z, xpoint_R)*180 / np.pi
+                print('xpoint angle is {:.2f} for {} case'.format(xpoint_angle, aa))
+                
+                xpoint_angle_dic[aa] = xpoint_angle
+                
                 angle_list = []
                 
                 for pol_index in pol_list:
-                    rloc = RadLoc[:, int(pol_index)][0]
-                    zloc = VertLoc[:, int(pol_index)][0]
+                    rloc = RadLoc[:, int(pol_index)][19]
+                    zloc = VertLoc[:, int(pol_index)][19]
                     
                     x = rloc - mag_axis_r
                     y = zloc - mag_axis_z
                     
                     
                     angle = np.arctan2(y, x)*180 / np.pi
-                    if angle <= -90:
+                    if angle <= xpoint_angle:
                         angle = angle + 360
                     angle_list.append(angle)
                     
                     
                                   
-                    angle_dic[aa] = angle_list
+                angle_list_dic[aa] = angle_list
                     
             ln = len(pol_list)
             pol_loc = np.zeros(ln)
@@ -467,13 +490,12 @@ class RP_mapping(load_data):
             color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                          'dot7': 'blue', 'one': 'purple'}
             for ab in self.data['dircomp']['multi_shift']: 
-                plt.plot(pol_loc, angle_dic[ab], 'o-', color = color_dic[ab])
+                plt.plot(pol_loc, angle_list_dic[ab], 'o', color = color_dic[ab])
                 plt.xlabel('poloidal index')
-                plt.title('poloidal angle verses poloidal index'.format(self.data['dircomp']['shift_dic'][ab]))
+                plt.title('poloidal angle verses poloidal index from {} to {}'.format(int(min(pol_loc)), int(max(pol_loc))))
                 
-                
-                
-            
+            angle_dic = {'angle_list': angle_list_dic, 
+                         'xpoint_angle': xpoint_angle_dic}
                 
             self.data['angle'] = angle_dic
             
