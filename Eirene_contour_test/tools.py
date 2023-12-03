@@ -62,8 +62,8 @@ def mast_dir_dic():
     mast_dir_dic = {
     'dev': 'mast',
     'shot': '027205',
-    'shift': ['org_change_particle_number', 'dot3', 'dot5', 'dot7', 'one_LS'],
-    'series' : ['46_n100000_5_nts5_a', '1_n5_dot3_a', '15_dn0.5hc0.05_ts5_dot5_a', '8_t1_dot7_a', '27_lsts5_tw_one_a']
+    'shift': ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS'],
+    'series' : ['46_n100000_5c_nts5_a', '1_n5_dot3_a', '15_dn0.5hc0.05_ts5_dot5_a', '8_t1_dot7_a', '27_lsts5_tw_one_a']
     }
     return mast_dir_dic
 
