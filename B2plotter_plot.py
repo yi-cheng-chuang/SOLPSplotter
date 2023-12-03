@@ -29,7 +29,7 @@ class Opacity_study(RP_mapping):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
             plt.rc('lines', linewidth=5, markersize=9)
-            plt.rcParams.update({'font.size': 20})
+            plt.rcParams.update({'font.size': 16})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
   
@@ -37,7 +37,7 @@ class Opacity_study(RP_mapping):
             print('Publish setting is incorrect or add another setting')
     
 
-    def Opacity_study_poloidal_plot(self, pol_list, x_choice):
+    def Opacity_study_poloidal_plot(self, pol_list):
         self.data['poloidal_index'] = pol_list
         
         for j in pol_list:
@@ -57,8 +57,7 @@ class Opacity_study(RP_mapping):
             i = i + 1
         
         if self.withshift == False and self.withseries == False:
-            result = self.opacity_data_method_single(pol_list = pol_list, 
-                                                     x_choice= x_choice)
+            result = self.opacity_data_method_single(pol_list = pol_list)
             
             self.data['opacity_poloidal'] = result
             
@@ -73,10 +72,10 @@ class Opacity_study(RP_mapping):
             # print(result.keys())
             # print(unit.keys())
             
-            opm.opacity_plot(pol_loc = self.data['angle'], result_dic = result, unit_dic = unit,
+            opm.opacity_plot(pol_loc = self.data['angle']['angle_list'], result_dic = result, unit_dic = unit,
                              log_flag = False, charactor= char,
-                             iter_list = None, 
-                             change_ver_dic = None)
+                             iter_list = None, change_ver_dic = None,
+                             xpoint_loc = self.data['angle']['xpoint_angle'])
             
         elif self.withshift == True and self.withseries == False:
             result = self.opacity_data_method_multi(pol_list = pol_list, 
@@ -126,10 +125,11 @@ class Opacity_study(RP_mapping):
                 p = str(self.data['dircomp']['shift_dic'][k])
                 shift_dic[k] = p
             
-            opm.opacity_plot(pol_loc = self.data['angle'], result_dic = result, unit_dic = unit,
+            opm.opacity_plot(pol_loc = self.data['angle']['angle_list'], result_dic = result, unit_dic = unit,
                              log_flag = False, charactor= char,
                              iter_list = self.data['dircomp']['multi_shift'], 
-                             change_ver_dic = shift_dic)
+                             change_ver_dic = shift_dic, 
+                             xpoint_loc= self.data['angle']['xpoint_angle'])
         
         elif self.withshift == False and self.withseries == True:
             result = self.opacity_data_method_multi(pol_list = pol_list, 
@@ -185,7 +185,7 @@ class Opacity_study(RP_mapping):
             opm.opacity_plot(pol_loc = self.data['angle'], result_dic = result, unit_dic = unit,
                              log_flag = False, charactor= char,
                              iter_list = self.data['dircomp']['Attempt'].keys(), 
-                             change_ver_dic = density_dic)
+                             change_ver_dic = density_dic, xpoint_loc= None)
         
         elif self.withshift == True and self.withseries == True:
             print('Opacity_study_poloidal_plot is not there yet, to be continue...')
@@ -195,7 +195,7 @@ class Opacity_study(RP_mapping):
             print('more work need to be done')
             
             
-    def opacity_data_method_single(self, pol_list, x_choice): 
+    def opacity_data_method_single(self, pol_list): 
         i = 0
         ln = len(pol_list)
         efold = np.zeros(ln)
@@ -221,23 +221,16 @@ class Opacity_study(RP_mapping):
             Ne = self.data['outputdata']['Ne'][:, pol_in]
             Te = self.data['outputdata']['Te'][:, pol_in]
             
-            if x_choice == 'psiN':
-                rd = fm.Opacity_calculator(x_choice= 'psiN', x_coord= psi, ne = Ne, te = Te, 
-                                       neuden = Nd)
-                ped_index = rd['sep_index']
-                
-                fe = self.calc_flux_expansion(pol_loc= k, 
-                                ped_index= ped_index, iter_index= None)
-                pd = self.data['DefaultSettings']['psi_dsa']
-                
-                # Opacity_calculator(x_choice, x_coord, ne, te, neuden)
-                
-            elif x_choice == 'RRsep':
-                print('RRsep version has not been built...')
-                # rd = fm.Opacity_calculator(x_choice= 'RRsep', x_coord = dsa_pol_loc, ne = Ne, te = Te, 
-                #                        neuden = Nd, psi = psi)
-                
+
+            rd = fm.Opacity_calculator(x_coord= psi, ne = Ne, te = Te, 
+                                   neuden = Nd)
+            ped_index = rd['sep_index']
             
+            fe = self.calc_flux_expansion(pol_loc= k, 
+                            ped_index= ped_index, iter_index= None)
+            pd = self.data['DefaultSettings']['psi_dsa']
+            
+
             efold[i] = rd['efold_length']
             delta[i] = rd['pedestal_width']
             opq[i] = rd['dimensionless_opaqueness']
@@ -308,7 +301,7 @@ class Opacity_study(RP_mapping):
                 Ne = self.data['outputdata']['Ne'][aa][:, pol_in]
                 Te = self.data['outputdata']['Te'][aa][:, pol_in]
                 
-                rd = fm.Opacity_calculator(x_choice= 'psiN', x_coord = psi, ne = Ne, te = Te,
+                rd = fm.Opacity_calculator(x_coord = psi, ne = Ne, te = Te,
                                            neuden = Nd)
                 
                 ped_index = rd['sep_index']
@@ -364,7 +357,7 @@ class Opacity_study(RP_mapping):
         return result
           
             
-    def Opacity_study_radial_plot(self, pol_loc, x_choice):
+    def Opacity_study_radial_plot(self, pol_loc):
         self.load_output_data(param= 'NeuDen')
         self.load_output_data(param= 'Ne')
         self.load_output_data(param= 'Te')
@@ -382,7 +375,7 @@ class Opacity_study(RP_mapping):
             
             
             # result_dic = fm.Opacity_calculator(dsa_pol_loc, Ne, Te, Nd, psi)
-            result_dic = fm.Opacity_calculator(x_choice = x_choice, x_coord = psi, 
+            result_dic = fm.Opacity_calculator(x_coord = psi, 
                                            ne = Ne, te = Te, neuden = Nd)
             
             ped_index = result_dic['sep_index']
@@ -397,8 +390,8 @@ class Opacity_study(RP_mapping):
             
             
             P = self.data['Parameter']
-            opm.opacity_radial_method_single(result_dic = result_dic, SEP = SEP, x_choice = x_choice, 
-                                             x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, 
+            opm.opacity_radial_method_single(result_dic = result_dic, SEP = SEP, 
+                                     x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, 
                                                   P = P, log_flag = True)
         
         elif self.withshift == True and self.withseries == False:
@@ -432,8 +425,6 @@ class Opacity_study(RP_mapping):
                 psi_dic[aa] = self.data['psi']['psi_{}_val'.format(pol_loc)][aa]
                 # psi_RGI = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 0]
                 
-                # if x_choice == 'psiN':
-                #     xcoord_dic[aa] = psi_dic[aa]
                 
                 pol_index = int(pol_loc)
                 Nd_dic[aa] = self.data['outputdata']['NeuDen'][aa][:, pol_index]
@@ -441,7 +432,7 @@ class Opacity_study(RP_mapping):
                 Te_dic[aa] = self.data['outputdata']['Te'][aa][:, pol_index]
                 
                 
-                result_dic = fm.Opacity_calculator(x_choice = x_choice, x_coord = psi_dic[aa], 
+                result_dic = fm.Opacity_calculator(x_coord = psi_dic[aa], 
                             ne = Ne_dic[aa], te = Te_dic[aa], neuden = Nd_dic[aa])
                 
                 ped_index = result_dic['sep_index']
@@ -504,7 +495,7 @@ class Opacity_study(RP_mapping):
             ii = 1
             
             P = self.data['Parameter']
-            opm.opacity_radial_method_multi(x_choice = x_choice, result_dic = result, SEP = SEP, 
+            opm.opacity_radial_method_multi(result_dic = result, SEP = SEP, 
                             iter_list = self.data['dircomp']['multi_shift'], 
                              change_var_dic = shift_dic, log_flag = True, 
                              char = char, P = P)
@@ -547,9 +538,8 @@ class Opacity_study(RP_mapping):
                 Te_dic[aa] = self.data['outputdata']['Te'][aa][:, pol_index]
                 
                 
-                result_dic = fm.Opacity_calculator(x_choice = x_choice, 
-                    x_coord = psi_dic[aa], ne = Ne_dic[aa], te = Te_dic[aa], 
-                    neuden = Nd_dic[aa])
+                result_dic = fm.Opacity_calculator(x_coord = psi_dic[aa], 
+                        ne = Ne_dic[aa], te = Te_dic[aa], neuden = Nd_dic[aa])
                 
                 ped_index = result_dic['sep_index']
                 
@@ -608,7 +598,7 @@ class Opacity_study(RP_mapping):
             
             
             P = self.data['Parameter']
-            opm.opacity_radial_method_multi(x_choice = x_choice, result_dic = result, 
+            opm.opacity_radial_method_multi(result_dic = result, 
                 SEP = SEP, iter_list = self.data['dircomp']['Attempt'].keys(), 
                 change_var_dic = density_dic, log_flag = True, char= char, P = P)
             
@@ -623,7 +613,7 @@ class Opacity_study(RP_mapping):
     
     
     
-    def transport_coe_align_plot(self):
+    def transport_coe_align_plot(self, plot_transcoe):
         if self.withshift == True and self.withseries == False:
             trans_dic = {}
             jxa = self.data['b2mn']['org']['jxa']
@@ -647,21 +637,21 @@ class Opacity_study(RP_mapping):
             log_flag = False
             coe_label_dic = {'1': 'particle diffusivity', '2': 'ion thermal diffusivity'
                              ,'3': 'electron thermal diffusivity'}
-    
-            for k in coe_label_dic.keys():
-                if log_flag:
-                    plt.yscale('log')
-                plt.figure(figsize=(7,7))
-                color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                             'dot7': 'blue', 'one': 'purple'}
-                for ab in self.data['dircomp']['multi_shift']: 
-                    # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
-                    #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
-                    plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab] )
-                    plt.xlabel('psiN')
-                    plt.title('radial {} coefficient'.format(coe_label_dic[k]))
-                    # plt.legend() 
-            plt.show()
+            if plot_transcoe:
+                for k in coe_label_dic.keys():
+                    if log_flag:
+                        plt.yscale('log')
+                    plt.figure(figsize=(7,7))
+                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                                 'dot7': 'blue', 'one': 'purple'}
+                    for ab in self.data['dircomp']['multi_shift']: 
+                        # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
+                        #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
+                        plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab] )
+                        plt.xlabel('psiN')
+                        plt.title('radial {} coefficient'.format(coe_label_dic[k]))
+                        # plt.legend() 
+                plt.show()
         else:
             print('transport_coe_align_plot is not there yet')
     
