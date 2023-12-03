@@ -9,12 +9,12 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
                'Parameters': P, 'DefaultSettings': DP, 
                'Publish': 'b2plottersetting'}
     return set_dic
 
-DP = {'series_flag': 'eireneN'}
+DP = {'series_flag': 'change_den'}
 
 
 def mast_comp_dic():
@@ -22,7 +22,7 @@ def mast_comp_dic():
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
-    series_dic = {'org': '49_n100000_te2_nts5_a', 'dot3': '13_n100000_2_dot3_a', 
+    series_dic = {'org': '49_n100000_in1e4te1_nts5_a', 'dot3': '13_n100000_2_dot3_a', 
                   'dot5': '24_n100000_2_dot5_a', 'dot7': '12_n100000_2_dot7_a', 
                   'one': '31_n100000_2_one_a'}
     outputlist = ['Output', 'Output2', 'EirOutput']
@@ -38,8 +38,8 @@ def mast_comp_dic_withshift():
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
-    series = ['45_r1_full3e5_sol9e5_nts5_a', '13_r1_full3e5_sol9e5_adjinp_dot3_a', '24_r1_full3e5_sol9e5_ts5_dot5_a', 
-              '11_full3e5_sol9e5_dot7_a', '30_full3e5_sol9e5_one_a']
+    series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
+              '12_n100000_2_dot7_a', '31_n100000_2_one_a']
     outputlist = ['Output', 'Output2', 'EirOutput']
     
     mast_withshift_dic = {'Shot': '027205', 'multi_shift': multi_shift, 'shift_dic': shift_dic, 
@@ -51,7 +51,7 @@ def mast_comp_dic_withshift():
 def mast_comp_dir_series():
     a_shift = 'org'
     shift = 0
-    tail = '_full3e5_sol9e5_nts5_a'
+    tail = '_ca_nts5_a'
     outputlist = ['Output', 'Output2', 'EirOutput']
     shift_filename = 'org_new_vd'
     mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
@@ -69,8 +69,6 @@ def mast_comp_dir_eireneN():
                     'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
     
     return mast_eireneN_dir_dic
-
-
 
 
 
