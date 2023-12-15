@@ -28,7 +28,7 @@ class Opacity_study(RP_mapping):
     def set_plot(self):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth=5, markersize=9)
+            plt.rc('lines', linewidth= 5, markersize= 9)
             plt.rcParams.update({'font.size': 16})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
@@ -67,8 +67,6 @@ class Opacity_study(RP_mapping):
             char['withshift'] = self.withshift
             char['withseries'] = self.withseries
             
-            log_flag = False
-            
             # print(result.keys())
             # print(unit.keys())
             
@@ -92,7 +90,6 @@ class Opacity_study(RP_mapping):
             #                       coords=[series_list, pol_list], 
             #                 dims=['different_density','Poloidal_Location'], 
             #                  name = r'dimensionless opaqueness $m$')
-            
             
             
             data_collect_opq = np.zeros((mm, ll))
@@ -267,6 +264,7 @@ class Opacity_study(RP_mapping):
         ne_ped_dic = {}
         tdelta_dic = {}
         flux_expand_dic = {}
+        xcoord_cut_dic = {}
         
         for aa in iter_list:
             i = 0
@@ -280,6 +278,7 @@ class Opacity_study(RP_mapping):
             ne_ped = np.zeros(ln)
             tdelta = np.zeros(ln)
             flux_exp = np.zeros(ln)
+            xcoord_cut = {}
         
             
             
@@ -303,6 +302,9 @@ class Opacity_study(RP_mapping):
                 
                 rd = fm.Opacity_calculator(x_coord = psi, ne = Ne, te = Te,
                                            neuden = Nd)
+                
+                xcoord_cut_index = {k: rd['x_coord_cut']}
+                xcoord_cut = xcoord_cut | xcoord_cut_index
                 
                 ped_index = rd['sep_index']
                 
@@ -340,6 +342,7 @@ class Opacity_study(RP_mapping):
             ne_ped_dic[aa] = ne_ped
             tdelta_dic[aa] = tdelta
             flux_expand_dic[aa] = flux_exp
+            xcoord_cut_dic[aa] = xcoord_cut
             
             
         
@@ -353,6 +356,7 @@ class Opacity_study(RP_mapping):
                   'temperature_pedestal_width': tdelta_dic,
                   'flux_expansion': flux_expand_dic               
                   }
+        self.data['xcoord_cut'] = xcoord_cut_dic
         
         return result
           
