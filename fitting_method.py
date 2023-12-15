@@ -143,8 +143,6 @@ def flux_expand_fit(RRsep, arclength):
     return flux_fit_dic
 
 
-
-
 def Opacity_calculator(x_coord, ne, te, neuden):
 
         fit_tanh_dic = tanh_fit(x_coord, ne, te)
@@ -166,6 +164,7 @@ def Opacity_calculator(x_coord, ne, te, neuden):
         # print(type(x_coord_rev))
         neuden_rev = list(reversed(neuden))
         # print(type(x_coord_rev))
+        mod_dn = 0.5*np.log(2 + np.sqrt(3))*dn
         for j in range(len(x_coord_rev)):
             if x_coord_rev[j] <= sym_pt_ne + dn and x_coord_rev[j] >= sym_pt_ne - dn:
                 xcoord_exp.append(x_coord_rev[j])
