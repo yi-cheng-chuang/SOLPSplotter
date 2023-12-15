@@ -41,9 +41,19 @@ class load_expdata(B2plotter):
             self.data['dirdata']['fitloc'] = fitloc
             
     def fitmastexp(self, writefile):
-        n_tot = 200
-        # solps_psi = 1.09145489
-        solps_psi = 1.1
+        n_tot = 100
+        
+        if self.data['b2mn']['jxa'] == None:
+            b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
+                                  + '/b2mn.dat')
+            self.data['b2mn'] = b2mn
+        else:
+            pass
+        jxa = self.data['b2mn']['jxa']
+        self.calcpsi_1D(pol_loc= str(jxa))
+        psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
+        
+        
         p0 = [0.97, 0.6, 0.01, 0.01, 3/14]
         p1 = [0.95, 0.2, 0.02, 0.01, 6/7]
         self.loadmastdata(EXP= True, fit= False)
@@ -59,7 +69,7 @@ class load_expdata(B2plotter):
         popt_te, pcov_te = curve_fit(fm.tanh, psi, te, p1)
         print(popt_te)
           
-        x_model = np.linspace(min(psi), max(psi), n_tot)
+        x_model = np.linspace(min(psi_solps[:, 2]), 1.1, n_tot)
         tanh_ne_fit = fm.tanh(x_model, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         tanh_te_fit = fm.tanh(x_model, popt_te[0], popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
@@ -177,6 +187,29 @@ class load_expdata(B2plotter):
             exp_fit_dic = {'psiN': psi_solps[:, 2], 'ne': ne_fit_solps, 'te': te_fit_solps,
                            'ne_coe': sh_popt_ne, 'te_coe': sh_popt_te}
             
+            "fit electron density in 38 grids"
+            # plt.figure(figsize=(7,7))
+            # plt.plot(psi_solps[:, 2], ne_fit_solps,'-o', color='r', label= 'electron density fit with shift')
+             
+            # plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
+            # plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
+            # plt.title('Electron density')
+            # plt.legend()
+            
+            "fit electron temperature in 38 grids"
+            # plt.figure(figsize=(7,7))
+            # plt.plot(psi_solps[:, 2], te_fit_solps,'-o', color='r', label= 'electron temperature fit with shift')
+             
+            # plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
+            # plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
+            # plt.title('Electron temperature')
+            # plt.legend()
+            
+            
+            
+            
+            
+            
             self.data['experimental_fit'] = exp_fit_dic
         elif self.withshift == True and self.withseries == False:
             print('load experimental fit to be continue...')
@@ -195,6 +228,14 @@ class load_expdata(B2plotter):
                 w_list.append("{: .6f}".format(sh_te_fit[j]))
                 w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
                 w_datalist.append(w_writelist)
+            
+            # for j in range(len(psi_solps[:, 2])):
+            #     w_list =[]
+            #     w_list.append("{: .6f}".format(psi_solps[:, 2][j]))
+            #     w_list.append("{: .6f}".format(ne_fit_solps[j]))
+            #     w_list.append("{: .6f}".format(te_fit_solps[j]))
+            #     w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
+            #     w_datalist.append(w_writelist)
            
             with open(fdir, 'w') as f:
                 for l,w_line in enumerate(w_datalist):   
