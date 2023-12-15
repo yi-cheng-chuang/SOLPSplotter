@@ -196,7 +196,7 @@ class RP_mapping(load_data):
                 
                 
                 psi_solps_mid = np.zeros(rad_range)
-                psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
+                psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
                 # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
                 for i in range(rad_range):
                     psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
