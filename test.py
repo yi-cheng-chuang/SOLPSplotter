@@ -20,7 +20,8 @@ pts = np.array([[2.1, 6.2, 8.3],
 # k = lmem.mast_series_dir()
 
 
-
+print(0.5*np.log(2+ np.sqrt(3)))
+print(0.5*np.log(2- np.sqrt(3)))
 
 
 c = [3, 50, 7]
