@@ -169,8 +169,7 @@ class B2plotter:
         for i in range(g['nw']):
             gR[i] = g['rleft'] + i * dR + float(shift)
             
-                
-                
+
         psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
         psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
         psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
@@ -182,7 +181,8 @@ class B2plotter:
         
         
         gfilesum = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR, 'gZ': gZ,
-                    'check': 'yeah', 'interp_dic': interp_dic}
+   'check': 'yeah! shift is {} and series is {}'.format(self.withshift, self.withseries),
+                    'interp_dic': interp_dic}
             
         return geo, gfilesum
             
@@ -200,17 +200,6 @@ class B2plotter:
             self.data['b2fgeo'] = geo
             self.data['gfile']['gcomp'] = gfilesum
             
-            
-            
-            # try:
-            #     b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
-            #                           + '/b2mn.dat')
-            # except:
-            #     print('can not generate b2mn')
-            
-            # self.data['b2mn'] = b2mn   
-            # self.loadgeo_method_single()
-            
         elif self.withshift == True and self.withseries == False:
             b2mn_dic = {}
             geo_dic = {}
@@ -225,9 +214,6 @@ class B2plotter:
             self.data['b2mn'] = b2mn_dic
             self.data['b2fgeo'] = geo_dic      
             self.data['gfile']['gcomp'] = gfilesum_dic
-            
-            
-            
             
             # b2mn_dic = {}
             # geo_dic = {}
@@ -293,31 +279,17 @@ class B2plotter:
             # return interp_dic
         
         elif self.withshift == False and self.withseries == True:
-            
+            b2mn_dic = {}
             for seriesname in self.data['dircomp']['Attempt'].keys():
-                self.loadb2mn_method(itername= seriesname)
-                
-                
-                
-            self.loadgeo_method(itername= None) 
+                b2mn = self.loadb2mn_method(itername= seriesname)
+                b2mn_dic[seriesname] = b2mn
             
             
-            
-            
-            # b2mn_dic = {}
-            # for ab in self.data['dircomp']['Attempt'].keys():
+            self.data['b2mn'] = b2mn
                 
-                
-            #     try:
-            #         b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][ab]
-            #                               + '/b2mn.dat')
-            #     except:
-            #         print('can not generate b2mn')
-                
-            #     b2mn_dic[ab] = b2mn
-            
-            # self.data['b2mn'] = b2mn_dic          
-            # self.loadgeo_method_single()
+            geo, gfilesum = self.loadgeo_method(itername= None) 
+            self.data['b2fgeo'] = geo
+            self.data['gfile']['gcomp'] = gfilesum
                             
         elif self.withshift == True and self.withseries == True:
             print('load_solpsgeo is not there yet, to be continue...')
@@ -326,50 +298,63 @@ class B2plotter:
             print('There is a bug')
 
 
-    def calcpsi_method_noshift(self):
+    def calcpsi_method(self, itername):
         
-        pol_range = int(self.data['b2fgeo']['nx'] + 2)
-        # print('xdim is {}'.format(pol_range))
-        rad_range = int(self.data['b2fgeo']['ny'] + 2)
-        # print('ydim is {}'.format(rad_range))
-        
-        self.data['DefaultSettings']['pol_range'] = pol_range
-        self.data['DefaultSettings']['rad_range'] = rad_range
-    
-        # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
-        # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
-        psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-        psival = np.zeros((rad_range, pol_range))
         if self.withshift == False and self.withseries == False:
+            pol_range = int(self.data['b2fgeo']['nx'] + 2)
+            # print('xdim is {}'.format(pol_range))
+            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            # print('ydim is {}'.format(rad_range))
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
+            # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
             Attempt = self.data['dircomp']['Attempt']
             DRT = self.data['dirdata']['outputdir']['Output']
+            
+        elif self.withshift == True and self.withseries == False:
+            pol_range = int(self.data['b2fgeo'][itername]['nx'] + 2)
+            # print('xdim is {}'.format(str(pol_range)))
+            rad_range = int(self.data['b2fgeo'][itername]['ny'] + 2)
+            # print('ydim is {}'.format(str(rad_range)))
+            psiNinterp_RBS = self.data['gfile']['gcomp'][itername]['interp_dic']['RBS']
+            Attempt = self.data['dircomp']['Attempt'][itername]
+            DRT = self.data['dirdata']['infolderdir'][itername]['outputdir']['Output']
+            
         elif self.withshift == False and self.withseries == True:
-            aa = list(self.data['dircomp']['Attempt'].keys())[0]
-            Attempt = self.data['dircomp']['Attempt'][aa]
-            DRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
-        
+            pol_range = int(self.data['b2fgeo']['nx'] + 2)
+            # print('xdim is {}'.format(pol_range))
+            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            # print('ydim is {}'.format(rad_range))
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
+            # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
+            Attempt = self.data['dircomp']['Attempt'][itername]
+            DRT = self.data['dirdata']['outputdir'][itername]['Output']
+            
+
+        psival = np.zeros((rad_range, pol_range))
+       
         RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
                     usecols = (3)).reshape((rad_range, pol_range))
         VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
                       usecols = (3)).reshape((rad_range, pol_range))
         
         coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
-        
-        self.data['grid'] = coord_dic
-        
+            
         for pol_loc in range(pol_range):
             for i in range(rad_range):
                 # print(i)
                 psival[i, pol_loc] = psiNinterp_RBS(RadLoc[i, pol_loc], 
                                                       VertLoc[i, pol_loc])
-              
-        self.data['psi']['psival'] = psival
-
+        return coord_dic, psival
+                
     def calcpsi(self):
             
         if self.withshift == False and self.withseries == False:
             
-            self.calcpsi_method_noshift()          
+            coord_dic, psival = self.calcpsi_method(itername= None)
+            self.data['grid'] = coord_dic
+            self.data['psi']['psival'] = psival
         
         elif self.withshift == True and self.withseries == False:
             pol_range_dic = {}
@@ -391,7 +376,7 @@ class B2plotter:
             
                 solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['infolderdir'][aa]['simudir'] + '/dsa')
     
-                psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
+                psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
 
                 psival = np.zeros((rad_range, pol_range))
                 
@@ -418,7 +403,8 @@ class B2plotter:
             
         elif self.withshift == False and self.withseries == True:
             # print('we are working on calcpsi for series case')
-            self.calcpsi_method_noshift()
+            series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
+            self.calcpsi_method(itername= series_rep)
     
     def plot_seperatrix(self):
         psi_1d = self.data['psi']['psival'][0, :]
@@ -602,7 +588,7 @@ class B2plotter:
                 # SEP_dic[aa] = SEP       
                 solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['infolderdir'][aa]['simudir'] + '/dsa')
 
-                psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic'][aa]
+                psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
                 # print(type(psiNinterp_RBS))
                 
                 pol_index = int(pol_loc)
