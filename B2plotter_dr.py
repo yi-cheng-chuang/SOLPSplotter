@@ -31,7 +31,7 @@ xl.transport_coe_align_plot(plot_transcoe= False)
 
 # xl.calcpsi()
 
-plot_flag = 'skip'
+plot_flag = 'radial'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
@@ -52,7 +52,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = True
+radial_plot_flag = False
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
