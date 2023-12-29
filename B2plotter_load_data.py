@@ -43,17 +43,32 @@ class load_expdata(B2plotter):
     def fitmastexp(self, writefile):
         n_tot = 100
         
-        if self.data['b2mn']['jxa'] == None:
-            b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
-                                  + '/b2mn.dat')
-            self.data['b2mn'] = b2mn
+        
+        
+        if self.withshift == False and self.withseries == False:
+            self.check_b2mn(itername = None)
+            jxa = self.data['b2mn']['jxa']
+            self.calcpsi_1D(pol_loc= str(jxa))
+            psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
+            
+        elif self.withshift == True and self.withseries == False:
+            self.check_b2mn(itername = 'org')
+            jxa = self.data['b2mn']['org']['jxa']
+            self.calcpsi_1D(pol_loc= str(jxa))
+            psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]['org']
+        
+        elif self.withshift == False and self.withseries == True:
+            series_rap = list(self.data['dircomp']['Attempt'].keys())[0]
+            self.check_b2mn(itername = series_rap)
+            jxa = self.data['b2mn']['org']['jxa']
+            self.calcpsi_1D(pol_loc= str(jxa))
+            psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))][series_rap]
+        
         else:
-            pass
-        jxa = self.data['b2mn']['jxa']
-        self.calcpsi_1D(pol_loc= str(jxa))
-        psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
+            print('fitmastexp function has a bug checking b2mn')
+            
         
-        
+            
         p0 = [0.97, 0.6, 0.01, 0.01, 3/14]
         p1 = [0.95, 0.2, 0.02, 0.01, 6/7]
         self.loadmastdata(EXP= True, fit= False)
