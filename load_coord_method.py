@@ -76,24 +76,6 @@ def read_b2fgmtry(fname):
 
     return geo
 
-def mast_coord_dir(a_shift):
-    d= tl.mast_dir_dic()
-    basedrt, topdrt, tpdrt= tl.set_wdir()
-    shift_list = ['org', 'dot3', 'dot5', 'dot7', 'one']
-    
-    for s in shift_list:
-        if a_shift == s:
-            i = shift_list.index(a_shift)
-            filename = d['series'][i]
-            newbase = '{}/{}/{}/{}/{}'.format(basedrt, d['dev'], d['shot'], d['shift'][i], filename)
-            tbase = '{}/{}/{}/{}'.format(basedrt, d['dev'], d['shot'], d['shift'][i])
-            drt = '{}/Output2'.format(newbase)
-            Attempt = str(tl.s_number(drt)[0])
-            print(i)
-            print(filename)
-            print(Attempt)
-    
-    return newbase, tbase, drt, Attempt, i
 
 # def read_dsa(fname='dsa'):
 #     if not path.exists(fname):
