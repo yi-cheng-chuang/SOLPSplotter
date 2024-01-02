@@ -23,15 +23,15 @@ xl.set_plot()
 xl.load_mast_dir()
 xl.load_solpsgeo()
 xl.calcpsi()
-xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
+# xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
 xl.fitmastexp(writefile= True)
 xl.transport_coe_align_plot(plot_transcoe= False)
-# xl.load_vessel()
+xl.load_vessel()
 # xl.flux_comparison_plot()
 
 # xl.calcpsi()
 
-plot_flag = 'radial'
+plot_flag = 'skip'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
@@ -52,7 +52,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = False
+radial_plot_flag = True
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
