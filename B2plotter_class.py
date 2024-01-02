@@ -105,6 +105,7 @@ class B2plotter:
  
 #-------------------------------------------------------------------       
  
+#loadgeometry
 
     """
     loadb2mn method for single case, changing aspect ratio cases and 
@@ -266,6 +267,11 @@ class B2plotter:
         else:
             print('There is a bug')
 
+
+#---------------------------------------------------------------------------
+
+#psi function mapping
+
     """
     calcpsi method for single case, changing aspect ratio cases and 
     changing density cases
@@ -295,8 +301,11 @@ class B2plotter:
             psiNinterp_RBS = self.data['gfile']['gcomp'][itername]['interp_dic']['RBS']
             Attempt = self.data['dircomp']['Attempt'][itername]
             DRT = self.data['dirdata']['infolderdir'][itername]['outputdir']['Output']
-            self.data['DefaultSettings'][itername]['XDIM'] = pol_range
-            self.data['DefaultSettings'][itername]['YDIM'] = rad_range
+            
+            xdim_dic = {itername: pol_range}
+            ydim_dic = {itername: rad_range}       
+            self.data['DefaultSettings']['XDIM'] = xdim_dic
+            self.data['DefaultSettings']['YDIM'] = ydim_dic
             
         elif self.withshift == False and self.withseries == True:
             pol_range = int(self.data['b2fgeo']['nx'] + 2)
@@ -308,8 +317,11 @@ class B2plotter:
             # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
             Attempt = self.data['dircomp']['Attempt'][itername]
             DRT = self.data['dirdata']['outputdir'][itername]['Output']
-            self.data['DefaultSettings'][itername]['XDIM'] = pol_range
-            self.data['DefaultSettings'][itername]['YDIM'] = rad_range
+            
+            xdim_dic = {itername: pol_range}
+            ydim_dic = {itername: rad_range}       
+            self.data['DefaultSettings']['XDIM'] = xdim_dic
+            self.data['DefaultSettings']['YDIM'] = ydim_dic
             
 
         psival = np.zeros((rad_range, pol_range))
@@ -355,39 +367,10 @@ class B2plotter:
             self.data['psi']['psival'] = psival
     
     
-    def plot_seperatrix(self):
-        psi_1d = self.data['psi']['psival'][0, :]
-        # self.data['psi']['psi1d'] = psi_1d
-        
-        pol_range = int(self.data['b2fgeo']['nx'] + 2)
-        rad_range = int(self.data['b2fgeo']['ny'] + 2)
-        
-        
-        index_low = []
-        index_high = []
-        index = np.zeros(2)
-        for y in range(rad_range):
-            if psi_1d[y] <= 1:
-                index_low.append(y)
-            if psi_1d[y] >= 1:
-                index_high.append(y)
-    
-        
-        index[0] = index_low[-1]
-        index[1] = index_high[0]
-        
-        index_dic = {'index_low': index_low, 'index_high': index_high, 
-                     'index': index}
-        self.data['index'] = index_dic
-        
-        
-    
-    
-    
-    
-    
-    
-        
+#---------------------------------------------------------------------------
+   
+#1D psi function mapping  
+
     def calcpsi_1D_method(self, itername, pol_loc, no_coord_avg_check):
         
             
@@ -602,42 +585,10 @@ class B2plotter:
         else:
             print('calcpsi_1D function has a bug')
             
-            
 
-    def RR_cal_dsa(self, pol_loc):
-        geo = self.data['b2fgeo']
-        pol_range = int(self.data['b2fgeo']['nx'] + 2)
-        # print('xdim is {}'.format(str(pol_range)))
-        rad_range = int(self.data['b2fgeo']['ny'] + 2)
-        
-        pol_index = int(pol_loc)
-        
-        crLowerLeft = geo['crx'][pol_index,:,0]
-        
-        Attempt = self.data['dircomp']['Attempt']
-        DRT = self.data['dirdata']['infolderdir']['outputdir']['Output']
-        DRT2 = self.data['dirdata']['infolderdir']['outputdir']['Output2']
-        XDIM = self.data['b2fgeo']['nx'] + 2
-        YDIM = self.data['b2fgeo']['ny'] + 2
-        
-        
-        
-        Rad0Cor = np.loadtxt('{}/Rad0Cor{}'.format(DRT2, str(Attempt)),
-                    usecols = (3)).reshape((YDIM, XDIM))
-        Vert0Cor = np.loadtxt('{}/Vert0Cor{}'.format(DRT2, str(Attempt)), 
-                      usecols = (3)).reshape((YDIM,XDIM))
-        
-        comp = np.zeros((int(rad_range), 2))
-        comp[:, 0] = Rad0Cor[:, pol_index]
-        comp[:, 1] = crLowerLeft
-        
-        RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
-                    usecols = (3)).reshape((YDIM, XDIM))
-        VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
-                      usecols = (3)).reshape((YDIM,XDIM))
-        
-        crloc = RadLoc[:, pol_index]
-        czloc = VertLoc[:, pol_index]
+#---------------------------------------------------------------------------          
+
+# flux expansion calculation
 
                 
     def calc_flux_expansion(self, pol_loc, ped_index, iter_index):
@@ -681,7 +632,7 @@ class B2plotter:
         else:
             print('calc_flux_expansion function has a bug')
     
-    
+
 
 'Way to generate align transport coefficient'
     
@@ -1109,6 +1060,37 @@ backup:
                     
             #     else:
             #         print('There is a bug')
+
+
+def plot_seperatrix(self):
+    psi_1d = self.data['psi']['psival'][0, :]
+    # self.data['psi']['psi1d'] = psi_1d
+    
+    pol_range = int(self.data['b2fgeo']['nx'] + 2)
+    rad_range = int(self.data['b2fgeo']['ny'] + 2)
+    
+    
+    index_low = []
+    index_high = []
+    index = np.zeros(2)
+    for y in range(rad_range):
+        if psi_1d[y] <= 1:
+            index_low.append(y)
+        if psi_1d[y] >= 1:
+            index_high.append(y)
+
+    
+    index[0] = index_low[-1]
+    index[1] = index_high[0]
+    
+    index_dic = {'index_low': index_low, 'index_high': index_high, 
+                 'index': index}
+    self.data['index'] = index_dic
+
+
+
+
+
 
 """
 
