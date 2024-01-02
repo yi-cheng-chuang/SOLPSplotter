@@ -83,6 +83,10 @@ def set_wdir(): #Function to set correct Working Directory Path depending on whi
             basedrt = r"C:/Users/user/Documents/SOLPS data/simulation data"
             topdrt = r"C:/Users/user/Documents/SOLPS data/experiment data"
             tpdrt = r"C:/Users/user/Documents/GitHub/load-plot/poster_plot_generator"
+        elif os.environ['USERNAME'] == 'ychuang':
+            basedrt = r"C:/Users/ychuang/Documents/SOLPS_data/simulation_data"
+            topdrt = r"C:/Users/ychuang/Documents/SOLPS_data/experimental_data"
+            tpdrt = r"C:/Users/ychuang/Documents/GitHub/load-plot/poster_plot_generator"
     else:
         print('please add new directory in tools')
     
