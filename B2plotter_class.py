@@ -175,8 +175,10 @@ class B2plotter:
         except:
             print('can not generate geo')
 
-
-        g = lcm.loadg(self.data['dirdata']['gdir'][0])
+        
+        g = lcm.loadg(self.data['dirdata']['gbase'] 
+                               + '/MAST__RMP_results/g027205.00275_efitpp')
+        # g = lcm.loadg(self.data['dirdata']['gdir'][0])
         psiN = (g['psirz'] - g['simag']) / (g['sibry'] - g['simag'])
 
         dR = g['rdim'] / (g['nw'] - 1)
@@ -225,7 +227,9 @@ class B2plotter:
     """     
     def load_solpsgeo(self):
         
-        g = lcm.loadg(self.data['dirdata']['gdir'][0])
+        # g = lcm.loadg(self.data['dirdata']['gdir'][0])
+        g = lcm.loadg(self.data['dirdata']['gbase'] 
+                               + '/MAST__RMP_results/g027205.00275_efitpp')
         self.data['gfile']['g'] = g
         
         
@@ -338,31 +342,36 @@ class B2plotter:
                 # print(i)
                 psival[i, pol_loc] = psiNinterp_RBS(RadLoc[i, pol_loc], 
                                                       VertLoc[i, pol_loc])
-        return coord_dic, psival
+        return RadLoc, VertLoc, psival
                 
     def calcpsi(self):
             
         if self.withshift == False and self.withseries == False:            
-            coord_dic, psival = self.calcpsi_method(itername= None)
+            RadLoc, VertLoc, psival = self.calcpsi_method(itername= None)
+            coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival
         
         elif self.withshift == True and self.withseries == False:
             psival_dic = {}
-            coord_withshift_dic = {}
+            RadLoc_dic = {}
+            VertLoc_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                coord_dic, psival = self.calcpsi_method(itername= aa)
+                RadLoc, VertLoc, psival = self.calcpsi_method(itername= aa)
                 psival_dic[aa] = psival
-                coord_withshift_dic[aa] = coord_dic
+                RadLoc_dic[aa] = RadLoc
+                VertLoc_dic[aa] = VertLoc
             
-            self.data['grid'] = coord_withshift_dic
+            coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
+            self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival_dic
                 
             
         elif self.withshift == False and self.withseries == True:
             # print('we are working on calcpsi for series case')
             series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
-            coord_dic, psival = self.calcpsi_method(itername= series_rep)
+            RadLoc, VertLoc, psival = self.calcpsi_method(itername= series_rep)
+            coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival
     
