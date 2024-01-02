@@ -48,7 +48,7 @@ class load_expdata(B2plotter):
         if self.withshift == False and self.withseries == False:
             self.check_b2mn(itername = None)
             jxa = self.data['b2mn']['jxa']
-            self.calcpsi_1D(pol_loc= str(jxa))
+            self.calcpsi_1D(pol_loc= str(jxa), no_coord_avg_check = False)
             psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
             
         elif self.withshift == True and self.withseries == False:
@@ -193,7 +193,7 @@ class load_expdata(B2plotter):
             else:
                 pass
             jxa = self.data['b2mn']['jxa']
-            self.calcpsi_1D(pol_loc= str(jxa))
+            self.calcpsi_1D(pol_loc= str(jxa), no_coord_avg_check = False)
             psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
             
             ne_fit_solps = fm.tanh(psi_solps[:, 2], popt_ne[0] + shift, popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
@@ -219,9 +219,6 @@ class load_expdata(B2plotter):
             # plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
             # plt.title('Electron temperature')
             # plt.legend()
-            
-            
-            
             
             
             
