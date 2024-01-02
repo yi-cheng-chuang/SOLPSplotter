@@ -23,221 +23,168 @@ class RP_mapping(load_data):
     def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
         load_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
     
+    
+    def calc_sep_index(self, psi, rad_range):
+        index_low = []
+        index_high = []
+        index = []
+        # print(psi)
+        if psi[0] > psi[-1]:
+            order = 'reverse_order_large2small'
+        elif psi[0] < psi[-1]:
+            order = 'order_small2large'
         
-    def calc_RRsep(self, plotRR, plot_psi_dsa_align):
+        if order == 'order_small2large':
+            for y in range(len(psi)):
+                if psi[y] <= 1:
+                    index_low.append(y)
+                elif psi[y] > 1:
+                    index_high.append(y)
+                else:
+                    pass
+        elif order == 'reverse_order_large2small':
+            print('The input array is in reverse order')
         
-        if self.withshift == False and self.withseries == False:
+        else:
+            print('calc_sep_index function has a bug')
+        
+        index.append(index_low[-1])
+        index.append(index_high[0])
+        
+        # print(type(index_high)) 
+        # print('the following is index_low')
+        # print(index_low)
+        
+        index_dic = {'index_low': index_low, 'index_high': index_high, 
+                     'index': index}
+        return index_dic
+    
+    
+    
+    def calc_RRsep_method(self, itername, plotRR):
+        
+        if itername == None:
         
             pol_range = int(self.data['b2fgeo']['nx'] + 2)
             rad_range = int(self.data['b2fgeo']['ny'] + 2)
             mag_axis_z = self.data['gfile']['g']['zmaxis']
             # print(mag_axis_z)
             
-            Attempt = self.data['dircomp']['Attempt']
-            DRT = self.data['dirdata']['outputdir']['Output']
-            DRT2 = self.data['dirdata']['outputdir']['Output2']
-            XDIM = self.data['b2fgeo']['nx'] + 2
-            YDIM = self.data['b2fgeo']['ny'] + 2
+            RadLoc = self.data['grid']['RadLoc']
+            VertLoc = self.data['grid']['VertLoc']
+        
+        elif itername != None:
+            pol_range = int(self.data['b2fgeo'][itername]['nx'] + 2)
+            rad_range = int(self.data['b2fgeo'][itername]['ny'] + 2)
+            mag_axis_z = self.data['gfile']['g']['zmaxis']
+            # print(mag_axis_z)
             
+            RadLoc = self.data['grid'][itername]['RadLoc']
+            VertLoc = self.data['grid'][itername]['VertLoc']
             
-            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
-                        usecols = (3)).reshape((YDIM, XDIM))
-            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
-                          usecols = (3)).reshape((YDIM,XDIM))
-            
-            
-            "Calculate midplane R for Z=0"
-            
-            "Calculate weight"
-            
-            crup = RadLoc[:, 58]
-            crlow = RadLoc[:, 60]
-            czup = VertLoc[:, 58]
-            czlow = VertLoc[:, 60]
-            
-            pol_list = [52, 53, 54, 55, 56, 57]
-            
+        
+        
+        "Calculate midplane R for Z=0"
+        
+        "Calculate weight"
+        
+        crup = RadLoc[:, 58]
+        crlow = RadLoc[:, 60]
+        czup = VertLoc[:, 58]
+        czlow = VertLoc[:, 60]
+        
 
-            weight_mid = np.zeros(rad_range)
-            for x in range(rad_range):
-                weight_mid[x] = (mag_axis_z - czlow[x])/ (czup[x] - czlow[x])
-            
-            mid_choice = np.zeros((rad_range, 4))
-            mid_choice[:, 0] = czup
-            mid_choice[:, 1] = czlow
-            mid_choice[:, 2] = crup
-            mid_choice[:, 3] = crlow
-            
-            
-            
-            mid_R = np.zeros(rad_range)
-            for xa in range(rad_range):
-                mid_R[xa] = weight_mid[xa]*crup[xa] + (1 - weight_mid[xa])*crlow[xa]
-            
-            mid_Z = np.zeros(rad_range)
-            for xb in range(rad_range):
-                mid_Z[xb] = weight_mid[xb]*czup[xb] + (1 - weight_mid[xb])*czlow[xb]
-                
-            pol_list = [57, 58, 59, 60]
+        weight_mid = np.zeros(rad_range)
+        for x in range(rad_range):
+            weight_mid[x] = (mag_axis_z - czlow[x])/ (czup[x] - czlow[x])
+        
+        mid_choice = np.zeros((rad_range, 4))
+        mid_choice[:, 0] = czup
+        mid_choice[:, 1] = czlow
+        mid_choice[:, 2] = crup
+        mid_choice[:, 3] = crlow
+        
+        
+        
+        mid_R = np.zeros(rad_range)
+        for xa in range(rad_range):
+            mid_R[xa] = weight_mid[xa]*crup[xa] + (1 - weight_mid[xa])*crlow[xa]
+        
+        mid_Z = np.zeros(rad_range)
+        for xb in range(rad_range):
+            mid_Z[xb] = weight_mid[xb]*czup[xb] + (1 - weight_mid[xb])*czlow[xb]
             
             
+        psi_solps_mid = np.zeros(rad_range)
+        psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+        # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
+        for i in range(rad_range):
+            psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
+            psi_solps_mid[i] = psi_mid
+        
+        
+        sep_index_dic = self.calc_sep_index(psi = psi_solps_mid, rad_range = rad_range)
+        sep_index_high = int(sep_index_dic['index'][1])
+        
+        
+        weight_psi = (psi_solps_mid[sep_index_high] - 1)/(psi_solps_mid[sep_index_high] -psi_solps_mid[sep_index_high -1])
+        
+        R_sep = (1 - weight_psi)*mid_R[sep_index_high] + weight_psi*mid_R[sep_index_high -1]
+        R_Rsep = mid_R - R_sep
+        
+        midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
+                        'mid_R': mid_R, 'mid_Z': mid_Z, 
+                        'psi_solps_mid': psi_solps_mid, 
+                        'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
+        
+        psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
+        
+        psi_dsa_ratio = psi_dsa_dic['dsa_psi_fitcoe'][0]
+        
+        
+        pol_list = [57, 58, 59, 60]
+        if plotRR:
+            plt.figure(figsize=(7,7))
+            for in_pol in pol_list:
+                crloc = RadLoc[:, int(in_pol)]
+                czloc = VertLoc[:, int(in_pol)]
+                plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
+            plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
+            plt.xlabel('R: [m]')
+            plt.ylabel('Z: [m]')
+    
+    
+        return midplane_dic, psi_dsa_ratio, sep_index_high
+    
+    
+    
+    def calc_RRsep(self, plotRR, plot_psi_dsa_align):
+        
+        if self.withshift == False and self.withseries == False:
+            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(self, itername = None, plotRR = plotRR)
             
-            psi_solps_mid = np.zeros(rad_range)
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
-            for i in range(rad_range):
-                psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
-                psi_solps_mid[i] = psi_mid
-            
-            sep = []
-            for in_sep in psi_solps_mid:
-                if in_sep >= 1:
-                    sep.append(list(psi_solps_mid).index(in_sep))
-            
-                    
-            sep_index = sep[0]
-            # print(sep)
-            
-            weight_psi = (psi_solps_mid[sep_index] - 1)/(psi_solps_mid[sep_index] -psi_solps_mid[sep_index -1])
-            
-            R_sep = (1 - weight_psi)*mid_R[sep_index] + weight_psi*mid_R[sep_index -1]
-            R_Rsep = mid_R - R_sep
-            
-            midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
-                            'mid_R': mid_R, 'mid_Z': mid_Z, 
-                            'psi_solps_mid': psi_solps_mid, 
-                            'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
-            
-            psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
-            
-            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic['dsa_psi_fitcoe'][0]
-                        
+            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
             self.data['midplane_calc'] = midplane_dic
-            
-            if plotRR:
-                plt.figure(figsize=(7,7))
-                for in_pol in pol_list:
-                    crloc = RadLoc[:, int(in_pol)]
-                    czloc = VertLoc[:, int(in_pol)]
-                    plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
-                plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
-                plt.xlabel('R: [m]')
-                plt.ylabel('Z: [m]')
-            
-            
-               
+            self.data['DefaultSettings']['SEP'] = sep_index_high
+        
         
         elif self.withshift == True and self.withseries == False:        
-            pol_range_dic = {}
-            rad_range_dic = {}
-            SEP_dic = {}
-            midplane_dic = {}
+            
+            sep_index_dic = {}
+            midplane_series_dic = {}
             psi_dsa_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                pol_range = int(self.data['b2fgeo'][aa]['nx'] + 2)
-                # print('xdim is {}'.format(str(pol_range)))
-                rad_range = int(self.data['b2fgeo'][aa]['ny'] + 2)
-                # print('ydim is {}'.format(str(rad_range)))
-                pol_range_dic[aa] = pol_range
-                rad_range_dic[aa] = rad_range
+                midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(self, itername = aa, plotRR = plotRR)
                 
-                mag_axis_z = self.data['gfile']['g']['zmaxis']
-                # print(mag_axis_z)
-                
-                Attempt = self.data['dircomp']['Attempt'][aa]
-                DRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
-                DRT2 = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output2']
-                
-                
-                RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
-                            usecols = (3)).reshape((rad_range, pol_range))
-                VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
-                              usecols = (3)).reshape((rad_range, pol_range))
-                
-                
-                "Calculate midplane R for Z=0"
-                
-                "Calculate weight"
-                
-                if aa == 'one':
-                    crup = RadLoc[:, 57]
-                    crlow = RadLoc[:, 59]
-                    czup = VertLoc[:, 57]
-                    czlow = VertLoc[:, 59]
-                else:
-                    crup = RadLoc[:, 57]
-                    crlow = RadLoc[:, 59]
-                    czup = VertLoc[:, 57]
-                    czlow = VertLoc[:, 59]
-                
-                
-                weight_mid = np.zeros(rad_range)
-                for x in range(rad_range):
-                    weight_mid[x] = (czup[x] - mag_axis_z)/ (czup[x] - czlow[x])
-                
-                mid_choice = np.zeros((rad_range, 4))
-                mid_choice[:, 0] = czup
-                mid_choice[:, 1] = czlow
-                mid_choice[:, 2] = crup
-                mid_choice[:, 3] = crlow
-                
-                
-                
-                mid_R = np.zeros(rad_range)
-                for xa in range(rad_range):
-                    mid_R[xa] = (1 - weight_mid[xa])*crup[xa] + weight_mid[xa]*crlow[xa]
-                
-                mid_Z = np.zeros(rad_range)
-                for xb in range(rad_range):
-                    mid_Z[xb] = (1 - weight_mid[xb])*czup[xb] + weight_mid[xb]*czlow[xb]
-                    
-                
-                pol_list = [57, 58, 59, 60]
-                
-                
-                psi_solps_mid = np.zeros(rad_range)
-                psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
-                # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
-                for i in range(rad_range):
-                    psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
-                    psi_solps_mid[i] = psi_mid
-                
-                sep = []
-                for in_sep in psi_solps_mid:
-                    if in_sep >= 1:
-                        sep.append(list(psi_solps_mid).index(in_sep))
-                
-                        
-                sep_index = sep[0]
-                SEP_dic[aa] = sep_index
-                
-                weight_psi = (psi_solps_mid[sep_index] - 1)/(psi_solps_mid[sep_index] -psi_solps_mid[sep_index -1])
-                
-                R_sep = (1 - weight_psi)*mid_R[sep_index] + weight_psi*mid_R[sep_index -1]
-                R_Rsep = mid_R - R_sep
-                
-                midplane_dic[aa] = {'weight': weight_mid, 'mid_choice': mid_choice, 
-                                'mid_R': mid_R, 'mid_Z': mid_Z, 
-                                'psi_solps_mid': psi_solps_mid, 
-                                'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
-                
-                pd_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
-                
-                psi_dsa_dic[aa] = pd_dic['dsa_psi_fitcoe'][0]
-                
-                
-                
-                if plotRR:
-                    plt.figure(figsize=(7,7))
-                    for in_pol in pol_list:
-                        crloc = RadLoc[:, int(in_pol)]
-                        czloc = VertLoc[:, int(in_pol)]
-                        plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
-                    plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
-                    plt.xlabel('R: [m]')
-                    plt.ylabel('Z: [m]')
-                    plt.title('{} R-Z plot'.format(aa))
+                midplane_series_dic[aa] = midplane_dic
+                psi_dsa_dic[aa] = psi_dsa_ratio
+                sep_index_dic[aa] = sep_index_high
             
+            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
+            self.data['midplane_calc'] = midplane_series_dic
+            self.data['DefaultSettings']['SEP'] = sep_index_dic
+                
+                
             if plot_psi_dsa_align:
                 color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                              'dot7': 'blue', 'one': 'purple'}
@@ -251,116 +198,105 @@ class RP_mapping(load_data):
                 plt.title('psiN R-Rsep plot')
                 # plt.legend()
                     
-            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
-            self.data['midplane_calc'] = midplane_dic
-            self.data['DefaultSettings']['XDIM'] = pol_range_dic
-            self.data['DefaultSettings']['YDIM'] = rad_range_dic
-            self.data['DefaultSettings']['SEP'] = SEP_dic
-            
+           
         elif self.withshift == False and self.withseries == True:
-        
-            pol_range = self.data['b2fgeo']['nx'] + 2
-            rad_range = self.data['b2fgeo']['ny'] + 2
+            den_rep = list(self.data['dircomp']['Attempt'].keys())[0]
             
+            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(self, itername = den_rep, plotRR = plotRR)
             
-            solps_dsa_dic = {}
-            for aa in self.data['dircomp']['Attempt'].keys():
-                solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
-            
-            den_list = list(self.data['dircomp']['Attempt'].keys())
-            aa = den_list[0]
-            
-            mag_axis_z = self.data['gfile']['g']['zmaxis']
-            print(mag_axis_z)
-            
-            Attempt = self.data['dircomp']['Attempt'][aa]
-            DRT = self.data['dirdata']['outputdir'][aa]['Output']
-            # DRT2 = self.data['dirdata']['outputdir']['Output2']
-            # XDIM = self.data['b2fgeo']['nx'] + 2
-            # YDIM = self.data['b2fgeo']['ny'] + 2
-            
-            
-            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
-                        usecols = (3)).reshape((rad_range, pol_range))
-            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
-                          usecols = (3)).reshape((rad_range, pol_range))
-            
-            
-            "Calculate midplane R for Z=0"
-            
-            "Calculate weight"
-            crup = RadLoc[:, 58]
-            crlow = RadLoc[:, 60]
-            czup = VertLoc[:, 58]
-            czlow = VertLoc[:, 60]
-            
-            weight_mid = np.zeros(rad_range)
-            for x in range(rad_range):
-                weight_mid[x] = (czup[x] - mag_axis_z)/ (czup[x] - czlow[x])
-            
-            mid_choice = np.zeros((rad_range, 4))
-            mid_choice[:, 0] = czup
-            mid_choice[:, 1] = czlow
-            mid_choice[:, 2] = crup
-            mid_choice[:, 3] = crlow
-            
-            
-            
-            mid_R = np.zeros(rad_range)
-            for xa in range(rad_range):
-                mid_R[xa] = (1 - weight_mid[xa])*crup[xa] + weight_mid[xa]*crlow[xa]
-            
-            mid_Z = np.zeros(rad_range)
-            for xb in range(rad_range):
-                mid_Z[xb] = (1 - weight_mid[xb])*czup[xb] + weight_mid[xb]*czlow[xb]
-                
-            
-            pol_list = [57, 58, 59, 60]
-            
-            
-            psi_solps_mid = np.zeros(rad_range)
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
-            for i in range(rad_range):
-                psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
-                psi_solps_mid[i] = psi_mid
-            
-            sep = []
-            for in_sep in psi_solps_mid:
-                if in_sep >= 1:
-                    sep.append(list(psi_solps_mid).index(in_sep))
-            
-                    
-            sep_index = sep[0]
-            # print(sep)
-            
-            weight_psi = (psi_solps_mid[sep_index] - 1)/(psi_solps_mid[sep_index] -psi_solps_mid[sep_index -1])
-            
-            R_sep = (1 - weight_psi)*mid_R[sep_index] + weight_psi*mid_R[sep_index -1]
-            R_Rsep = mid_R - R_sep
-            
-            psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)           
-            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic['dsa_psi_fitcoe'][0]
-            
-            midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
-                            'mid_R': mid_R, 'mid_Z': mid_Z, 
-                            'psi_solps_mid': psi_solps_mid, 
-                            'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
-                
+            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
             self.data['midplane_calc'] = midplane_dic
+            self.data['DefaultSettings']['SEP'] = sep_index_high
+        
+        elif self.withshift == True and self.withseries == True:
+            print('calc_RRsep function is not there yet!')
+        
+        else:
+            print('calc_RRsep function has a bug')
             
-            if plotRR:
-                plt.figure(figsize=(7,7))
-                for in_pol in pol_list:
-                    crloc = RadLoc[:, int(in_pol)]
-                    czloc = VertLoc[:, int(in_pol)]
-                    plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
-                plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
-                plt.xlabel('R: [m]')
-                plt.ylabel('Z: [m]')
-                plt.title('{} R-Z plot'.format(aa))
             
     
+        
+    def calc_pol_angle_method(self, itername, pol_list, plot_angle):
+        
+        if itername == None:
+        
+            pol_range = int(self.data['b2fgeo']['nx'] + 2)
+            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            mag_axis_z = self.data['gfile']['g']['zmaxis']
+            # print(mag_axis_z)
+            mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_value']
+            # print(mag_axis_r)
+            
+            RadLoc = self.data['grid']['RadLoc']
+            VertLoc = self.data['grid']['VertLoc']
+        
+        elif itername != None:
+            
+            pol_range = int(self.data['b2fgeo'][itername]['nx'] + 2)
+            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            mag_axis_z = self.data['gfile']['g'][itername]['zmaxis']
+            # print(mag_axis_z)
+            mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_dic'][itername]
+            # print(mag_axis_r)
+            
+            RadLoc = self.data['grid'][itername]['RadLoc']
+            VertLoc = self.data['grid'][itername]['VertLoc']
+        
+        
+        
+        
+        
+        Attempt = self.data['dircomp']['Attempt']
+        DRT = self.data['dirdata']['outputdir']['Output']
+        XDIM = self.data['b2fgeo']['nx'] + 2
+        YDIM = self.data['b2fgeo']['ny'] + 2
+        
+        
+        RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                    usecols = (3)).reshape((YDIM, XDIM))
+        VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                      usecols = (3)).reshape((YDIM,XDIM))
+        
+        mag_axis_z = self.data['gfile']['g']['zmaxis']
+        print(mag_axis_z)
+        
+        
+        xprloc = RadLoc[:, 72][19]
+        xpzloc = VertLoc[:, 72][19]
+        
+        xpoint_R = xprloc - mag_axis_r
+        xpoint_Z = xpzloc - mag_axis_z
+        xpoint_angle = np.arctan2(xpoint_Z, xpoint_R)*180 / np.pi
+        print('xpoint angle is {}'.format(str(xpoint_angle)))
+        
+                 
+        angle_list = []
+        
+        for pol_index in pol_list:
+            rloc = RadLoc[:, int(pol_index)][19]
+            zloc = VertLoc[:, int(pol_index)][19]
+            
+            x = rloc - mag_axis_r
+            y = zloc - mag_axis_z
+            
+            
+            angle = np.arctan2(y, x)*180 / np.pi
+            if angle <= xpoint_angle:
+                angle = angle + 360
+            angle_list.append(angle)
+            
+        pol_loc = np.asarray(int(pol_list))
+        
+        if plot_angle: 
+            plt.figure(figsize=(7,7))
+            plt.plot(pol_loc, angle_list, 'o', color = 'r', label= 'poloidal angle')
+            plt.xlabel('poloidal index')
+            plt.title('poloidal angle verses poloidal index')
+            plt.legend()
+        
+        angle_dic = {'angle_list': angle_list, 'xpoint_angle': xpoint_angle}
+        self.data['angle'] = angle_dic
     
     
     
@@ -615,32 +551,7 @@ class RP_mapping(load_data):
 
         return arclength, interpolated_points       
     
-    
-    def calc_sep_index(self, psi, rad_range):
-        index_low = []
-        index_high = []
-        index = []
-        # print(psi)
-        for y in range(len(psi)):
-            if psi[y] <= 1:
-                index_low.append(y)
-            elif psi[y] > 1:
-                index_high.append(y)
-            else:
-                pass
-
-        
-        # print(type(index_high))
-        index.append(index_low[-1])
-        index.append(index_high[0])
-        # print('the following is index_low')
-        # print(index_low)
-        
-        index_dic = {'index_low': index_low, 'index_high': index_high, 
-                     'index': index}
-        return index_dic
-    
-    
+       
     def calc_dsa(self, pol_loc):
         
         if self.withshift == False and self.withseries == False:
@@ -790,3 +701,331 @@ class RP_mapping(load_data):
                         'dsa_{}_val'.format(pol_index): RR_sep}
             
             self.data['dsa']['dsa_{}'.format(pol_index)] = dsa_dic
+
+
+"""
+backup
+
+# sep = []
+# for in_sep in psi_solps_mid:
+#     if in_sep >= 1:
+#         sep.append(list(psi_solps_mid).index(in_sep))
+
+        
+# sep_index = sep[0]
+# # print(sep)
+
+pol_range = int(self.data['b2fgeo']['nx'] + 2)
+rad_range = int(self.data['b2fgeo']['ny'] + 2)
+mag_axis_z = self.data['gfile']['g']['zmaxis']
+# print(mag_axis_z)
+
+# Attempt = self.data['dircomp']['Attempt']
+# DRT = self.data['dirdata']['outputdir']['Output']
+# DRT2 = self.data['dirdata']['outputdir']['Output2']
+# XDIM = self.data['b2fgeo']['nx'] + 2
+# YDIM = self.data['b2fgeo']['ny'] + 2
+
+
+RadLoc = self.data['grid']['RadLoc']
+VertLoc = self.data['grid']['VertLoc']
+
+
+"Calculate midplane R for Z=0"
+
+"Calculate weight"
+
+crup = RadLoc[:, 58]
+crlow = RadLoc[:, 60]
+czup = VertLoc[:, 58]
+czlow = VertLoc[:, 60]
+
+pol_list = [52, 53, 54, 55, 56, 57]
+
+
+weight_mid = np.zeros(rad_range)
+for x in range(rad_range):
+    weight_mid[x] = (mag_axis_z - czlow[x])/ (czup[x] - czlow[x])
+
+mid_choice = np.zeros((rad_range, 4))
+mid_choice[:, 0] = czup
+mid_choice[:, 1] = czlow
+mid_choice[:, 2] = crup
+mid_choice[:, 3] = crlow
+
+
+
+mid_R = np.zeros(rad_range)
+for xa in range(rad_range):
+    mid_R[xa] = weight_mid[xa]*crup[xa] + (1 - weight_mid[xa])*crlow[xa]
+
+mid_Z = np.zeros(rad_range)
+for xb in range(rad_range):
+    mid_Z[xb] = weight_mid[xb]*czup[xb] + (1 - weight_mid[xb])*czlow[xb]
+    
+pol_list = [57, 58, 59, 60]
+
+
+
+psi_solps_mid = np.zeros(rad_range)
+psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+# psi_solps_cp = psiNinterp_RBS(crloc, czloc)
+for i in range(rad_range):
+    psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
+    psi_solps_mid[i] = psi_mid
+
+sep = []
+for in_sep in psi_solps_mid:
+    if in_sep >= 1:
+        sep.append(list(psi_solps_mid).index(in_sep))
+
+        
+sep_index = sep[0]
+# print(sep)
+
+weight_psi = (psi_solps_mid[sep_index] - 1)/(psi_solps_mid[sep_index] -psi_solps_mid[sep_index -1])
+
+R_sep = (1 - weight_psi)*mid_R[sep_index] + weight_psi*mid_R[sep_index -1]
+R_Rsep = mid_R - R_sep
+
+midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
+                'mid_R': mid_R, 'mid_Z': mid_Z, 
+                'psi_solps_mid': psi_solps_mid, 
+                'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
+
+psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
+
+self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic['dsa_psi_fitcoe'][0]
+            
+self.data['midplane_calc'] = midplane_dic
+
+if plotRR:
+    plt.figure(figsize=(7,7))
+    for in_pol in pol_list:
+        crloc = RadLoc[:, int(in_pol)]
+        czloc = VertLoc[:, int(in_pol)]
+        plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
+    plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
+    plt.xlabel('R: [m]')
+    plt.ylabel('Z: [m]')
+    
+
+pol_range = int(self.data['b2fgeo'][aa]['nx'] + 2)
+# print('xdim is {}'.format(str(pol_range)))
+rad_range = int(self.data['b2fgeo'][aa]['ny'] + 2)
+# print('ydim is {}'.format(str(rad_range)))
+pol_range_dic[aa] = pol_range
+rad_range_dic[aa] = rad_range
+
+mag_axis_z = self.data['gfile']['g']['zmaxis']
+# print(mag_axis_z)
+
+Attempt = self.data['dircomp']['Attempt'][aa]
+DRT = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output']
+DRT2 = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output2']
+
+
+RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+            usecols = (3)).reshape((rad_range, pol_range))
+VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+              usecols = (3)).reshape((rad_range, pol_range))
+
+
+"Calculate midplane R for Z=0"
+
+"Calculate weight"
+
+if aa == 'one':
+    crup = RadLoc[:, 57]
+    crlow = RadLoc[:, 59]
+    czup = VertLoc[:, 57]
+    czlow = VertLoc[:, 59]
+else:
+    crup = RadLoc[:, 57]
+    crlow = RadLoc[:, 59]
+    czup = VertLoc[:, 57]
+    czlow = VertLoc[:, 59]
+
+
+weight_mid = np.zeros(rad_range)
+for x in range(rad_range):
+    weight_mid[x] = (czup[x] - mag_axis_z)/ (czup[x] - czlow[x])
+
+mid_choice = np.zeros((rad_range, 4))
+mid_choice[:, 0] = czup
+mid_choice[:, 1] = czlow
+mid_choice[:, 2] = crup
+mid_choice[:, 3] = crlow
+
+
+
+mid_R = np.zeros(rad_range)
+for xa in range(rad_range):
+    mid_R[xa] = (1 - weight_mid[xa])*crup[xa] + weight_mid[xa]*crlow[xa]
+
+mid_Z = np.zeros(rad_range)
+for xb in range(rad_range):
+    mid_Z[xb] = (1 - weight_mid[xb])*czup[xb] + weight_mid[xb]*czlow[xb]
+    
+
+pol_list = [57, 58, 59, 60]
+
+
+psi_solps_mid = np.zeros(rad_range)
+psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
+# psi_solps_cp = psiNinterp_RBS(crloc, czloc)
+for i in range(rad_range):
+    psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
+    psi_solps_mid[i] = psi_mid
+
+sep = []
+for in_sep in psi_solps_mid:
+    if in_sep >= 1:
+        sep.append(list(psi_solps_mid).index(in_sep))
+
+        
+sep_index = sep[0]
+SEP_dic[aa] = sep_index
+
+weight_psi = (psi_solps_mid[sep_index] - 1)/(psi_solps_mid[sep_index] -psi_solps_mid[sep_index -1])
+
+R_sep = (1 - weight_psi)*mid_R[sep_index] + weight_psi*mid_R[sep_index -1]
+R_Rsep = mid_R - R_sep
+
+midplane_dic[aa] = {'weight': weight_mid, 'mid_choice': mid_choice, 
+                'mid_R': mid_R, 'mid_Z': mid_Z, 
+                'psi_solps_mid': psi_solps_mid, 
+                'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
+
+pd_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
+
+psi_dsa_dic[aa] = pd_dic['dsa_psi_fitcoe'][0]
+
+
+
+if plotRR:
+    plt.figure(figsize=(7,7))
+    for in_pol in pol_list:
+        crloc = RadLoc[:, int(in_pol)]
+        czloc = VertLoc[:, int(in_pol)]
+        plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
+    plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
+    plt.xlabel('R: [m]')
+    plt.ylabel('Z: [m]')
+    plt.title('{} R-Z plot'.format(aa))
+    
+            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
+            self.data['midplane_calc'] = midplane_dic
+            self.data['DefaultSettings']['XDIM'] = pol_range_dic
+            self.data['DefaultSettings']['YDIM'] = rad_range_dic
+            self.data['DefaultSettings']['SEP'] = SEP_dic
+            
+            
+     pol_range = self.data['b2fgeo']['nx'] + 2
+     rad_range = self.data['b2fgeo']['ny'] + 2
+     
+     
+     solps_dsa_dic = {}
+     for aa in self.data['dircomp']['Attempt'].keys():
+         solps_dsa_dic[aa] = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+     
+     den_list = list(self.data['dircomp']['Attempt'].keys())
+     aa = den_list[0]
+     
+     mag_axis_z = self.data['gfile']['g']['zmaxis']
+     print(mag_axis_z)
+     
+     Attempt = self.data['dircomp']['Attempt'][aa]
+     DRT = self.data['dirdata']['outputdir'][aa]['Output']
+     # DRT2 = self.data['dirdata']['outputdir']['Output2']
+     # XDIM = self.data['b2fgeo']['nx'] + 2
+     # YDIM = self.data['b2fgeo']['ny'] + 2
+     
+     
+     RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+                 usecols = (3)).reshape((rad_range, pol_range))
+     VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+                   usecols = (3)).reshape((rad_range, pol_range))
+     
+     
+     "Calculate midplane R for Z=0"
+     
+     "Calculate weight"
+     crup = RadLoc[:, 58]
+     crlow = RadLoc[:, 60]
+     czup = VertLoc[:, 58]
+     czlow = VertLoc[:, 60]
+     
+     weight_mid = np.zeros(rad_range)
+     for x in range(rad_range):
+         weight_mid[x] = (czup[x] - mag_axis_z)/ (czup[x] - czlow[x])
+     
+     mid_choice = np.zeros((rad_range, 4))
+     mid_choice[:, 0] = czup
+     mid_choice[:, 1] = czlow
+     mid_choice[:, 2] = crup
+     mid_choice[:, 3] = crlow
+     
+     
+     
+     mid_R = np.zeros(rad_range)
+     for xa in range(rad_range):
+         mid_R[xa] = (1 - weight_mid[xa])*crup[xa] + weight_mid[xa]*crlow[xa]
+     
+     mid_Z = np.zeros(rad_range)
+     for xb in range(rad_range):
+         mid_Z[xb] = (1 - weight_mid[xb])*czup[xb] + weight_mid[xb]*czlow[xb]
+         
+     
+     pol_list = [57, 58, 59, 60]
+     
+     
+     psi_solps_mid = np.zeros(rad_range)
+     psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+     # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
+     for i in range(rad_range):
+         psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
+         psi_solps_mid[i] = psi_mid
+     
+     sep = []
+     for in_sep in psi_solps_mid:
+         if in_sep >= 1:
+             sep.append(list(psi_solps_mid).index(in_sep))
+     
+             
+     sep_index = sep[0]
+     # print(sep)
+     
+     weight_psi = (psi_solps_mid[sep_index] - 1)/(psi_solps_mid[sep_index] -psi_solps_mid[sep_index -1])
+     
+     R_sep = (1 - weight_psi)*mid_R[sep_index] + weight_psi*mid_R[sep_index -1]
+     R_Rsep = mid_R - R_sep
+     
+     psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)           
+     self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic['dsa_psi_fitcoe'][0]
+     
+     midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
+                     'mid_R': mid_R, 'mid_Z': mid_Z, 
+                     'psi_solps_mid': psi_solps_mid, 
+                     'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
+         
+     self.data['midplane_calc'] = midplane_dic
+     
+     if plotRR:
+         plt.figure(figsize=(7,7))
+         for in_pol in pol_list:
+             crloc = RadLoc[:, int(in_pol)]
+             czloc = VertLoc[:, int(in_pol)]
+             plt.plot(crloc, czloc, color = 'g', label = 'R&Zlocation')
+         plt.plot(mid_R, mid_Z, color = 'r', label= 'R_Rsep')
+         plt.xlabel('R: [m]')
+         plt.ylabel('Z: [m]')
+         plt.title('{} R-Z plot'.format(aa))       
+            
+
+
+
+
+"""
+
+
