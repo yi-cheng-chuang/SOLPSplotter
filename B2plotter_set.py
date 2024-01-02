@@ -23,7 +23,7 @@ def mast_comp_dic():
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
-    series_dic = {'org': '67_n10000_n1e2_nts5_a', 'dot3': '13_n100000_2_dot3_a', 
+    series_dic = {'org': '69_n10000_10n8e3_nts5_a', 'dot3': '13_n100000_2_dot3_a', 
                   'dot5': '24_n100000_2_dot5_a', 'dot7': '12_n100000_2_dot7_a', 
                   'one': '31_n100000_2_one_a'}
     outputlist = ['Output', 'Output2', 'EirOutput']
