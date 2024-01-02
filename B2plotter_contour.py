@@ -132,7 +132,7 @@ class PlotContour(Opacity_study):
         #     print('mesh.extra file not found! Using vvfile.ogr instead')
         #     WallFile=None
             
-        VVFILE = np.loadtxt('{}/vvfile.ogr'.format(self.data['dirdata']['simutop']))
+        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
         
         self.data['vessel'] = VVFILE
         
