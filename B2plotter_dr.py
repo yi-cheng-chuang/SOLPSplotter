@@ -23,8 +23,11 @@ xl.set_plot()
 xl.load_mast_dir()
 xl.load_solpsgeo()
 xl.calcpsi()
-# xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
-xl.fitmastexp(writefile= True)
+xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
+fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
+                          'plot_exp_and_fit': True, 'plot_shift_compare': False,
+                          'data_print': True}
+xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.transport_coe_align_plot(plot_transcoe= False)
 xl.load_vessel()
 # xl.flux_comparison_plot()
