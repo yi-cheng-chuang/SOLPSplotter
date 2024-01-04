@@ -207,11 +207,36 @@ class PlotContour(Opacity_study):
             ne = self.data['experimental_fit']['ne']*pow(10, 20)
             te = self.data['experimental_fit']['te']*pow(10, 3)
             
+            exp = self.data['ExpDict']
+            psi = exp['psi_normal']
+            
+            
+            psi = []
+            exp_ne = []
+            ne_er = []
+            exp_te = []
+            te_er = []
+            for ep in range(len(exp['psi_normal'])):
+                
+                if  exp['psi_normal'][ep] >= min(psiN):
+                    psi.append(exp['psi_normal'][ep])
+                    exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
+                    ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
+                    exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
+                    te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
+                    
+                    
+            # exp_ne = exp['electron_density(10^20/m^3)']*pow(10, 20)
+            # ne_er = exp['density error(10^20/m^3)']*pow(10, 20)
+            # exp_te = exp['electron_temperature(KeV)']*pow(10, 3)
+            # te_er = exp['temperature error(10^20/m^3)']*pow(10, 3)
+            
             'core'
             
             plt.figure(figsize=(7,7))
             plt.yscale('log')
-            plt.errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = 'o', color = 'g', label= 'ne_solps')
+            plt.errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = '-', color = 'g', label= 'ne_solps')
+            plt.errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'b', label= 'ne_exp')
             plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
             plt.xlabel('psiN')
             plt.title('electron density with experimental fit')
@@ -220,7 +245,8 @@ class PlotContour(Opacity_study):
             
             plt.figure(figsize=(7,7))
             plt.yscale('log')
-            plt.errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = 'o', color = 'g', label= 'te_solps')
+            plt.errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = '-', color = 'g', label= 'te_solps')
+            plt.errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'b', label= 'te_exp')
             plt.plot(psiN, te, 'o', color = 'r', label= 'te_exp_fit')
             plt.xlabel('psiN')
             plt.title('electron temperature with experimental fit')
