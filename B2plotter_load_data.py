@@ -110,14 +110,14 @@ class load_expdata(B2plotter):
         
         
         if self.withshift == False and self.withseries == False:
-            psi_solps = self.check_and_loadpsi1D(self, itername = None)
+            psi_solps = self.check_and_loadpsi1D(itername = None)
             
         elif self.withshift == True and self.withseries == False:
-            psi_solps = self.check_and_loadpsi1D(self, itername = 'org')
+            psi_solps = self.check_and_loadpsi1D(itername = 'org')
         
         elif self.withshift == False and self.withseries == True:
             series_rap = list(self.data['dircomp']['Attempt'].keys())[0]
-            psi_solps = self.check_and_loadpsi1D(self, itername = series_rap)
+            psi_solps = self.check_and_loadpsi1D(itername = series_rap)
         
         else:
             print('fitmastexp function has a bug checking b2mn')
