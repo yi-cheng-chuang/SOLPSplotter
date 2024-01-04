@@ -167,7 +167,7 @@ class RP_mapping(load_data):
     def calc_RRsep(self, plotRR, plot_psi_dsa_align):
         
         if self.withshift == False and self.withseries == False:
-            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(self, itername = None, plotRR = plotRR)
+            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(itername = None, plotRR = plotRR)
             
             self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
             self.data['midplane_calc'] = midplane_dic
