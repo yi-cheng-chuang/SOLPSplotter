@@ -5,10 +5,7 @@ Created on Thu Jul 13 12:45:19 2023
 @author: user
 """
 import B2plotter_set as b2s
-import SOLPSplotter_geoRR as sgr
-import B2plotter_plot as b2p
 import B2plotter_contour as b2c
-import B2plotter_mid_calc as b2mc
 
 d = b2s.Setting_dic()
 lex = b2s.loadDS_dic(d['DEV'])
