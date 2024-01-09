@@ -12,9 +12,6 @@ import glob
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import colors, cm
 from scipy.io import loadmat
-from D3DPreProcess import PsiNtoR
-import equilibrium as eq
-from D3DPreProcess import RhotoPsiN
 import B2plotter_set as b2s
 import load_mast_expdata_method as lmem
 import load_coord_method as lcm
@@ -23,7 +20,6 @@ from scipy import interpolate
 from scipy.optimize import curve_fit
 from scipy.stats import binned_statistic
 import matplotlib.pyplot as plt
-import B2TransportParser as b2tp
 
 
 class B2plotter:
