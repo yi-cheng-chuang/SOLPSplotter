@@ -621,7 +621,7 @@ class Opacity_study(RP_mapping):
         if self.withshift == True and self.withseries == False:
             trans_dic = {}
             jxa = self.data['b2mn']['org']['jxa']
-            self.calcpsi_1D(pol_loc= jxa)
+            self.calcpsi_1D(pol_loc= jxa, no_coord_avg_check = False)
             for aa in self.data['dircomp']['multi_shift']:
                 trans_file_dir = self.data['dirdata']['infolderdir'][aa]['simudir'] + '/b2.transport.inputfile'
                 
@@ -632,7 +632,7 @@ class Opacity_study(RP_mapping):
                 x= cod[:,0]  #the coordinate here is R-R_sep
                 
                 trans_dic[aa] = np.zeros([len(x), 4])
-                trans_dic[aa][:, 0] = self.data['psi']['psi_{}_val'.format(jxa)][aa]
+                trans_dic[aa][:, 0] = self.data['psi']['psi_{}_val'.format(jxa)][aa][:, 2]
                 trans_dic[aa][:, 1] = cod[:, 1]
                 trans_dic[aa][:, 2] = coki[:, 1]
                 trans_dic[aa][:, 3] = coke[:, 1]
