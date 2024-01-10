@@ -290,8 +290,7 @@ class B2plotter:
             # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
             Attempt = self.data['dircomp']['Attempt']
             DRT = self.data['dirdata']['outputdir']['Output']
-            self.data['DefaultSettings']['XDIM'] = pol_range
-            self.data['DefaultSettings']['YDIM'] = rad_range
+            
             
         elif self.withshift == True and self.withseries == False:
             pol_range = int(self.data['b2fgeo'][itername]['nx'] + 2)
@@ -302,10 +301,6 @@ class B2plotter:
             Attempt = self.data['dircomp']['Attempt'][itername]
             DRT = self.data['dirdata']['infolderdir'][itername]['outputdir']['Output']
             
-            xdim_dic = {itername: pol_range}
-            ydim_dic = {itername: rad_range}       
-            self.data['DefaultSettings']['XDIM'] = xdim_dic
-            self.data['DefaultSettings']['YDIM'] = ydim_dic
             
         elif self.withshift == False and self.withseries == True:
             pol_range = int(self.data['b2fgeo']['nx'] + 2)
@@ -318,12 +313,7 @@ class B2plotter:
             Attempt = self.data['dircomp']['Attempt'][itername]
             DRT = self.data['dirdata']['outputdir'][itername]['Output']
             
-            xdim_dic = {itername: pol_range}
-            ydim_dic = {itername: rad_range}       
-            self.data['DefaultSettings']['XDIM'] = xdim_dic
-            self.data['DefaultSettings']['YDIM'] = ydim_dic
             
-
         psival = np.zeros((rad_range, pol_range))
        
         RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
@@ -338,38 +328,48 @@ class B2plotter:
                 # print(i)
                 psival[i, pol_loc] = psiNinterp_RBS(RadLoc[i, pol_loc], 
                                                       VertLoc[i, pol_loc])
-        return RadLoc, VertLoc, psival
+        return RadLoc, VertLoc, psival, pol_range, rad_range
                 
     def calcpsi(self):
             
         if self.withshift == False and self.withseries == False:            
-            RadLoc, VertLoc, psival = self.calcpsi_method(itername= None)
+            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(itername= None)
             coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival
+            self.data['DefaultSettings']['XDIM'] = pol_range
+            self.data['DefaultSettings']['YDIM'] = rad_range
         
         elif self.withshift == True and self.withseries == False:
             psival_dic = {}
             RadLoc_dic = {}
             VertLoc_dic = {}
+            xdim_dic = {}
+            ydim_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                RadLoc, VertLoc, psival = self.calcpsi_method(itername= aa)
+                RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(itername= aa)
                 psival_dic[aa] = psival
                 RadLoc_dic[aa] = RadLoc
                 VertLoc_dic[aa] = VertLoc
+                xdim_dic[aa] = pol_range
+                ydim_dic[aa] = rad_range
             
             coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival_dic
+            self.data['DefaultSettings']['XDIM'] = xdim_dic
+            self.data['DefaultSettings']['YDIM'] = ydim_dic
                 
             
         elif self.withshift == False and self.withseries == True:
             # print('we are working on calcpsi for series case')
             series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
-            RadLoc, VertLoc, psival = self.calcpsi_method(itername= series_rep)
+            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(itername= series_rep)
             coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
             self.data['grid'] = coord_dic
-            self.data['psi']['psival'] = psival
+            self.data['psi']['psival'] = psival       
+            self.data['DefaultSettings']['XDIM'] = pol_range
+            self.data['DefaultSettings']['YDIM'] = rad_range
     
     
 #---------------------------------------------------------------------------
@@ -386,8 +386,11 @@ class B2plotter:
             # print('xdim is {}'.format(str(pol_range)))
             rad_range = int(self.data['b2fgeo']['ny'] + 2)
             # print('ydim is {}'.format(str(rad_range)))
-            self.data['DefaultSettings']['XDIM'] = pol_range
-            self.data['DefaultSettings']['YDIM'] = rad_range
+            # self.data['DefaultSettings']['XDIM'] = pol_range
+            # self.data['DefaultSettings']['YDIM'] = rad_range
+            psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
+            psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
             
         elif self.withshift == True and self.withseries == False:
             
@@ -396,8 +399,11 @@ class B2plotter:
             # print('xdim is {}'.format(str(pol_range)))
             rad_range = int(self.data['b2fgeo'][itername]['ny'] + 2)
             # print('ydim is {}'.format(str(rad_range)))
-            self.data['DefaultSettings'][itername]['XDIM'] = pol_range
-            self.data['DefaultSettings'][itername]['YDIM'] = rad_range
+            # self.data['DefaultSettings']['XDIM'][itername] = pol_range
+            # self.data['DefaultSettings']['YDIM'][itername] = rad_range
+            psiNinterp_RGI = self.data['gfile']['gcomp'][itername]['interp_dic']['RGI'] 
+            psiNinterp_2d = self.data['gfile']['gcomp'][itername]['interp_dic']['2d']
+            psiNinterp_RBS = self.data['gfile']['gcomp'][itername]['interp_dic']['RBS']
         
         elif self.withshift == False and self.withseries == True:
             
@@ -406,14 +412,13 @@ class B2plotter:
             # print('xdim is {}'.format(str(pol_range)))
             rad_range = int(self.data['b2fgeo']['ny'] + 2)
             # print('ydim is {}'.format(str(rad_range)))
-            self.data['DefaultSettings'][itername]['XDIM'] = pol_range
-            self.data['DefaultSettings'][itername]['YDIM'] = rad_range
+            # self.data['DefaultSettings']['XDIM'] = pol_range
+            # self.data['DefaultSettings']['YDIM'] = rad_range
+            psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
+            psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
             
-            
-            
-        psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
-        psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
-        psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+                       
         # print(type(psiNinterp_RBS))
         
         
@@ -578,8 +583,8 @@ class B2plotter:
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival_dic
                    
         elif self.withshift == True and self.withseries == False:
-              
-            psival = self.calcpsi_1D_method(itername = aa, pol_loc = pol_loc, 
+            series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
+            psival = self.calcpsi_1D_method(itername = series_rep, pol_loc = pol_loc, 
                                         no_coord_avg_check = no_coord_avg_check)
                 
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
