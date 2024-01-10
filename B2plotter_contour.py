@@ -37,7 +37,7 @@ class PlotContour(Opacity_study):
     
     
    
-    def flux_expansion_map(self, pol_loc, iter_index):
+    def flux_expansion_map_method(self, pol_loc, iter_index):
         
         if self.withshift == False and self.withseries == False:
             
@@ -125,20 +125,58 @@ class PlotContour(Opacity_study):
         else:
             print('There is a bug')
 
-    def load_vessel(self):
+    def load_vessel_method(self, itername):
         # try:
         #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
         # except:
         #     print('mesh.extra file not found! Using vvfile.ogr instead')
         #     WallFile=None
-            
-        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
+        if self.withshift == False and self.withseries == False:
+            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
         
-        self.data['vessel'] = VVFILE
+        elif self.withshift == True and self.withseries == False:
+            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata'][itername]['simutop']))
+        
+        elif self.withshift == False and self.withseries == True:
+            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
+
+            
+        elif self.withshift == True and self.withseries == True:
+            print('load_vessel_method function is not there yet!')
+        
+        else:
+            print('load_vessel_method function has a bug')
         
         # if plot:
         #     plt.plot
-    
+        return VVFILE
+        
+    def load_vessel(self):
+        if self.withshift == False and self.withseries == False:
+            vessel_file = self.load_vessel_method(itername = None)
+            self.data['vessel'] = vessel_file
+        
+        elif self.withshift == True and self.withseries == False:
+            vessel_file_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                vessel_file = self.load_vessel_method(itername = aa)
+                vessel_file_dic[aa] = vessel_file
+            
+            self.data['vessel'] = vessel_file_dic
+        
+        elif self.withshift == False and self.withseries == True:
+            series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
+            vessel_file = self.load_vessel_method(itername = series_rep)
+            self.data['vessel'] = vessel_file
+        
+        elif self.withshift == True and self.withseries == True:
+            print('load_vessel function is not there yet!')
+        
+        else:
+            print('load_vessel function has a bug')
+            
+        
+        
     def plot_all_radial(self):
         
         
