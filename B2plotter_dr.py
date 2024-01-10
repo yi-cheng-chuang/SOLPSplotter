@@ -52,7 +52,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = True
+radial_plot_flag = False
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
