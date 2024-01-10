@@ -75,7 +75,8 @@ class RP_mapping(load_data):
             
             RadLoc = self.data['grid']['RadLoc']
             VertLoc = self.data['grid']['VertLoc']
-        
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            
         elif itername != None:
             geo = self.data['b2fgeo'][itername]
             pol_range = int(geo['nx'] + 2)
@@ -83,6 +84,17 @@ class RP_mapping(load_data):
             
             RadLoc = self.data['grid']['RadLoc'][itername]
             VertLoc = self.data['grid']['VertLoc'][itername]
+            
+        if self.withshift == False and self.withseries == False:
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            
+        elif self.withshift == True and self.withseries == False:
+            psiNinterp_RBS = self.data['gfile']['gcomp'][itername]['interp_dic']['RBS']
+        
+        elif self.withshift == False and self.withseries == True:
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            
+        
         
         
         
@@ -122,7 +134,7 @@ class RP_mapping(load_data):
             
             
         psi_solps_mid = np.zeros(rad_range)
-        psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+        
         # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
         for i in range(rad_range):
             psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
@@ -180,7 +192,7 @@ class RP_mapping(load_data):
             midplane_series_dic = {}
             psi_dsa_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(self, itername = aa, plotRR = plotRR)
+                midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(itername = aa, plotRR = plotRR)
                 
                 midplane_series_dic[aa] = midplane_dic
                 psi_dsa_dic[aa] = psi_dsa_ratio
