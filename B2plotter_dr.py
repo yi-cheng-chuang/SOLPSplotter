@@ -4,11 +4,11 @@ Created on Thu Jul 13 12:45:19 2023
 
 @author: user
 """
-import B2plotter_set as b2s
+import SOLPSplotter_set as sps
 import B2plotter_contour as b2c
 
-d = b2s.Setting_dic()
-lex = b2s.loadDS_dic(d['DEV'])
+d = sps.Setting_dic()
+lex = sps.loadDS_dic(d['DEV'])
 
 
 
