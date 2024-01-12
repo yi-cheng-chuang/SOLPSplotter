@@ -5,7 +5,7 @@ Created on Mon Jul 31 11:47:48 2023
 @author: user
 """
 from B2plotter_PRmap import RP_mapping
-import B2plotter_set as b2s
+import SOLPSplotter_set as sps
 import opacity_plot_method as opm
 import matplotlib.pyplot as plt
 import load_mast_expdata_method as lmem
@@ -61,7 +61,7 @@ class Opacity_study(RP_mapping):
             
             self.data['opacity_poloidal'] = result
             
-            unit = b2s.opacity_study_unit()
+            unit = sps.opacity_study_unit()
             
             char = {}
             char['withshift'] = self.withshift
@@ -115,7 +115,7 @@ class Opacity_study(RP_mapping):
             opm.data_reorder(iter_list = pol_list, change_var = shift_list,
                              data_collect = data_collect_opq, char = char)
             
-            unit = b2s.opacity_study_unit()
+            unit = sps.opacity_study_unit()
                        
             shift_dic = {}
             for k in self.data['dircomp']['multi_shift']:
@@ -171,7 +171,7 @@ class Opacity_study(RP_mapping):
             opm.data_reorder(iter_list = pol_list, change_var = density_list,
                              data_collect = data_collect_opq, char = char)
             
-            unit = b2s.opacity_study_unit()
+            unit = sps.opacity_study_unit()
             
             
             density_dic = {}
