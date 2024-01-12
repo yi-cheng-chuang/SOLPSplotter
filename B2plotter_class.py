@@ -12,7 +12,7 @@ import glob
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import colors, cm
 from scipy.io import loadmat
-import B2plotter_set as b2s
+import SOLPSplotter_set as sps
 import load_mast_expdata_method as lmem
 import load_coord_method as lcm
 import fitting_method as fm 
@@ -66,14 +66,14 @@ class B2plotter:
     def load_mast_dir(self):
         if self.DEV == 'mast':
             if self.withshift == False and self.withseries == False:
-                self.data['dircomp'] = b2s.mast_comp_dic()
+                self.data['dircomp'] = sps.mast_comp_dic()
                 mast_basedir, Attempt_dic, shift_value = lmem.mast_base_dir()
                 self.data['dirdata'] = mast_basedir
                 self.data['dircomp']['Attempt'] = Attempt_dic
                 self.data['dircomp']['shift_value'] = shift_value
                 
             elif self.withshift == True and self.withseries == False:
-                self.data['dircomp'] = b2s.mast_comp_dic_withshift()
+                self.data['dircomp'] = sps.mast_comp_dic_withshift()
                 shift_dir, att_dic = lmem.mast_withshift_dir()
                 self.data['dirdata'] = shift_dir
                 self.data['dircomp']['Attempt'] = att_dic
@@ -81,12 +81,12 @@ class B2plotter:
             elif self.withshift == False and self.withseries == True:
                 series_flag = self.DefaultSettings['series_flag']
                 if series_flag == 'change_den':
-                    self.data['dircomp'] = b2s.mast_comp_dir_series()
+                    self.data['dircomp'] = sps.mast_comp_dir_series()
                     series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
                 elif series_flag == 'eireneN':
-                    self.data['dircomp'] = b2s.mast_comp_dir_eireneN()
+                    self.data['dircomp'] = sps.mast_comp_dir_eireneN()
                     series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
