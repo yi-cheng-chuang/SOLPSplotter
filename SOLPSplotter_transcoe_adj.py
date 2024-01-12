@@ -5,6 +5,7 @@ Created on Thu Jan 11 15:00:38 2024
 @author: user
 """
 from B2plotter_class import B2plotter
+import SOLPSplotter_set as sps
 import re
 import transport_coefficient_adjust_method as tcam
 import matplotlib.pyplot as plt
@@ -29,7 +30,7 @@ class transport_coefficient_adjustment(B2plotter):
         self.loadDS = loadDS
     
        
-    def mod_transco(self, withmod, de_SOL = 26, ki_SOL = 31, ke_SOL = 25, ):
+    def mod_transco(self, withmod, de_SOL = 26, ki_SOL = 31, ke_SOL = 25):
         
         simu_dir = self.data['dirdata']['infolderdir']['org']['simudir']
         file_loc = '{}/b2.transport.inputfile_new'.format(simu_dir)
@@ -74,11 +75,14 @@ class transport_coefficient_adjustment(B2plotter):
 
         b = tcam.Generate_transcoefile_method(cod, CoeffID=1, SpeciesID=2, M=[1])
         
-        c = b2tp.WriteInputfile(file = 'b2.transport.inputfile_mod_{}{}'.format(shift, n), points= trans_list ,M_1 = True, M=[1])
+        shift = 'org'
+        n = self.data['dircomp']['Attempt']['org']
+        
+        c = tcam.Write_transcoefile_method(file = 'b2.transport.inputfile_mod_{}{}'.format(shift, n), points= trans_list ,M_1 = True, M=[1])
 
         log_flag = False
         specieslist = ['1','3','4']
-        d = tl.unit_dic()
+        d = 
         i = 0
 
         for k in specieslist:
