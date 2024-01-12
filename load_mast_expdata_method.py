@@ -7,15 +7,15 @@ Created on Thu Jul 13 21:05:04 2023
 
 import glob
 import numpy as np 
-import B2plotter_set as b2s
+import SOLPSplotter_set as sps
 
 
-d = b2s.mast_comp_dic()
-od = b2s.Setting_dic()
+d = sps.mast_comp_dic()
+od = sps.Setting_dic()
 # print(type(d))
 
 def mast_base_dir():
-    basedrt, topdrt, tpdrt= b2s.set_wdir()
+    basedrt, topdrt, tpdrt= sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
     
@@ -33,7 +33,7 @@ def mast_base_dir():
             for i in d['Output']:
                 adir[i] = '{}/{}'.format(newbase, i)
      
-    attempt = str(b2s.s_number(adir['Output'], series_flag= None)[0])
+    attempt = str(sps.s_number(adir['Output'], series_flag= None)[0])
     shift_value = d['shift_dic'][a_shift]
     
     mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
@@ -42,14 +42,14 @@ def mast_base_dir():
 
     return mast_basedir, attempt, shift_value
 
-mwd = b2s.mast_comp_dic_withshift()
+mwd = sps.mast_comp_dic_withshift()
 
 
 def mast_withshift_dir():
-    basedrt, topdrt, tpdrt= b2s.set_wdir()
+    basedrt, topdrt, tpdrt= sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
-    basedrt, topdrt, tpdrt= b2s.set_wdir()
+    basedrt, topdrt, tpdrt= sps.set_wdir()
     shift_list = list(mwd['shift_dic'].keys())
     # print(type(shift_list))
     a_shift = mwd['multi_shift']
@@ -68,7 +68,7 @@ def mast_withshift_dir():
                 for i in d['Output']:
                     adir[i] = '{}/{}'.format(newbase, i)
                  
-                att_dic[aa] = str(b2s.s_number(adir['Output'], series_flag= None)[0])
+                att_dic[aa] = str(sps.s_number(adir['Output'], series_flag= None)[0])
                 
                 mastdic[aa] = {'simudir': newbase, 'simutop': tbase, 
                                'outputdir': adir}
@@ -81,17 +81,17 @@ def mast_withshift_dir():
     return mast_withshift_dir_dic, att_dic
 
 
-mcds = b2s.mast_comp_dir_series()
+mcds = sps.mast_comp_dir_series()
 
 def mast_series_dir(series_flag):
     if series_flag == 'change_den':
-        mcds = b2s.mast_comp_dir_series()
+        mcds = sps.mast_comp_dir_series()
     elif series_flag == 'eireneN':
-        mcds = b2s.mast_comp_dir_eireneN()
+        mcds = sps.mast_comp_dir_eireneN()
     else:
         print('please check series_flag')
        
-    basedrt, topdrt, tpdrt= b2s.set_wdir()
+    basedrt, topdrt, tpdrt= sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], mcds['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, mcds['Shot']))
     newbase = glob.glob('{}/{}/{}/{}/*{}'.format(basedrt,od['DEV'], mcds['Shot'], 
@@ -103,11 +103,11 @@ def mast_series_dir(series_flag):
     new_dic = {}
     for i in newbase:
         if series_flag == 'change_den':
-            attempt_dic[b2s.s_number(i, series_flag)[0][0]] = b2s.s_number(i, series_flag)[0][1]
-            new_dic[b2s.s_number(i, series_flag)[0][0]] = i
+            attempt_dic[sps.s_number(i, series_flag)[0][0]] = sps.s_number(i, series_flag)[0][1]
+            new_dic[sps.s_number(i, series_flag)[0][0]] = i
         elif series_flag == 'eireneN':
-            attempt_dic[b2s.s_number(i, series_flag)[0][1]] = b2s.s_number(i, series_flag)[0][0]
-            new_dic[b2s.s_number(i, series_flag)[0][1]] = i
+            attempt_dic[sps.s_number(i, series_flag)[0][1]] = sps.s_number(i, series_flag)[0][0]
+            new_dic[sps.s_number(i, series_flag)[0][1]] = i
     # print(attempt_list)
     
     adir = {}
