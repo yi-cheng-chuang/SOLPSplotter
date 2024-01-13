@@ -5,23 +5,17 @@ Created on Tue Sep 26 17:27:01 2023
 @author: user
 """
 
-from B2plotter_load_data import load_data
-import opacity_plot_method as opm
+from SOLPSplotter_load_data import load_outputgen_data
 import matplotlib.pyplot as plt
-import load_mast_expdata_method as lmem
 import load_coord_method as lcm
 import fitting_method as fm 
-from scipy import interpolate
 from scipy.interpolate import interp1d
-from scipy.optimize import curve_fit
 import numpy as np
-import xarray as xr
-import math
 
 
-class RP_mapping(load_data):
+class RP_mapping(load_outputgen_data):
     def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
-        load_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
+        load_outputgen_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
     
   
 #-----------------------------------------------------------------------------
