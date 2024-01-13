@@ -12,6 +12,7 @@ Richard Reksoatmodjo and Jameson Crouse
 import re
 import numpy as np
 import matplotlib.pyplot as plt
+import load_coord_method as lcm
 
 def load_transcoefile_method(file ='b2.transport.inputfile', plot=False):
     
@@ -116,3 +117,124 @@ def Write_transcoefile_method(file='b2.transport.inputfile', points={},M_1 = Tru
                 for k in inputfile.keys():
                     f.writelines(inputfile[k][MM])
                 f.write(' no_pflux=.false.\n /\n')
+
+
+
+"""
+The following functions (read_transport_files)  comes from SOLPSutils code written by 
+Robert Wilcox and Jeremy Lore
+"""
+
+
+def read_transport_files(fileloc, dsa=None, geo=None, state=None, force_read_inpufile=False):
+    # Attempts to get transport coefficient data, including pinch term.
+    # Fills using b2.transport.parameters, then b2.transport.inputfile if
+    # b2mn.dat indicates inputfile is active. 
+    #
+    # Uses f90nml
+    #
+    # Inputs:
+    # fileloc : location of b2mn.dat, b2.transport.*
+    # dsa : dsa from read_dsa (or whatever dx_sep to interpolate onto)
+    # geo : geometry dict from read_b2fgmtry 
+    # state : state dict from read_b2fstate
+    #
+    # Note, geo and state only used to get dimensions, only really need
+    # geo['ny'], state['ns']
+    
+    if dsa is None:
+        dsa = lcm.read_dsa('dsa')
+    
+    if geo is None:
+        geo = lcm.read_b2fgmtry('../baserun/b2fgmtry')
+
+    if state is None:
+        state = lcm.read_b2fstate('b2fstate')
+        
+    read_inputfile = False
+    if force_read_inpufile:
+        read_inputfile = True
+
+    # Read b2mn.dat unless overridden by input argument
+    if not read_inputfile:
+        b2mn = lcm.scrape_b2mn("b2mn.dat")
+        if ("b2tqna_inputfile" in b2mn.keys()):
+            if b2mn["b2tqna_inputfile"] == 1:
+                read_inputfile = True
+
+    # Initialize variables we want defined. The final arrays will have
+    # a dimension [ny+2] but b2.transport.inputfile may not!
+    dn = np.zeros((geo['ny']+2,state['ns']))
+    dp = np.zeros((geo['ny']+2,state['ns']))
+    chii = np.zeros((geo['ny']+2,state['ns']))
+    chie = np.zeros(geo['ny']+2)
+    vlax = np.zeros((geo['ny']+2,state['ns']))
+    vlay = np.zeros((geo['ny']+2,state['ns']))
+    vsa = np.zeros((geo['ny']+2,state['ns']))
+    sig = np.zeros(geo['ny']+2)
+    alf = np.zeros(geo['ny']+2)    
+
+    try:
+        import f90nml
+        parser = f90nml.Parser()
+        parser.global_start_index=1
+    except:
+        print('f90nml required to read transport input files!')
+        return None
+    
+    try:
+        nml = parser.read('b2.transport.parameters')
+        this = nml['transport']['parm_dna']
+        for ispec in range(len(this)):
+            dn[:,ispec] = this[ispec]
+    except:
+        pass
+    
+    if read_inputfile:
+        try:
+            nml = parser.read('b2.transport.inputfile')
+            tdata = nml['transport']['tdata']
+            nS = len(tdata)
+            for ispec in range(nS):
+                nKinds = len(tdata[ispec])
+                for jkind in range(nKinds):
+                    this = tdata[ispec][jkind]
+
+                    # Check if this kind was filled with none by f90nml (not defined)
+                    test = [i[1] for i in this]
+                    if all(val is None for val in test):
+                        continue
+                    
+                    # Read and interpolate back on dsa
+                    xRaw = [i[0] for i in this] 
+                    yRaw = [i[1] for i in this]
+                    yInterp = np.interp(dsa,xRaw,yRaw)
+                    
+                    if jkind+1 == 1:
+                        dn[:,ispec] = yInterp
+                    elif jkind+1 == 2:
+                        dp[:,ispec] = yInterp
+                    elif jkind+1 == 3:
+                        chii[:,ispec] = yInterp
+                    elif jkind+1 == 4:
+                        chie[:] = yInterp
+                    elif jkind+1 == 5:
+                        vlax[:,ispec] = yInterp                        
+                    elif jkind+1 == 6:
+                        vlay[:,ispec] = yInterp                        
+                    elif jkind+1 == 7:
+                        vsa[:,ispec] = yInterp                        
+                    elif jkind+1 == 8:
+                        sig[:] = yInterp                        
+                    elif jkind+1 == 9:
+                        alf[:] = yInterp                        
+                    
+        except:
+            pass
+        
+        
+    return dict(dn=dn, dp=dp, chii=chii, chie=chie, vlax=vlax, vlay=vlay, vsa=vsa, sig=sig, alf=alf)
+
+
+
+
