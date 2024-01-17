@@ -45,7 +45,7 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
             else:
                 pass
             if max(pol_loc) > 180 and i != 'electron_pedestal_density':
-                plt.axvline(x= 180, color='firebrick',lw=3, ls='--', label= 'inner midplane')
+                plt.axvline(x= 180, color='deeppink',lw=3, ls='--', label= 'inner midplane')
             else:
                 pass
             if min(pol_loc) < 0 and i != 'electron_pedestal_density':
@@ -76,20 +76,22 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
                 elif i == 'pedestal_width_psiN' or i == 'temperature_pedestal_width':
                     # plt.scatter(pol_loc[aa], np.round_(result_dic[i][aa], 2), 
                     #              label= 'modified {} m case'.format(change_ver_dic[aa]))
-                    plt.errorbar(pol_loc[aa], np.round_(result_dic[i][aa], 2), yerr= np.std(result_dic[i][aa]), fmt= 'o', 
-                                  label= '{}'.format(i))
+                    # plt.errorbar(pol_loc[aa], np.round_(result_dic[i][aa], 2), yerr= np.std(result_dic[i][aa]), fmt= 'o', 
+                    #               label= '{}'.format(i))
+                    plt.plot(pol_loc[aa], np.round_(result_dic[i][aa], 2), '-',
+                          label= 'modified {} m case'.format(change_ver_dic[aa]))
                     plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[i], 
                                                       max(pol_loc[aa]), min(pol_loc[aa])))
 
                 elif i == 'pedestal_width' or i == 'efold_length':
                     new_r = result_dic[i][aa]*1000
-                    plt.plot(pol_loc[aa], new_r, 'o', color= color_dic[aa], 
+                    plt.plot(pol_loc[aa], new_r, '-', color= color_dic[aa], 
                              label= 'modified {} m case'.format(change_ver_dic[aa]))
                     plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[i], 
                                                       max(pol_loc[aa]), min(pol_loc[aa])))                   
                     plt.xlabel('poloidal angle')
                 else:
-                    plt.plot(pol_loc[aa], result_dic[i][aa], 'o',
+                    plt.plot(pol_loc[aa], result_dic[i][aa], '-',
                           label= 'modified {} m case'.format(change_ver_dic[aa]))
                     # plt.plot(pol_loc[aa], result_dic[i][aa], '-', color= color_dic[aa])
                     plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[i], 
@@ -104,17 +106,17 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
             else:
                 pass
             if max(pol_loc['org']) > 180 and i != 'electron_pedestal_density':
-                plt.axvline(x= 180, color='firebrick',lw=3, ls='--', label= 'inner midplane')
+                plt.axvline(x= 180, color='seagreen',lw=3, ls='--', label= 'inner midplane')
             else:
                 pass
             if min(pol_loc['org']) < 0 and i != 'electron_pedestal_density':
-                plt.axvline(x= 0, color='chocolate',lw=3, ls='--', label= 'outer midplane')
+                plt.axvline(x= 0, color='darkorange',lw=3, ls='--', label= 'outer midplane')
             else:
                 pass
             
             if min(pol_loc['org']) < -70 and i != 'electron_pedestal_density':
-                plt.axvline(x= xpoint_loc[aa], color='magenta',lw=3, ls='--', label= 'xpoint angle')
-                plt.axvline(x= xpoint_loc[aa] + 360, color='magenta',lw=3, ls='--')
+                plt.axvline(x= xpoint_loc[aa], color='darkblue',lw=3, ls='--', label= 'xpoint angle')
+                plt.axvline(x= xpoint_loc[aa] + 360, color='darkblue',lw=3, ls='--')
             else:
                 pass
             # plt.ylabel('{}'.format(unit_dic[i]))
