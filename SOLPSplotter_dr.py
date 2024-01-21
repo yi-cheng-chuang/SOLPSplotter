@@ -13,12 +13,12 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-xt = sta.transport_coefficient_adjustment(DEV = d['DEV'], withshift= d['withshift'], 
-        withseries= d['withseries'], DefaultSettings = d['DefaultSettings'])
-xt.load_mast_dir()
-xt.load_solpsgeo()
-xt.calcpsi()
-xt.mod_transco(withmod = False, de_SOL = 26, ki_SOL = 31, ke_SOL = 25, log_flag = False)
+# xt = sta.transport_coefficient_adjustment(DEV = d['DEV'], withshift= d['withshift'], 
+#         withseries= d['withseries'], DefaultSettings = d['DefaultSettings'])
+# xt.load_mast_dir()
+# xt.load_solpsgeo()
+# xt.calcpsi()
+# xt.mod_transco(withmod = False, de_SOL = 26, ki_SOL = 31, ke_SOL = 25, log_flag = False)
 
 
 
@@ -64,7 +64,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = False
+radial_plot_flag = True
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
