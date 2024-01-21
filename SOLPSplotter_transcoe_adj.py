@@ -24,8 +24,8 @@ class transport_coefficient_adjustment(Directory_and_Geometry):
         
         
         
-        
-        simu_dir = self.data['dirdata']['simudir']
+        folder = '71_n100000_m12n8e3_nts5_a'
+        simu_dir = '{}/{}'.format(self.data['dirdata']['simutop'], folder)
         file_loc = '{}/b2.transport.inputfile_new'.format(simu_dir)
 
         trans_list = tcam.load_transcoefile_method(file_loc, plot= False)
@@ -41,15 +41,15 @@ class transport_coefficient_adjustment(Directory_and_Geometry):
         if withmod:
             mod_y = np.zeros(m)
             for j in range(m):
-                if j<= 26:
+                if j<= de_SOL:
                     mod_y[j] = cod[j,1]
                 else:
-                    mod_y[j] = 15.0
+                    mod_y[j] = 12.0
             cod[:,1] = mod_y
 
             mod_yki = np.zeros(m)
             for j in range(m):
-                if j<= 31:
+                if j<= ki_SOL:
                     mod_yki[j] = coki[j,1]  
                 else:
                     mod_yki[j] = 10.0
@@ -57,7 +57,7 @@ class transport_coefficient_adjustment(Directory_and_Geometry):
 
             mod_yke = np.zeros(m)
             for j in range(m):
-                if j<= 25:
+                if j<= ke_SOL:
                     mod_yke[j] = coke[j,1]  
                 else:
                     mod_yke[j] = 18.0
@@ -69,9 +69,9 @@ class transport_coefficient_adjustment(Directory_and_Geometry):
         tcam.Generate_transcoefile_method(cod, CoeffID=1, SpeciesID=2, M=[1])
         
         shift = 'org'
-        n = self.data['dircomp']['Attempt']
+        n = str(sps.s_number(file_loc, series_flag= None)[0])
         
-        tcam.Write_transcoefile_method(file = 'b2.transport.inputfile_mod_{}{}'.format(shift, n), points= trans_list ,M_1 = True, M=[1])
+        tcam.Write_transcoefile_method(file = '{}/b2.transport.inputfile_mod_{}{}'.format(simu_dir, shift, n), points= trans_list ,M_1 = True, M=[1])
 
         log_flag = False
         specieslist = ['1','3','4']

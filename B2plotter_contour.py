@@ -476,7 +476,7 @@ class PlotContour(Opacity_study):
             
             plt.figure(figsize=(6,12))
             plt.tripcolor(TP, Eiratom, shading='flat', cmap= CMAP, norm= NORM_neu_eiratom)
-            plt.title('Eiratom')
+            plt.title('Neutral density contour plot')
             # plt.title('Neutral density contour plot outerleg')
             
             SM_neu_eiratom= cm.ScalarMappable(NORM_neu_eiratom, CMAP)    

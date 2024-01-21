@@ -305,7 +305,7 @@ class RP_mapping(load_outputgen_data):
                 angle = angle + 360
             angle_list.append(angle)
             
-        pol_loc = np.asarray(int(pol_list))
+        pol_loc = np.asarray(list(map(int, pol_list)))
         
         if plot_angle: 
             plt.figure(figsize=(7,7))
@@ -461,7 +461,7 @@ class RP_mapping(load_outputgen_data):
     
    
     def calc_dsa(self, pol_loc):
-        dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
+        
         if self.withshift == False and self.withseries == False:
             
             arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(itername = None, pol_loc = pol_loc)
@@ -476,16 +476,17 @@ class RP_mapping(load_outputgen_data):
             dsa_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 
-            
+                arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(itername = aa, pol_loc = pol_loc)
+                
                 dsa_dic[aa] = {'arclength': arclength, 'interpfunc': interpfunc_dic,
-                            'dsa_{}_val'.format(pol_index): RR_sep}
+                            'dsa_{}_val'.format(pol_loc): RR_sep}
             
-            self.data['dsa']['dsa_{}'.format(pol_index)] = dsa_dic
+            self.data['dsa']['dsa_{}'.format(pol_loc)] = dsa_dic
     
     
     
         elif self.withshift == False and self.withseries == True:
-            
+            dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
             den_list = list(self.data['dircomp']['Attempt'].keys())
             aa = den_list[0] 
             

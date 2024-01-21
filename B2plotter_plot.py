@@ -41,7 +41,7 @@ class Opacity_study(RP_mapping):
         self.data['poloidal_index'] = pol_list
         
         for j in pol_list:
-            self.calcpsi_1D(pol_loc= j)
+            self.calcpsi_1D(pol_loc= j, no_coord_avg_check= False)
             self.calc_dsa(pol_loc= j)
         
         self.load_output_data(param= 'NeuDen')
@@ -285,9 +285,9 @@ class Opacity_study(RP_mapping):
             for k in pol_list:
                 
                 if self.withshift == True and self.withseries == False:
-                    psi = self.data['psi']['psi_{}_val'.format(k)][aa]
+                    psi = self.data['psi']['psi_{}_val'.format(k)][aa][:, 2]
                 elif self.withshift == False and self.withseries == True:
-                    psi = self.data['psi']['psi_{}_val'.format(k)]
+                    psi = self.data['psi']['psi_{}_val'.format(k)][:, 2]
                 else:
                     print('out of expectation')
                 

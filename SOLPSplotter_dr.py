@@ -13,15 +13,6 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-# xt = sta.transport_coefficient_adjustment(DEV = d['DEV'], withshift= d['withshift'], 
-#         withseries= d['withseries'], DefaultSettings = d['DefaultSettings'])
-# xt.load_mast_dir()
-# xt.load_solpsgeo()
-# xt.calcpsi()
-# xt.mod_transco(withmod = False, de_SOL = 26, ki_SOL = 31, ke_SOL = 25, log_flag = False)
-
-
-
 xl = b2c.PlotContour(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
             DefaultSettings = d['DefaultSettings'], loadDS = lex, 
             Parameters= d['Parameters'], Publish= d['Publish'])
@@ -36,7 +27,7 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.transport_coe_align_plot(plot_transcoe= False)
 xl.load_b2fstate()
-xl.load_vessel()
+# xl.load_vessel()
 # xl.flux_comparison_plot()
 
 
@@ -54,8 +45,8 @@ if plot_flag == 'radial':
 elif plot_flag == 'poloidal':
     # xl.set_plot()
     poloidal_index_list = []
-    for i in range(40):
-        poloidal_index_list.append('{}'.format(28 + i))
+    for i in range(47):
+        poloidal_index_list.append('{}'.format(25 + i))
     xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= True)
     xl.Opacity_study_poloidal_plot(pol_list= poloidal_index_list)
 elif plot_flag == 'skip':

@@ -610,29 +610,25 @@ class Directory_and_Geometry:
             arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
             RR_sep = self.data['midplane_calc']['R_Rsep']
         
-            
-            arcR_inv = list(reversed(arcR))
-            RRsep_inv = list(reversed(RR_sep))
-                       
-            arcR_cut = []
-            RRsep_cut = []
-            
-            for p_in in ped_index:
-                arcR_cut.append(arcR_inv[p_in])
-                RRsep_cut.append(RRsep_inv[p_in])
-                
-                       
-            flux_fit_dic = fm.flux_expand_fit(RRsep = RRsep_cut, arclength = arcR_cut)
-            
-            flux_expand = flux_fit_dic['flux_fitcoe'][0]
-            
-            return flux_expand
-        
         elif self.withshift == True and self.withseries == True:
             print('calc_flux_expansion is not there yet, to be continue...')
+        
+        arcR_inv = list(reversed(arcR))
+        RRsep_inv = list(reversed(RR_sep))
+                   
+        arcR_cut = []
+        RRsep_cut = []
+        
+        for p_in in ped_index:
+            arcR_cut.append(arcR_inv[p_in])
+            RRsep_cut.append(RRsep_inv[p_in])
             
-        else:
-            print('calc_flux_expansion function has a bug')
+                   
+        flux_fit_dic = fm.flux_expand_fit(RRsep = RRsep_cut, arclength = arcR_cut)
+        
+        flux_expand = flux_fit_dic['flux_fitcoe'][0]
+        
+        return flux_expand
     
 
 
