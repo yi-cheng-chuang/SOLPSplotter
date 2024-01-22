@@ -4,9 +4,9 @@ Created on Thu Jul 13 12:45:19 2023
 
 @author: user
 """
-import SOLPSplotter_set as sps
+import SOLPS_set as sps
 import B2plotter_contour as b2c
-import SOLPSplotter_transcoe_adj as sta
+import SOLPS_transcoe_adj as sta
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
