@@ -7,7 +7,7 @@ Created on Thu Jul 13 21:05:04 2023
 
 import glob
 import numpy as np 
-import SOLPSplotter_set as sps
+import SOLPS_set as sps
 
 
 d = sps.mast_comp_dic()
