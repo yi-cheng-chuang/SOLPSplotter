@@ -4,7 +4,7 @@ Created on Sun Oct 15 21:54:40 2023
 
 @author: user
 """
-from SOLPSplotter_geo import Directory_and_Geometry
+from SOLPSplotter_geo import load_geometry
 import matplotlib.pyplot as plt
 import load_mast_expdata_method as lmem
 import load_B2_data_method as lbdm
@@ -13,10 +13,10 @@ from scipy.optimize import curve_fit
 import numpy as np
 
 
-class load_expdata(Directory_and_Geometry):
+class load_expdata(load_geometry):
     
     def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS):
-        Directory_and_Geometry.__init__(self, DEV, withshift, 
+        load_geometry.__init__(self, DEV, withshift, 
                                         withseries, DefaultSettings)
         # Employee.__init__(self, first, last, pay)
         self.loadDS = loadDS
