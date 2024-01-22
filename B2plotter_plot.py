@@ -5,7 +5,7 @@ Created on Mon Jul 31 11:47:48 2023
 @author: user
 """
 from B2plotter_PRmap import RP_mapping
-import SOLPSplotter_set as sps
+import SOLPS_set as sps
 import opacity_plot_method as opm
 import matplotlib.pyplot as plt
 import load_mast_expdata_method as lmem
