@@ -47,6 +47,7 @@ class load_expdata(load_geometry):
             psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
             
             return psi_solps
+        
         elif itername != None:
             self.check_b2mn(itername = itername)
             jxa = self.data['b2mn'][itername]['jxa']
@@ -102,7 +103,7 @@ class load_expdata(load_geometry):
         plot_shift_compare = plot_setting_dic['plot_shift_compare']
         data_print = plot_setting_dic['data_print']
         
-        n_tot = 100
+        n_tot = 200
         
         
         if self.withshift == False and self.withseries == False:
@@ -133,7 +134,7 @@ class load_expdata(load_geometry):
         popt_te, pcov_te = curve_fit(fm.tanh, psi, te, p1)
 
           
-        x_model = np.linspace(min(psi_solps[:, 2]), 1.1, n_tot)
+        x_model = np.linspace(min(psi), 1.1, n_tot)
         tanh_ne_fit = fm.tanh(x_model, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         tanh_te_fit = fm.tanh(x_model, popt_te[0], popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
@@ -456,7 +457,8 @@ class load_outputgen_data(load_expdata):
             print('load_b2fstate function is not there yet!')
             
             
-            
+    
+    
          
     
     
