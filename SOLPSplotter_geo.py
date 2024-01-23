@@ -10,6 +10,7 @@ import numpy as np
 import SOLPS_set as sps
 from SOLPS_load_directory import load_directory 
 import load_mast_expdata_method as lmem
+import load_B2_data_method as lbdm
 import load_coord_method as lcm
 import fitting_method as fm 
 from scipy import interpolate
@@ -290,7 +291,69 @@ class load_geometry(load_directory):
             self.data['DefaultSettings']['XDIM'] = pol_range
             self.data['DefaultSettings']['YDIM'] = rad_range
     
-    
+
+#----------------------------------------------------------------------------
+
+
+    def calcpsi_block_method(self, file_loc, shift):
+        b2mn = lcm.scrape_b2mn(file_loc + '/b2mn.dat')
+        print(file_loc)
+        print(b2mn)
+        jxa = b2mn['jxa']
+        pol_index = int(jxa)
+        
+        simu_dir = file_loc.rsplit("/",1)[0]
+        fname = file_loc.rsplit("/",1)[1]
+        print('plasmf input: {}'.format(simu_dir))
+        print('filename input: {}'.format(fname))
+        
+        geo = lcm.read_b2fgmtry(simu_dir + '/baserun/b2fgmtry')
+        rad_range = int(geo['ny'] + 2)
+        
+        crLowerLeft = geo['crx'][pol_index,:,0]
+        crLowerRight = geo['crx'][pol_index,:,1]
+        crUpperLeft = geo['crx'][pol_index,:,2]
+        crUpperRight = geo['crx'][pol_index,:,3]
+        czLowerLeft = geo['cry'][pol_index,:,0]
+        czLowerRight = geo['cry'][pol_index,:,1]
+        czUpperLeft = geo['cry'][pol_index,:,2]
+        czUpperRight = geo['cry'][pol_index,:,3]
+        
+        
+        g = lcm.loadg(self.data['dirdata']['gbase'] 
+                               + '/MAST__RMP_results/g027205.00275_efitpp')
+        # g = lcm.loadg(self.data['dirdata']['gdir'][0])
+        psiN = (g['psirz'] - g['simag']) / (g['sibry'] - g['simag'])
+
+        dR = g['rdim'] / (g['nw'] - 1)
+        dZ = g['zdim'] / (g['nh'] - 1)
+        
+        gZ = np.zeros(g['nh'])
+        for i in range(g['nh']):
+            gZ[i] = g['zmid'] - 0.5 * g['zdim'] + i * dZ
+            
+        
+        gR = np.zeros(g['nw'])
+        for i in range(g['nw']):
+            gR[i] = g['rleft'] + i * dR + float(shift)
+            
+
+        psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
+        
+        
+        psi_solps_RBS = np.zeros(rad_range)
+        for i in range(rad_range):
+            psi_LL_RBS = psiNinterp_RBS(crLowerLeft[i], czLowerLeft[i])
+            psi_UL_RBS = psiNinterp_RBS(crUpperLeft[i], czUpperLeft[i])
+            psi_LR_RBS = psiNinterp_RBS(crLowerRight[i], czLowerRight[i])
+            psi_UR_RBS = psiNinterp_RBS(crUpperRight[i], czUpperRight[i])
+            psi_solps_RBS[i] = np.mean([psi_LL_RBS, psi_UL_RBS, 
+                                        psi_LR_RBS, psi_UR_RBS])
+        
+        return psi_solps_RBS
+
+
+
 #---------------------------------------------------------------------------
    
 #1D psi function mapping  
