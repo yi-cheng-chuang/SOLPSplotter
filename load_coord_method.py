@@ -6,7 +6,6 @@ Created on Wed Jul 12 18:37:40 2023
 """
 
 from os import path, environ
-import B2plotter_tool as b2t
 import numpy as np
 
 
