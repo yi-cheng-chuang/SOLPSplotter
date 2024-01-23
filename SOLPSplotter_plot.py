@@ -115,15 +115,18 @@ class Opacity_study(RP_mapping):
             
             unit = opm.opacity_study_unit()
                        
-            shift_dic = {}
-            for k in self.data['dircomp']['multi_shift']:
-                p = str(self.data['dircomp']['shift_dic'][k])
-                shift_dic[k] = p
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            # shift_dic = {}
+            # for k in self.data['dircomp']['multi_shift']:
+            #     p = A_dic[k]
+            #     shift_dic[k] = p
             
             opm.opacity_plot(pol_loc = self.data['angle']['angle_list'], result_dic = result, unit_dic = unit,
                              log_flag = False, charactor= char,
                              iter_list = self.data['dircomp']['multi_shift'], 
-                             change_ver_dic = shift_dic, 
+                             change_ver_dic = A_dic, 
                              xpoint_loc= self.data['angle']['xpoint_angle'])
         
         elif self.withshift == False and self.withseries == True:
