@@ -14,6 +14,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import load_coord_method as lcm
 
+
+def transport_coe_unit():
+    transcoe_unit = {
+       '1':['Particle density-driven diffusivity: D (m$^{2}$/s)','Density-driven diffusivity'],
+       '3':['Ion thermal anomalous diffusivity: ${\chi_i}$ (m$^{2}$/s)', 'Ion thermal diffusivity'],
+       '4':['Electron thermal anomalous diffusivity: ${\chi_e}$ (m$^{2}$/s)', 'Electron thermal diffusivity'], 
+           
+        }
+    
+    return transcoe_unit
+
+
+
 def load_transcoefile_method(file ='b2.transport.inputfile', plot=False):
     
     Coefficients = {'1':'Particle density-driven diffusivity',
