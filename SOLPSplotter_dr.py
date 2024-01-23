@@ -33,7 +33,7 @@ xl.load_b2fstate()
 
 # xl.calcpsi()
 
-plot_flag = 'skip'
+plot_flag = 'poloidal'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
@@ -46,7 +46,7 @@ elif plot_flag == 'poloidal':
     poloidal_index_list = []
     for i in range(47):
         poloidal_index_list.append('{}'.format(25 + i))
-    xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= True)
+    xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
     xl.Opacity_study_poloidal_plot(pol_list= poloidal_index_list)
 elif plot_flag == 'skip':
     pass
