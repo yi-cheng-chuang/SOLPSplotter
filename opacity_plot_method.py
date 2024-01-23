@@ -23,8 +23,6 @@ def opacity_study_unit():
     return unit
 
 
-
-
 def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor, 
                  iter_list, change_ver_dic, xpoint_loc):
     withshift = charactor['withshift']
@@ -81,35 +79,39 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
             for aa in iter_list:
                 if i == 'electron_pedestal_density':
                     plt.scatter(result_dic['electron_pedestal_density'][aa], result_dic['efold_length'][aa], 
-                             color= color_dic[aa], label= '{} {}'.format(aa, 'efold length'))
+                             color= color_dic[aa], label= 'aspect ratio = {} {}'.format(aa, 'efold length'))
                     plt.scatter(result_dic['electron_pedestal_density'][aa], result_dic['pedestal_width'][aa], 
-                             color= color_dic[aa], label= '{} {}'.format(aa, 'pedestal width'))
+                             color= color_dic[aa], label= 'aspect ratio = {} {}'.format(aa, 'pedestal width'))
                     plt.xlabel('electron_pedestal_density: $n_{ped}$ (m$^{-3}$)')
                     plt.title('{} and {} verses {} from {:.2f} to {:.2f}'.format('efold length', 
                                                               'pedestal width', 'electron pedestal density', max(pol_loc[aa]), min(pol_loc[aa])))
                     # plt.title('{} and {} verses {}'.format('efold length', 
                     #                 'pedestal width', 'electron pedestal density'))
                     plt.legend()
-                elif i == 'pedestal_width_psiN' or i == 'temperature_pedestal_width':
+                    
+                elif i == 'pedestal_width_psiN':
                     # plt.scatter(pol_loc[aa], np.round_(result_dic[i][aa], 2), 
                     #              label= 'modified {} m case'.format(change_ver_dic[aa]))
                     # plt.errorbar(pol_loc[aa], np.round_(result_dic[i][aa], 2), yerr= np.std(result_dic[i][aa]), fmt= 'o', 
                     #               label= '{}'.format(i))
-                    plt.plot(pol_loc[aa], np.round_(result_dic[i][aa], 2), '-',
-                          label= 'modified {} m case'.format(change_ver_dic[aa]))
+                    plt.plot(pol_loc[aa], np.round_(result_dic[i][aa], 2), '-', color= color_dic[aa],
+                          label= 'aspect ratio = {}'.format(change_ver_dic[aa]))
                     plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[i], 
                                                       max(pol_loc[aa]), min(pol_loc[aa])))
+                    plt.legend()
 
                 elif i == 'pedestal_width' or i == 'efold_length':
                     new_r = result_dic[i][aa]*1000
                     plt.plot(pol_loc[aa], new_r, '-', color= color_dic[aa], 
-                             label= 'modified {} m case'.format(change_ver_dic[aa]))
+                             label= 'aspect ratio = {}'.format(change_ver_dic[aa]))
                     plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[i], 
                                                       max(pol_loc[aa]), min(pol_loc[aa])))                   
                     plt.xlabel('poloidal angle')
+                    plt.legend()
+                    
                 else:
-                    plt.plot(pol_loc[aa], result_dic[i][aa], '-',
-                          label= 'modified {} m case'.format(change_ver_dic[aa]))
+                    plt.plot(pol_loc[aa], result_dic[i][aa], '-', color= color_dic[aa] ,
+                          label= 'aspect ratio = {}'.format(change_ver_dic[aa]))
                     # plt.plot(pol_loc[aa], result_dic[i][aa], '-', color= color_dic[aa])
                     plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[i], 
                                                       max(pol_loc[aa]), min(pol_loc[aa])))
@@ -168,10 +170,6 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
             print('opacity_plot has a bug')
         
         
-        
-        plt.legend()
-        # j = j + 1
-
 
 def data_reorder(iter_list, change_var, data_collect, char):
     withshift = char['withshift']
@@ -205,15 +203,22 @@ def data_reorder(iter_list, change_var, data_collect, char):
         
     elif withshift == True and withseries == False:
         plt.figure(figsize=(7,7))
+        A_list = [1.4, 2.0, 2.4, 2.8, 3.4]
         color_list = ['red', 'orange', 'green', 'blue', 'purple']
         for p in range(len(change_var)):
-            x_cor = np.ones(len(iter_list))*change_var[p]
+            x_cor = np.ones(len(iter_list))*A_list[p]
             plt.scatter(x_cor, data_collect[:, p], color= color_list[p], 
-                            label= 'efold length for different core electron density {}'.format(change_var[p]))
-        plt.xlabel('modify distance: [m]')
+                        label= 'aspect ratio= {}'.format(str(A_list[p])))
+        plt.axvline(x= 0.7/0.5, color='salmon',lw=3, ls='--', 
+                    label= 'MAST aspect ratio')
+        plt.axvline(x= 1.67/0.67, color='darkgreen',lw=3, ls='--', label= 'D3D aspect ratio')
+        plt.axvline(x= 0.68/0.22, color='cyan',lw=3, ls='--', label= 'C-Mod/ ITER aspect ratio')
+        plt.axvline(x= 3.4, color='black',lw=3, ls='--', label= 'JT-60 aspect ratio')
+        plt.xlabel('aspect ratio')
         # plt.ylabel('dimensionless opaqueness')
         # plt.title('dimensionless opaqueness verses different modify distance')
         plt.title('dimensionless opaqueness')
+        plt.legend()
     
 
 
