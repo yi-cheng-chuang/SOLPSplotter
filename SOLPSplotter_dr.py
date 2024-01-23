@@ -5,7 +5,7 @@ Created on Thu Jul 13 12:45:19 2023
 @author: user
 """
 import SOLPS_set as sps
-import B2plotter_contour as b2c
+import SOLPSplotter_contour as spc
 import SOLPS_transcoe_adj as sta
 
 d = sps.Setting_dic()
@@ -13,7 +13,7 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-xl = b2c.PlotContour(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
+xl = spc.PlotContour(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
             DefaultSettings = d['DefaultSettings'], loadDS = lex, 
             Parameters= d['Parameters'], Publish= d['Publish'])
 xl.set_plot()
@@ -25,7 +25,6 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'plot_exp_and_fit': True, 'plot_shift_compare': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
-xl.transport_coe_align_plot(plot_transcoe= False)
 xl.load_b2fstate()
 # xl.load_vessel()
 # xl.flux_comparison_plot()
@@ -38,9 +37,9 @@ plot_flag = 'skip'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
-    xl.calcpsi_1D(pol_loc= PL)
+    xl.calcpsi_1D(pol_loc= PL, no_coord_avg_check= False)
     xl.calc_dsa(pol_loc= PL)
-    xl.flux_expansion_map(pol_loc= PL, iter_index= None)
+    # xl.flux_expansion_map_method(pol_loc= PL, iter_index= None)
     xl.Opacity_study_radial_plot(pol_loc= PL)
 elif plot_flag == 'poloidal':
     # xl.set_plot()
@@ -55,7 +54,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = True
+radial_plot_flag = False
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
