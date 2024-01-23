@@ -30,6 +30,13 @@ c_total = [3, 4, 7, 9, 10, 19, 20, 21, 49, 50]
 print(all([item in c_total for item in c]))
 
 
+mod = [0, 0.3, 0.5, 0.7, 1]
+
+for i in mod:
+    A = (0.7 + i)/0.5
+    print(A)
+
+
 
 
 
