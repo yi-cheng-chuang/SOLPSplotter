@@ -149,6 +149,61 @@ class transport_coefficient_adjustment(load_geometry):
         else:
             print('transport_coe_align_plot is not there yet')
     
+    
+    def transport_coe_compare_plot(self, file_loc_list, plot_compare):
+        trans_dic = {}
+        jxa = self.data['b2mn']['jxa']
+        psi_1d_dic = {}
+        for fl in file_loc_list:
+            fname = fl.rsplit("/",1)[1]
+            psi_1d_dic[fname] = self.calcpsi_block_method(file_loc = fl, 
+                                                                   shift = 0)
+            
+        
+        self.data['psi_1d'] = psi_1d_dic    
+            
+            
+        for an in file_loc_list:
+            aa = an.rsplit("/",1)[1]
+            trans_file_dir = an + '/b2.transport.inputfile'
+            
+            trans_list = tcam.load_transcoefile_method(trans_file_dir, plot= False)
+            cod = trans_list['1'].T
+            coki = trans_list['3'].T
+            coke = trans_list['4'].T
+            x= cod[:,0]  #the coordinate here is R-R_sep
+            
+            trans_dic[aa] = np.zeros([len(x), 4])
+            trans_dic[aa][:, 0] = self.calcpsi_block_method(file_loc = an, shift = 0)
+            trans_dic[aa][:, 1] = cod[:, 1]
+            trans_dic[aa][:, 2] = coki[:, 1]
+            trans_dic[aa][:, 3] = coke[:, 1]
+    
+   
+        log_flag = False
+        coe_label_dic = {'1': 'particle diffusivity', '2': 'ion thermal diffusivity'
+                         ,'3': 'electron thermal diffusivity'}
+        
+        note_list = ['leakage', 'decay length']
+        if plot_compare:
+            for k in coe_label_dic.keys():
+                if log_flag:
+                    plt.yscale('log')
+                plt.figure(figsize=(7,7))
+                for ab in trans_dic.keys(): 
+                    # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
+                    #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
+                    plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', 
+                             label= '{}'.format(ab))
+                    plt.xlabel('psiN')
+                    plt.title('radial {} coefficient'.format(coe_label_dic[k]))
+                    plt.legend() 
+            plt.show()
+        else:
+            print('transport_coe_align_plot is not there yet')
+    
+    
+    
     def align_transcoe_method(self, std_file_loc, input_file_loc, itername, plot_align):
         
         # one_list, n , filename_a, shift_a = tl.mast_tranco_dir('one')
