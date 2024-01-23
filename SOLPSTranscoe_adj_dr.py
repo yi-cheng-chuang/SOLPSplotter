@@ -20,3 +20,12 @@ xt.calcpsi()
 xt.mod_transco(withmod = False, de_SOL = 24, ki_SOL = 31, ke_SOL = 23, log_flag = False)
 xt.transport_coe_align_plot(plot_transcoe = True)
 xt.align_transco(plot_align = True)
+
+basedrt, topdrt, tpdrt = sps.set_wdir()
+
+FL = basedrt + '/mast/027205/org_new_series/72_n100000_n5e3et1e2_nts5_a'
+FL2 = basedrt + '/mast/027205/org_new_series/72_n100000_m12n8e3_nts5_a'
+# xt.calcpsi_block_method(file_loc = FL, shift = 0)
+flist = [FL, FL2]
+
+xt.transport_coe_compare_plot(file_loc_list = flist, plot_compare = True)
