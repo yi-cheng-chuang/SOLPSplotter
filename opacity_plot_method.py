@@ -8,6 +8,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def opacity_study_unit():
+    unit = {'efold_length_psiN': 'efold length psiN',
+            'pedestal_width_psiN': 'Pedestal width psiN',
+              'dimensionless_opaqueness': 'dimensionless opaqueness', 
+              'neutral_density': 'neutral density ${n_D}$ (m$^{-3}$)', 
+              'electron_pedestal_density': 'electron pedestal density: $n_{ped}$ (m$^{-3}$)',
+              'temperature_pedestal_width': 'temperature pedestal width: $\Delta T$: [m]',
+              'flux_expansion': 'flux_expansion',
+              'efold_length': 'efold length: $\lambda_{n_D}$: [mm]',
+              'pedestal_width': 'Pedestal width: $\Delta n$: [mm]',
+              
+              }
+    return unit
+
+
+
+
 def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor, 
                  iter_list, change_ver_dic, xpoint_loc):
     withshift = charactor['withshift']
@@ -406,6 +423,7 @@ def opacity_radial_method_multi(result_dic, SEP, iter_list,
             # plt.ylabel(P['Ne'])
             plt.title('Electron density with fits')
             plt.legend()
+    
 
 
     
