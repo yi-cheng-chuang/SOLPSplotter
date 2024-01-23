@@ -9,7 +9,7 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
                'Parameters': P, 'DefaultSettings': DP, 
                'Publish': 'b2plottersetting'}
     return set_dic
@@ -39,7 +39,7 @@ def mast_comp_dic_withshift():
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
-    series = ['72_n100000_n5e3et1e2_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
+    series = ['72_n100000_m12n8e3_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
               '12_n100000_2_dot7_a', '31_n100000_2_one_a']
     # series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
     #           '12_n100000_2_dot7_a', '31_n100000_2_one_a']
@@ -138,38 +138,6 @@ def loadDS_dic(DEV):
     
 
 A = ['39']
-
-def opacity_study_unit():
-    unit = {'efold_length_psiN': 'efold length psiN',
-            'pedestal_width_psiN': 'Pedestal width psiN',
-              'dimensionless_opaqueness': 'dimensionless opaqueness', 
-              'neutral_density': 'neutral density ${n_D}$ (m$^{-3}$)', 
-              'electron_pedestal_density': 'electron pedestal density: $n_{ped}$ (m$^{-3}$)',
-              'temperature_pedestal_width': 'temperature pedestal width: $\Delta T$: [m]',
-              'flux_expansion': 'flux_expansion',
-              'efold_length': 'efold length: $\lambda_{n_D}$: [mm]',
-              'pedestal_width': 'Pedestal width: $\Delta n$: [mm]',
-              
-              }
-    return unit
-
-
-def transport_coe_unit():
-    transcoe_unit = {
-       '1':['Particle density-driven diffusivity','Density-driven diffusivity: D (m$^{2}$/s)'],
-       '3':['Ion thermal anomalous diffusivity', 'Ion thermal diffusivity: ${\chi_i}$ (m$^{2}$/s)'],
-       '4':['Electron thermal anomalous diffusivity', 'Electron thermal diffusivity: ${\chi_e}$ (m$^{2}$/s)'], 
-           
-        }
-    
-    return transcoe_unit
-
-
-
-
-
-
-
 
 
 
