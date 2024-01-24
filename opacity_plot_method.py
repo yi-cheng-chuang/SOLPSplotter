@@ -98,6 +98,7 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
                           label= 'aspect ratio = {}'.format(change_ver_dic[aa]))
                     plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[i], 
                                                       max(pol_loc[aa]), min(pol_loc[aa])))
+                    plt.xlabel('poloidal angle')
                     plt.legend()
 
                 elif i == 'pedestal_width' or i == 'efold_length':
@@ -139,6 +140,7 @@ def opacity_plot(pol_loc, result_dic, unit_dic, log_flag, charactor,
             else:
                 pass
             # plt.ylabel('{}'.format(unit_dic[i]))
+            plt.legend()
             
         elif withshift == False and withseries == True:
             for aa in iter_list:
