@@ -138,13 +138,17 @@ class transport_coefficient_adjustment(load_geometry):
                     plt.figure(figsize=(7,7))
                     color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                                  'dot7': 'blue', 'one': 'purple'}
+                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                              'dot7': '2.8', 'one': '3.4'}
                     for ab in self.data['dircomp']['multi_shift']: 
                         # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
                         #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
-                        plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab] )
+                        plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
+                                 'o-', color= color_dic[ab], 
+                                 label = 'aspect ratio = {}'.format(A_dic[ab]))
                         plt.xlabel('psiN')
                         plt.title('radial {} coefficient'.format(coe_label_dic[k]))
-                        # plt.legend() 
+                        plt.legend() 
                 plt.show()
         else:
             print('transport_coe_align_plot is not there yet')
@@ -152,7 +156,6 @@ class transport_coefficient_adjustment(load_geometry):
     
     def transport_coe_compare_plot(self, file_loc_list, plot_compare):
         trans_dic = {}
-        jxa = self.data['b2mn']['jxa']
         psi_1d_dic = {}
         for fl in file_loc_list:
             fname = fl.rsplit("/",1)[1]
