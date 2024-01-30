@@ -288,7 +288,7 @@ class load_expdata(load_geometry):
             
         
             
-class load_outputgen_data(load_expdata):
+class load_simu_data(load_expdata):
     
     def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
         load_expdata.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS)
@@ -449,8 +449,25 @@ class load_outputgen_data(load_expdata):
     def load_b2fstate(self):
         if self.withshift == False and self.withseries == False:
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], 'b2fstate')
-            state = lbdm.read_b2fstate_Bob(fname = file_loc)
-            self.data['b2fstate'] = state
+            state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+            state_dic = vars(state)
+            dim_dic = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+            self.data['b2fstate'] = state_dic
+            self.data['DefaultSettings']['dims'] = dim_dic
+            # self.b2fstate = state
+        
+        elif self.withshift == True and self.withseries == False:
+            state_dic = {}
+            dim_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
+                state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+                state_dic[aa] = vars(state)
+                dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+
+            self.data['b2fstate'] = state_dic
+            self.data['DefaultSettings']['dims'] = dim_dic
             # self.b2fstate = state
         
         else:
@@ -459,15 +476,34 @@ class load_outputgen_data(load_expdata):
     def load_b2fplasmf(self):
         if self.withshift == False and self.withseries == False:
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], 'b2fplasmf')
-            n_pol = self.data['b2fgeo']['nx']
-            n_rad = self.data['b2fgeo']['ny']
-            n_sp = self.data['b2fstate']['ns']
+            dim_dic = self.data['DefaultSettings']['dims']
+            n_pol = dim_dic['nx']
+            n_rad = dim_dic['ny']
+            n_sp = dim_dic['ns']
             fplasma = lbdm.read_b2fplasmf(fileName = file_loc, nx = n_pol, 
                                           ny = n_rad, ns = n_sp)
-            k = vars(fplasma)
-            self.data['b2fplasmf'] = k
-            print('the next line is b2fplasmf')
-            print(type(k))
+            fplasma_dic = vars(fplasma)
+            self.data['b2fplasmf'] = fplasma_dic
+            # print('the next line is b2fplasmf')
+            # print(type(k))
+        
+        elif self.withshift == True and self.withseries == False:
+            fplasma_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fplasmf')
+                dim_dic = self.data['DefaultSettings']['dims']
+                n_pol = dim_dic[aa]['nx']
+                n_rad = dim_dic[aa]['ny']
+                n_sp = dim_dic[aa]['ns']
+                fplasma = lbdm.read_b2fplasmf(fileName = file_loc, nx = n_pol, 
+                                              ny = n_rad, ns = n_sp)
+                fplasma_dic[aa] = vars(fplasma)
+                
+                
+            self.data['b2fplasmf'] = fplasma_dic
+            
+        
         
         else:
             print('load_b2fplasmf function is not there yet!')
