@@ -69,7 +69,7 @@ def read_field(f,fieldname,dims,intField=False):
     return fieldVal
 
 
-def read_b2fstate_Eric(b2fstateLoc):
+def read_b2fstate(b2fstateLoc):
     '''reads b2fstate and returns a class of the data
     b2fstateLoc is the file path to b2fgmtry i.e "/path/to/b2fstate"'''
     fieldname = 'nx,ny'
@@ -125,73 +125,7 @@ def read_b2fstate_Eric(b2fstateLoc):
     # Close file
     fid.close()
     print('done reading state file')
-    return state
-
-def read_b2fstate(b2fstateLoc):
-    '''reads b2fstate and returns a class of the data
-    b2fstateLoc is the file path to b2fgmtry i.e "/path/to/b2fstate"'''
-    fieldname = 'nx,ny'
-    fid = open(b2fstateLoc)
-    line = fid.readline().rstrip()#read the first line
-    version = line[7:17]
-    print('read_b2fstate -- file version '+version)#check the version
-    dim = read_field(fid,'nx,ny,ns',3,True)#check the grid size
-    nx  = dim[0]
-    ny  = dim[1]
-    ns  = dim[2]
-    fluxdim  = [nx+2,ny+2,2]
-    fluxdimp = [nx+2,ny+2]
-    fluxdims = [nx+2,ny+2,2,ns]
-    if (version >= '03.001.000'):
-        fluxdim  = [nx+2,ny+2,2,2]
-        fluxdimp = fluxdim
-        fluxdims = [nx+2,ny+2,2,2,ns]
-    #initialize class that will hold all the data of b2fstate
-    #note that it is read in order that it appears in the file, adding a variable won't work unless it is put in order that it appears in the file
-    
-    # Read charges etc.
-
-    zamin = read_field(fid,'zamin',ns)
-    zamax = read_field(fid,'zamax',ns)
-    zn    = read_field(fid,'zn',ns)
-    am    = read_field(fid,'am',ns)
-
-    # Read state variables
-
-    na     = read_field(fid,'na',[nx+2,ny+2,ns])
-    ne     = read_field(fid,'ne',[nx+2,ny+2])
-    ua     = read_field(fid,'ua',[nx+2,ny+2,ns])
-    uadia  = read_field(fid,'uadia',[nx+2,ny+2,2,ns])
-    te     = read_field(fid,'te',[nx+2,ny+2])
-    ti     = read_field(fid,'ti',[nx+2,ny+2])
-    po     = read_field(fid,'po',[nx+2,ny+2])
-
-    # Read fluxes
-
-    fna    = read_field(fid,'fna',fluxdims)
-    fhe    = read_field(fid,'fhe',fluxdim)
-    fhi    = read_field(fid,'fhi',fluxdim)
-    fch    = read_field(fid,'fch',fluxdim)
-    fch_32 = read_field(fid,'fch_32',fluxdim)
-    fch_52 = read_field(fid,'fch_52',fluxdim)
-    kinrgy = read_field(fid,'kinrgy',[nx+2,ny+2,ns])
-    time   = read_field(fid,'time',1)
-    fch_p  = read_field(fid,'fch_p',fluxdimp)
-            
-    # state = {'zamin': zamin, 'zamax': zamax, 'na': na, 'ne': ne, 'zn': zn, am
-    # ne     = read_field(fid,'ne',[nx+2,ny+2])
-    # ua     = read_field(fid,'ua',[nx+2,ny+2,ns])
-    # uadia  = read_field(fid,'uadia',[nx+2,ny+2,2,ns])
-    # te     = read_field(fid,'te',[nx+2,ny+2])
-    # ti     = read_field(fid,'ti',[nx+2,ny+2])
-    # po}
-    
-    state = {}
-    
-    print('done reading state file')
-    return state
-
-
+    return state, dim
 
 
 
