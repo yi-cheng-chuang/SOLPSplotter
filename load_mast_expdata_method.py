@@ -49,11 +49,12 @@ def mast_withshift_dir():
     basedrt, topdrt, tpdrt= sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
-    basedrt, topdrt, tpdrt= sps.set_wdir()
     shift_list = list(mwd['shift_dic'].keys())
     # print(type(shift_list))
     a_shift = mwd['multi_shift']
-    mastdic = {}
+    simudir_dic = {}
+    simutop_dic = {}
+    outputdir_dic = {}
     att_dic = {}
     for aa in a_shift:
         for s in shift_list:
@@ -70,12 +71,14 @@ def mast_withshift_dir():
                  
                 att_dic[aa] = str(sps.s_number(adir['Output'], series_flag= None)[0])
                 
-                mastdic[aa] = {'simudir': newbase, 'simutop': tbase, 
-                               'outputdir': adir}
+                simudir_dic[aa] = newbase
+                simutop_dic[aa] = tbase
+                outputdir_dic[aa] = adir
     
     mast_withshift_dir_dic = {'basedrt': basedrt, 'topdrt': topdrt, 
                               'gbase': gbase, 'gdir': gdir, 
-                              'infolderdir': mastdic}
+                              'simudir': simudir_dic, 'simutop': simutop_dic, 
+                              'outputdir': outputdir_dic}
     
     
     return mast_withshift_dir_dic, att_dic
