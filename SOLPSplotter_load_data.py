@@ -455,6 +455,25 @@ class load_outputgen_data(load_expdata):
         
         else:
             print('load_b2fstate function is not there yet!')
+    
+    def load_b2fplasmf(self):
+        if self.withshift == False and self.withseries == False:
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], 'b2fplasmf')
+            n_pol = self.data['b2fgeo']['nx']
+            n_rad = self.data['b2fgeo']['ny']
+            n_sp = self.data['b2fstate']['ns']
+            fplasma = lbdm.read_b2fplasmf(fileName = file_loc, nx = n_pol, 
+                                          ny = n_rad, ns = n_sp)
+            k = vars(fplasma)
+            self.data['b2fplasmf'] = k
+            print('the next line is b2fplasmf')
+            print(type(k))
+        
+        else:
+            print('load_b2fplasmf function is not there yet!')
+            
+            
+            
             
             
     
