@@ -26,6 +26,7 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
+xl.load_b2fplasmf()
 # xl.load_vessel()
 # xl.flux_comparison_plot()
 
@@ -33,7 +34,7 @@ xl.load_b2fstate()
 
 # xl.calcpsi()
 
-plot_flag = 'poloidal'
+plot_flag = 'skip'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
