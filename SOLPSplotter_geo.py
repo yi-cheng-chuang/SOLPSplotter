@@ -21,7 +21,7 @@ class load_geometry(load_directory):
         load_directory.__init__(self, DEV, withshift, 
                                         withseries, DefaultSettings)
                 
-#loadgeometry
+
 
    
     def check_b2mn(self, itername):
@@ -45,7 +45,7 @@ class load_geometry(load_directory):
             else:
                 pass
                 
-                   
+#loadgeometry                  
     """
     loadb2fgmtry method for single case, changing aspect ratio cases and 
     changing density cases
@@ -172,6 +172,127 @@ class load_geometry(load_directory):
     changing density cases
        
     """ 
+    
+    def calcpsi_method_avcr(self, geo, psi_RBS):
+        
+        pol_range = int(geo['nx'] + 2)
+        rad_range = int(geo['ny'] + 2)
+        psival = np.zeros((rad_range, pol_range))
+        
+        # Assuming you have four 98x38 matrices stored in variables
+
+        # Replace these with your actual matrices or generate them as needed
+        
+        crLowerLeft = geo['crx'][:,:,0]
+        crLowerRight = geo['crx'][:,:,1]
+        crUpperLeft = geo['crx'][:,:,2]
+        crUpperRight = geo['crx'][:,:,3]
+        czLowerLeft = geo['cry'][:,:,0]
+        czLowerRight = geo['cry'][:,:,1]
+        czUpperLeft = geo['cry'][:,:,2]
+        czUpperRight = geo['cry'][:,:,3]
+        
+        
+        # Create a list of matrices
+        crx_collect = [crLowerLeft, crLowerRight, crUpperLeft, crUpperRight]
+        cry_collect = [czLowerLeft, czLowerRight, czUpperLeft, czUpperRight]
+        
+        # Convert the list of matrices to a NumPy array
+        crx_array = np.array(crx_collect)
+        cry_array = np.array(cry_collect)
+        
+        # Calculate the average along the first axis (axis=0) to get the desired matrix
+        rad_mean = np.mean(crx_array, axis = 0)
+        vert_mean = np.mean(cry_array, axis = 0)
+        
+        
+        rad_loc = rad_mean.transpose()
+        vert_loc = vert_mean.transpose()
+        
+        # Now, average_matrix contains the average values of the corresponding elements in the four matrices
+        self.data['grid_check'] = rad_loc
+        for pol_loc in range(pol_range):
+            for i in range(rad_range):
+                # print(i)
+                psival[i, pol_loc] = psi_RBS(rad_loc[i, pol_loc], 
+                                                      vert_loc[i, pol_loc])
+        
+        
+        
+        return rad_loc, vert_loc, psival, pol_range, rad_range
+    
+    
+    def calcpsi_avcr(self):
+            
+        if self.withshift == False and self.withseries == False:
+            
+            b2fgeo = self.data['b2fgeo']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            
+            
+            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method_avcr(geo = b2fgeo, 
+                                                                    psi_RBS = psiNinterp_RBS)
+            
+            
+            coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
+            self.data['grid']['avcr'] = coord_dic
+            self.data['psi']['psival'] = psival
+            self.data['DefaultSettings']['XDIM'] = pol_range
+            self.data['DefaultSettings']['YDIM'] = rad_range
+        
+        elif self.withshift == True and self.withseries == False:
+            psival_dic = {}
+            RadLoc_dic = {}
+            VertLoc_dic = {}
+            xdim_dic = {}
+            ydim_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                b2fgeo = self.data['b2fgeo'][aa]
+                psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
+                
+                RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method_avcr(geo = b2fgeo, 
+                                                                    psi_RBS = psiNinterp_RBS)
+                
+                psival_dic[aa] = psival
+                RadLoc_dic[aa] = RadLoc
+                VertLoc_dic[aa] = VertLoc
+                xdim_dic[aa] = pol_range
+                ydim_dic[aa] = rad_range
+            
+            coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
+            self.data['grid']['avcr'] = coord_dic
+            self.data['psi']['psival'] = psival_dic
+            self.data['DefaultSettings']['XDIM'] = xdim_dic
+            self.data['DefaultSettings']['YDIM'] = ydim_dic
+                
+            
+        elif self.withshift == False and self.withseries == True:
+
+            b2fgeo = self.data['b2fgeo']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            
+            
+            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(geo = b2fgeo, 
+                                                                psi_RBS = psiNinterp_RBS)
+            
+            coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
+            self.data['grid']['avcr'] = coord_dic
+            self.data['psi']['psival'] = psival       
+            self.data['DefaultSettings']['XDIM'] = pol_range
+            self.data['DefaultSettings']['YDIM'] = rad_range
+        
+        elif self.withshift == True and self.withseries == True:
+            print('calcpsi_avcr function is not there yet!')
+        
+        else:
+            print('calcpsi_avcr function has a bug')
+
+
+    
+
+#-----------------------------------------------------------------------------
+    
 
     def calcpsi_method(self, rad_range, pol_range, psi_RBS, attempt_number, outputdir):
                
@@ -182,7 +303,7 @@ class load_geometry(load_directory):
         VertLoc = np.loadtxt('{}/VertLoc{}'.format(outputdir, str(attempt_number)), 
                       usecols = (3)).reshape((rad_range, pol_range))
         
-        coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
+        # coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
             
         for pol_loc in range(pol_range):
             for i in range(rad_range):
@@ -206,11 +327,12 @@ class load_geometry(load_directory):
             Attempt = self.data['dircomp']['Attempt']
             DRT = self.data['dirdata']['outputdir']['Output']
             
-                
-            
+
             RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(rad_range = n_rad, 
                                 pol_range = n_pol, psi_RBS = psiNinterp_RBS, 
                                 attempt_number = Attempt, outputdir = DRT)
+            
+            
             coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival
@@ -236,6 +358,7 @@ class load_geometry(load_directory):
                 RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(rad_range = n_rad, 
                                     pol_range = n_pol, psi_RBS = psiNinterp_RBS, 
                                     attempt_number = Attempt, outputdir = DRT)
+                
                 psival_dic[aa] = psival
                 RadLoc_dic[aa] = RadLoc
                 VertLoc_dic[aa] = VertLoc
@@ -258,8 +381,6 @@ class load_geometry(load_directory):
             n_rad = int(self.data['b2fgeo']['ny'] + 2)
             # print('ydim is {}'.format(rad_range))
             psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
-            # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
             Attempt = self.data['dircomp']['Attempt'][series_rep]
             DRT = self.data['dirdata']['outputdir'][series_rep]['Output']
             
@@ -273,6 +394,13 @@ class load_geometry(load_directory):
             self.data['psi']['psival'] = psival       
             self.data['DefaultSettings']['XDIM'] = pol_range
             self.data['DefaultSettings']['YDIM'] = rad_range
+        
+        elif self.withshift == True and self.withseries == True:
+            print('calcpsi function is not there yet!')
+        
+        else:
+            print('calcpsi function has a bug!')
+        
     
 
 #----------------------------------------------------------------------------
@@ -341,50 +469,13 @@ class load_geometry(load_directory):
    
 #1D psi function mapping  
 
-    def calcpsi_1D_method(self, itername, pol_loc, no_coord_avg_check):
+    def calcpsi_1D_method(self, geo, psiNinterp_dic, pol_loc, no_coord_avg_check, grid_data):
         
-            
-        if self.withshift == False and self.withseries == False:
-            
-            geo = self.data['b2fgeo']
-            pol_range = int(self.data['b2fgeo']['nx'] + 2)
-            # print('xdim is {}'.format(str(pol_range)))
-            rad_range = int(self.data['b2fgeo']['ny'] + 2)
-            # print('ydim is {}'.format(str(rad_range)))
-            # self.data['DefaultSettings']['XDIM'] = pol_range
-            # self.data['DefaultSettings']['YDIM'] = rad_range
-            psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
-            psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            
-        elif self.withshift == True and self.withseries == False:
-            
-            geo = self.data['b2fgeo'][itername]
-            pol_range = int(self.data['b2fgeo'][itername]['nx'] + 2)
-            # print('xdim is {}'.format(str(pol_range)))
-            rad_range = int(self.data['b2fgeo'][itername]['ny'] + 2)
-            # print('ydim is {}'.format(str(rad_range)))
-            # self.data['DefaultSettings']['XDIM'][itername] = pol_range
-            # self.data['DefaultSettings']['YDIM'][itername] = rad_range
-            psiNinterp_RGI = self.data['gfile']['gcomp'][itername]['interp_dic']['RGI'] 
-            psiNinterp_2d = self.data['gfile']['gcomp'][itername]['interp_dic']['2d']
-            psiNinterp_RBS = self.data['gfile']['gcomp'][itername]['interp_dic']['RBS']
         
-        elif self.withshift == False and self.withseries == True:
-            
-            geo = self.data['b2fgeo']
-            pol_range = int(self.data['b2fgeo']['nx'] + 2)
-            # print('xdim is {}'.format(str(pol_range)))
-            rad_range = int(self.data['b2fgeo']['ny'] + 2)
-            # print('ydim is {}'.format(str(rad_range)))
-            # self.data['DefaultSettings']['XDIM'] = pol_range
-            # self.data['DefaultSettings']['YDIM'] = rad_range
-            psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
-            psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            
-                       
-        # print(type(psiNinterp_RBS))
+        rad_range = int(geo['ny'] + 2)
+        psiNinterp_RGI = psiNinterp_dic['RGI'] 
+        psiNinterp_2d = psiNinterp_dic['2d']
+        psiNinterp_RBS = psiNinterp_dic['RBS']
         
         
         pol_index = int(pol_loc)
@@ -467,42 +558,16 @@ class load_geometry(load_directory):
         #                                 psi_LR_GF, psi_UR_GF])
         
         
-        if no_coord_avg_check == True:
-            
-            if self.withshift == False and self.withseries == False:
-                if self.data['psi']['psival'] == None:
-                    self.calcpsi()
-                    crloc = self.data['psi']['psival'][:, pol_index]
-                    czloc = self.data['psi']['psival'][:, pol_index]
-                else:
-                    crloc = self.data['psi']['psival'][:, pol_index]
-                    czloc = self.data['psi']['psival'][:, pol_index]
-            
-            elif self.withshift == True and self.withseries == False:
-                if self.data['psi']['psival'][itername] == None:
-                    self.calcpsi()
-                    crloc = self.data['psi']['psival'][itername][:, pol_index]
-                    czloc = self.data['psi']['psival'][itername][:, pol_index]
-                else:
-                    crloc = self.data['psi']['psival'][itername][:, pol_index]
-                    czloc = self.data['psi']['psival'][itername][:, pol_index]
-            
-            elif self.withshift == False and self.withseries == True:
-                if self.data['psi']['psival'] == None:
-                    self.calcpsi()
-                    crloc = self.data['psi']['psival'][:, pol_index]
-                    czloc = self.data['psi']['psival'][:, pol_index]
-                else:
-                    crloc = self.data['psi']['psival'][:, pol_index]
-                    czloc = self.data['psi']['psival'][:, pol_index]
-            
-            elif self.withshift == True and self.withseries == True:
-                print('calcpsi_1D_method function is not there yet!')
-            
-            else:
-                print('calcpsi_1D_method function has a bug')
-            
+        if no_coord_avg_check:
                    
+            if self.data['psi']['psival'] == None:
+                self.calcpsi()
+                crloc = grid_data[:, pol_index]
+                czloc = grid_data[:, pol_index]
+            else:
+                crloc = grid_data[:, pol_index]
+                czloc = grid_data[:, pol_index]
+            
             psi_solps_cp = np.zeros(rad_range)
             # psi_solps_cp = psiNinterp_RBS(crloc, czloc)
             for i in range(rad_range):
@@ -522,8 +587,7 @@ class load_geometry(load_directory):
             psival[:, 2] = psi_solps_RBS
         
         
-        # index_dic = self.calc_sep_index(psi = psi_solps_RBS, rad_range = rad_range)
-        
+        # index_dic = self.calc_sep_index(psi = psi_solps_RBS, rad_range = rad_range)        
         # self.data['DefaultSettings']['SEP'] = index_dic['index'][0]
         
         return psival
@@ -533,24 +597,50 @@ class load_geometry(load_directory):
     def calcpsi_1D(self, pol_loc, no_coord_avg_check):
         
         if self.withshift == False and self.withseries == False:
-            psival = self.calcpsi_1D_method(itername = None, pol_loc = pol_loc, 
-                                            no_coord_avg_check = no_coord_avg_check)
+            
+            if self.withshift == False and self.withseries == False:
+                
+                b2fgeo = self.data['b2fgeo']
+                Interp_dic = self.data['gfile']['gcomp']['interp_dic']
+                psiN = self.data['psi']['psival']
+                
+            
+            psival = self.calcpsi_1D_method(geo = b2fgeo, psiNinterp_dic = Interp_dic, 
+                        pol_loc = pol_loc, no_coord_avg_check = no_coord_avg_check, 
+                        grid_data = psiN)
+            
+            
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
         
         elif self.withshift == True and self.withseries == False:
             
             psival_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                psival = self.calcpsi_1D_method(itername = aa, pol_loc = pol_loc, 
-                                         no_coord_avg_check = no_coord_avg_check)
+                
+                b2fgeo = self.data['b2fgeo'][aa]
+                Interp_dic = self.data['gfile']['gcomp'][aa]['interp_dic'] 
+                psiN = self.data['psi']['psival'][aa]
+                
+                
+                psival = self.calcpsi_1D_method(geo = b2fgeo, psiNinterp_dic = Interp_dic, 
+                            pol_loc = pol_loc, no_coord_avg_check = no_coord_avg_check, 
+                            grid_data = psiN)
+                
                 psival_dic[aa] = psival
             
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival_dic
                    
         elif self.withshift == True and self.withseries == False:
-            series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
-            psival = self.calcpsi_1D_method(itername = series_rep, pol_loc = pol_loc, 
-                                        no_coord_avg_check = no_coord_avg_check)
+            
+            
+            b2fgeo = self.data['b2fgeo']
+            Interp_dic = self.data['gfile']['gcomp']['interp_dic'] 
+            psiN = self.data['psi']['psival']
+            
+            
+            psival = self.calcpsi_1D_method(geo = b2fgeo, psiNinterp_dic = Interp_dic, 
+                        pol_loc = pol_loc, no_coord_avg_check = no_coord_avg_check, 
+                        grid_data = psiN)
                 
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival
         
