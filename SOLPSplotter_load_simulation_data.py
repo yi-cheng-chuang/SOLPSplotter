@@ -86,7 +86,7 @@ class load_simu_data(load_expdata):
             XDIM = int(self.data['DefaultSettings']['XDIM'])
             YDIM = int(self.data['DefaultSettings']['YDIM'])
         elif self.withshift == True and self.withseries == False:
-            BASEDRT = self.data['dirdata']['infolderdir'][itername]['outputdir']['Output']
+            BASEDRT = self.data['dirdata']['outputdir'][itername]['Output']
             Attempt = self.data['dircomp']['Attempt'][itername]
             XGrid = int(self.data['b2fgeo'][itername]['nx'])
             # print(XGrid)
