@@ -210,7 +210,7 @@ class load_geometry(load_directory):
         vert_loc = vert_mean.transpose()
         
         # Now, average_matrix contains the average values of the corresponding elements in the four matrices
-        self.data['grid_check'] = rad_loc
+        # self.data['grid_check'] = rad_loc
         for pol_loc in range(pol_range):
             for i in range(rad_range):
                 # print(i)
@@ -235,7 +235,7 @@ class load_geometry(load_directory):
             
             
             coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
-            self.data['grid']['avcr'] = coord_dic
+            self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival
             self.data['DefaultSettings']['XDIM'] = pol_range
             self.data['DefaultSettings']['YDIM'] = rad_range
@@ -261,7 +261,7 @@ class load_geometry(load_directory):
                 ydim_dic[aa] = rad_range
             
             coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
-            self.data['grid']['avcr'] = coord_dic
+            self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival_dic
             self.data['DefaultSettings']['XDIM'] = xdim_dic
             self.data['DefaultSettings']['YDIM'] = ydim_dic
@@ -277,7 +277,7 @@ class load_geometry(load_directory):
                                                                 psi_RBS = psiNinterp_RBS)
             
             coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
-            self.data['grid']['avcr'] = coord_dic
+            self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival       
             self.data['DefaultSettings']['XDIM'] = pol_range
             self.data['DefaultSettings']['YDIM'] = rad_range
