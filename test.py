@@ -7,7 +7,6 @@ Created on Fri Jul 14 22:34:31 2023
 
 import xarray as xr
 import numpy as np
-import load_mast_expdata_method as lmem
 
 a = np.zeros([2, 2, 1])
 b = np.ones([2, 2])
@@ -36,6 +35,13 @@ for i in mod:
     A = (0.7 + i)/0.5
     print(A)
 
+test_zero = np.zeros(10)
+test_ones = np.ones(10)
+test_id = np.identity(4, dtype=int)
+
+test_value = np.all(test_id == 0)
+
+print('the test result is: {}'.format(test_value))
 
 
 
