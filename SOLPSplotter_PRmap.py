@@ -5,7 +5,7 @@ Created on Tue Sep 26 17:27:01 2023
 @author: user
 """
 
-from SOLPSplotter_load_data import load_simu_data
+from SOLPSplotter_load_simulation_data import load_simu_data
 import matplotlib.pyplot as plt
 import load_coord_method as lcm
 import fitting_method as fm 
