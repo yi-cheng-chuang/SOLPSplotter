@@ -19,7 +19,8 @@ xl = spc.PlotContour(DEV = d['DEV'], withshift= d['withshift'], withseries= d['w
 xl.set_plot()
 xl.load_mast_dir()
 xl.load_solpsgeo()
-xl.calcpsi()
+# xl.calcpsi()
+xl.calcpsi_avcr()
 xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
 fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
                           'plot_exp_and_fit': True, 'plot_shift_compare': False,
