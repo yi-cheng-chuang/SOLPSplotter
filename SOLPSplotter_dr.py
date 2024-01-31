@@ -29,6 +29,10 @@ xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
 xl.load_b2fplasmf()
 xl.b2fplasmf_filter()
+xl.load_output_data(param= 'Te')
+
+poloidal_index_list = ['59']
+xl.opacity_data_fit
 # xl.load_vessel()
 # xl.flux_comparison_plot()
 
