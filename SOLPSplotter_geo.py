@@ -23,30 +23,7 @@ class load_geometry(load_directory):
                 
 #loadgeometry
 
-    """
-    loadb2mn method for single case, changing aspect ratio cases and 
-    changing density cases
-    
-    """
-
-    def loadb2mn_method(self, itername):
-               
-        try:
-            if self.withshift == False and self.withseries == False:
-                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
-                                      + '/b2mn.dat')
-            elif self.withshift == True and self.withseries == False:
-                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
-                                          + '/b2mn.dat')
-            elif self.withshift == False and self.withseries == True:
-                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
-                                      + '/b2mn.dat')
-        except:
-            print('can not generate b2mn')
-        
-        return b2mn
-    
-    
+   
     def check_b2mn(self, itername):
         if self.withshift == False and self.withseries == False:
             if self.data['b2mn']['jxa'] == None:
@@ -75,49 +52,34 @@ class load_geometry(load_directory):
     
     """
 
-    def loadgeo_method(self, itername):
+    def loadgeo_method(self, attempt_loc, simufile_loc, g_data, shift_value):
         
         try:
-            if self.withshift == False and self.withseries == False:
-                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
-                                       + '/baserun/b2fgmtry')
-            elif self.withshift == True and self.withseries == False:
-                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'][itername] 
-                                           + '/baserun/b2fgmtry')
-            elif self.withshift == False and self.withseries == True:
-                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
-                                           + '/baserun/b2fgmtry')
+            b2mn = lcm.scrape_b2mn(attempt_loc + '/b2mn.dat')
+            
+        except:
+            print('can not generate b2mn')
+        
+            
+        try:
+            geo = lcm.read_b2fgmtry(simufile_loc + '/baserun/b2fgmtry')
             # print(type(geo))
         except:
             print('can not generate geo')
-
         
-        g = lcm.loadg(self.data['dirdata']['gbase'] 
-                               + '/MAST__RMP_results/g027205.00275_efitpp')
-        # g = lcm.loadg(self.data['dirdata']['gdir'][0])
-        psiN = (g['psirz'] - g['simag']) / (g['sibry'] - g['simag'])
+        psiN = (g_data['psirz'] - g_data['simag']) / (g_data['sibry'] - g_data['simag'])
 
-        dR = g['rdim'] / (g['nw'] - 1)
-        dZ = g['zdim'] / (g['nh'] - 1)
+        dR = g_data['rdim'] / (g_data['nw'] - 1)
+        dZ = g_data['zdim'] / (g_data['nh'] - 1)
         
-        gZ = np.zeros(g['nh'])
-        for i in range(g['nh']):
-            gZ[i] = g['zmid'] - 0.5 * g['zdim'] + i * dZ
+        gZ = np.zeros(g_data['nh'])
+        for i in range(g_data['nh']):
+            gZ[i] = g_data['zmid'] - 0.5 * g_data['zdim'] + i * dZ
                 
-        if self.withshift == False and self.withseries == False:
-            shift = self.data['dircomp']['shift_value']
-            # print(shift)
-        elif self.withshift == True and self.withseries == False:
-            shift = self.data['dircomp']['shift_dic'][itername]
-            # print(shift)
-        elif self.withshift == False and self.withseries == True:
-            shift = self.data['dircomp']['shift_value']
-            # print(shift)
-            
-        
-        gR = np.zeros(g['nw'])
-        for i in range(g['nw']):
-            gR[i] = g['rleft'] + i * dR + float(shift)
+
+        gR = np.zeros(g_data['nw'])
+        for i in range(g_data['nw']):
+            gR[i] = g_data['rleft'] + i * dR + float(shift_value)
             
 
         psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
@@ -134,7 +96,7 @@ class load_geometry(load_directory):
                     'check': 'yeah! shift is {} and series is {}'.format(self.withshift, self.withseries),
                     'interp_dic': interp_dic}
             
-        return geo, gfilesum
+        return b2mn, geo, gfilesum
             
     """
     load_solpsgeo function is to load the geometric file for solps and is
@@ -143,17 +105,22 @@ class load_geometry(load_directory):
     """     
     def load_solpsgeo(self):
         
-        # g = lcm.loadg(self.data['dirdata']['gdir'][0])
-        g = lcm.loadg(self.data['dirdata']['gbase'] 
-                               + '/MAST__RMP_results/g027205.00275_efitpp')
-        self.data['gfile']['g'] = g
+        g_loc = self.data['dirdata']['gbase'] + '/MAST__RMP_results/g027205.00275_efitpp'
+        gfile_data = lcm.loadg(g_loc)
+        self.data['gfile']['g'] = gfile_data
         
         
         if self.withshift == False and self.withseries == False:
-            b2mn = self.loadb2mn_method(itername= None)
+            simudir = self.data['dirdata']['simudir']
+            simutop = self.data['dirdata']['simutop']
+            shift = self.data['dircomp']['shift_value']
+            
+            b2mn, geo, g, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
+                            simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
+            
             self.data['b2mn'] = b2mn
-            geo, gfilesum = self.loadgeo_method(itername= None)
             self.data['b2fgeo'] = geo
+            self.data['gfile']['g'] = g
             self.data['gfile']['gcomp'] = gfilesum
             
         elif self.withshift == True and self.withseries == False:
@@ -161,9 +128,13 @@ class load_geometry(load_directory):
             geo_dic = {}
             gfilesum_dic = {}
             for shiftname in self.data['dircomp']['multi_shift']:
-                b2mn = self.loadb2mn_method(itername= shiftname)
+                
+                simudir = self.data['dirdata']['simudir'][shiftname]
+                simutop = self.data['dirdata']['simutop'][shiftname]
+                shift = self.data['dircomp']['shift_dic'][shiftname]
+                b2mn, geo, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
+                        simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
                 b2mn_dic[shiftname] = b2mn
-                geo, gfilesum = self.loadgeo_method(itername= shiftname)
                 geo_dic[shiftname] = geo
                 gfilesum_dic[shiftname] = gfilesum
             
@@ -174,10 +145,14 @@ class load_geometry(load_directory):
         elif self.withshift == False and self.withseries == True:
             
             seriesname = list(self.data['dircomp']['Attempt'].keys())[0]
-            b2mn = self.loadb2mn_method(itername= seriesname)
+            simudir = self.data['dirdata']['simudir'][seriesname]
+            simutop = self.data['dirdata']['simutop']
+            shift = self.data['dircomp']['shift_value']                          
+            b2mn, geo, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
+                    simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
+            
+            
             self.data['b2mn'] = b2mn
-                
-            geo, gfilesum = self.loadgeo_method(itername= None) 
             self.data['b2fgeo'] = geo
             self.data['gfile']['gcomp'] = gfilesum
                             
@@ -198,47 +173,13 @@ class load_geometry(load_directory):
        
     """ 
 
-    def calcpsi_method(self, itername):
-        
-        if self.withshift == False and self.withseries == False:
-            pol_range = int(self.data['b2fgeo']['nx'] + 2)
-            # print('xdim is {}'.format(pol_range))
-            rad_range = int(self.data['b2fgeo']['ny'] + 2)
-            # print('ydim is {}'.format(rad_range))
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
-            # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
-            Attempt = self.data['dircomp']['Attempt']
-            DRT = self.data['dirdata']['outputdir']['Output']
-            
-            
-        elif self.withshift == True and self.withseries == False:
-            pol_range = int(self.data['b2fgeo'][itername]['nx'] + 2)
-            # print('xdim is {}'.format(str(pol_range)))
-            rad_range = int(self.data['b2fgeo'][itername]['ny'] + 2)
-            # print('ydim is {}'.format(str(rad_range)))
-            psiNinterp_RBS = self.data['gfile']['gcomp'][itername]['interp_dic']['RBS']
-            Attempt = self.data['dircomp']['Attempt'][itername]
-            DRT = self.data['dirdata']['outputdir'][itername]['Output']
-            
-            
-        elif self.withshift == False and self.withseries == True:
-            pol_range = int(self.data['b2fgeo']['nx'] + 2)
-            # print('xdim is {}'.format(pol_range))
-            rad_range = int(self.data['b2fgeo']['ny'] + 2)
-            # print('ydim is {}'.format(rad_range))
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
-            # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
-            Attempt = self.data['dircomp']['Attempt'][itername]
-            DRT = self.data['dirdata']['outputdir'][itername]['Output']
-            
-            
+    def calcpsi_method(self, rad_range, pol_range, psi_RBS, attempt_number, outputdir):
+               
         psival = np.zeros((rad_range, pol_range))
        
-        RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
+        RadLoc = np.loadtxt('{}/RadLoc{}'.format(outputdir, str(attempt_number)),
                     usecols = (3)).reshape((rad_range, pol_range))
-        VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
+        VertLoc = np.loadtxt('{}/VertLoc{}'.format(outputdir, str(attempt_number)), 
                       usecols = (3)).reshape((rad_range, pol_range))
         
         coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
@@ -246,14 +187,30 @@ class load_geometry(load_directory):
         for pol_loc in range(pol_range):
             for i in range(rad_range):
                 # print(i)
-                psival[i, pol_loc] = psiNinterp_RBS(RadLoc[i, pol_loc], 
+                psival[i, pol_loc] = psi_RBS(RadLoc[i, pol_loc], 
                                                       VertLoc[i, pol_loc])
         return RadLoc, VertLoc, psival, pol_range, rad_range
+
+
                 
     def calcpsi(self):
             
-        if self.withshift == False and self.withseries == False:            
-            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(itername= None)
+        if self.withshift == False and self.withseries == False:
+            n_pol = int(self.data['b2fgeo']['nx'] + 2)
+            # print('xdim is {}'.format(pol_range))
+            n_rad = int(self.data['b2fgeo']['ny'] + 2)
+            # print('ydim is {}'.format(rad_range))
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
+            # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
+            Attempt = self.data['dircomp']['Attempt']
+            DRT = self.data['dirdata']['outputdir']['Output']
+            
+                
+            
+            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(rad_range = n_rad, 
+                                pol_range = n_pol, psi_RBS = psiNinterp_RBS, 
+                                attempt_number = Attempt, outputdir = DRT)
             coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival
@@ -267,7 +224,18 @@ class load_geometry(load_directory):
             xdim_dic = {}
             ydim_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(itername= aa)
+                
+                n_pol = int(self.data['b2fgeo'][aa]['nx'] + 2)
+                # print('xdim is {}'.format(str(pol_range)))
+                n_rad = int(self.data['b2fgeo'][aa]['ny'] + 2)
+                # print('ydim is {}'.format(str(rad_range)))
+                psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
+                Attempt = self.data['dircomp']['Attempt'][aa]
+                DRT = self.data['dirdata']['outputdir'][aa]['Output']
+                
+                RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(rad_range = n_rad, 
+                                    pol_range = n_pol, psi_RBS = psiNinterp_RBS, 
+                                    attempt_number = Attempt, outputdir = DRT)
                 psival_dic[aa] = psival
                 RadLoc_dic[aa] = RadLoc
                 VertLoc_dic[aa] = VertLoc
@@ -283,8 +251,23 @@ class load_geometry(load_directory):
             
         elif self.withshift == False and self.withseries == True:
             # print('we are working on calcpsi for series case')
+            
             series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
-            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(itername= series_rep)
+            n_pol = int(self.data['b2fgeo']['nx'] + 2)
+            # print('xdim is {}'.format(pol_range))
+            n_rad = int(self.data['b2fgeo']['ny'] + 2)
+            # print('ydim is {}'.format(rad_range))
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            # psiNinterp_RGI = self.data['gfile']['gcomp']['interp_dic']['RGI'] 
+            # psiNinterp_2d = self.data['gfile']['gcomp']['interp_dic']['2d']
+            Attempt = self.data['dircomp']['Attempt'][series_rep]
+            DRT = self.data['dirdata']['outputdir'][series_rep]['Output']
+            
+            
+            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(rad_range = n_rad, 
+                                pol_range = n_pol, psi_RBS = psiNinterp_RBS, 
+                                attempt_number = Attempt, outputdir = DRT)
+            
             coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival       
@@ -652,9 +635,67 @@ c = b2tp.WriteInputfile(file='b2.transport.inputfile_align_{}_{}'.format(shift_a
 """
 backup:
 
+try:
+    if self.withshift == False and self.withseries == False:
+        geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
+                               + '/baserun/b2fgmtry')
+    elif self.withshift == True and self.withseries == False:
+        geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'][itername] 
+                                   + '/baserun/b2fgmtry')
+    elif self.withshift == False and self.withseries == True:
+        geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
+                                   + '/baserun/b2fgmtry')
+    # print(type(geo))
+except:
+    print('can not generate geo')
+    
+    
 
+# g = lcm.loadg(self.data['dirdata']['gdir'][0])
+g = lcm.loadg(self.data['dirdata']['gbase'] 
+                       + '/MAST__RMP_results/g027205.00275_efitpp')
         
-        
+
+if self.withshift == False and self.withseries == False:
+    b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
+                          + '/b2mn.dat')
+elif self.withshift == True and self.withseries == False:
+    b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
+                              + '/b2mn.dat')
+elif self.withshift == False and self.withseries == True:
+    b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
+                          + '/b2mn.dat')
+
+            elif self.withshift == True and self.withseries == False:
+                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'][itername] 
+                                           + '/baserun/b2fgmtry')
+            elif self.withshift == False and self.withseries == True:
+                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
+                                           + '/baserun/b2fgmtry')
+            # print(type(geo))
+            
+            if self.withshift == False and self.withseries == False:
+                shift = self.data['dircomp']['shift_value']
+                # print(shift)
+            elif self.withshift == True and self.withseries == False:
+                shift = self.data['dircomp']['shift_dic'][itername]
+                # print(shift)
+            elif self.withshift == False and self.withseries == True:
+                shift = self.data['dircomp']['shift_value']
+                # print(shift)
+                
+            if self.withshift == False and self.withseries == False:
+                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
+                                      + '/b2mn.dat')
+            elif self.withshift == True and self.withseries == False:
+                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
+                                          + '/b2mn.dat')
+            elif self.withshift == False and self.withseries == True:
+                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
+                                      + '/b2mn.dat')
+
+
+
             ---- eliminated geometry input code ----
         
 """
