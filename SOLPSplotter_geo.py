@@ -115,12 +115,11 @@ class load_geometry(load_directory):
             simutop = self.data['dirdata']['simutop']
             shift = self.data['dircomp']['shift_value']
             
-            b2mn, geo, g, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
+            b2mn, geo, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
                             simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
             
             self.data['b2mn'] = b2mn
             self.data['b2fgeo'] = geo
-            self.data['gfile']['g'] = g
             self.data['gfile']['gcomp'] = gfilesum
             
         elif self.withshift == True and self.withseries == False:
@@ -217,8 +216,7 @@ class load_geometry(load_directory):
                 psival[i, pol_loc] = psi_RBS(rad_loc[i, pol_loc], 
                                                       vert_loc[i, pol_loc])
         
-        
-        
+                
         return rad_loc, vert_loc, psival, pol_range, rad_range
     
     
@@ -489,14 +487,6 @@ class load_geometry(load_directory):
         czUpperLeft = geo['cry'][pol_index,:,2]
         czUpperRight = geo['cry'][pol_index,:,3]
             
-        # LLsep = np.mean([crLowerLeft[int(SEP)-1], crLowerLeft[int(SEP)-2]])
-        # LRsep = np.mean([crLowerRight[int(SEP)-1], crLowerRight[int(SEP)-2]])
-        # ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
-        # URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
-        
-        # weight = dsa[int(SEP)-1]/ (dsa[int(SEP)-1] - dsa[int(SEP)-2])
-        # print(weight)
-        
         
         "dsa check"
         # kk = np.zeros((int(rad_range),3))
@@ -651,48 +641,8 @@ class load_geometry(load_directory):
             print('calcpsi_1D function has a bug')
             
 
-#---------------------------------------------------------------------------          
 
-# flux expansion calculation
-
-                
-    def calc_flux_expansion(self, pol_loc, ped_index, iter_index):
         
-        if self.withshift == False and self.withseries == False:
-            
-            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
-            RR_sep = self.data['midplane_calc']['R_Rsep']
-        
-        elif self.withshift == True and self.withseries == False:
-            
-            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)][iter_index]['dsa_{}_val'.format(pol_loc)]
-            RR_sep = self.data['midplane_calc'][iter_index]['R_Rsep']
-        
-        elif self.withshift == False and self.withseries == True:
-            
-            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
-            RR_sep = self.data['midplane_calc']['R_Rsep']
-        
-        elif self.withshift == True and self.withseries == True:
-            print('calc_flux_expansion is not there yet, to be continue...')
-        
-        arcR_inv = list(reversed(arcR))
-        RRsep_inv = list(reversed(RR_sep))
-                   
-        arcR_cut = []
-        RRsep_cut = []
-        
-        for p_in in ped_index:
-            arcR_cut.append(arcR_inv[p_in])
-            RRsep_cut.append(RRsep_inv[p_in])
-            
-                   
-        flux_fit_dic = fm.flux_expand_fit(RRsep = RRsep_cut, arclength = arcR_cut)
-        
-        flux_expand = flux_fit_dic['flux_fitcoe'][0]
-        
-        return flux_expand
-    
 
 
 'Way to generate align transport coefficient'
