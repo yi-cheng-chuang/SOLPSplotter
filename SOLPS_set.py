@@ -9,7 +9,7 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
                'Parameters': P, 'DefaultSettings': DP, 
                'Publish': 'b2plottersetting'}
     return set_dic
@@ -76,6 +76,33 @@ def mast_comp_dir_eireneN():
                     'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
     
     return mast_eireneN_dir_dic
+
+
+def mast_comp_dir_compare():
+    
+    a_shift = 'org'
+    shift = 0
+    
+    multi_shift = ['org', 'dot3', 'dot5', 'dot7', 'one']
+    shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
+    shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
+    tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
+            'one': 'one_a'}
+    series = ['72_n100000_n5e3et1e2_nts5_a', '14_n100000_leakagebou_dot3_a', '25_n100000_leakagebou_dot5_a', 
+              '13_n100000_leakagebou_dot7_a', '32_n100000_leakagebou_one_a']
+    
+    series_2 = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
+              '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
+    
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    shift_filename = 'org_new_series'
+    mast_compare_dir_dic = {'Shot': '027205', 'shift': shift, 'shift_value': shift_dic,
+                    'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
+    
+    return mast_compare_dir_dic
+
+
+
 
 
 
