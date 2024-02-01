@@ -23,7 +23,7 @@ class RP_mapping(load_simu_data):
 #calculate separatrix index, R-Rsep, R-Rsep psiN mapping  
   
     
-    def calc_sep_index(self, psi, rad_range):
+    def calc_sep_index(self, psi, sep_value):
         index_low = []
         index_high = []
         index = []
@@ -35,9 +35,9 @@ class RP_mapping(load_simu_data):
         
         if order == 'order_small2large':
             for y in range(len(psi)):
-                if psi[y] <= 1:
+                if psi[y] <= sep_value:
                     index_low.append(y)
-                elif psi[y] > 1:
+                elif psi[y] > sep_value:
                     index_high.append(y)
                 else:
                     pass
@@ -60,39 +60,17 @@ class RP_mapping(load_simu_data):
     
     
     
-    def calc_RRsep_method(self, itername, plotRR):
+    def calc_RRsep_method(self, geo, radgrid, vertgrid, gfile_data, psiNinterp_function, plotRR):
+               
+        pol_range = int(geo['nx'] + 2)
+        rad_range = int(geo['ny'] + 2)
         
-        if itername == None:
-        
-            pol_range = int(self.data['b2fgeo']['nx'] + 2)
-            rad_range = int(self.data['b2fgeo']['ny'] + 2)
-            
-            RadLoc = self.data['grid']['RadLoc']
-            VertLoc = self.data['grid']['VertLoc']
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            
-        elif itername != None:
-            geo = self.data['b2fgeo'][itername]
-            pol_range = int(geo['nx'] + 2)
-            rad_range = int(geo['ny'] + 2)
-            
-            RadLoc = self.data['grid']['RadLoc'][itername]
-            VertLoc = self.data['grid']['VertLoc'][itername]
-            
-        if self.withshift == False and self.withseries == False:
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            
-        elif self.withshift == True and self.withseries == False:
-            psiNinterp_RBS = self.data['gfile']['gcomp'][itername]['interp_dic']['RBS']
-        
-        elif self.withshift == False and self.withseries == True:
-            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
-            
+        RadLoc = radgrid
+        VertLoc = vertgrid
+        psiNinterp_RBS = psiNinterp_function
         
         
-        
-        
-        mag_axis_z = self.data['gfile']['g']['zmaxis']
+        mag_axis_z = gfile_data['zmaxis']
         # print(mag_axis_z)
         
         
@@ -134,8 +112,7 @@ class RP_mapping(load_simu_data):
             psi_mid = psiNinterp_RBS(mid_R[i], mid_Z[i])
             psi_solps_mid[i] = psi_mid
         
-        
-        sep_index_dic = self.calc_sep_index(psi = psi_solps_mid, rad_range = rad_range)
+        sep_index_dic = self.calc_sep_index(psi = psi_solps_mid, sep_value = 1)
         sep_index_high = int(sep_index_dic['index'][1])
         
         
@@ -173,11 +150,21 @@ class RP_mapping(load_simu_data):
     def calc_RRsep(self, plotRR, plot_psi_dsa_align):
         
         if self.withshift == False and self.withseries == False:
-            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(itername = None, plotRR = plotRR)
+            b2fgeo = self.data['b2fgeo']
+            radloc = self.data['grid']['RadLoc']
+            vertloc = self.data['grid']['VertLoc']
+            gfile = self.data['gfile']['g']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            
+            
+            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(geo = b2fgeo, 
+                        radgrid = radloc, vertgrid = vertloc, gfile_data = gfile, psiNinterp_function = psiNinterp_RBS, 
+                        plotRR = plotRR)
             
             self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
             self.data['midplane_calc'] = midplane_dic
-            self.data['DefaultSettings']['SEP'] = sep_index_high
+            
+            self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
         
         
         elif self.withshift == True and self.withseries == False:        
@@ -186,7 +173,17 @@ class RP_mapping(load_simu_data):
             midplane_series_dic = {}
             psi_dsa_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(itername = aa, plotRR = plotRR)
+                
+                b2fgeo = self.data['b2fgeo'][aa]
+                radloc = self.data['grid']['RadLoc'][aa]
+                vertloc = self.data['grid']['VertLoc'][aa]
+                gfile = self.data['gfile']['g']
+                psiNinterp_RBS = self.data['gfile']['gcomp'][aa]['interp_dic']['RBS']
+                
+                               
+                midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(geo = b2fgeo, 
+                            radgrid = radloc, vertgrid = vertloc, gfile_data = gfile, psiNinterp_function = psiNinterp_RBS, 
+                            plotRR = plotRR)
                 
                 midplane_series_dic[aa] = midplane_dic
                 psi_dsa_dic[aa] = psi_dsa_ratio
@@ -194,7 +191,7 @@ class RP_mapping(load_simu_data):
             
             self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
             self.data['midplane_calc'] = midplane_series_dic
-            self.data['DefaultSettings']['SEP'] = sep_index_dic
+            self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_dic
                 
                 
             if plot_psi_dsa_align:
@@ -214,11 +211,20 @@ class RP_mapping(load_simu_data):
         elif self.withshift == False and self.withseries == True:
             den_rep = list(self.data['dircomp']['Attempt'].keys())[0]
             
-            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(self, itername = den_rep, plotRR = plotRR)
+            b2fgeo = self.data['b2fgeo'][den_rep]
+            radloc = self.data['grid']['RadLoc'][den_rep]
+            vertloc = self.data['grid']['VertLoc'][den_rep]
+            gfile = self.data['gfile']['g']
+            psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
+            
+            
+            midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(geo = b2fgeo, 
+                        radgrid = radloc, vertgrid = vertloc, gfile_data = gfile, psiNinterp_function = psiNinterp_RBS, 
+                        plotRR = plotRR)
             
             self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
             self.data['midplane_calc'] = midplane_dic
-            self.data['DefaultSettings']['SEP'] = sep_index_high
+            self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
         
         elif self.withshift == True and self.withseries == True:
             print('calc_RRsep function is not there yet!')
@@ -231,65 +237,23 @@ class RP_mapping(load_simu_data):
 
 #calculate the poloidal angle function    
         
-    def calc_pol_angle_method(self, itername, pol_list, plot_angle):
+    def calc_pol_angle_method(self, RadLoc, VertLoc, gfile, shift, pol_list, plot_angle):
         
-        if itername == None:
         
-            pol_range = int(self.data['b2fgeo']['nx'] + 2)
-            rad_range = int(self.data['b2fgeo']['ny'] + 2)
-            
-            RadLoc = self.data['grid']['RadLoc']
-            VertLoc = self.data['grid']['VertLoc']
-            
-        
-        elif itername != None:
-            
-            geo = self.data['b2fgeo'][itername] 
-            pol_range = int(geo['nx'] + 2)
-            rad_range = int(geo['ny'] + 2)
-                
-            RadLoc = self.data['grid']['RadLoc'][itername]
-            VertLoc = self.data['grid']['VertLoc'][itername]
-        
-               
-        gfile = self.data['gfile']['g']
         mag_axis_z = gfile['zmaxis']
         # print(mag_axis_z)
         
+        mag_axis_r = gfile['rmaxis'] + shift
         
-        if self.withshift == False and self.withseries == False:
-            mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_value']
-            # print(mag_axis_r)
-        
-        elif self.withshift == True and self.withseries == False:
-            mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_dic'][itername]
-            # print(mag_axis_r)
-            
-        elif self.withshift == False and self.withseries == True:
-            mag_axis_r = self.data['gfile']['g']['rmaxis'] + self.data['dircomp']['shift_value']
-            # print(mag_axis_r)
-            
-        elif self.withshift == True and self.withseries == True:
-            print('calc_pol_angle_method function is not there yet!')
-        
-        else:
-            print('calc_pol_angle_method function has a bug')
-            
-               
+                         
         xprloc = RadLoc[:, 72][19]
         xpzloc = VertLoc[:, 72][19]
         
         xpoint_R = xprloc - mag_axis_r
         xpoint_Z = xpzloc - mag_axis_z
         xpoint_angle = np.arctan2(xpoint_Z, xpoint_R)*180 / np.pi
-        if self.withshift == False:
-            print('xpoint angle is {}'.format(str(xpoint_angle)))
-        elif self.withshift:
-            print('xpoint angle is {:.2f} for {} case'.format(xpoint_angle, itername))
-        else:
-            print('xpoint angle has a bug')
-            
-            
+        
+
         angle_list = []
         
         for pol_index in pol_list:
@@ -321,10 +285,20 @@ class RP_mapping(load_simu_data):
     def calc_pol_angle(self, pol_list, plot_angle):
         
         if self.withshift == False and self.withseries == False:
-            angle_list, xpoint_angle = self.calc_pol_angle_method(itername = None, 
-                                        plot_angle = plot_angle, pol_list = pol_list)
+            
+            rad_grid = self.data['grid']['RadLoc']
+            vert_grid = self.data['grid']['VertLoc']     
+            g_data = self.data['gfile']['g']
+            shift_val = self.data['dircomp']['shift_value']
+            
+                        
+            angle_list, xpoint_angle = self.calc_pol_angle_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                gfile = g_data, shift = shift_val, plot_angle = plot_angle, pol_list = pol_list)
+            
+            print('xpoint angle is {:.2f}'.format(xpoint_angle))
             
             angle_dic = {'angle_list': angle_list, 'xpoint_angle': xpoint_angle}
+            
             self.data['angle'] = angle_dic
             
         elif self.withshift == True and self.withseries == False:        
@@ -332,14 +306,23 @@ class RP_mapping(load_simu_data):
             angle_list_dic = {}
             xpoint_angle_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                angle_list, xpoint_angle = self.calc_pol_angle_method(itername = aa, 
-                                            plot_angle = plot_angle, pol_list = pol_list)
+                
+                rad_grid = self.data['grid']['RadLoc'][aa]
+                vert_grid = self.data['grid']['VertLoc'][aa]    
+                g_data = self.data['gfile']['g']
+                shift_val = self.data['dircomp']['shift_dic'][aa]
+                
+                angle_list, xpoint_angle = self.calc_pol_angle_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                    gfile = g_data, shift = shift_val, plot_angle = plot_angle, pol_list = pol_list)
                 
                 angle_list_dic[aa] = angle_list
                 xpoint_angle_dic[aa] = xpoint_angle
                 
-    
+                print('xpoint angle is {:.2f} for {} case'.format(xpoint_angle, aa))
+                
+                   
             angle_dic = {'angle_list': angle_list_dic, 'xpoint_angle': xpoint_angle_dic}
+            
             self.data['angle'] = angle_dic
             
            
@@ -348,10 +331,17 @@ class RP_mapping(load_simu_data):
             den_list = list(self.data['dircomp']['Attempt'].keys())
             aa = den_list[0]
             
-            angle_list, xpoint_angle = self.calc_pol_angle_method(itername = aa, 
-                                        plot_angle = plot_angle, pol_list = pol_list)
+            rad_grid = self.data['grid']['RadLoc'][aa]
+            vert_grid = self.data['grid']['VertLoc'][aa]    
+            g_data = self.data['gfile']['g']
+            shift_val = self.data['dircomp']['shift_value']
+            
+            
+            angle_list, xpoint_angle = self.calc_pol_angle_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                gfile = g_data, shift = shift_val, plot_angle = plot_angle, pol_list = pol_list)
             
             angle_dic = {'angle_list': angle_list, 'xpoint_angle': xpoint_angle}
+            
             self.data['angle'] = angle_dic
         
         elif self.withshift == True and self.withseries == True:
@@ -416,30 +406,101 @@ class RP_mapping(load_simu_data):
 
     
 
-    def calc_dsa_method(self, itername, pol_loc):
+    """
+    find the separatrix location using dsa and confirm that the dsa = arclength
+    
+    """
+
+    
+    def calc_sep_dsa_method(self, RadLoc, VertLoc, dsa, jxa):
         
-        if itername == None:
-            RadLoc = self.data['grid']['RadLoc']
-            VertLoc = self.data['grid']['VertLoc']
+                
+        pol_index = jxa
+        crloc = RadLoc[:, pol_index]
+        czloc = VertLoc[:, pol_index]
+        # print(crloc)
+        
+        arclength, interpfunc_dic = self.RR_sep_calculator(cr = crloc, cz = czloc)
+        
+        sep_dist = arclength - dsa
+        # print(sep_dist)
+        sep_val = np.mean(sep_dist)
+        
+        sep_index_dic = self.calc_sep_index(psi = arclength, sep_value = sep_val)
+        sep_index_high = int(sep_index_dic['index'][1])
+        
+        
+        return sep_dist, sep_index_high
+        
+        
+    def calc_sep_dsa(self):
+        
+        if self.withshift == False and self.withseries == False:
             
-        elif itername != None:
-            RadLoc = self.data['grid']['RadLoc'][itername]
-            VertLoc = self.data['grid']['VertLoc'][itername]
-        else:
-            print('calc_dsa_method function has a bug')
+            rad_grid = self.data['grid']['RadLoc']
+            vert_grid = self.data['grid']['VertLoc']     
+            dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
+            jxa = self.data['b2mn']['jxa']
             
+            dist, index = self.calc_sep_dsa_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                                            dsa = dsa, jxa = jxa)
             
-        if self.withshift == False:
-            SEP = self.data['DefaultSettings']['SEP']
-            
+            self.data['dist'] = dist
+            self.data['DefaultSettings']['sep_index_dsa'] = index
+        
         elif self.withshift == True and self.withseries == False:
-            SEP = self.data['DefaultSettings']['SEP'][itername]
             
+            dist_dic = {}
+            index_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                rad_grid = self.data['grid']['RadLoc'][aa]
+                vert_grid = self.data['grid']['VertLoc'][aa]     
+                dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+                jxa = self.data['b2mn'][aa]['jxa']
+                
+                dist, index = self.calc_sep_dsa_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                                                dsa = dsa, jxa = jxa)
+                
+                dist_dic[aa] = dist
+                index_dic[aa] = index
+            
+            
+            self.data['dist'] = dist_dic
+            self.data['DefaultSettings']['sep_index_dsa'] = index_dic
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            den_list = list(self.data['dircomp']['Attempt'].keys())
+            aa = den_list[0]
+            
+            rad_grid = self.data['grid']['RadLoc'][aa]
+            vert_grid = self.data['grid']['VertLoc'][aa]     
+            dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+            jxa = self.data['b2mn'][aa]['jxa']
+            
+            dist, index = self.calc_sep_dsa_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                                            dsa = dsa, jxa = jxa)
+            
+            self.data['dist'] = dist
+            self.data['DefaultSettings']['sep_index_dsa'] = index
+            
+        
         elif self.withshift == True and self.withseries == True:
-            print('calc_dsa_method function is not there yet!')
+            print('calc_sep_dsa function is not there yet!')
         
         else:
-            print('calc_dsa_method has a bug')
+            print('calc_sep_dsa function has a bug')
+                
+            
+    
+    """
+    Calculate dsa using arclength method
+
+    """       
+    
+        
+    def calc_dsa_method(self, RadLoc, VertLoc, SEP, pol_loc):
         
         
         pol_index = int(pol_loc)
@@ -449,22 +510,25 @@ class RP_mapping(load_simu_data):
         
         arclength, interpfunc_dic = self.RR_sep_calculator(cr = crloc, cz = czloc)
         
-        sep_dist = np.mean([arclength[int(SEP)+ 1], arclength[int(SEP)]])
+        sep_dist = np.mean([arclength[int(SEP)], arclength[int(SEP)- 1]])
         # print(sep_dist)
                 
         RR_sep = arclength - sep_dist
         
         return arclength, interpfunc_dic, RR_sep
         
-    
-    
-    
-   
+       
     def calc_dsa(self, pol_loc):
         
         if self.withshift == False and self.withseries == False:
             
-            arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(itername = None, pol_loc = pol_loc)
+            rad_grid = self.data['grid']['RadLoc']
+            vert_grid = self.data['grid']['VertLoc']
+            sep_loc = self.data['DefaultSettings']['sep_index_dsa']
+            
+            
+            arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(RadLoc = rad_grid, 
+                                 VertLoc = vert_grid, SEP = sep_loc,  pol_loc = pol_loc)
             
             dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
                         'dsa_{}_val'.format(pol_loc): RR_sep}
@@ -473,10 +537,17 @@ class RP_mapping(load_simu_data):
             
         
         elif self.withshift == True and self.withseries == False:
+            
             dsa_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 
-                arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(itername = aa, pol_loc = pol_loc)
+                rad_grid = self.data['grid']['RadLoc'][aa]
+                vert_grid = self.data['grid']['VertLoc'][aa]
+                sep_loc = self.data['DefaultSettings']['sep_index_dsa'][aa]
+                
+                
+                arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(RadLoc = rad_grid, 
+                                     VertLoc = vert_grid, SEP = sep_loc, pol_loc = pol_loc)
                 
                 dsa_dic[aa] = {'arclength': arclength, 'interpfunc': interpfunc_dic,
                             'dsa_{}_val'.format(pol_loc): RR_sep}
@@ -486,70 +557,141 @@ class RP_mapping(load_simu_data):
     
     
         elif self.withshift == False and self.withseries == True:
-            dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
+            
             den_list = list(self.data['dircomp']['Attempt'].keys())
-            aa = den_list[0] 
+            aa = den_list[0]
             
-            # pol_range = int(self.data['b2fgeo']['nx'] + 2)
-            rad_range = int(self.data['b2fgeo']['ny'] + 2)
+            rad_grid = self.data['grid']['RadLoc'][aa]
+            vert_grid = self.data['grid']['VertLoc'][aa]
+            sep_loc = self.data['DefaultSettings']['sep_index_dsa']
             
-            
-                       
-            Attempt = self.data['dircomp']['Attempt'][aa]
-            DRT = self.data['dirdata']['outputdir'][aa]['Output']
-            XDIM = self.data['b2fgeo']['nx'] + 2
-            YDIM = self.data['b2fgeo']['ny'] + 2
-            # dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
-            
-            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
-                        usecols = (3)).reshape((YDIM, XDIM))
-            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
-                          usecols = (3)).reshape((YDIM,XDIM))
-            
-            pol_index = int(pol_loc)
-            crloc = RadLoc[:, pol_index]
-            czloc = VertLoc[:, pol_index]
-            # print(crloc)
-            
-            arclength, interpfunc_dic = self.RR_sep_calculator(cr = crloc, cz = czloc)
-            
-            SEP = self.data['DefaultSettings']['SEP']
-            
-            sep_dist = np.mean([arclength[int(SEP)+ 1], arclength[int(SEP)]])
-            # print(sep_dist)
-            
-            
-            RR_sep = arclength - sep_dist
+            arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(RadLoc = rad_grid, 
+                                 VertLoc = vert_grid, SEP = sep_loc, pol_loc = pol_loc)
             
             dsa_dic = {'arclength': arclength, 'interpfunc': interpfunc_dic,
-                        'dsa_{}_val'.format(pol_index): RR_sep}
+                        'dsa_{}_val'.format(pol_loc): RR_sep}
             
-            self.data['dsa']['dsa_{}'.format(pol_index)] = dsa_dic
+            self.data['dsa']['dsa_{}'.format(pol_loc)] = dsa_dic
+        
+        
+        elif self.withshift == True and self.withseries == True:
+            print('calc_dsa_method function is not there yet!')
+        
+        else:
+            print('calc_dsa_method has a bug')
+
+
+#---------------------------------------------------------------------------          
+
+# flux expansion calculation
+
+                
+    def calc_flux_expansion_method(self, arcR, RR_sep, ped_index):
+        
+        
+        arcR_inv = list(reversed(arcR))
+        RRsep_inv = list(reversed(RR_sep))
+                   
+        arcR_cut = []
+        RRsep_cut = []
+        
+        for p_in in ped_index:
+            arcR_cut.append(arcR_inv[p_in])
+            RRsep_cut.append(RRsep_inv[p_in])
+            
+                   
+        flux_fit_dic = fm.flux_expand_fit(RRsep = RRsep_cut, arclength = arcR_cut)
+        
+        flux_expand = flux_fit_dic['flux_fitcoe'][0]
+        
+        return flux_expand
+    
+    
+    def calc_flux_expansion(self, pol_loc, ped_index, iter_index):
+       
+       if self.withshift == False and self.withseries == False:
+           
+           arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+           RR_sep = self.data['midplane_calc']['R_Rsep']
+       
+       elif self.withshift == True and self.withseries == False:
+           
+           arcR = self.data['dsa']['dsa_{}'.format(pol_loc)][iter_index]['dsa_{}_val'.format(pol_loc)]
+           RR_sep = self.data['midplane_calc'][iter_index]['R_Rsep']
+       
+       elif self.withshift == False and self.withseries == True:
+           
+           arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+           RR_sep = self.data['midplane_calc']['R_Rsep']
+       
+       elif self.withshift == True and self.withseries == True:
+           print('calc_flux_expansion is not there yet, to be continue...')
+       
+       flux_expand = self.calc_flux_expansion_method(arcR = arcR, RR_sep = RR_sep, 
+                                                     ped_index = ped_index)
+       
+       return flux_expand
+   
+    
+    def calc_flux_expansion_wait(self, pol_loc, ped_index):
+        
+        if self.withshift == False and self.withseries == False:
+            
+            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+            RR_sep = self.data['midplane_calc']['R_Rsep']
+            
+            flux_expand = self.calc_flux_expansion_method(arcR = arcR, RR_sep = RR_sep, 
+                                                          ped_index = ped_index)
+            
+            return flux_expand
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            flux_expand_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+            
+                arcR = self.data['dsa']['dsa_{}'.format(pol_loc)][aa]['dsa_{}_val'.format(pol_loc)]
+                RR_sep = self.data['midplane_calc'][aa]['R_Rsep']
+                
+                flux_expand = self.calc_flux_expansion_method(arcR = arcR, RR_sep = RR_sep, 
+                                                              ped_index = ped_index)
+                
+                flux_expand_dic[aa] = flux_expand
+            
+            return flux_expand_dic
+                
+                        
+        elif self.withshift == False and self.withseries == True:
+            
+            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+            RR_sep = self.data['midplane_calc']['R_Rsep']
+            
+            
+            flux_expand = self.calc_flux_expansion_method(arcR = arcR, RR_sep = RR_sep, 
+                                                          ped_index = ped_index)
+            
+            return flux_expand
+            
+            
+        elif self.withshift == True and self.withseries == True:
+            print('calc_flux_expansion is not there yet, to be continue...')
+        
+        else:
+            print('calc_flux_expansion has a bug.')
+
 
 
 #-----------------------------------------------------------------------------
       
 # Additional dsa check function 1: left_test           
         
-    def left_dsa_test_method(self, itername, pol_index, sep_loc):
+    def left_dsa_test_method(self, geo, pol_index, sep_loc, Attempt, DRT2):
+        
+        rad_range = int(geo['ny'] + 2)
+        
         "Test for left only result"
         
-        
-        if self.withshift == False:
-            geo = self.data['b2fgeo']
-            rad_range = int(geo['ny'] + 2)
-            
-        elif self.withshift == True and self.withseries == False:
-            geo = self.data['b2fgeo'][itername]
-            rad_range = int(geo['ny'] + 2)
-        
-        elif self.withshift == True and self.withseries == True:
-            print('left_dsa_test function is not there yet!')
-            
-        else:
-            print('left_dsa_test function has a bug')
-            
-            
         crLowerLeft = geo['crx'][pol_index,:,0]
         crLowerRight = geo['crx'][pol_index,:,1]
         crUpperLeft = geo['crx'][pol_index,:,2]
@@ -561,10 +703,10 @@ class RP_mapping(load_simu_data):
         
         SEP = sep_loc
         
-        LLsep = np.mean([crLowerLeft[int(SEP)-1], crLowerLeft[int(SEP)-2]])
-        LRsep = np.mean([crLowerRight[int(SEP)-1], crLowerRight[int(SEP)-2]])
-        ULsep = np.mean([crUpperLeft[int(SEP)-1], crUpperLeft[int(SEP)-2]])
-        URsep = np.mean([crUpperRight[int(SEP)-1], crUpperRight[int(SEP)-2]])
+        LLsep = np.mean([crLowerLeft[int(SEP)], crLowerLeft[int(SEP)-1]])
+        LRsep = np.mean([crLowerRight[int(SEP)], crLowerRight[int(SEP)-1]])
+        ULsep = np.mean([crUpperLeft[int(SEP)], crUpperLeft[int(SEP)-1]])
+        URsep = np.mean([crUpperRight[int(SEP)], crUpperRight[int(SEP)-1]])
         
         
         LLdsa = crLowerLeft - LLsep
@@ -577,33 +719,14 @@ class RP_mapping(load_simu_data):
       
         crzsum, points = fm.RR_sep_calculator(cr = crLowerLeft, cz = czLowerLeft)
         
-               
-        if self.withshift == False and self.withseries == False:
-            Attempt = self.data['dircomp']['Attempt']
-            DRT2 = self.data['dirdata']['outputdir']['Output2']
-                  
-        elif self.withshift == True and self.withseries == False:
-            Attempt = self.data['dircomp']['Attempt'][itername]
-            DRT2 = self.data['dirdata']['infolderdir'][itername]['outputdir']['Output2']
-        
-        elif self.withshift == False and self.withseries == True:
-            Attempt = self.data['dircomp']['Attempt'][itername]
-            DRT2 = self.data['dirdata']['outputdir'][itername]['Output2']
-        
-        elif self.withshift == True and self.withseries == True:
-            print('left_dsa_test function is not there yet!')
-            
-        else:
-            print('left_dsa_test function has a bug')
-            
-            
+                      
         XDIM = geo['nx'] + 2
         YDIM = geo['ny'] + 2   
         
         Rad0Cor = np.loadtxt('{}/Rad0Cor{}'.format(DRT2, str(Attempt)),
                     usecols = (3)).reshape((YDIM, XDIM))
-        Vert0Cor = np.loadtxt('{}/Vert0Cor{}'.format(DRT2, str(Attempt)), 
-                      usecols = (3)).reshape((YDIM,XDIM))
+        # Vert0Cor = np.loadtxt('{}/Vert0Cor{}'.format(DRT2, str(Attempt)), 
+        #               usecols = (3)).reshape((YDIM,XDIM))
         
         compare_left = np.zeros((int(rad_range), 2))
         compare_left[:, 0] = Rad0Cor[:, pol_index]
@@ -616,29 +739,59 @@ class RP_mapping(load_simu_data):
         pol_pos = int(pol_loc)
         
         if self.withshift == False and self.withseries == False:
-            SEP = self.data['DefaultSettings']['SEP']
-            compare_left = self.left_dsa_test(itername = None, pol_index = pol_pos, 
-                               sep_loc = SEP)
+            
+            b2fgeo = self.data['b2fgeo']
+            pol_pos = int(pol_loc)
+            sep = self.data['DefaultSettings']['sep_index_dsa']
+            attempt = self.data['dircomp']['Attempt']
+            drt2 = self.data['dirdata']['outputdir']['Output2']
+            
+            
+            compare_left = self.left_dsa_test_method(geo = b2fgeo, pol_index = pol_pos, 
+                                                sep_loc = sep, Attempt = attempt, 
+                                                DRT2 = drt2)
+            
+            
             self.data['dsa_compare_left'] = compare_left
         
         elif self.withshift == True and self.withseries == False:
+            
             compare_left_dic = {}
+            
             for aa in self.data['dircomp']['multi_shift']:
+                
+                
                 SEP = self.data['DefaultSettings']['SEP'][aa]
-                compare_left = self.left_dsa_test(itername = aa, pol_index = pol_pos, 
-                                   sep_loc = SEP)
+                b2fgeo = self.data['b2fgeo'][aa]
+                pol_pos = int(pol_loc)
+                sep = self.data['DefaultSettings']['sep_index_dsa'][aa]
+                attempt = self.data['dircomp']['Attempt'][aa]
+                drt2 = self.data['dirdata']['infolderdir'][aa]['outputdir']['Output2']
+                
+                
+                compare_left = self.left_dsa_test_method(geo = b2fgeo, pol_index = pol_pos, 
+                                                    sep_loc = sep, Attempt = attempt, 
+                                                    DRT2 = drt2)
                 
                 compare_left_dic[aa] = compare_left
                 
                 self.data['dsa_compare_left'] = compare_left_dic
         
         elif self.withshift == False and self.withseries == True:
+            
             den_list = list(self.data['dircomp']['Attempt'].keys())
             aa = den_list[0]
             
             SEP = self.data['DefaultSettings']['SEP']
-            compare_left = self.left_dsa_test(itername = aa, pol_index = pol_pos, 
-                               sep_loc = SEP)
+            b2fgeo = self.data['b2fgeo']
+            pol_pos = int(pol_loc)
+            sep = self.data['DefaultSettings']['sep_index_dsa'][aa]
+            attempt = self.data['dircomp']['Attempt'][aa]
+            drt2 = self.data['dirdata']['outputdir'][aa]['Output2']
+            
+            compare_left = self.left_dsa_test_method(geo = b2fgeo, pol_index = pol_pos, 
+                                                sep_loc = sep, Attempt = attempt, 
+                                                DRT2 = drt2)
             
             self.data['dsa_compare_left'] = compare_left
             
@@ -649,16 +802,6 @@ class RP_mapping(load_simu_data):
         else:
             print('left_test function has a bug')
             
-        
-# Additional dsa check function 2: dsa_and_arclength_check
-
-    def dsa_and_arclength_check(self):
-        dsa = lcm.read_dsa(self.data['dirdata']['simudir'] + '/dsa')
-
-
-
-
-
 
 """
 backup
