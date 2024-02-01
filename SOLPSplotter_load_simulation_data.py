@@ -210,6 +210,7 @@ class load_simu_data(load_expdata):
             fplasma = lbdm.read_b2fplasmf(fileName = file_loc, nx = n_pol, 
                                           ny = n_rad, ns = n_sp)
             fplasma_dic = vars(fplasma)
+            
             self.data['b2fplasmf'] = fplasma_dic
             # print('the next line is b2fplasmf')
             # print(type(k))
