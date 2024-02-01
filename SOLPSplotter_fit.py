@@ -17,12 +17,13 @@ import numpy as np
 
 
 class profile_fit(RP_mapping):
+    
     def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
         RP_mapping.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
     
     
     
-    def opacity_data_fit_method(self, b2fstate, psiN, pol_list): 
+    def opacity_data_fit_method(self, b2fstate, Neuden, psiN, psi_dsa_ratio, pol_list, itername): 
         # i = 0
         ln = len(pol_list)
         efold = np.zeros(ln)
@@ -37,19 +38,18 @@ class profile_fit(RP_mapping):
         fluxexp = np.zeros(ln)
         
         
-        # self.load_output_data(param= 'NeuDen')
+        self.load_output_data(param= 'NeuDen')
         # self.load_output_data(param= 'Ne')
         # self.load_output_data(param= 'Te')
         
         
-        Nd_data = b2fstate['na'][:, :, 1].transpose()
+
         Ne_data = b2fstate['ne'].transpose()
         Te_J = b2fstate['te'].transpose()
         ev = 1.6021766339999999 * pow(10, -19)
         Te_data = Te_J / ev
         
-        self.data['simu_data_check'] = Te_data
-        
+        # self.data['simu_data_check'] = Te_data
         
         
         for k in pol_list:
@@ -63,29 +63,29 @@ class profile_fit(RP_mapping):
             psi = psiN[:, pol_in]
             
             
-            Nd = Nd_data[:, pol_in]
-            Ne = Nd_data[:, pol_in]
-            Te = Nd_data[:, pol_in]
+            Nd = Neuden[:, pol_in]
+            Ne = Ne_data[:, pol_in]
+            Te = Te_data[:, pol_in]
             
 
             rd = fm.Opacity_calculator(x_coord= psi, ne = Ne, te = Te, 
                                    neuden = Nd)
             ped_index = rd['sep_index']
             
-            fe = self.calc_flux_expansion(pol_loc= k, 
-                            ped_index= ped_index, iter_index= None)
-            pd = self.data['DefaultSettings']['psi_dsa']
             
+            flux_expand = self.calc_flux_expansion(pol_loc = k, ped_index = ped_index, 
+                                                   iter_index = itername)
 
+            
             efold[i] = rd['efold_length']
             delta[i] = rd['pedestal_width']
             opq[i] = rd['dimensionless_opaqueness']
             neu_den[i] = rd['n_sep_fit']
             ne_ped[i] = rd['electron_pedestal_density']
             tdelta[i] = rd['temperature_pedestal_width']
-            fluxexp[i] = fe
-            efold_l[i] = rd['efold_length']*pd*fe
-            delta_l[i] = rd['pedestal_width']*pd*fe
+            fluxexp[i] = flux_expand
+            efold_l[i] = rd['efold_length']*psi_dsa_ratio*flux_expand
+            delta_l[i] = rd['pedestal_width']*psi_dsa_ratio*flux_expand
             
             
             # pol_loc[i] = int(k)
@@ -101,31 +101,98 @@ class profile_fit(RP_mapping):
                                   
                   }
         
+        self.data['poloidal_itemname'] = list(result.keys())
+        
         return result
     
     
     def opacity_data_fit(self, pol_list):
         
+        self.load_output_data(param= 'NeuDen')
+        
         if self.withshift == False and self.withseries == False:
-            print('opacity_data_fit function is not there yet!')
+            
+            for p in pol_list:
+                self.calc_dsa(pol_loc= p)
+            Neuden_data = self.data['outputdata']['NeuDen']
+            fstate = self.data['b2fstate']
+            psiN_map = self.data['psi']['psival']
+            pd = self.data['DefaultSettings']['psi_dsa']
+            
+            fitresult = self.opacity_data_fit_method(b2fstate = fstate, Neuden = Neuden_data, 
+                       psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list, 
+                                    itername = None)
+            
+            self.data['opacity_poloidal'] = fitresult
+            self.data['poloidal_itemname'] = list(fitresult.keys())
         
         elif self.withshift == True and self.withseries == False:
             
+            fitresult_dic = {}
+            
+            for p in pol_list:
+                self.calc_dsa(pol_loc= p)
+            
             for aa in self.data['dircomp']['multi_shift']:
+                
+                Neuden_data = self.data['outputdata']['NeuDen'][aa]
                 fstate = self.data['b2fstate'][aa]
                 psiN_map = self.data['psi']['psival'][aa]
-                rd = self.opacity_data_fit_method(b2fstate = fstate, psiN = psiN_map, 
-                                                  pol_list = pol_list)
+                pd = self.data['DefaultSettings']['psi_dsa'][aa]
+                
+                fitresult = self.opacity_data_fit_method(b2fstate = fstate, Neuden = Neuden_data,
+                        psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list,
+                                        itername = aa)
+                
+                fitresult_dic[aa] = fitresult
+            
+            self.data['opacity_poloidal'] = fitresult_dic
+            self.data['poloidal_itemname'] = list(fitresult_dic['org'].keys())
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            fitresult_dic = {}
+            
+            for p in pol_list:
+                self.calc_dsa(pol_loc= p)
+            
+            for aa in list(self.data['dircomp']['Attempt'].keys()):
+                
+                Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                fstate = self.data['b2fstate'][aa]
+                psiN_map = self.data['psi']['psival']
+                pd = self.data['DefaultSettings']['psi_dsa']
+                
+                fitresult = self.opacity_data_fit_method(b2fstate = fstate, Neuden = Neuden_data,
+                            psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list,
+                                        itername = None)
+                
+                fitresult_dic[aa] = fitresult
+            
+            self.data['opacity_poloidal'] = fitresult_dic
+            self.data['poloidal_itemname'] = list(fitresult.keys())
+        
+        elif self.withshift == True and self.withseries == True:
+            print('opacity_data_fit is not there yet!')
+        
         
         else:
-            print('opacity_data_fit is under construction')
+            print('opacity_data_fit has a bug')
                 
                 
-                
+      
+
+
+
+
+
             
-            
+# ----------------------------------------------------------------------------           
     
-    
+    """
+    backup:
+        
+
     
     def opacity_data_method_single(self, pol_list): 
         i = 0
@@ -294,4 +361,5 @@ class profile_fit(RP_mapping):
         self.data['xcoord_cut'] = xcoord_cut_dic
         
         return result
-        
+
+    """
