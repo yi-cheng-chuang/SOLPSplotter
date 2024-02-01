@@ -31,8 +31,6 @@ xl.load_b2fplasmf()
 xl.b2fplasmf_filter()
 xl.load_output_data(param= 'Te')
 
-poloidal_index_list = ['59']
-xl.opacity_data_fit
 # xl.load_vessel()
 # xl.flux_comparison_plot()
 
@@ -40,11 +38,12 @@ xl.opacity_data_fit
 
 # xl.calcpsi()
 
-plot_flag = 'skip'
+plot_flag = 'radial'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
     xl.calcpsi_1D(pol_loc= PL, no_coord_avg_check= False)
+    xl.calc_sep_dsa()
     xl.calc_dsa(pol_loc= PL)
     # xl.flux_expansion_map_method(pol_loc= PL, iter_index= None)
     xl.Opacity_study_radial_plot(pol_loc= PL)
