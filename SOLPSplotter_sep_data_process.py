@@ -66,10 +66,12 @@ class sep_data_process(RP_mapping):
             elif np.shape(datafile[plasmf_k]) == (nx+2, ny+2, ns):
                 for ns_a in range(ns):
                     if np.all(datafile[plasmf_k][:, :, ns_a] == 0):
-                        zero_nxnyns_list.append('{}%{}'.format(plasmf_k, ns_a))
+                        item_dic = {'item': plasmf_k, 'ns': ns_a}
+                        zero_nxnyns_list.append(item_dic)
                     
                     else:
-                        nxnyns_list.append('{}%{}'.format(plasmf_k, ns_a))
+                        item_dic = {'item': plasmf_k, 'ns': ns_a}
+                        nxnyns_list.append(item_dic)
                     
                 
             
@@ -77,9 +79,13 @@ class sep_data_process(RP_mapping):
                 
                 for nc_a in range(4):
                     if np.all(datafile[plasmf_k][:, :, nc_a] == 0):
-                        zero_nxnycorner_list.append('{}%{}'.format(plasmf_k, nc_a))
+                        
+                        item_dic = {'item': plasmf_k, 'nc': nc_a}
+                        zero_nxnycorner_list.append(item_dic)
                     
                     else:
+                        
+                        item_dic = {'item': plasmf_k, 'nc': nc_a}
                         nxny_corner_list.append('{}%{}'.format(plasmf_k, nc_a))
             
             
@@ -89,23 +95,27 @@ class sep_data_process(RP_mapping):
                 for ns_b in range(ns):
                     for nf_a in range(2):
                         if np.all(datafile[plasmf_k][:, :, nf_a, ns_b] == 0):
-                            zero_fluxdimns_list.append('{}%{}%ns{}'.format(plasmf_k, 
-                                                                    nf_a, ns_b))
+                            
+                            item_dic = {'item': plasmf_k, 'nf': nf_a, 'ns': ns_b}
+                            zero_fluxdimns_list.append(item_dic)
                         
                         else:
-                            fluxdim_ns_list.append('{}%{}%ns{}'.format(plasmf_k, 
-                                                                    nf_a, ns_b))
+                            
+                            item_dic = {'item': plasmf_k, 'nf': nf_a, 'ns': ns_b}
+                            fluxdim_ns_list.append(item_dic)
                           
             elif np.shape(datafile[plasmf_k]) == (nx+2, ny+2, nc, ns):
                 for ns_c in range(ns):
                     for nc_b in range(nc):
                         if np.all(datafile[plasmf_k][:, :, nc_b, ns_c] == 0):
-                            zero_nxnycornerns_list.append('{}%nc{}%ns{}'.format(plasmf_k, 
-                                                                    nc_b, ns_c))
+                            
+                            item_dic = {'item': plasmf_k, 'nc': nc_b, 'ns': ns_c}
+                            zero_nxnycornerns_list.append(item_dic)
                         
                         else:
-                            nxny_corner_ns_list.append('{}%nc{}%ns{}'.format(plasmf_k, 
-                                                                    nc_b, ns_c))
+                            
+                            item_dic = {'item': plasmf_k, 'nc': nc_b, 'ns': ns_c}
+                            nxny_corner_ns_list.append(item_dic)
                            
             
             else:
@@ -127,12 +137,12 @@ class sep_data_process(RP_mapping):
     
     
                     
-    def b2fplasmf_filter(self):
+    def b2f_file_filter(self, b2f_file, b2f_name):
         if self.withshift == False and self.withseries == False:
                        
-            b2plasmf = self.data['b2fplasmf']
+            # b2plasmf = self.data['b2fplasmf']
             dim = self.data['DefaultSettings']['dims']
-            key_order = self.b2f_filter_method(datafile = b2plasmf, 
+            key_order = self.b2f_filter_method(datafile = b2f_file, 
                                                              dim_setting = dim)
             
             self.data['b2fplasmf_key'] = key_order
@@ -143,7 +153,7 @@ class sep_data_process(RP_mapping):
             
             for aa in self.data['dircomp']['multi_shift']:
                                 
-                b2plasmf = self.data['b2fplasmf'][aa]
+                b2plasmf = b2f_file[aa]
                 dim = self.data['DefaultSettings']['dims'][aa]
                 key_order_dic[aa] = self.b2f_filter_method(datafile = b2plasmf, 
                                                                  dim_setting = dim)
@@ -157,19 +167,135 @@ class sep_data_process(RP_mapping):
             
             for aa in self.data['dircomp']['multi_shift']:
                                 
-                b2plasmf = self.data['b2fplasmf'][aa]
+                b2plasmf = b2f_file[aa]
                 dim = self.data['DefaultSettings']['dims'][aa]
                 key_order_dic[aa] = self.b2f_filter_method(datafile = b2plasmf, 
                                                                  dim_setting = dim)
                 
                 
-            self.data['b2fplasmf_key'] = key_order_dic
+            self.data['{}_key'.format(b2f_name)] = key_order_dic
     
     
-    def nxnyns_print(self):
+    def nxny_sep_data_process(self, specshape_list, shape_spec):
         
         if self.withshift == False and self.withseries == False:
-            nxnyns_list = self.data['b2fplasmf_key']['nxnyns']
+            
+            
+            # nxny_list = self.data['b2fplasmf_key']['nxny']
+            nxny_list = specshape_list[shape_spec]
+            
+            sep_index = self.data['DefaultSettings']['sep_index_dsa']
+            
+            sep_data_dic = {}
+            
+            for item in nxny_list:
+                
+                if shape_spec == 'nxny':
+                    
+                    data_U = self.data['b2fplasmf'][item][:, sep_index]
+                    data_L = self.data['b2fplasmf'][item][:, sep_index - 1]
+                    
+                    sep_data = np.mean([data_U, data_L], axis= 0)
+                    
+                    sep_data_dic[item] = sep_data
+                
+                elif shape_spec == 'nxnyns':
+                    
+                    ns = item['ns']
+                    plasma_k = item['item']
+                                       
+                    data_U = self.data['b2fplasmf'][plasma_k][:, sep_index, ns]
+                    data_L = self.data['b2fplasmf'][plasma_k][:, sep_index - 1, ns]
+                    
+                    sep_data = np.mean([data_U, data_L], axis= 0)
+                    
+                    sep_data_dic['{}%ns{}'.format(plasma_k, ns)] = sep_data
+                
+                elif shape_spec == 'fluxdim_ns':
+                    
+                    nf = item['nf']
+                    ns = item['ns']
+                    plasma_k = item['item']
+                                       
+                    data_U = self.data['b2fplasmf'][plasma_k][:, sep_index, nf, ns]
+                    data_L = self.data['b2fplasmf'][plasma_k][:, sep_index - 1, nf, ns]
+                    
+                    sep_data = np.mean([data_U, data_L], axis= 0)
+                    
+                    sep_data_dic['{}%nf{}%ns{}'.format(plasma_k, nf, ns)] = sep_data
+                
+                
+                
+            
+            self.data['{}_sep_data'.format(shape_spec)] = sep_data_dic
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            sep_data_all = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+            
+                # nxny_list = self.data['b2fplasmf_key'][aa]['nxny']
+                
+                nxny_list = specshape_list[aa][shape_spec]
+                               
+                sep_index = self.data['DefaultSettings']['sep_index_dsa'][aa]
+                
+                sep_data_dic = {}
+                
+                for item in nxny_list:
+                    
+                    if shape_spec == 'nxny':
+                        
+                        data_U = self.data['b2fplasmf'][aa][item][:, sep_index]
+                        data_L = self.data['b2fplasmf'][aa][item][:, sep_index - 1]
+                        
+                        sep_data = np.mean([data_U, data_L], axis= 0)
+                        
+                        sep_data_dic[item] = sep_data
+                    
+                
+                    elif shape_spec == 'nxnyns':
+                        
+                        ns = item['ns']
+                        plasma_k = item['item']
+                                           
+                        data_U = self.data['b2fplasmf'][aa][plasma_k][:, sep_index, ns]
+                        data_L = self.data['b2fplasmf'][aa][plasma_k][:, sep_index - 1, ns]
+                        
+                        sep_data = np.mean([data_U, data_L], axis= 0)
+                        
+                        sep_data_dic['{}%ns{}'.format(plasma_k, ns)] = sep_data
+                    
+                    elif shape_spec == 'fluxdim_ns':
+                        
+                        nf = item['nf']
+                        ns = item['ns']
+                        plasma_k = item['item']
+                                           
+                        data_U = self.data['b2fplasmf'][aa][plasma_k][:, sep_index, nf, ns]
+                        data_L = self.data['b2fplasmf'][aa][plasma_k][:, sep_index - 1, nf, ns]
+                        
+                        sep_data = np.mean([data_U, data_L], axis= 0)
+                        
+                        sep_data_dic['{}%nf{}%ns{}'.format(plasma_k, nf, ns)] = sep_data
+                    
+                    
+                
+                sep_data_all[aa] = sep_data_dic
+                
+            
+            self.data['{}_sep_data'.format(shape_spec)] = sep_data_all
+            
+            
+                   
+        else:
+            
+            print('nxny_sep_process function is not there yet!')
+            
+            
+                
             
             
             
