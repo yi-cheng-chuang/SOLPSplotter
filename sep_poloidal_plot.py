@@ -25,7 +25,7 @@ class sep_poloidal_plot(sep_data_process):
     def set_plot(self, plot_style):
         if plot_style == 'pol_subplot':
             plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 5, markersize= 9)
+            plt.rc('lines', linewidth= 3, markersize= 7)
             plt.rcParams.update({'font.size': 12})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
@@ -124,48 +124,165 @@ class sep_poloidal_plot(sep_data_process):
     
     
         
-    def sep_poloidal_plot(self, index_list, log_flag):
+    def iteminput_seppolsubplot_method(self, index_list, log_flag, result, 
+                                    i_name, ax, A_dic, color_dic):
         
-        itemname = self.data['b2fplasmf_key']['nxny']
         # adj_list = list(result_dic.keys())
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
+        # A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+        #           'dot7': '2.8', 'one': '3.4'}
+        # color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+        #              'dot7': 'blue', 'one': 'purple'}
         
         # print(adj_list)
-        for i in itemname:
-            plt.figure(figsize=(7,7))
-            if log_flag:
-                plt.yscale('log')
-            else:
-                pass
-            
-            if self.withshift == False and self.withseries == False:
-                
-                result = self.data['nxny_sep_data']
 
+            
+        if log_flag:
+            plt.yscale('log')
+        else:
+            pass
+        
+        
+        if self.withshift == False and self.withseries == False:
+            
+            # result = self.data['nxny_sep_data']
+
+            
+            unit = opm.opacity_study_unit()
+            pol_loc = self.data['angle']['angle_list']
+            xpoint = self.data['angle']['xpoint_angle']
+            a_shift = self.data['dircomp']['a_shift']
+            A_val = A_dic[a_shift]
+            color = color_dic[a_shift]
+            
+            
+            self.sep_poloidal_subplot_method(item = i_name, pol_angle = pol_loc, 
+    pol_index_list= index_list, result_dic = result, color_code = color, 
+                                    A_value = A_val, unit_dic = i_name, ax = ax)
+            
+            self.subplot_poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint,
+                                ax = ax)
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            
+            # result = self.data['nxny_sep_data']
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                dat_set = result[aa]
                 
                 unit = opm.opacity_study_unit()
-                pol_loc = self.data['angle']['angle_list']
-                xpoint = self.data['angle']['xpoint_angle']
-                a_shift = self.data['dircomp']['a_shift']
-                A_val = A_dic[a_shift]
-                color = color_dic[a_shift]
+                pol_loc = self.data['angle']['angle_list'][aa]
+                xpoint = self.data['angle']['xpoint_angle'][aa]
+
+                A_val = A_dic[aa]
+                color = color_dic[aa]
+                ang_fix = self.data['angle']['angle_list']['org']
+                xp_fix = self.data['angle']['xpoint_angle']['org']
                 
                 
-                self.sep_poloidal_plot_method(item = i, pol_angle = pol_loc, 
-        pol_index_list= index_list, result_dic = result, color_code = color, 
-                                        A_value = A_val, unit_dic = i)
                 
                 
-                self.poloidal_label(angle_fix= pol_loc, item= i, xpoint_fix = xpoint)
+                self.sep_poloidal_subplot_method(item = i_name, pol_angle = pol_loc, 
+        pol_index_list= index_list, result_dic = dat_set, color_code = color, 
+                                        A_value = A_val, unit_dic = i_name, ax = ax)
+                
+            
+            self.subplot_poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix,
+                                ax = ax)
+        
+        else:
+            print('sep_poloidal_plot is not there yet!')
+    
+    
+    
+    
+    def iteminput_seppolplot_method(self, index_list, log_flag, result, 
+                                    i_name, ax, A_dic, color_dic):
+        
+                
+        plt.figure(figsize=(7,7))
+        if log_flag:
+            plt.yscale('log')
+        else:
+            pass
+        
+        if self.withshift == False and self.withseries == False:
+            
+            result = self.data['nxny_sep_data']
+
+            
+            unit = opm.opacity_study_unit()
+            pol_loc = self.data['angle']['angle_list']
+            xpoint = self.data['angle']['xpoint_angle']
+            a_shift = self.data['dircomp']['a_shift']
+            A_val = A_dic[a_shift]
+            color = color_dic[a_shift]
             
             
+            self.sep_poloidal_plot_method(item = i_name, pol_angle = pol_loc, 
+    pol_index_list= index_list, result_dic = result, color_code = color, 
+                                    A_value = A_val, unit_dic = i_name)
             
-            else:
-                print('sep_poloidal_plot is not there yet!')
+            self.poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint)
+        
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            
+            # result = self.data['nxny_sep_data']
+            
+            for aa in self.data['dircomp']['multi_shift']:
                 
+                dat_set = result[aa]
+                
+                unit = opm.opacity_study_unit()
+                pol_loc = self.data['angle']['angle_list'][aa]
+                xpoint = self.data['angle']['xpoint_angle'][aa]
+
+                A_val = A_dic[aa]
+                color = color_dic[aa]
+                ang_fix = self.data['angle']['angle_list']['org']
+                xp_fix = self.data['angle']['xpoint_angle']['org']
+                
+                
+                
+                
+                self.sep_poloidal_plot_method(item = i_name, pol_angle = pol_loc, 
+        pol_index_list= index_list, result_dic = dat_set, color_code = color, 
+                                        A_value = A_val, unit_dic = i_name)
+                
+            
+            self.poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix)
+            
+        else:
+            print('sep_poloidal_plot is not there yet!')
+        
+        
+    
+    
+    def itemname_method(self, shapename, itemname, it):
+        
+        if shapename == 'nxny':
+            i_name = itemname[it]
+        
+        elif shapename == 'nxnyns':
+            
+            plasma_k = itemname[it]['item']
+            ns = itemname[it]['ns']
+            i_name = '{}%ns{}'.format(plasma_k, ns)
+        
+        elif shapename == 'nxnyns':
+            
+            plasma_k = itemname[it]['item']
+            ns = itemname[it]['ns']
+            i_name = '{}%ns{}'.format(plasma_k, ns)
+        
+        return i_name
+        
+        
+    
+    
     
     
     def sep_poloidal_subplot(self, item_name, result, shapename, index_list, log_flag):
@@ -196,7 +313,7 @@ class sep_poloidal_plot(sep_data_process):
         rows = 2
         cols = 3
         
-        sub_num = int(len(itemname)/ (rows * cols)) -1
+        sub_num = int(len(itemname)/ (rows * cols))
         
         for fig in range(sub_num):
             
@@ -205,154 +322,39 @@ class sep_poloidal_plot(sep_data_process):
             for rownum in range(rows):
                 
                 for colnum in range(cols):
-                    
-                    if shapename == 'nxny':
-                        i_name = itemname[it]
-                    
-                    elif shapename == 'nxnyns':
-                        
-                        plasma_k = itemname[it]['item']
-                        ns = itemname[it]['ns']
-                        i_name = '{}%ns{}'.format(plasma_k, ns)
+                                       
+                    i_name = self.itemname_method(shapename = shapename, 
+                                                  itemname = itemname, it = it)
                     
                     
                                         
-                    if log_flag:
-                        plt.yscale('log')
-                    else:
-                        pass
-                    
-                    if self.withshift == False and self.withseries == False:
-                        
-                        # result = self.data['nxny_sep_data']
-
-                        
-                        unit = opm.opacity_study_unit()
-                        pol_loc = self.data['angle']['angle_list']
-                        xpoint = self.data['angle']['xpoint_angle']
-                        a_shift = self.data['dircomp']['a_shift']
-                        A_val = A_dic[a_shift]
-                        color = color_dic[a_shift]
-                        
-                        
-                        self.sep_poloidal_subplot_method(item = i_name, pol_angle = pol_loc, 
-                pol_index_list= index_list, result_dic = result, color_code = color, 
-                                                A_value = A_val, unit_dic = i_name, ax = ax[rownum, colnum])
-                        
-                        self.subplot_poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint,
-                                            ax = ax[rownum, colnum])
-                    
-                    elif self.withshift == True and self.withseries == False:
-                        
-                        
-                        # result = self.data['nxny_sep_data']
-                        
-                        for aa in self.data['dircomp']['multi_shift']:
-                            
-                            dat_set = result[aa]
-                            
-                            unit = opm.opacity_study_unit()
-                            pol_loc = self.data['angle']['angle_list'][aa]
-                            xpoint = self.data['angle']['xpoint_angle'][aa]
-
-                            A_val = A_dic[aa]
-                            color = color_dic[aa]
-                            ang_fix = self.data['angle']['angle_list']['org']
-                            xp_fix = self.data['angle']['xpoint_angle']['org']
-                            
-                            
-                            
-                            
-                            self.sep_poloidal_subplot_method(item = i_name, pol_angle = pol_loc, 
-                    pol_index_list= index_list, result_dic = dat_set, color_code = color, 
-                                                    A_value = A_val, unit_dic = i_name, ax = ax[rownum, colnum])
-                            
-                        
-                        self.subplot_poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix,
-                                            ax = ax[rownum, colnum])
-                    
-                    else:
-                        print('haha')
+                    self.iteminput_seppolsubplot_method(index_list = index_list, 
+                        log_flag = log_flag, result = result, i_name = i_name, 
+                        ax = ax[rownum, colnum], A_dic = A_dic, color_dic = color_dic)
                             
                             
                     
                     it = it + 1
             
             # plt.tight_layout()
+            plt.savefig('{}_subplot_{}.png'.format(shapename, fig))
             
         
-        if it < len(itemname):
+        while it < len(itemname):
             
             
-            if shapename == 'nxny':
-                i_name = itemname[it]
-            
-            elif shapename == 'nxnyns':
-                
-                plasma_k = itemname[it]['item']
-                ns = itemname[it]['ns']
-                i_name = '{}%ns{}'.format(plasma_k, ns)
+            i_name = self.itemname_method(shapename = shapename, 
+                              itemname = itemname, it = it)
             
             
+            self.iteminput_seppolplot_method(index_list = index_list, 
+                log_flag = log_flag, result = result, i_name = i_name, 
+                ax = ax[rownum, colnum], A_dic = A_dic, color_dic = color_dic)
             
-            plt.figure(figsize=(7,7))
-            if log_flag:
-                plt.yscale('log')
-            else:
-                pass
-            
-            if self.withshift == False and self.withseries == False:
-                
-                result = self.data['nxny_sep_data']
-
-                
-                unit = opm.opacity_study_unit()
-                pol_loc = self.data['angle']['angle_list']
-                xpoint = self.data['angle']['xpoint_angle']
-                a_shift = self.data['dircomp']['a_shift']
-                A_val = A_dic[a_shift]
-                color = color_dic[a_shift]
-                
-                
-                self.sep_poloidal_plot_method(item = i_name, pol_angle = pol_loc, 
-        pol_index_list= index_list, result_dic = result, color_code = color, 
-                                        A_value = A_val, unit_dic = i_name)
-                
-                self.poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint)
-            
-            
-            elif self.withshift == True and self.withseries == False:
-                
-                
-                # result = self.data['nxny_sep_data']
-                
-                for aa in self.data['dircomp']['multi_shift']:
-                    
-                    dat_set = result[aa]
-                    
-                    unit = opm.opacity_study_unit()
-                    pol_loc = self.data['angle']['angle_list'][aa]
-                    xpoint = self.data['angle']['xpoint_angle'][aa]
-
-                    A_val = A_dic[aa]
-                    color = color_dic[aa]
-                    ang_fix = self.data['angle']['angle_list']['org']
-                    xp_fix = self.data['angle']['xpoint_angle']['org']
-                    
-                    
-                    
-                    
-                    self.sep_poloidal_plot_method(item = i_name, pol_angle = pol_loc, 
-            pol_index_list= index_list, result_dic = dat_set, color_code = color, 
-                                            A_value = A_val, unit_dic = i_name)
-                    
-                
-                self.poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix)
-                
-            else:
-                print('sep_poloidal_plot is not there yet!')
             
             it = it + 1
+            
+            plt.savefig('{}_{}.png'.format(shapename, i_name))
         
         
         
@@ -360,7 +362,7 @@ class sep_poloidal_plot(sep_data_process):
         
         name_list = self.data['{}_key'.format(b2fname)]
         
-        self.nxny_sep_data_process(specshape_list = name_list, shape_spec = datashape)
+        self.sep_data_process(specshape_list = name_list, shape_spec = datashape)
 
         self.set_plot(plot_style = 'pol_subplot')
 
@@ -372,6 +374,205 @@ class sep_poloidal_plot(sep_data_process):
 
         self.sep_poloidal_subplot(index_list = pol_loc_list, item_name = name_list, 
                              shapename = datashape, result = sep_data, log_flag = False)
+
+
+
+
+# ----------------------------------------------------------------------------
+
+
+
+"""
+
+def sep_poloidal_subplot(self, item_name, result, shapename, index_list, log_flag):
+    
+    
+    if self.withshift == False and self.withseries == False:
+        itemname = item_name[shapename]
+    
+    elif self.withshift == True and self.withseries == False:
+        itemname = item_name['org'][shapename]
+    
+    else:
+        print('itername is not there yet!')
+        
+    
+    
+    # itemname = self.data['b2fplasmf_key']['nxny']
+    # adj_list = list(result_dic.keys())
+    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+              'dot7': '2.8', 'one': '3.4'}
+    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                 'dot7': 'blue', 'one': 'purple'}
+    
+    # print(adj_list)
+    
+    it = 0
+    
+    rows = 2
+    cols = 3
+    
+    sub_num = int(len(itemname)/ (rows * cols)) -1
+    
+    for fig in range(sub_num):
+        
+        fig, ax = plt.subplots(nrows = rows, ncols = cols)
+        
+        for rownum in range(rows):
+            
+            for colnum in range(cols):
+                
+                if shapename == 'nxny':
+                    i_name = itemname[it]
+                
+                elif shapename == 'nxnyns':
+                    
+                    plasma_k = itemname[it]['item']
+                    ns = itemname[it]['ns']
+                    i_name = '{}%ns{}'.format(plasma_k, ns)
+                
+                
+                                    
+                if log_flag:
+                    plt.yscale('log')
+                else:
+                    pass
+                
+                if self.withshift == False and self.withseries == False:
+                    
+                    # result = self.data['nxny_sep_data']
+
+                    
+                    unit = opm.opacity_study_unit()
+                    pol_loc = self.data['angle']['angle_list']
+                    xpoint = self.data['angle']['xpoint_angle']
+                    a_shift = self.data['dircomp']['a_shift']
+                    A_val = A_dic[a_shift]
+                    color = color_dic[a_shift]
+                    
+                    
+                    self.sep_poloidal_subplot_method(item = i_name, pol_angle = pol_loc, 
+            pol_index_list= index_list, result_dic = result, color_code = color, 
+                                            A_value = A_val, unit_dic = i_name, ax = ax[rownum, colnum])
+                    
+                    self.subplot_poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint,
+                                        ax = ax[rownum, colnum])
+                
+                elif self.withshift == True and self.withseries == False:
+                    
+                    
+                    # result = self.data['nxny_sep_data']
+                    
+                    for aa in self.data['dircomp']['multi_shift']:
+                        
+                        dat_set = result[aa]
+                        
+                        unit = opm.opacity_study_unit()
+                        pol_loc = self.data['angle']['angle_list'][aa]
+                        xpoint = self.data['angle']['xpoint_angle'][aa]
+
+                        A_val = A_dic[aa]
+                        color = color_dic[aa]
+                        ang_fix = self.data['angle']['angle_list']['org']
+                        xp_fix = self.data['angle']['xpoint_angle']['org']
+                        
+                        
+                        
+                        
+                        self.sep_poloidal_subplot_method(item = i_name, pol_angle = pol_loc, 
+                pol_index_list= index_list, result_dic = dat_set, color_code = color, 
+                                                A_value = A_val, unit_dic = i_name, ax = ax[rownum, colnum])
+                        
+                    
+                    self.subplot_poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix,
+                                        ax = ax[rownum, colnum])
+                
+                else:
+                    print('haha')
+                        
+                        
+                
+                it = it + 1
+        
+        # plt.tight_layout()
+        
+    
+    if it < len(itemname):
+        
+        
+        if shapename == 'nxny':
+            i_name = itemname[it]
+        
+        elif shapename == 'nxnyns':
+            
+            plasma_k = itemname[it]['item']
+            ns = itemname[it]['ns']
+            i_name = '{}%ns{}'.format(plasma_k, ns)
+        
+        
+        
+        plt.figure(figsize=(7,7))
+        if log_flag:
+            plt.yscale('log')
+        else:
+            pass
+        
+        if self.withshift == False and self.withseries == False:
+            
+            result = self.data['nxny_sep_data']
+
+            
+            unit = opm.opacity_study_unit()
+            pol_loc = self.data['angle']['angle_list']
+            xpoint = self.data['angle']['xpoint_angle']
+            a_shift = self.data['dircomp']['a_shift']
+            A_val = A_dic[a_shift]
+            color = color_dic[a_shift]
+            
+            
+            self.sep_poloidal_plot_method(item = i_name, pol_angle = pol_loc, 
+    pol_index_list= index_list, result_dic = result, color_code = color, 
+                                    A_value = A_val, unit_dic = i_name)
+            
+            self.poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint)
+        
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            
+            # result = self.data['nxny_sep_data']
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                dat_set = result[aa]
+                
+                unit = opm.opacity_study_unit()
+                pol_loc = self.data['angle']['angle_list'][aa]
+                xpoint = self.data['angle']['xpoint_angle'][aa]
+
+                A_val = A_dic[aa]
+                color = color_dic[aa]
+                ang_fix = self.data['angle']['angle_list']['org']
+                xp_fix = self.data['angle']['xpoint_angle']['org']
+                
+                
+                
+                
+                self.sep_poloidal_plot_method(item = i_name, pol_angle = pol_loc, 
+        pol_index_list= index_list, result_dic = dat_set, color_code = color, 
+                                        A_value = A_val, unit_dic = i_name)
+                
+            
+            self.poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix)
+            
+        else:
+            print('sep_poloidal_plot is not there yet!')
+        
+        it = it + 1
+
+
+
+"""
             
             
         
