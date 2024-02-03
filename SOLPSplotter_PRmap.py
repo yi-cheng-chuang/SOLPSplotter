@@ -14,8 +14,8 @@ import numpy as np
 
 
 class RP_mapping(load_simu_data):
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
-        load_simu_data.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
+    def __init__(self, DefaultSettings, loadDS):
+        load_simu_data.__init__(self, DefaultSettings, loadDS)
     
   
 #-----------------------------------------------------------------------------
