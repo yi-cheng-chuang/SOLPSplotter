@@ -18,8 +18,8 @@ import numpy as np
 
 class profile_fit(RP_mapping):
     
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
-        RP_mapping.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
+    def __init__(self, DefaultSettings, loadDS):
+        RP_mapping.__init__(self, DefaultSettings, loadDS)
     
     
     
