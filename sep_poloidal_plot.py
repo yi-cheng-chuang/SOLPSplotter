@@ -337,7 +337,7 @@ class sep_poloidal_plot(sep_data_process):
                     it = it + 1
             
             # plt.tight_layout()
-            plt.savefig('{}_subplot_{}.png'.format(shapename, fig))
+            # plt.savefig('{}_subplot_{}.png'.format(shapename, fig))
             
         
         while it < len(itemname):
@@ -354,7 +354,7 @@ class sep_poloidal_plot(sep_data_process):
             
             it = it + 1
             
-            plt.savefig('{}_{}.png'.format(shapename, i_name))
+            # plt.savefig('{}_{}.png'.format(shapename, i_name))
         
         
         
@@ -368,7 +368,7 @@ class sep_poloidal_plot(sep_data_process):
 
         self.calc_pol_angle(pol_list = pol_loc_list, plot_angle= False)
 
-        name_list = self.data['b2fplasmf_key']
+        # name_list = self.data['b2fplasmf_key']
         sep_data = self.data['{}_sep_data'.format(datashape)]
 
 
