@@ -25,7 +25,7 @@ xl.calcpsi_avcr()
 xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
 xl.calc_sep_dsa()
 fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
-                          'plot_exp_and_fit': True, 'plot_shift_compare': False,
+                          'plot_exp_and_fit': False, 'plot_shift_compare': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
@@ -55,6 +55,11 @@ if b2file_name == 'b2fplasmf':
                     pol_loc_list = poloidal_index_list, b2fname = b2file_name)
         
     elif dat_shape == 'nxnyns':
+        
+        xl.fplasmf_sep_process(datashape = dat_shape, 
+                     pol_loc_list = poloidal_index_list, b2fname = b2file_name)
+    
+    elif dat_shape == 'fluxdim_ns':
         
         xl.fplasmf_sep_process(datashape = dat_shape, 
                      pol_loc_list = poloidal_index_list, b2fname = b2file_name)
