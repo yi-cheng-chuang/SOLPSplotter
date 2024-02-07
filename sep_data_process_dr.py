@@ -14,9 +14,7 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-xl = spp.sep_poloidal_plot(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
-            DefaultSettings = d['DefaultSettings'], loadDS = lex, 
-            Parameters= d['Parameters'])
+xl = spp.sep_poloidal_plot(DefaultSettings = d, loadDS = lex)
 
 xl.load_mast_dir()
 xl.load_solpsgeo()
@@ -32,8 +30,8 @@ xl.load_b2fstate()
 xl.load_b2fplasmf()
 # xl.load_ft46()
 
-b2file_name = 'b2fstate'
-dat_shape = 'nxnyns'
+b2file_name = 'b2fplasmf'
+dat_shape = 'nxny'
 
 ['b2fstate', 'b2fplasmf']
 ['nxny', 'nxnyns', 'nxnycorner', 'fluxdim_ns', 'nxny_corner_ns']
