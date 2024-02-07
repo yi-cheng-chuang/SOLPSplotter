@@ -47,6 +47,8 @@ def mast_comp_dic_withshift():
     
     # series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
     #           '12_n100000_2_dot7_a', '31_n100000_2_one_a']
+    
+    
     outputlist = ['Output', 'Output2', 'EirOutput']
     
     mast_withshift_dic = {'Shot': '027205', 'multi_shift': multi_shift, 'shift_dic': shift_dic, 
