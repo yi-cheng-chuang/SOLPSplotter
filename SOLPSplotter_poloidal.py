@@ -17,10 +17,10 @@ import numpy as np
 
 
 class poloidal_plot(profile_fit):
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters, Publish):
-        profile_fit.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
+    def __init__(self, DefaultSettings, loadDS):
+        profile_fit.__init__(self, DefaultSettings, loadDS)
         
-        self.Publish = Publish
+        self.Publish = DefaultSettings['Publish']
         self.data['DefaultSettings']['Publish'] = self.Publish
     
     

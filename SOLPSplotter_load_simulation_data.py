@@ -15,27 +15,27 @@ import numpy as np
 
 class load_simu_data(load_expdata):
     
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
-        load_expdata.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS)
+    def __init__(self, DefaultSettings, loadDS):
+        load_expdata.__init__(self, DefaultSettings, loadDS)
         # Employee.__init__(self, first, last, pay)
         
         "Parameters"
-        if isinstance(Parameters, dict):
-            self.Parameters = Parameters
+        if isinstance(DefaultSettings['Parameters'], dict):
+            self.Parameters = DefaultSettings['Parameters']
         else:
             print('parameter has to be a dictionary')
             
-        if Parameters is None:
+        if DefaultSettings['Parameters'] is None:
             print('There is no parameters input')
         else:
-            self.Parameters = Parameters
+            self.Parameters = DefaultSettings['Parameters']
             
         Plist = []
         for pkey, pvalue in self.Parameters.items():
             Plist.append(pkey)
         
         self.data['paramkey'] = Plist
-        self.data['Parameter'] = Parameters
+        self.data['Parameter'] = DefaultSettings['Parameters']
 
         
     "Add and remove elements from parameter or defaultsettings"

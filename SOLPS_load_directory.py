@@ -14,11 +14,11 @@ from scipy import interpolate
 
 
 class load_directory:
-    def __init__(self, DEV, withshift, withseries, DefaultSettings):
+    def __init__(self, DefaultSettings):
         
-        self.DEV = DEV
-        self.withshift = withshift
-        self.withseries = withseries
+        self.DEV = DefaultSettings['DEV']
+        self.withshift = DefaultSettings['withshift']
+        self.withseries = DefaultSettings['withseries']
                  
             
         "DefaultSettings"    

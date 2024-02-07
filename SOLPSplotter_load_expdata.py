@@ -15,9 +15,8 @@ import numpy as np
 
 class load_expdata(load_geometry):
     
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS):
-        load_geometry.__init__(self, DEV, withshift, 
-                                        withseries, DefaultSettings)
+    def __init__(self, DefaultSettings, loadDS):
+        load_geometry.__init__(self, DefaultSettings)
         # Employee.__init__(self, first, last, pay)
         self.loadDS = loadDS
         

@@ -17,9 +17,8 @@ from scipy import interpolate
 
 
 class load_geometry(load_directory):
-    def __init__(self, DEV, withshift, withseries, DefaultSettings):
-        load_directory.__init__(self, DEV, withshift, 
-                                        withseries, DefaultSettings)
+    def __init__(self, DefaultSettings):
+        load_directory.__init__(self, DefaultSettings)
                 
 
 
