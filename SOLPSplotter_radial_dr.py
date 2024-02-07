@@ -14,9 +14,7 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-xl = spf.profile_fit(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
-            DefaultSettings = d['DefaultSettings'], loadDS = lex, 
-            Parameters= d['Parameters'])
+xl = spf.profile_fit(DefaultSettings = d, loadDS = lex)
 
 xl.load_mast_dir()
 xl.load_solpsgeo()
