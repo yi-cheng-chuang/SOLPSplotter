@@ -6,6 +6,7 @@ Created on Thu Feb  1 16:36:57 2024
 """
 
 from SOLPSplotter_sep_data_process import sep_data_process
+import os
 import opacity_plot_method as opm
 import matplotlib.pyplot as plt
 import load_mast_expdata_method as lmem
@@ -25,10 +26,12 @@ class sep_poloidal_plot(sep_data_process):
     def set_plot(self, plot_style):
         if plot_style == 'pol_subplot':
             plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 3, markersize= 7)
-            plt.rcParams.update({'font.size': 12})
+            plt.rc('lines', linewidth= 2, markersize= 2)
+            plt.rcParams.update({'font.size': 8})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
+            # plt.rcParams['figure.figsize'] = 40, 12
+            
   
         else:
             print('Publish setting is incorrect or add another setting')
@@ -198,7 +201,7 @@ class sep_poloidal_plot(sep_data_process):
     
     
     def iteminput_seppolplot_method(self, index_list, log_flag, result, 
-                                    i_name, ax, A_dic, color_dic):
+                                    i_name, A_dic, color_dic):
         
                 
         plt.figure(figsize=(7,7))
@@ -270,18 +273,44 @@ class sep_poloidal_plot(sep_data_process):
             
             plasma_k = itemname[it]['item']
             ns = itemname[it]['ns']
+            
             i_name = '{}%ns{}'.format(plasma_k, ns)
         
-        elif shapename == 'nxnyns':
+        elif shapename == 'fluxdim_ns':
             
-            plasma_k = itemname[it]['item']
+            nf = itemname[it]['nf']
             ns = itemname[it]['ns']
+            plasma_k = itemname[it]['item']
+            
+            i_name = '{}%nf{}%ns{}'.format(plasma_k, nf, ns)
+        
+        elif shapename == 'nxnycorner':
+            
+            i_name = itemname[it]
+        
+        
+        elif shapename == 'nxny_corner_ns':
+        
+            ns = itemname[it]['ns']
+            plasma_k = itemname[it]['item']
+            
             i_name = '{}%ns{}'.format(plasma_k, ns)
+        
+        else:
+            print('itemname_method is not there yet!')
+        
         
         return i_name
         
         
-    
+    def set_figdir(self): #Function to set correct Working Directory Path depending on which machine is in use
+        if os.environ['OS'] == 'Windows_NT':
+                
+            if os.environ['USERNAME'] == 'ychuang':
+                
+                fig_dir = r"C:\Users\ychuang\Documents\SOLPS_data\simulation_data\mast\027205\dataplot_fig"
+        
+        return fig_dir
     
     
     
@@ -311,11 +340,11 @@ class sep_poloidal_plot(sep_data_process):
         it = 0
         
         rows = 2
-        cols = 3
+        cols = 2
         
         sub_num = int(len(itemname)/ (rows * cols))
         
-        for fig in range(sub_num):
+        for fig_num in range(sub_num):
             
             fig, ax = plt.subplots(nrows = rows, ncols = cols)
             
@@ -335,9 +364,13 @@ class sep_poloidal_plot(sep_data_process):
                             
                     
                     it = it + 1
+                    
+                    
             
-            # plt.tight_layout()
-            # plt.savefig('{}_subplot_{}.png'.format(shapename, fig))
+            plt.tight_layout()
+            fig_dir  = self.set_figdir()
+            plt.savefig('{}/{}_subplot_{}.png'.format(fig_dir, shapename, fig_num), dpi = 200)
+            
             
         
         while it < len(itemname):
@@ -348,13 +381,14 @@ class sep_poloidal_plot(sep_data_process):
             
             
             self.iteminput_seppolplot_method(index_list = index_list, 
-                log_flag = log_flag, result = result, i_name = i_name, 
-                ax = ax[rownum, colnum], A_dic = A_dic, color_dic = color_dic)
+                log_flag = log_flag, result = result, i_name = i_name,
+                 A_dic = A_dic, color_dic = color_dic)
             
             
             it = it + 1
             
-            # plt.savefig('{}_{}.png'.format(shapename, i_name))
+            fig_dir  = self.set_figdir()
+            plt.savefig('{}/{}_{}.png'.format(fig_dir, shapename, i_name), dpi = 200)
         
         
         
@@ -362,18 +396,34 @@ class sep_poloidal_plot(sep_data_process):
         
         name_list = self.data['{}_key'.format(b2fname)]
         
-        self.sep_data_process(specshape_list = name_list, shape_spec = datashape)
+        self.sep_data_process(specshape_list = name_list, 
+                            shape_spec = datashape, b2f_name = b2fname)
 
         self.set_plot(plot_style = 'pol_subplot')
 
         self.calc_pol_angle(pol_list = pol_loc_list, plot_angle= False)
 
         # name_list = self.data['b2fplasmf_key']
-        sep_data = self.data['{}_sep_data'.format(datashape)]
+        
+        
+        
+        if '{}_sep_data'.format(datashape) in self.data:
+            
+            sep_data = self.data['{}_sep_data'.format(datashape)]
+                        
+            self.sep_poloidal_subplot(index_list = pol_loc_list, item_name = name_list, 
+                                 shapename = datashape, result = sep_data, log_flag = False)
+            
+            
+        else:
+            
+            print('no data to plot!')
+            
+            
+            
 
 
-        self.sep_poloidal_subplot(index_list = pol_loc_list, item_name = name_list, 
-                             shapename = datashape, result = sep_data, log_flag = False)
+        
 
 
 
