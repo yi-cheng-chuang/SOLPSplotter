@@ -320,56 +320,95 @@ class sep_data_process(RP_mapping):
              
     
         
-    def sep_data_method(self, specshape_list, shape_spec, itername):
+    def sep_data_method(self, specshape_list, shape_spec, itername, b2f_name):
         
         # nxny_list = self.data['b2fplasmf_key'][aa]['nxny']
-        
-        nxny_list = specshape_list[itername][shape_spec]
-                       
         # sep_index = self.data['DefaultSettings']['sep_index_dsa'][itername]
         
-        sep_data_dic = {}
+        if itername == None:
+            
+            nxny_list = specshape_list[shape_spec]
         
-        for item in nxny_list:
+        else:
             
-            data_U, data_L, dic_key = self.dataUL_method(itername = itername, 
-                                        shape_spec = shape_spec, item = item)
+            nxny_list = specshape_list[itername][shape_spec]
             
-            sep_data = np.mean([data_U, data_L], axis= 0)
             
-            sep_data_dic[dic_key] = sep_data
-                   
-        return sep_data_dic
+        
+        if len(nxny_list) == 0:
+            print('there is no {} data'.format(shape_spec))
+            
+            warning_text = 'there is no {} data'.format(shape_spec)
+            
+            return warning_text
+        
+        else:
+            
+            sep_data_dic = {}
+            
+            for item in nxny_list:
+                
+                data_U, data_L, dic_key = self.dataUL_method(itername = itername, 
+                        shape_spec = shape_spec, item = item, b2f_name = b2f_name)
+                
+                sep_data = np.mean([data_U, data_L], axis= 0)
+                
+                sep_data_dic[dic_key] = sep_data
+                       
+            return sep_data_dic
+            
+                       
+        
+        
+        
     
     
     
-    def sep_data_process(self, specshape_list, shape_spec):
+    def sep_data_process(self, specshape_list, shape_spec, b2f_name):
         
         if self.withshift == False and self.withseries == False:
             
             
-            sep_data_dic = self.sep_data_method(specshape_list = specshape_list, 
-                                                shape_spec = shape_spec, itername = None)    
+            itemlist = specshape_list[shape_spec]
+            if len(itemlist) == 0:
+                print('no data for sep_data_process to work!')
+            
+            else:
+                sep_data_dic = self.sep_data_method(specshape_list = specshape_list, 
+                    shape_spec = shape_spec, itername = None, b2f_name = b2f_name)    
+                    
+                    
+                
+                self.data['{}_sep_data'.format(shape_spec)] = sep_data_dic
                 
                 
             
-            self.data['{}_sep_data'.format(shape_spec)] = sep_data_dic
-        
         elif self.withshift == True and self.withseries == False:
             
-            sep_data_all = {}
             
-            for aa in self.data['dircomp']['multi_shift']:
+            itemlist = specshape_list['org'][shape_spec]
+            if len(itemlist) == 0:
+                print('no data for sep_data_process to work!')
+            
+            else:
                 
+                sep_data_all = {}
                 
-                sep_data_dic = self.sep_data_method(specshape_list = specshape_list, 
-                                                shape_spec = shape_spec, itername = aa)
+                for aa in self.data['dircomp']['multi_shift']:
+                    
+                    sep_data_dic = self.sep_data_method(specshape_list = specshape_list, 
+                        shape_spec = shape_spec, itername = aa, b2f_name = b2f_name)
+                    
+                
+                    sep_data_all[aa] = sep_data_dic
+                    
+                        
+                
+                self.data['{}_sep_data'.format(shape_spec)] = sep_data_all
                 
             
-                sep_data_all[aa] = sep_data_dic
-                
             
-            self.data['{}_sep_data'.format(shape_spec)] = sep_data_all
+            
             
             
         else:
