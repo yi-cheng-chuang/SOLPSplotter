@@ -18,8 +18,8 @@ import numpy as np
 
 
 class sep_poloidal_plot(sep_data_process):
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters):
-        sep_data_process.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
+    def __init__(self, DefaultSettings, loadDS):
+        sep_data_process.__init__(self, DefaultSettings, loadDS)
         
    
     
