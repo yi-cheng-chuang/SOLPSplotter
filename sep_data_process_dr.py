@@ -32,41 +32,23 @@ xl.load_b2fstate()
 xl.load_b2fplasmf()
 # xl.load_ft46()
 
-b2file_name = 'b2fplasmf'
+b2file_name = 'b2fstate'
 dat_shape = 'nxnyns'
 
+['b2fstate', 'b2fplasmf']
+['nxny', 'nxnyns', 'nxnycorner', 'fluxdim_ns', 'nxny_corner_ns']
 
 
 poloidal_index_list = []
 for i in range(47):
     poloidal_index_list.append('{}'.format(25 + i))
 
+b2fplasmf = xl.data[b2file_name]
 
+xl.b2f_file_filter(b2f_file= b2fplasmf, b2f_name = b2file_name)
 
-if b2file_name == 'b2fplasmf':
-    
-    b2fplasmf = xl.data['b2fplasmf']
-
-    xl.b2f_file_filter(b2f_file= b2fplasmf, b2f_name = b2file_name)
-    
-    if dat_shape == 'nxny':
-        
-        xl.fplasmf_sep_process(datashape = dat_shape, 
-                    pol_loc_list = poloidal_index_list, b2fname = b2file_name)
-        
-    elif dat_shape == 'nxnyns':
-        
-        xl.fplasmf_sep_process(datashape = dat_shape, 
-                     pol_loc_list = poloidal_index_list, b2fname = b2file_name)
-    
-    elif dat_shape == 'fluxdim_ns':
-        
-        xl.fplasmf_sep_process(datashape = dat_shape, 
-                     pol_loc_list = poloidal_index_list, b2fname = b2file_name)
-        
-
-
-
+xl.fplasmf_sep_process(datashape = dat_shape, 
+            pol_loc_list = poloidal_index_list, b2fname = b2file_name)
 
 
 
