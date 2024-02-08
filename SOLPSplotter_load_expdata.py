@@ -160,6 +160,7 @@ class load_expdata(load_geometry):
         sym_pt = popt_ne[0]
         dtn = popt_te[2]
         te_sym_pt = popt_te[0]
+        h = popt_ne[1]*pow(10, 20)
         
         ro_popt_te = np.round_(popt_te, 2)
         
@@ -173,7 +174,10 @@ class load_expdata(load_geometry):
             plt.plot(x_model, tanh_ne_fit, color='r', label= 'electron density fit')
             plt.errorbar(psi, ne, ne_er,fmt= "o", label= 'electron density experiment data')
             plt.axvline(x=dn + sym_pt, color= 'black',lw= 3, ls= '--', 
-                        label= 'Pedestal width [m]: $\Delta n_e$')
+                        label= 'Pedestal width : $\Delta n_e$')
+            plt.axvline(x=-dn + sym_pt, color= 'black',lw= 3, ls= '--')
+            plt.axvline(x=dn + sym_pt, color= 'black',lw= 3, ls= '--', 
+                        label= 'Pedestal width : $\Delta n_e$')
             plt.axvline(x=-dn + sym_pt, color= 'black',lw= 3, ls= '--')
             plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
             # plt.ylabel('Electron density: ${n_e}$ (10$^{20}$*m$^{-3}$)')
@@ -187,7 +191,7 @@ class load_expdata(load_geometry):
             plt.plot(x_model, tanh_te_fit, color='r', label= 'electron temperature fit')
             plt.errorbar(psi, te, te_er, fmt= "o", label= 'electron temperature experiment data')
             plt.axvline(x=dtn + te_sym_pt, color='black',lw=3, ls='--', 
-                        label= 'temperature pedestal width [m]: $\Delta T_e$')
+                        label= 'temperature pedestal width : $\Delta T_e$')
             plt.axvline(x=-dtn + te_sym_pt, color='black',lw=3, ls= '--')
             plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
             # plt.ylabel('Electron temperature: ${T_e}$ (KeV)')
