@@ -16,11 +16,10 @@ import numpy as np
 
 
 class Opacity_study(RP_mapping):
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters, Publish):
-        RP_mapping.__init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters)
+    def __init__(self, DefaultSettings, loadDS):
+        RP_mapping.__init__(self, DefaultSettings, loadDS)
         
-        self.Publish = Publish
-        self.data['DefaultSettings']['Publish'] = self.Publish
+        self.Publish = self.DefaultSettings['Publish']
     
     
     def set_plot(self):
@@ -203,7 +202,7 @@ class Opacity_study(RP_mapping):
           
             psi = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 2]
             # psi_RGI = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 0]
-            SEP = int(self.data['DefaultSettings']['SEP'])
+            SEP = int(self.data['DefaultSettings']['sep_index_dsa'])
             
             pol_index = int(pol_loc)
             Nd = self.data['outputdata']['NeuDen'][:, pol_index]
