@@ -175,7 +175,38 @@ class PlotContour(Opacity_study):
             print('load_vessel function has a bug')
             
         
+    
+    def plot_vessel(self):
         
+        if self.withshift == False and self.withseries == False:
+            
+            vessel = self.data['vessel']
+            
+            plt.figure(figsize=(7,7))
+            plt.plot(vessel[:,0], vessel[:,1], color = 'g')
+            # plt.xlabel('R')
+            
+            shift = self.data['dircomp']['shift_value']*1000
+            tick_label = np.arange(0 + shift, 2100 + shift, 500)
+            
+            ytick = np.arange(-1100, 1100, 500)
+            plt.yticks(ytick)
+            
+            plt.xticks(tick_label)
+            plt.title('vessel')
+            plt.show()
+        
+        else:
+            
+            print('plot_vessel function is not there yet!')
+        
+        
+        
+        
+    
+    
+    
+    
     def plot_all_radial(self):
         
         
