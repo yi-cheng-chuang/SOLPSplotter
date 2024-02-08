@@ -16,9 +16,8 @@ import numpy as np
 
 class transport_coefficient_adjustment(load_geometry):
     
-    def __init__(self, DEV, withshift, withseries, DefaultSettings):
-        load_geometry.__init__(self, DEV, withshift, 
-                                        withseries, DefaultSettings)
+    def __init__(self, DefaultSettings):
+        load_geometry.__init__(self, DefaultSettings)
     
        
     def mod_transco_method(self,file_loc, withmod, de_SOL, ki_SOL, ke_SOL, log_flag):
@@ -100,7 +99,7 @@ class transport_coefficient_adjustment(load_geometry):
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
         
         elif self.withshift == True and self.withseries == False:
-            simudir = self.data['dirdata']['infolderdir']['org']['simudir']
+            simudir = self.data['dirdata']['simudir']['org']
             fileloc = '{}/b2.transport.inputfile_new'.format(simudir)
             self.mod_transco_method(file_loc = fileloc, withmod = withmod, de_SOL = de_SOL, 
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
@@ -113,7 +112,7 @@ class transport_coefficient_adjustment(load_geometry):
             jxa = self.data['b2mn']['org']['jxa']
             self.calcpsi_1D(pol_loc= jxa, no_coord_avg_check = False)
             for aa in self.data['dircomp']['multi_shift']:
-                trans_file_dir = self.data['dirdata']['infolderdir'][aa]['simudir'] + '/b2.transport.inputfile'
+                trans_file_dir = self.data['dirdata']['simudir'][aa] + '/b2.transport.inputfile'
                 
                 trans_list = tcam.load_transcoefile_method(trans_file_dir, plot= False)
                 cod = trans_list['1'].T
@@ -278,13 +277,13 @@ class transport_coefficient_adjustment(load_geometry):
         # folder = '72_n100000_m12n8e3_nts5_a'
         
         if self.withshift == True and self.withseries == False:
-            simudir = self.data['dirdata']['infolderdir']['org']['simudir']
+            simudir = self.data['dirdata']['simudir']['org']
             stdfileloc = '{}/b2.transport.inputfile'.format(simudir)
             for shiftname in self.data['dircomp']['multi_shift']:
                 if shiftname == 'org':
                     pass
                 else:
-                    input_simudir = self.data['dirdata']['infolderdir'][shiftname]['simudir']
+                    input_simudir = self.data['dirdata']['simudir'][shiftname]
                     inpfileloc = '{}/b2.transport.inputfile'.format(input_simudir)
                     
                     self.align_transcoe_method(std_file_loc = stdfileloc, 
