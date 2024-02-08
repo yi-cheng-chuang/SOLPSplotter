@@ -17,9 +17,8 @@ import numpy as np
 
 
 class PlotContour(Opacity_study):
-    def __init__(self, DEV, withshift, withseries, DefaultSettings, loadDS, Parameters, Publish):
-        Opacity_study.__init__(self, DEV, withshift, withseries, 
-                               DefaultSettings, loadDS, Parameters, Publish)
+    def __init__(self, DefaultSettings, loadDS):
+        Opacity_study.__init__(self, DefaultSettings, loadDS)
     
     
    
