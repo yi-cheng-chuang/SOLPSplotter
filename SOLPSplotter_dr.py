@@ -13,9 +13,7 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-xl = spc.PlotContour(DEV = d['DEV'], withshift= d['withshift'], withseries= d['withseries'],
-            DefaultSettings = d['DefaultSettings'], loadDS = lex, 
-            Parameters= d['Parameters'], Publish= d['Publish'])
+xl = spc.PlotContour(DefaultSettings = d, loadDS = lex)
 xl.set_plot()
 xl.load_mast_dir()
 xl.load_solpsgeo()
@@ -28,7 +26,6 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
 xl.load_b2fplasmf()
-xl.b2fplasmf_filter()
 xl.load_output_data(param= 'Te')
 
 # xl.load_vessel()
@@ -38,7 +35,7 @@ xl.load_output_data(param= 'Te')
 
 # xl.calcpsi()
 
-plot_flag = 'radial'
+plot_flag = 'skip'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
@@ -60,7 +57,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = False
+radial_plot_flag = True
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
