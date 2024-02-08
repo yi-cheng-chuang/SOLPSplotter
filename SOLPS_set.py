@@ -41,15 +41,15 @@ def mast_comp_dic_withshift():
             'one': 'one_a'}
     
     
-    # series = ['72_n100000_n5e3et1e2_nts5_a', '14_n100000_leakagebou_dot3_a', '25_n100000_leakagebou_dot5_a', 
-    #           '13_n100000_leakagebou_dot7_a', '32_n100000_leakagebou_one_a']
+    series = ['72_n100000_n5e3et1e2_nts5_a', '14_n100000_leakagebou_dot3_a', '25_n100000_leakagebou_dot5_a', 
+              '13_n100000_leakagebou_dot7_a', '32_n100000_leakagebou_one_a']
     
     # series = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
     #           '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
     
 
-    series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
-              '12_n100000_2_dot7_a', '31_n100000_2_one_a']
+    # series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
+    #           '12_n100000_2_dot7_a', '31_n100000_2_one_a']
     
     
     outputlist = ['Output', 'Output2', 'EirOutput']
