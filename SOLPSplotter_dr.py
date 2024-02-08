@@ -25,10 +25,11 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
-xl.load_b2fplasmf()
+# xl.load_b2fplasmf()
 xl.load_output_data(param= 'Te')
 
-# xl.load_vessel()
+xl.load_vessel()
+xl.plot_vessel()
 # xl.flux_comparison_plot()
 
 
@@ -57,7 +58,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = True
+radial_plot_flag = False
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
