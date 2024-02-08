@@ -9,7 +9,7 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
                'Parameters': P, 'series_flag': 'change_den', 
                'Publish': 'b2plottersetting'}
     return set_dic
@@ -25,6 +25,7 @@ def mast_comp_dic():
     series_dic = {'org': '72_n100000_n5e3et1e2_nts5_a', 'dot3': '13_n100000_2_dot3_a', 
                   'dot5': '24_n100000_2_dot5_a', 'dot7': '12_n100000_2_dot7_a', 
                   'one': '31_n100000_2_one_a'}
+    
     outputlist = ['Output', 'Output2', 'EirOutput']
     mast_dir_dic = {'Shot': '027205', 'shift_dic': shift_dic, 
                     'shift_file_dic': shift_file_dic, 'series_dic': series_dic, 
@@ -40,15 +41,15 @@ def mast_comp_dic_withshift():
             'one': 'one_a'}
     
     
-    series = ['72_n100000_n5e3et1e2_nts5_a', '14_n100000_leakagebou_dot3_a', '25_n100000_leakagebou_dot5_a', 
-              '13_n100000_leakagebou_dot7_a', '32_n100000_leakagebou_one_a']
+    # series = ['72_n100000_n5e3et1e2_nts5_a', '14_n100000_leakagebou_dot3_a', '25_n100000_leakagebou_dot5_a', 
+    #           '13_n100000_leakagebou_dot7_a', '32_n100000_leakagebou_one_a']
     
     # series = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
     #           '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
     
 
-    # series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
-    #           '12_n100000_2_dot7_a', '31_n100000_2_one_a']
+    series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
+              '12_n100000_2_dot7_a', '31_n100000_2_one_a']
     
     
     outputlist = ['Output', 'Output2', 'EirOutput']
