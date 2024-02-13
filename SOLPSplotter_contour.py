@@ -134,7 +134,7 @@ class PlotContour(Opacity_study):
             VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
         
         elif self.withshift == True and self.withseries == False:
-            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata'][itername]['simutop']))
+            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop'][itername]))
         
         elif self.withshift == False and self.withseries == True:
             VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
