@@ -37,7 +37,7 @@ xl.plot_vessel()
 
 # xl.calcpsi()
 
-plot_flag = 'poloidal'
+plot_flag = 'skip'
 if plot_flag == 'radial':
     # xl.set_plot()
     PL = '59'
@@ -59,7 +59,7 @@ else:
     print('check plot_flag')
 
 
-radial_plot_flag = False
+radial_plot_flag = True
 if radial_plot_flag:
     xl.plot_all_radial()
 else:
