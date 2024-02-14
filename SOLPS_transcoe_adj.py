@@ -153,7 +153,7 @@ class transport_coefficient_adjustment(load_geometry):
             print('transport_coe_align_plot is not there yet')
     
     
-    def transport_coe_compare_plot(self, file_loc_list, plot_compare):
+    def transport_coe_compare_plot(self, file_loc_list, plot_compare, save_eps):
         trans_dic = {}
         psi_1d_dic = {}
         for fl in file_loc_list:
@@ -201,6 +201,10 @@ class transport_coefficient_adjustment(load_geometry):
                     plt.title('radial {} coefficient'.format(coe_label_dic[k]))
                     plt.legend() 
             plt.show()
+            
+            if save_eps:
+                plt.savefig('destination_path.eps', format='eps')
+                
         else:
             print('transport_coe_align_plot is not there yet')
     
