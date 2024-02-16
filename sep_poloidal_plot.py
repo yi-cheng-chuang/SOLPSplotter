@@ -6,6 +6,7 @@ Created on Thu Feb  1 16:36:57 2024
 """
 
 from SOLPSplotter_sep_data_process import sep_data_process
+import SOLPS_set as ss
 import os
 import opacity_plot_method as opm
 import matplotlib.pyplot as plt
@@ -387,8 +388,8 @@ class sep_poloidal_plot(sep_data_process):
             
             it = it + 1
             
-            fig_dir  = self.set_figdir()
-            plt.savefig('{}/{}_{}.png'.format(fig_dir, shapename, i_name), dpi = 200)
+            fig_dir  = ss.set_figdir()
+            plt.savefig('{}/{}_{}.svg'.format(fig_dir, shapename, i_name), format='svg')
         
         
         
