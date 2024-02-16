@@ -5,7 +5,7 @@ Created on Thu Jan 11 15:00:38 2024
 @author: user
 """
 from SOLPSplotter_geo import load_geometry
-import SOLPS_set as sps
+import SOLPS_set as ss
 import transport_coefficient_adjust_method as tcam
 from scipy import interpolate
 import matplotlib.pyplot as plt
@@ -63,9 +63,9 @@ class transport_coefficient_adjustment(load_geometry):
         tcam.Generate_transcoefile_method(cod, CoeffID=1, SpeciesID=2, M=[1])
         
         shift = 'org'
-        n = str(sps.s_number(file_loc, series_flag= None)[0])
+        n = str(ss.s_number(file_loc, series_flag= None)[0])
         simu_dir = file_loc.rsplit("/",2)[0]
-        # k = str(sps.s_number(file_loc, series_flag= None))
+        # k = str(ss.s_number(file_loc, series_flag= None))
         print(simu_dir)
         
         tcam.Write_transcoefile_method(file = '{}/b2.transport.inputfile_mod_{}{}'.format(simu_dir, shift, n), points= trans_list ,M_1 = True, M=[1])
@@ -106,7 +106,7 @@ class transport_coefficient_adjustment(load_geometry):
         
         
         
-    def transport_coe_align_plot(self, plot_transcoe):
+    def transport_coe_align_plot(self, plot_transcoe, save_eps):
         if self.withshift == True and self.withseries == False:
             trans_dic = {}
             jxa = self.data['b2mn']['org']['jxa']
@@ -148,12 +148,19 @@ class transport_coefficient_adjustment(load_geometry):
                         plt.xlabel('psiN')
                         plt.title('radial {} coefficient'.format(coe_label_dic[k]))
                         plt.legend() 
+                    
+                    if save_eps:
+                        
+                        fig_dir  = ss.set_figdir()
+                        plt.savefig('{}/{}.svg'.format(fig_dir, coe_label_dic[k]), format='svg')
+                    
+                    
                 plt.show()
         else:
             print('transport_coe_align_plot is not there yet')
     
     
-    def transport_coe_compare_plot(self, file_loc_list, plot_compare, save_eps):
+    def transport_coe_compare_plot(self, file_loc_list, plot_compare):
         trans_dic = {}
         psi_1d_dic = {}
         for fl in file_loc_list:
@@ -187,6 +194,8 @@ class transport_coefficient_adjustment(load_geometry):
                          ,'3': 'electron thermal diffusivity'}
         
         note_list = ['leakage', 'decay length']
+        
+        
         if plot_compare:
             for k in coe_label_dic.keys():
                 if log_flag:
@@ -202,8 +211,7 @@ class transport_coefficient_adjustment(load_geometry):
                     plt.legend() 
             plt.show()
             
-            if save_eps:
-                plt.savefig('destination_path.eps', format='eps')
+            
                 
         else:
             print('transport_coe_align_plot is not there yet')
@@ -241,12 +249,12 @@ class transport_coefficient_adjustment(load_geometry):
         ke_func = interpolate.interp1d(x, yke, fill_value = 'extrapolate')
         onke[:,1] = ke_func(onx)
 
-        n = str(sps.s_number(input_file_loc, series_flag= None)[0])
+        n = str(ss.s_number(input_file_loc, series_flag= None)[0])
         simu_dir = input_file_loc.rsplit("/",2)[0]
-        filename = sps.s_number(std_file_loc, series_flag= None)[1]
+        filename = ss.s_number(std_file_loc, series_flag= None)[1]
         char = filename.split('_')[2]
         print(char)
-        # k = str(sps.s_number(file_loc, series_flag= None))
+        # k = str(ss.s_number(file_loc, series_flag= None))
         print(simu_dir)
 
         
