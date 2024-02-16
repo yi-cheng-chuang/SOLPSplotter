@@ -127,6 +127,20 @@ def set_wdir(): #Function to set correct Working Directory Path depending on whi
     
     return basedrt, topdrt, tpdrt
 
+
+def set_figdir(): #Function to set correct Working Directory Path depending on which machine is in use
+    if os.environ['OS'] == 'Windows_NT':
+            
+        if os.environ['USERNAME'] == 'ychuang':
+            
+            fig_dir = r"C:\Users\ychuang\Documents\SOLPS_data\simulation_data\mast\027205\dataplot_fig"
+    
+    return fig_dir
+
+
+
+
+
 def s_number(text, series_flag):
     sd = Setting_dic()
     if sd['withshift'] == False and sd['withseries'] == False:
