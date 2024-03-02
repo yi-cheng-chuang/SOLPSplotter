@@ -432,3 +432,44 @@ def read_b2fstate_Bob(fname):
                         # For other dimensions assign as is (e.g., zamin)
                         state[varname] = np.array(data)
     return state
+
+
+def read_iout_method(fdir, fname):
+    
+    if not os.path.exists(fdir):
+        print('ERROR: {} file not found: '.format(fname), fdir)
+        return None
+
+    DEBUG = False
+
+    data = []
+    with open(fdir, 'r') as f:
+        lines = f.readlines()
+    
+    
+    for i, line in enumerate(reversed(lines)):
+        if i == 0:
+            print(line.rstrip())
+        
+    
+    # for i, line in enumerate(lines):
+        
+    #     splitline = line.split()
+    #     for value in splitline:
+    #         if value.type() == "int":
+    #             data.append(int(value))
+    #         else:
+    #             data.append(float(value))
+        
+    
+    
+    
+    
+
+
+
+
+
+
+
+
