@@ -152,7 +152,7 @@ class transport_coefficient_adjustment(load_geometry):
                     if save_eps:
                         
                         fig_dir  = ss.set_figdir()
-                        plt.savefig('{}/{}.svg'.format(fig_dir, coe_label_dic[k]), format='svg')
+                        plt.savefig('{}/{}.pdf'.format(fig_dir, coe_label_dic[k]), format='pdf')
                     
                     
                 plt.show()
