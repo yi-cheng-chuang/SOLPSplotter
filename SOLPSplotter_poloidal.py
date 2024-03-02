@@ -8,6 +8,7 @@ Created on Wed Jan 31 17:25:25 2024
 from SOLPSplotter_fit import profile_fit
 import opacity_plot_method as opm
 import matplotlib.pyplot as plt
+import SOLPS_set as ss
 import load_mast_expdata_method as lmem
 import load_coord_method as lcm
 import fitting_method as fm 
@@ -112,7 +113,7 @@ class poloidal_plot(profile_fit):
     
     
     
-    def opacity_poloidal_plot(self, log_flag):
+    def opacity_poloidal_plot(self, log_flag, save_pdf):
         
         itemname = self.data['poloidal_itemname']
         # adj_list = list(result_dic.keys())
@@ -168,6 +169,11 @@ class poloidal_plot(profile_fit):
                 
                 
                 self.poloidal_label(angle_fix= ang_fix, item= i, xpoint_fix = xp_fix)
+                
+                if save_pdf:
+                    
+                    fig_dir  = ss.set_figdir()
+                    plt.savefig('{}/{}.pdf'.format(fig_dir, i), format='pdf')
             
             
             elif self.withshift == True and self.withseries == False:
