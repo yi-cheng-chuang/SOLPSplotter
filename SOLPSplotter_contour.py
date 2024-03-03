@@ -7,6 +7,7 @@ Created on Sun Nov 26 18:24:05 2023
 
 from SOLPSplotter_plot import Opacity_study
 import matplotlib.pyplot as plt
+import Contourplot_method as cpm
 from matplotlib import colors, cm
 import matplotlib.tri as tri
 
@@ -20,22 +21,7 @@ class PlotContour(Opacity_study):
     def __init__(self, DefaultSettings, loadDS):
         Opacity_study.__init__(self, DefaultSettings, loadDS)
     
-    
-   
-    def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity):
-        CMAP = cm.viridis
-        NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
-        
-        plt.figure(figsize=(6,12))
-        plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
-        plt.title('{} contour plot'.format(quantity))
-        
-        
-        SM= cm.ScalarMappable(NORM,CMAP)    
-        plt.colorbar(SM)
-    
-    
-   
+       
     def flux_expansion_map_method(self, pol_loc, iter_index):
         
         if self.withshift == False and self.withseries == False:
@@ -52,18 +38,10 @@ class PlotContour(Opacity_study):
                 flux_expand = flux_fit_dic['flux_fitcoe'][0]
                 a_flux_exp = flux_expand*np.ones(self.data['b2fgeo']['ny'])
                 flux_expand_map[:, pol_loc] = a_flux_exp
-                
-            
-            Attempt = self.data['dircomp']['Attempt']
-            DRT = self.data['dirdata']['outputdir']['Output']
-            XDIM = self.data['b2fgeo']['nx'] + 2
-            YDIM = self.data['b2fgeo']['ny'] + 2
             
             
-            RadLoc = np.loadtxt('{}/RadLoc{}'.format(DRT, str(Attempt)),
-                        usecols = (3)).reshape((YDIM, XDIM))
-            VertLoc = np.loadtxt('{}/VertLoc{}'.format(DRT, str(Attempt)), 
-                          usecols = (3)).reshape((YDIM,XDIM))
+            RadLoc = self.data['grid']['RadLoc']
+            VertLoc = self.data['grid']['VertLoc']
             
             R_con = RadLoc[1:37, 1:97]
             Z_con = VertLoc[1:37, 1:97]
@@ -73,22 +51,27 @@ class PlotContour(Opacity_study):
             self.data['flux_contour'] = contour_dic
             
             
-            map_flat = flux_expand_map.flatten()
+            # map_flat = flux_expand_map.flatten()
             
             
-            CMAP = cm.viridis
-            NORM= plt.Normalize(map_flat.min(), map_flat.max())
-            
-            plt.figure(figsize=(6,12))
-            plt.contourf(R_con, Z_con, flux_expand_map, levels= 20, cmap=CMAP,norm=NORM)
-            plt.title('flux expansion contour plot')
+            cpm.contour_plot(plot_2dval = flux_expand_map, R_coord = RadLoc, 
+                             Z_coord = VertLoc, quantity = 'flux expansion')
             
             
-            SM= cm.ScalarMappable(NORM,CMAP)    
-            plt.colorbar(SM)
             
             
-            return flux_expand
+            # CMAP = cm.viridis
+            # NORM= plt.Normalize(map_flat.min(), map_flat.max())
+            
+            # plt.figure(figsize=(6,12))
+            # plt.contourf(R_con, Z_con, flux_expand_map, levels= 20, cmap=CMAP,norm=NORM)
+            # plt.title('flux expansion contour plot')
+            
+            
+            # SM= cm.ScalarMappable(NORM,CMAP)    
+            # plt.colorbar(SM)
+                     
+            # return flux_expand
         
         elif self.withshift == True and self.withseries == False:
             
@@ -124,48 +107,27 @@ class PlotContour(Opacity_study):
         else:
             print('There is a bug')
 
-    def load_vessel_method(self, itername):
-        # try:
-        #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
-        # except:
-        #     print('mesh.extra file not found! Using vvfile.ogr instead')
-        #     WallFile=None
-        if self.withshift == False and self.withseries == False:
-            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
-        
-        elif self.withshift == True and self.withseries == False:
-            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop'][itername]))
-        
-        elif self.withshift == False and self.withseries == True:
-            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
 
-            
-        elif self.withshift == True and self.withseries == True:
-            print('load_vessel_method function is not there yet!')
-        
-        else:
-            print('load_vessel_method function has a bug')
-        
-        # if plot:
-        #     plt.plot
-        return VVFILE
         
     def load_vessel(self):
         if self.withshift == False and self.withseries == False:
-            vessel_file = self.load_vessel_method(itername = None)
+            filedir = self.data['dirdata']['simutop']
+            vessel_file = cpm.load_vessel_method(fdir = filedir)
             self.data['vessel'] = vessel_file
         
         elif self.withshift == True and self.withseries == False:
             vessel_file_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
-                vessel_file = self.load_vessel_method(itername = aa)
+                filedir = self.data['dirdata']['simutop'][aa]
+                vessel_file = self.load_vessel_method(fdir = filedir)
                 vessel_file_dic[aa] = vessel_file
             
             self.data['vessel'] = vessel_file_dic
         
         elif self.withshift == False and self.withseries == True:
-            series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
-            vessel_file = self.load_vessel_method(itername = series_rep)
+            # series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
+            filedir = self.data['dirdata']['simutop']
+            vessel_file = self.load_vessel_method(fdir = filedir)
             self.data['vessel'] = vessel_file
         
         elif self.withshift == True and self.withseries == True:
@@ -518,4 +480,48 @@ class PlotContour(Opacity_study):
             print('plot_all_radial is not there yet...')
         
         
+"""
+backup:
     
+def load_vessel_method(self, itername):
+    # try:
+    #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
+    # except:
+    #     print('mesh.extra file not found! Using vvfile.ogr instead')
+    #     WallFile=None
+    
+    if self.withshift == False and self.withseries == False:
+        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
+    
+    elif self.withshift == True and self.withseries == False:
+        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop'][itername]))
+    
+    elif self.withshift == False and self.withseries == True:
+        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
+
+        
+    elif self.withshift == True and self.withseries == True:
+        print('load_vessel_method function is not there yet!')
+    
+    else:
+        print('load_vessel_method function has a bug')
+    
+    # if plot:
+    #     plt.plot
+    return VVFILE
+
+
+
+def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity):
+    CMAP = cm.viridis
+    NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
+    
+    plt.figure(figsize=(6,12))
+    plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
+    plt.title('{} contour plot'.format(quantity))
+    
+    
+    SM= cm.ScalarMappable(NORM,CMAP)    
+    plt.colorbar(SM)
+
+"""
