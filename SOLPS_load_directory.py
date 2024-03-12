@@ -40,7 +40,7 @@ class load_directory:
         self.data = {'defaultkey':keylist,'dircomp':{}, 'DefaultSettings': {},
                      'grid':{}, 'dirdata':{}, 'ExpDict': {}, 'dsa':{},
                      'gfile':{}, 'gridsettings': {}, 'psi':{}, 
-                     'outputdata':{}}
+                     'outputdata':{}, 'iout_data':{}}
 
         
     def _reset_object(self):
