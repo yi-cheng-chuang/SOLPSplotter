@@ -21,9 +21,10 @@ class profile_fit(RP_mapping):
     def __init__(self, DefaultSettings, loadDS):
         RP_mapping.__init__(self, DefaultSettings, loadDS)
     
+       
     
-    
-    def opacity_data_fit_method(self, b2fstate, Neuden, psiN, psi_dsa_ratio, pol_list, itername): 
+    def opacity_data_fit_method(self, b2fstate, Neuden, psiN, 
+                psi_dsa_ratio, pol_list, itername): 
         # i = 0
         ln = len(pol_list)
         efold = np.zeros(ln)
@@ -42,8 +43,6 @@ class profile_fit(RP_mapping):
         # self.load_output_data(param= 'Ne')
         # self.load_output_data(param= 'Te')
         
-        
-
         Ne_data = b2fstate['ne'].transpose()
         Te_J = b2fstate['te'].transpose()
         ev = 1.6021766339999999 * pow(10, -19)
@@ -73,6 +72,9 @@ class profile_fit(RP_mapping):
             ped_index = rd['sep_index']
             
             
+            fit_dic = {'tanh_ne_fit': rd['tanh_ne_fit'], 'tanh_te_fit': rd['tanh_te_fit'],
+                       'exp_fit': rd['exp_fit']}
+            
             flux_expand = self.calc_flux_expansion(pol_loc = k, ped_index = ped_index, 
                                                    iter_index = itername)
 
@@ -97,8 +99,7 @@ class profile_fit(RP_mapping):
                   'electron_pedestal_density': ne_ped,
                   'temperature_pedestal_width': tdelta,
                   'flux_expansion': fluxexp,
-                  'efold_length': efold_l, 'pedestal_width': delta_l,
-                                  
+                  'efold_length': efold_l, 'pedestal_width': delta_l,                            
                   }
         
         self.data['poloidal_itemname'] = list(result.keys())
@@ -180,7 +181,94 @@ class profile_fit(RP_mapping):
             print('opacity_data_fit has a bug')
                 
                 
-      
+    def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_list):
+        
+        self.load_output_data(param= 'NeuDen')
+        # self.load_output_data(param= 'Ne')
+        # self.load_output_data(param= 'Te')
+        
+        Ne_data = b2fstate['ne'].transpose()
+        Te_J = b2fstate['te'].transpose()
+        ev = 1.6021766339999999 * pow(10, -19)
+        Te_data = Te_J / ev
+        pol_in = int(pol_list[0])
+        
+        psi = psiN[:, pol_in]
+        
+        
+        Nd = Neuden[:, pol_in]
+        Ne = Ne_data[:, pol_in]
+        Te = Te_data[:, pol_in]
+        
+
+        rd = fm.Opacity_calculator(x_coord= psi, ne = Ne, te = Te, 
+                               neuden = Nd)
+             
+        fit_dic = {'tanh_ne_fit': rd['tanh_ne_fit'], 'tanh_te_fit': rd['tanh_te_fit'],
+             'exp_fit': rd['exp_fit'], 'x_coord_cut': rd['x_coord_cut'],
+                     'ne_symmetry_point': rd['ne_symmetry_point'], 
+                      'te_symmetry_point': rd['te_symmetry_point'],
+               'n_sep_fit': rd['n_sep_fit'], 'NeuDen': Nd, 'Ne': Ne, 'Te': Te}
+        
+        return fit_dic
+    
+    
+    def radial_data_fit(self, pol_list):
+        
+        self.load_output_data(param= 'NeuDen')
+        
+        if self.withshift == False and self.withseries == False:
+            
+            
+            Neuden_data = self.data['outputdata']['NeuDen']
+            fstate = self.data['b2fstate']
+            psiN_map = self.data['psi']['psival']
+            
+            fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                        Neuden = Neuden_data, psiN = psiN_map, pol_list = pol_list)
+            
+            self.data['radial_fit_data'] = fitresult
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            fitresult_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                fstate = self.data['b2fstate'][aa]
+                psiN_map = self.data['psi']['psival'][aa]
+                
+                fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                            Neuden = Neuden_data, psiN = psiN_map, pol_list = pol_list)
+                
+                fitresult_dic[aa] = fitresult
+            
+            self.data['radial_fit_data'] = fitresult_dic
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            fitresult_dic = {}
+            
+            for aa in list(self.data['dircomp']['Attempt'].keys()):
+                
+                Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                fstate = self.data['b2fstate'][aa]
+                psiN_map = self.data['psi']['psival']
+                
+                fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                            Neuden = Neuden_data, psiN = psiN_map, pol_list = pol_list)
+                
+                fitresult_dic[aa] = fitresult
+            
+            self.data['radial_fit_data'] = fitresult_dic
+        
+        elif self.withshift == True and self.withseries == True:
+            print('radial_data_fit is not there yet!')
+        
+        
+        else:
+            print('radial_data_fit has a bug')
 
 
 
