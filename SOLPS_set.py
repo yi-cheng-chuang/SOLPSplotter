@@ -9,7 +9,7 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
                'Parameters': P, 'series_flag': 'change_den', 
                'Publish': 'b2plottersetting'}
     return set_dic
@@ -22,7 +22,7 @@ def mast_comp_dic():
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
-    series_dic = {'org': '72_n100000_n5e3et1e2_nts5_a', 'dot3': '15_n100000_leakagebou_dot3_a', 
+    series_dic = {'org': '73_n100000_n5e3et1e2_nts5_a', 'dot3': '15_n100000_leakagebou_dot3_a', 
                   'dot5': '26_n100000_leakagebou_dot5_a', 'dot7': '14_n100000_leakagebou_dot7_a', 
                   'one': '33_n100000_leakagebou_one_a'}
     
@@ -34,18 +34,19 @@ def mast_comp_dic():
     return mast_dir_dic
 
 def mast_comp_dic_withshift():
-    multi_shift = ['org', 'dot3', 'dot5', 'dot7', 'one']
+    multi_shift = ['org', 'dot3', 'dot5', 'dot7']
+    # multi_shift = ['org', 'dot3', 'dot5', 'dot7', 'one']
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
     
     
-    series = ['73_n100000_n5e3et1e2_nts5_a', '15_n100000_leakagebou_dot3_a', '26_n100000_leakagebou_dot5_a', 
-              '14_n100000_leakagebou_dot7_a', '33_n100000_leakagebou_one_a']
+    # series = ['73_n100000_n5e3et1e2_nts5_a', '15_n100000_leakagebou_dot3_a', '26_n100000_leakagebou_dot5_a', 
+    #           '14_n100000_leakagebou_dot7_a', '33_n100000_leakagebou_one_a']
     
-    # series = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
-    #           '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
+    series = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
+              '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
     
 
     # series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
