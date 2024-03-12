@@ -434,7 +434,7 @@ def read_b2fstate_Bob(fname):
     return state
 
 
-def read_iout_method(fdir, fname):
+def read_iout_method(fdir, fname, nx, ny):
     
     if not os.path.exists(fdir):
         print('ERROR: {} file not found: '.format(fname), fdir)
@@ -442,24 +442,40 @@ def read_iout_method(fdir, fname):
 
     DEBUG = False
 
-    data = []
+    data = np.zeros([ny+2, nx+2])
     with open(fdir, 'r') as f:
         lines = f.readlines()
     
     
     for i, line in enumerate(reversed(lines)):
-        if i == 0:
-            print(line.rstrip())
+        splitline = line.split()
+        value_list = []
+        
+        for k, value in enumerate(splitline):
+            if k == 0:
+                pass
+            else:
+                value_list.append(float(value))
+                
+            # if value.type() is int:
+            #     data.append(int(value))
+            # else:
+                
+        # print(len(value_list))
+        if i < ny+2:
+            data[i, :] = value_list
+        
+        iout = data[1:37, 1:97]
+            
+        
+        # iout = np.array(data).reshape([nx+2, ny+2], order = 'F')
+    
+    return iout
         
     
     # for i, line in enumerate(lines):
         
-    #     splitline = line.split()
-    #     for value in splitline:
-    #         if value.type() == "int":
-    #             data.append(int(value))
-    #         else:
-    #             data.append(float(value))
+    #     
         
     
     
