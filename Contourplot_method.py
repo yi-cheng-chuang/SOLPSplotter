@@ -28,7 +28,7 @@ def contour_plot(plot_2dval, R_coord, Z_coord, quantity):
     
     SM= cm.ScalarMappable(NORM,CMAP)    
     plt.colorbar(SM)
-
+    plt.show()
 
 def load_vessel_method(fdir):
     # try:
