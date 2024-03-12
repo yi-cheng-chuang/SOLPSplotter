@@ -319,34 +319,63 @@ class load_simu_data(load_expdata):
             print('load_b2fplasmf function is not there yet!')
     
     
-    def load_iout(self, filename):
+    def load_iout(self, filename, simple_quant):
+        filename_list = filename.split('.')
+        quant = filename_list[0]
+        
+        if simple_quant:
+            pass
+        else:
+            quant = quant.split('_')[1]
+        
+        
         if self.withshift == False and self.withseries == False:
             file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'], 'output', filename)           
-            lbdm.read_iout_method(fdir = file_loc, fname = filename)
+            ny = self.data['b2fgeo']['ny']
+            nx = self.data['b2fgeo']['nx']
+            iout = lbdm.read_iout_method(fdir = file_loc, fname = filename, 
+                                  ny = ny, nx = nx)
+            
+            self.data['iout_data'][quant] = iout
 
         
         elif self.withshift == True and self.withseries == False:
-            state_dic = {}
-            dim_dic = {}
+            iout_dic = {}
             
             for aa in self.data['dircomp']['multi_shift']:
-                file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'], 'output', filename)           
-                lbdm.read_iout_method(fdir = file_loc, fname = filename)
+                ny = self.data['b2fgeo'][aa]['ny']
+                nx = self.data['b2fgeo'][aa]['nx']
+                file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'][aa], 'output', filename)           
+                iout = lbdm.read_iout_method(fdir = file_loc, fname = filename, 
+                                      ny = ny, nx = nx)
+                
+                iout_dic[aa] = iout
+            
+            self.data['iout_data'][quant] = iout_dic
                 
                 
         
         elif self.withshift == False and self.withseries == True:
-            state_dic = {}
-            dim_dic = {}
+            iout_dic = {}
             
             for aa in list(self.data['dircomp']['Attempt'].keys()):
-                file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'], 'output', filename)           
-                lbdm.read_iout_method(fdir = file_loc, fname = filename)
-        
-        
+                ny = self.data['b2fgeo']['ny']
+                nx = self.data['b2fgeo']['nx']
+                file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'][aa], 'output', filename)           
+                iout = lbdm.read_iout_method(fdir = file_loc, fname = filename, 
+                                      ny = ny, nx = nx)
+                
+                iout_dic[aa] = iout
+            
+            self.data['iout_data'][quant] = iout_dic
+            
+            
         
         else:
             print('load_b2fstate function is not there yet!')
+        
+        
+        return quant
             
             
             
