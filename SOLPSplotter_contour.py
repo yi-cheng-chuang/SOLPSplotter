@@ -7,6 +7,7 @@ Created on Sun Nov 26 18:24:05 2023
 
 from SOLPSplotter_plot import Opacity_study
 import matplotlib.pyplot as plt
+import SOLPS_set as ss
 import Contourplot_method as cpm
 from matplotlib import colors, cm
 import matplotlib.tri as tri
@@ -21,85 +22,130 @@ class PlotContour(Opacity_study):
     def __init__(self, DefaultSettings, loadDS):
         Opacity_study.__init__(self, DefaultSettings, loadDS)
     
+    
+    def calc_flux_expansion_line_method(self, RR_sep, arcR):
+                   
+        flux_fit_dic = fm.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
+        
+        flux_expand = flux_fit_dic['flux_fitcoe'][0]
+        a_flux_exp = flux_expand*np.ones(self.data['b2fgeo']['ny'])
+        
+        return a_flux_exp
+    
+    
+    def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity, itername):
+        CMAP = cm.viridis
+        NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
+        
+        plt.figure(figsize=(6,12))
+        plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
+        
+        if itername == None:
+            plt.title('{} contour plot'.format(quantity))
+        
+        else:
+            plt.title('{} contour plot for {} case'.format(quantity, itername))
+            
+        
+                
+        SM= cm.ScalarMappable(NORM,CMAP)    
+        plt.colorbar(SM)
+        
+        
+    
+    def flux_expansion_contour_plot_method(self, RR_sep, flux_expand_map, itername):
+        
+        for pol_loc in range(self.data['b2fgeo']['nx']):
+            
+            if itername == None:
+                arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+
+            else:
+                arcR = self.data['dsa']['dsa_{}'.format(pol_loc)][itername]['dsa_{}_val'.format(pol_loc)]
+            
+            
+            flux_fit_dic = fm.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
+            
+            flux_expand = flux_fit_dic['flux_fitcoe'][0]
+            a_flux_exp = flux_expand*np.ones(self.data['b2fgeo']['ny'])
+            
+            flux_expand_map[:, pol_loc] = a_flux_exp
+        
+        
+        RadLoc = self.data['grid']['RadLoc']
+        VertLoc = self.data['grid']['VertLoc']
+        
+        R_con = RadLoc[1:37, 1:97]
+        Z_con = VertLoc[1:37, 1:97]
+        
+        # contour_dic = {'R_coord': R_con, 'Z_coord': Z_con, 
+        #                'flux_map': flux_expand_map}
+        
+        contour_dic = {'flux_map': flux_expand_map}
+        
+        # map_flat = flux_expand_map.flatten()
+        
+        
+        cpm.contour_plot(plot_2dval = flux_expand_map, R_coord = R_con, 
+                         Z_coord = Z_con, quantity = 'flux expansion')
+        
+        
+        # self.plot_vessel(itername = itername, independent = False, meter = True)
+        # plt.show()
+        
+        return contour_dic
+        
        
-    def flux_expansion_map_method(self, pol_loc, iter_index):
+    def flux_expansion_contour_plot(self):
         
         if self.withshift == False and self.withseries == False:
             
+            for pol_loc in range(self.data['b2fgeo']['nx']):
+                self.calc_dsa(pol_loc)
+            
+                        
             RR_sep = self.data['midplane_calc']['R_Rsep']
             flux_expand_map = np.zeros([self.data['b2fgeo']['ny'], self.data['b2fgeo']['nx']])
             
+            contour_dic = self.flux_expansion_contour_plot_method(RR_sep = RR_sep, 
+                            flux_expand_map = flux_expand_map, itername = None)
             
-            for pol_loc in range(self.data['b2fgeo']['nx']):
-                self.calc_dsa(pol_loc)
-                arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
-                flux_fit_dic = fm.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
-                
-                flux_expand = flux_fit_dic['flux_fitcoe'][0]
-                a_flux_exp = flux_expand*np.ones(self.data['b2fgeo']['ny'])
-                flux_expand_map[:, pol_loc] = a_flux_exp
-            
-            
-            RadLoc = self.data['grid']['RadLoc']
-            VertLoc = self.data['grid']['VertLoc']
-            
-            R_con = RadLoc[1:37, 1:97]
-            Z_con = VertLoc[1:37, 1:97]
-            
-            contour_dic = {'R_coord': R_con, 'Z_coord': Z_con, 
-                           'flux_map': flux_expand_map}
             self.data['flux_contour'] = contour_dic
             
             
-            # map_flat = flux_expand_map.flatten()
-            
-            
-            cpm.contour_plot(plot_2dval = flux_expand_map, R_coord = RadLoc, 
-                             Z_coord = VertLoc, quantity = 'flux expansion')
-            
-            
-            
-            
-            # CMAP = cm.viridis
-            # NORM= plt.Normalize(map_flat.min(), map_flat.max())
-            
-            # plt.figure(figsize=(6,12))
-            # plt.contourf(R_con, Z_con, flux_expand_map, levels= 20, cmap=CMAP,norm=NORM)
-            # plt.title('flux expansion contour plot')
-            
-            
-            # SM= cm.ScalarMappable(NORM,CMAP)    
-            # plt.colorbar(SM)
-                     
-            # return flux_expand
         
         elif self.withshift == True and self.withseries == False:
             
-            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)][iter_index]['dsa_{}_val'.format(pol_loc)]
-            RR_sep = self.data['midplane_calc'][iter_index]['R_Rsep']
+            contour_dic = {}
             
-            arcR_inv = list(reversed(arcR))
-            RRsep_inv = list(reversed(RR_sep))
-                                              
-            flux_fit_dic = fm.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
+            for pol_loc in range(self.data['b2fgeo']['nx']):
+                self.calc_dsa(pol_loc)
             
-            flux_expand = flux_fit_dic['flux_fitcoe'][0]
+            for aa in self.data['dircomp']['multi_shift']:
             
-            return flux_expand
+                RR_sep = self.data['midplane_calc'][aa]['R_Rsep']
+                flux_expand_map = np.zeros([self.data['b2fgeo']['ny'], self.data['b2fgeo']['nx']])
+            
+            
+                contour_dic[aa] = self.flux_expansion_contour_plot_method(RR_sep = RR_sep, 
+                                flux_expand_map = flux_expand_map, itername = aa)
+                
+            
+            self.data['flux_contour'] = contour_dic
+            
         
         elif self.withshift == False and self.withseries == True:
             
-            arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+            for pol_loc in range(self.data['b2fgeo']['nx']):
+                self.calc_dsa(pol_loc)
+                                    
             RR_sep = self.data['midplane_calc']['R_Rsep']
+            flux_expand_map = np.zeros([self.data['b2fgeo']['ny'], self.data['b2fgeo']['nx']])
             
-            arcR_inv = list(reversed(arcR))
-            RRsep_inv = list(reversed(RR_sep))
+            contour_dic = self.flux_expansion_contour_plot_method(RR_sep = RR_sep, 
+                            flux_expand_map = flux_expand_map, itername = None)
             
-            flux_fit_dic = fm.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
-            
-            flux_expand = flux_fit_dic['flux_fitcoe'][0]
-            
-            return flux_expand
+            self.data['flux_contour'] = contour_dic
         
         elif self.withshift == True and self.withseries == True:
             print('calc_flux_expansion is not there yet, to be continue...')
@@ -136,37 +182,137 @@ class PlotContour(Opacity_study):
         else:
             print('load_vessel function has a bug')
             
-        
     
-    def plot_vessel(self):
+    
+    def plot_vessel_method(self, vessel_data, shift_value, independent, meter):
         
-        if self.withshift == False and self.withseries == False:
-            
-            vessel = self.data['vessel']
-            
+        if independent:
             plt.figure(figsize=(7,7))
-            plt.plot(vessel[:,0], vessel[:,1], color = 'g')
+        else:
+            pass
+        
+        if meter:
+            plt.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, color = 'g')
             # plt.xlabel('R')
+                    
+            tick_label = np.arange(0 + shift_value, 2.1 + shift_value, 0.5)
             
-            shift = self.data['dircomp']['shift_value']*1000
-            tick_label = np.arange(0 + shift, 2100 + shift, 500)
+            ytick = np.arange(-1.1, 1.1, 0.5)
+            plt.yticks(ytick)
+            
+            plt.xticks(tick_label)
+            
+            
+        else:
+            plt.plot(vessel_data[:,0], vessel_data[:,1], color = 'g')
+            # plt.xlabel('R')
+                    
+            tick_label = np.arange(0 + shift_value, 2100 + shift_value, 500)
             
             ytick = np.arange(-1100, 1100, 500)
             plt.yticks(ytick)
             
             plt.xticks(tick_label)
+            
+        
+        if independent:
             plt.title('vessel')
             plt.show()
+        
+        else:
+            pass
+            
+            
+    def plot_vessel(self, itername, independent, meter):
+        
+        if self.withshift == False and self.withseries == False:
+            
+            vessel = self.data['vessel']
+            shift = self.data['dircomp']['shift_value']*1000
+            
+            self.plot_vessel_method(vessel_data = vessel, shift_value = shift, 
+                                    independent = independent, meter= meter)
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            vessel = self.data['vessel'][itername]
+            shift = self.data['dircomp']['shift_dic'][itername]*1000
+            
+            self.plot_vessel_method(vessel_data = vessel, shift_value = shift, 
+                                    independent = independent, meter = meter)
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            vessel = self.data['vessel']
+            shift = self.data['dircomp']['shift_value']
+            
+            self.plot_vessel_method(vessel_data = vessel, shift_value = shift, 
+                                    independent = independent, meter = meter)
         
         else:
             
             print('plot_vessel function is not there yet!')
         
         
+    def iout_contour_plot(self, quant):
         
+        if self.withshift == False and self.withseries == False:
+            
+            data = self.data['iout_data'][quant]
+            
+            RadLoc = self.data['grid']['RadLoc']
+            VertLoc = self.data['grid']['VertLoc']
+            
+            R_con = RadLoc[1:37, 1:97]
+            Z_con = VertLoc[1:37, 1:97]
+                        
+            self.contour_plot(plot_2dval = data, R_coord = R_con, 
+                             Z_coord = Z_con, quantity = quant, itername = None)
+            
+            fig_dir  = ss.set_figdir()
+            plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
         
-    
-    
+        elif self.withshift == True and self.withseries == False:
+            
+            data_dic = self.data['iout_data'][quant]
+            
+            RadLoc = self.data['grid']['RadLoc']
+            VertLoc = self.data['grid']['VertLoc']
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                data = self.data['iout_data'][quant][aa]
+                
+                R_con = RadLoc[aa][1:37, 1:97]
+                Z_con = VertLoc[aa][1:37, 1:97]
+                            
+                self.contour_plot(plot_2dval = data, R_coord = R_con, 
+                                 Z_coord = Z_con, quantity = quant, itername = aa)
+                
+                fig_dir  = ss.set_figdir()
+                plt.savefig('{}/{}_{}.png'.format(fig_dir, quant, aa), format='png')
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            data_dic = self.data['iout_data'][quant]
+            
+            RadLoc = self.data['grid']['RadLoc']
+            VertLoc = self.data['grid']['VertLoc']
+            
+            
+            for aa in list(self.data['dircomp']['Attempt'].keys()):
+                
+                data = self.data['iout_data'][quant][aa]
+            
+                R_con = RadLoc[1:37, 1:97]
+                Z_con = VertLoc[1:37, 1:97]
+                            
+                self.contour_plot(plot_2dval = data, R_coord = R_con, 
+                                 Z_coord = Z_con, quantity = quant, itername = aa)
+        
+        else:
+            print('iout_contour_plot function is not there yet!')
+
     
     
     def plot_all_radial(self):
@@ -523,5 +669,35 @@ def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity):
     
     SM= cm.ScalarMappable(NORM,CMAP)    
     plt.colorbar(SM)
+
+
+for pol_loc in range(self.data['b2fgeo']['nx']):
+    self.calc_dsa(pol_loc)
+    arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
+    
+    a_flux_exp = self.calc_flux_expansion_line_method(RR_sep = RR_sep, 
+                                                      arcR = arcR)
+    
+    flux_expand_map[:, pol_loc] = a_flux_exp
+
+
+RadLoc = self.data['grid']['RadLoc']
+VertLoc = self.data['grid']['VertLoc']
+
+R_con = RadLoc[1:37, 1:97]
+Z_con = VertLoc[1:37, 1:97]
+
+contour_dic = {'R_coord': R_con, 'Z_coord': Z_con, 
+               'flux_map': flux_expand_map}
+self.data['flux_contour'] = contour_dic
+
+
+# map_flat = flux_expand_map.flatten()
+
+
+cpm.contour_plot(plot_2dval = flux_expand_map, R_coord = RadLoc, 
+                 Z_coord = VertLoc, quantity = 'flux expansion')
+
+
 
 """
