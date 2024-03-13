@@ -321,12 +321,12 @@ class load_simu_data(load_expdata):
     
     def load_iout(self, filename, simple_quant):
         filename_list = filename.split('.')
-        quant = filename_list[0]
+        quant = simple_quant
         
-        if simple_quant:
-            pass
-        else:
-            quant = quant.split('_')[1]
+        # if simple_quant:
+        #     pass
+        # else:
+        #     quant = quant.split('_')[1]
         
         
         if self.withshift == False and self.withseries == False:
@@ -376,6 +376,38 @@ class load_simu_data(load_expdata):
         
         
         return quant
+    
+    def load_iout_ratio(self, file_tuple):
+        
+        if len(file_tuple) > 2:
+            print('input more than two files!')
+        
+        else:
+            for ftu in file_tuple:
+                self.load_iout(filename = ftu[0], simple_quant = ftu[1])
+            
+            
+
+            name1 = file_tuple[0][1]
+            data1 = self.data['iout_data'][name1]
+            
+            name2 = file_tuple[1][1]
+            data2 = self.data['iout_data'][name2]
+            
+            ratio_data = np.divide(data1, data2)
+            quantname = '{}/{}'.format(name1, name2)
+            
+            self.data['iout_data']['{}/{}'.format(name1, name2)] = ratio_data
+            
+            return quantname
+            
+            
+            
+            
+        
+        
+            
+        
             
             
             
