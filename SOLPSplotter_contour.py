@@ -36,6 +36,7 @@ class PlotContour(Opacity_study):
     def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity, itername):
         CMAP = cm.viridis
         NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
+        vessel = self.data['vessel']
         
         plt.figure(figsize=(6,12))
         plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
@@ -46,7 +47,7 @@ class PlotContour(Opacity_study):
         else:
             plt.title('{} contour plot for {} case'.format(quantity, itername))
             
-        
+        plt.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = 'g')
                 
         SM= cm.ScalarMappable(NORM,CMAP)    
         plt.colorbar(SM)
