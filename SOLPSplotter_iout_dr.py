@@ -25,18 +25,55 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'plot_exp_and_fit': False, 'plot_shift_compare': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
-# xl.load_iout(filename = 'b2npc11_fnax001.dat')
+xl.load_vessel()
 
-iout_quant = [('b2npc11_fnax001.dat', False), ('hz.dat', True), ('hx.dat', True), ('hy.dat', True)]
+topic = 'Q1'
 
-#('b2tfnb_bxuanax001.dat', False)
 
-for item in iout_quant:
+"""
+
+('b2tfnb_bxuanax001.dat', False), ('hx.dat', True), ('hy.dat', True), 
+('b2npc11_fnax001.dat', False), ('hz.dat', True)
+
+"""
+
+if topic == 'Q1':
+    test_equ = 0
+    if test_equ == 0:
+        
+        f_tuple1 = [('b2npco_sna000.dat', False), ('vol.dat', True)]
+        f_tuple2 = [('b2npc11_sna001.dat', False), ('vol.dat', True)]
+        f_tuple3 = [('b2npco_sna000.dat', False), ('vol.dat', True)]
+        f_tuple4 = [('b2npco_sna000.dat', False), ('vol.dat', True)]
+        
+        f_list = [f_tuple1, f_tuple2, f_tuple3, f_tuple4]
+        
+        qu = xl.load_iout_ratio(file_tuple = f_list[0])
+        print(qu)
+        
+        xl.iout_contour_plot(quant = qu)
+        
+        iout_quant = [ ('b2npco_sna000.dat', False), ('b2npc11_sna001.dat', False), 
+                      ('b2stel_sna_ion000.dat', False), ('b2stbr_sna_eir001.dat', False), 
+                      ('b2stcx_sna_001.dat', False), ('b2npc11_dnadt001.dat', False), ('b2stel_sna_rec000.dat', False)]
+
+elif topic == 'test':
     
-    qu = xl.load_iout(filename = item[0], simple_quant = item[1])
-    print(qu)
+    iout_quant = [ ('b2npco_sna000.dat', False), ('b2npc11_sna001.dat', False), 
+                  ('b2stel_sna_ion000.dat', False), ('b2stbr_sna_eir001.dat', False), 
+                  ('b2stcx_sna_001.dat', False), ('b2npc11_dnadt001.dat', False), ('b2stel_sna_rec000.dat', False)]
 
-    xl.iout_contour_plot(quant = qu)
+
+
+    for item in iout_quant:
+        
+        qu = xl.load_iout(filename = item[0], simple_quant = item[1])
+        print(qu)
+
+        xl.iout_contour_plot(quant = qu)
+    
+
+
     
 
 
