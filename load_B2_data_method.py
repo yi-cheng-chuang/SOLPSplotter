@@ -472,10 +472,6 @@ def read_iout_method(fdir, fname, nx, ny):
     
     return iout
         
-    
-    # for i, line in enumerate(lines):
-        
-    #     
         
     
     
