@@ -319,6 +319,47 @@ class load_simu_data(load_expdata):
             print('load_b2fplasmf function is not there yet!')
     
     
+    def load_ft44(self):
+        
+        ftname = 'fort.44.i'
+        
+        if self.withshift == False and self.withseries == False:
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], '{}'.format(ftname))
+            ft44 = lEdm.read_ft44(fileName = file_loc)
+            ft44_dic = vars(ft44)
+            
+            self.data['ft44'] = ft44_dic
+            # print('the next line is b2fplasmf')
+            # print(type(k))
+        
+        elif self.withshift == True and self.withseries == False:
+            ft44_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
+                ft44 = lEdm.read_ft44(fileName = file_loc)
+                ft44_dic[aa] = vars(ft44)
+                
+                
+            self.data['ft44'] = ft44_dic
+        
+        elif self.withshift == False and self.withseries == True:
+            ft44_dic = {}
+            
+            for aa in list(self.data['dircomp']['Attempt'].keys()):
+                
+                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
+                ft44 = lEdm.read_ft44(fileName = file_loc)
+                ft44_dic[aa] = vars(ft44)
+                
+                
+            self.data['ft44'] = ft44_dic
+            
+                
+        else:
+            print('load_b2fplasmf function is not there yet!')
+    
     def load_iout(self, filename, simple_quant):
         filename_list = filename.split('.')
         quant = simple_quant
@@ -377,7 +418,8 @@ class load_simu_data(load_expdata):
         
         return quant
     
-    def load_iout_ratio(self, file_tuple):
+    def load_iout_ratio(self, file_tuple, itername):
+        
         
         if len(file_tuple) > 2:
             print('input more than two files!')
@@ -386,21 +428,158 @@ class load_simu_data(load_expdata):
             for ftu in file_tuple:
                 self.load_iout(filename = ftu[0], simple_quant = ftu[1])
             
+            if itername == None:
+                
+                name1 = file_tuple[0][1]
+                data1 = self.data['iout_data'][name1]
+                
+                name2 = file_tuple[1][1]
+                data2 = self.data['iout_data'][name2]
+                
+                ratio_data = np.divide(data1, data2)
+                quantname = '{}_divide_{}'.format(name1, name2)
+                
+                self.data['iout_data'][quantname] = ratio_data
+                # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
             
+            else:
+                
+                name1 = file_tuple[0][1]
+                data1 = self.data['iout_data'][name1][itername]
+                
+                name2 = file_tuple[1][1]
+                data2 = self.data['iout_data'][name2][itername]
+                
+                ratio_data = np.divide(data1, data2)
+                quantname = '{}_divide_{}'.format(name1, name2)
+                
+                # self.data['iout_data'][quantname][itername] = ratio_data
+                # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+                
 
-            name1 = file_tuple[0][1]
+            return ratio_data, quantname
+        
+            
+            
+    
+        
+    def load_iout_multi(self, name1, name2, itername, input_name):
+        
+        if input_name == None and itername == None:
+            
             data1 = self.data['iout_data'][name1]
             
-            name2 = file_tuple[1][1]
+            data2 = self.data['iout_data'][name2]
+            
+            multi_data = np.multiply(data1, data2)
+            quantname = '{}_multi_{}'.format(name1, name2)
+            
+            self.data['iout_data'][quantname] = multi_data
+            # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+        
+        elif input_name != None and itername != None:
+            data1 = self.data['iout_data'][name1][itername]
+            
+            data2 = self.data['iout_data'][name2][itername]
+            
+            multi_data = np.multiply(data1, data2)
+            quantname = '{}'.format(input_name)
+            
+            # self.data['iout_data'][quantname][itername] = multi_data
+            # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+            
+        
+        
+        return multi_data, quantname
+    
+    def load_iout_name_ratio(self, setname, name1, name2, stdname, itername):
+        
+        
+        if self.withshift == False and self.withseries == False:
+        
+            data1 = self.data['iout_data'][name1]
+            
             data2 = self.data['iout_data'][name2]
             
             ratio_data = np.divide(data1, data2)
-            quantname = '{}/{}'.format(name1, name2)
+            quantname = '{}_divide_{}'.format(name1, name2)
             
-            self.data['iout_data']['{}/{}'.format(name1, name2)] = ratio_data
+            self.data['iout_data'][quantname] = ratio_data
+            # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
             
             return quantname
+        
+        elif self.withshift == True and self.withseries == False:
             
+            if setname == 'iout_data':
+                
+                data1 = self.data[setname][name1]
+                
+                data2 = self.data[setname][name2][stdname]
+                
+                ratio_data = np.divide(data1, data2)*100
+                quantname = '{}_change_percent'.format(name2)
+                
+                # self.data['iout_data'][quantname] = ratio_data
+                # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+                
+                return ratio_data, quantname
+            
+            elif setname == 'ft44':
+                
+                data1 = self.data[setname][name1]
+                
+                data2 = self.data[setname][stdname][name2]
+                
+                ratio_data = np.divide(data1, data2)*100
+                quantname = '{}_change_percent'.format(name2)
+                
+                # self.data['iout_data'][quantname] = ratio_data
+                # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+                
+                return ratio_data, quantname
+                
+            
+           
+        
+        
+        else:
+            print('load_iout_name_ratio function is not there yet!')
+        
+    
+        
+        
+    
+    
+    def load_differ(self, setname, name, itername1, itername2):
+        
+        if setname == 'iout_data':
+            data1 = self.data[setname][name][itername1]
+            
+            data2 = self.data[setname][name][itername2]
+            
+            diff_data = data1 - data2
+            quantname = '{}_{}_minus_{}'.format(name, itername1, itername2)
+            
+            self.data[setname][quantname] = diff_data
+            # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+        
+        elif setname == 'ft44':
+            
+            data1 = self.data[setname][itername1][name]
+            
+            data2 = self.data[setname][itername2][name]
+            
+            diff_data = data1 - data2
+            quantname = '{}_{}_minus_{}'.format(name, itername1, itername2)
+            
+            self.data[setname][quantname] = diff_data
+            # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+            
+            
+        
+        
+        return quantname
             
             
             
