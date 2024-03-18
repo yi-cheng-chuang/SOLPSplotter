@@ -9,7 +9,7 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
                'Parameters': P, 'series_flag': 'change_den', 
                'Publish': 'b2plottersetting'}
     return set_dic
