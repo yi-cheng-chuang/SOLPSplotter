@@ -39,7 +39,7 @@ class profile_fit(RP_mapping):
         fluxexp = np.zeros(ln)
         
         
-        self.load_output_data(param= 'NeuDen')
+        # self.load_output_data(param= 'NeuDen')
         # self.load_output_data(param= 'Ne')
         # self.load_output_data(param= 'Te')
         
@@ -109,12 +109,15 @@ class profile_fit(RP_mapping):
     
     def opacity_data_fit(self, pol_list):
         
+        # self.load_ft44()
         self.load_output_data(param= 'NeuDen')
         
         if self.withshift == False and self.withseries == False:
             
             for p in pol_list:
                 self.calc_dsa(pol_loc= p)
+            # data = self.data['ft44']['dab2']
+            # Neuden_data = np.transpose(data[:, :, 0])
             Neuden_data = self.data['outputdata']['NeuDen']
             fstate = self.data['b2fstate']
             psiN_map = self.data['psi']['psival']
@@ -137,6 +140,8 @@ class profile_fit(RP_mapping):
             for aa in self.data['dircomp']['multi_shift']:
                 
                 Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                # data = self.data['ft44'][aa]['dab2']
+                # Neuden_data = np.transpose(data[:, :, 0])
                 fstate = self.data['b2fstate'][aa]
                 psiN_map = self.data['psi']['psival'][aa]
                 pd = self.data['DefaultSettings']['psi_dsa'][aa]
@@ -160,6 +165,8 @@ class profile_fit(RP_mapping):
             for aa in list(self.data['dircomp']['Attempt'].keys()):
                 
                 Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                # data = self.data['ft44'][aa]['dab2']
+                # Neuden_data = np.transpose(data[:, :, 0])
                 fstate = self.data['b2fstate'][aa]
                 psiN_map = self.data['psi']['psival']
                 pd = self.data['DefaultSettings']['psi_dsa']
@@ -183,7 +190,7 @@ class profile_fit(RP_mapping):
                 
     def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_list):
         
-        self.load_output_data(param= 'NeuDen')
+        # self.load_output_data(param= 'NeuDen')
         # self.load_output_data(param= 'Ne')
         # self.load_output_data(param= 'Te')
         
@@ -215,12 +222,15 @@ class profile_fit(RP_mapping):
     
     def radial_data_fit(self, pol_list):
         
-        self.load_output_data(param= 'NeuDen')
+        # self.load_output_data(param= 'NeuDen')
+        
+        self.load_ft44()
         
         if self.withshift == False and self.withseries == False:
             
-            
-            Neuden_data = self.data['outputdata']['NeuDen']
+            data = self.data['ft44']['dab2']
+            Neuden_data = np.transpose(data[:, :, 0])
+            # Neuden_data = self.data['outputdata']['NeuDen']
             fstate = self.data['b2fstate']
             psiN_map = self.data['psi']['psival']
             
