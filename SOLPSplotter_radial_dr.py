@@ -26,9 +26,10 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
+xl.load_ft44()
 # xl.load_b2fplasmf()
 # xl.b2fplasmf_filter()
-xl.load_output_data(param= 'Te')
+# xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
 
 poloidal_index_list = ['59']
@@ -39,4 +40,5 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 xl.opacity_data_fit(pol_list = poloidal_index_list)
 xl.radial_data_fit(pol_list = poloidal_index_list)
 xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list)
+xl.plot_all_radial(separate = False)
 
