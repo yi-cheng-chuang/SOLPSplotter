@@ -62,7 +62,7 @@ class radial_plot(profile_fit):
             plt.yscale('log')
         else:
             pass
-        plt.plot(x_coord, Nd,'-', color = 'green', label= 'solps neutral density')
+        plt.plot(x_coord[1:37], Nd,'-', color = 'green', label= 'solps neutral density')
         # plt.plot(psi_RGI, Nd,'-', color = 'b', label= 'RGI_solps neutral density')
         plt.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, ls='-', label= 'exponential fit')
         plt.axvline(x= max(xcoord_cut), color='orange',lw=3)
@@ -122,9 +122,12 @@ class radial_plot(profile_fit):
         if self.withshift == False and self.withseries == False:
             
             pol_index = int(pol_loc[0])
-            Nd = self.data['radial_fit_data']['NeuDen'][:, pol_index]
-            Ne = self.data['radial_fit_data']['Ne'][:, pol_index]
-            Te = self.data['radial_fit_data']['Te'][:, pol_index]
+            # Nd = self.data['radial_fit_data']['NeuDen'][:, pol_index]
+            # Ne = self.data['radial_fit_data']['Ne'][:, pol_index]
+            # Te = self.data['radial_fit_data']['Te'][:, pol_index]
+            Nd = self.data['radial_fit_data']['NeuDen']
+            Ne = self.data['radial_fit_data']['Ne']
+            Te = self.data['radial_fit_data']['Te']
             SEP = int(self.data['DefaultSettings']['sep_index_dsa'])
             psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 2]
             
@@ -133,7 +136,7 @@ class radial_plot(profile_fit):
             
             
             P = self.data['Parameter']
-            self.opacity_radial_method(self, result_dic = result_dic, SEP = SEP, 
+            self.opacity_radial_method(result_dic = result_dic, SEP = SEP, 
             x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, P = P, log_flag = True)
         
         
@@ -521,10 +524,12 @@ class radial_plot(profile_fit):
     
     
     
-    def plot_all_radial(self):
+    def plot_all_radial(self, separate):
         
         if self.withshift == False and self.withseries == False:
-
+            
+            """
+            
             # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
             if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
                 pass
@@ -536,6 +541,19 @@ class radial_plot(profile_fit):
             ne_pro = self.data['outputdata']['Ne']
             te_pro = self.data['outputdata']['Te']
             neu_pro = self.data['outputdata']['NeuDen']
+            
+            """
+            
+            b2fstate = self.data['b2fstate']
+            
+            ne_pro = b2fstate['ne'].transpose()
+            Te_J = b2fstate['te'].transpose()
+            ev = 1.6021766339999999 * pow(10, -19)
+            te_pro = Te_J / ev
+            
+            data = self.data['ft44']['dab2']
+            neu_pro = np.transpose(data[:, :, 0])
+            
             
             core_ne_pro = ne_pro[:, 25:71]
             core_te_pro = te_pro[:, 25:71]
@@ -614,28 +632,54 @@ class radial_plot(profile_fit):
             
             'core'
             
-            plt.figure(figsize=(7,7))
-            plt.yscale('log')
-            plt.errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = '-', color = 'g', label= 'ne_solps')
-            plt.errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'b', label= 'ne_exp')
-            plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-            plt.xlabel('psiN')
-            plt.title('electron density with experimental fit')
-            plt.legend()
+        
+            
+            if separate:
+                plt.figure(figsize=(7,7))
+                plt.yscale('log')
+                plt.errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = '-', color = 'g', label= 'ne_solps')
+                plt.errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'b', label= 'ne_exp')
+                # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+                plt.xlabel('psiN')
+                plt.title('electron density with experimental fit')
+                plt.legend()
+                
+                
+                plt.figure(figsize=(7,7))
+                plt.yscale('log')
+                plt.errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = '-', color = 'g', label= 'te_solps')
+                plt.errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'b', label= 'te_exp')
+                # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+                plt.xlabel('psiN')
+                plt.title('electron temperature with experimental fit')
+                plt.legend()
+            else:
+                fig, axs = plt.subplots(1, 2)
+                
+                axs[0].set_yscale('log')
+                axs[0].errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = '-', color = 'g', label= 'ne_solps')
+                axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'b', label= 'ne_exp')
+                # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+                axs[0].set_xlabel('psiN')
+                axs[0].set_title('electron density with experimental fit')
+                axs[0].legend()
+                
+                axs[1].set_yscale('log')
+                axs[1].errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = '-', color = 'g', label= 'te_solps')
+                axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'b', label= 'te_exp')
+                # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+                axs[1].set_xlabel('psiN')
+                axs[1].set_title('electron temperature with experimental fit')
+                axs[1].legend()
+                
             
             
-            plt.figure(figsize=(7,7))
-            plt.yscale('log')
-            plt.errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = '-', color = 'g', label= 'te_solps')
-            plt.errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'b', label= 'te_exp')
-            plt.plot(psiN, te, 'o', color = 'r', label= 'te_exp_fit')
-            plt.xlabel('psiN')
-            plt.title('electron temperature with experimental fit')
-            plt.legend()
+            
+            print('the shape of mean_core_neu is {}'.format(np.shape(mean_core_neu)))
             
             plt.figure(figsize=(7,7))
             plt.yscale('log')
-            plt.errorbar(psiN, mean_core_neu, yerr= std_core_neu, fmt = 'o', color = 'g', label= 'Neuden_solps')
+            plt.errorbar(psiN[1:37], mean_core_neu, yerr= std_core_neu, fmt = 'o', color = 'g', label= 'Neuden_solps')
             plt.xlabel('psiN')
             plt.title('Neutral density')
             plt.legend()
@@ -659,7 +703,7 @@ class radial_plot(profile_fit):
             
             plt.figure(figsize=(7,7))
             plt.yscale('log')
-            plt.errorbar(psiN, mean_innerleg_neu, yerr= std_innerleg_neu, fmt = 'o', color = 'g', label= 'neuden_solps')
+            plt.errorbar(psiN[1:37], mean_innerleg_neu, yerr= std_innerleg_neu, fmt = 'o', color = 'g', label= 'neuden_solps')
             plt.xlabel('psiN')
             plt.title('inner leg neutral density')
             plt.legend()
@@ -684,7 +728,7 @@ class radial_plot(profile_fit):
             
             plt.figure(figsize=(7,7))
             plt.yscale('log')
-            plt.errorbar(psiN, mean_outerleg_neu, yerr= std_outerleg_neu, fmt = 'o', color = 'g', label= 'neuden_solps')
+            plt.errorbar(psiN[1:37], mean_outerleg_neu, yerr= std_outerleg_neu, fmt = 'o', color = 'g', label= 'neuden_solps')
             plt.xlabel('psiN')
             plt.title('outer leg neutral density')
             plt.legend()
