@@ -30,7 +30,7 @@ xl.load_vessel()
 xl.load_ft44()
 xl.set_plot()
 
-topic = 'Q3'
+topic = 'Q3-1'
 
 
 """
@@ -280,8 +280,8 @@ elif topic == 'Q3':
                                     stdname = 'org', itername = aa, setname = 'iout_data')
                     print(per_qu)
                     resqu_per_dic[aa] = data
-                    bon = {'max': 5000, 'min': 0.1}
-                    xl.plot_change_data(data = data, log_bar = True, bounds = bon,
+                    bon = {'max': 100, 'min': -100}
+                    xl.plot_change_data(data = data, log_bar = False, bounds = bon,
                                          itername = aa, quant = per_qu, ma100 = True)
                 
             xl.data['iout_data'][per_qu] = resqu_per_dic
@@ -307,7 +307,7 @@ elif topic == 'Q3-1':
             neuden_data = np.transpose(data[:, :, 0])
             print(np.shape(neuden_data))
             
-            bon = {'max': 300, 'min': -300}
+            bon = {'max': 100, 'min': -100}
             
             xl.plot_change_data(data = neuden_data, log_bar = False, bounds = bon, 
                      itername = aa, quant = 'neutral density increase percentage', ma100 = True)
