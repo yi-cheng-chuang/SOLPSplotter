@@ -27,7 +27,7 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
 xl.load_b2fplasmf()
-xl.load_output_data(param= 'Te')
+# xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
 
 
@@ -38,7 +38,7 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 xl.set_plot()
 poloidal_index_list = []
-for i in range(47):
+for i in range(44):
     poloidal_index_list.append('{}'.format(25 + i))
     
 xl.opacity_data_fit(pol_list = poloidal_index_list)
