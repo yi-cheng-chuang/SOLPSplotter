@@ -42,11 +42,17 @@ def mast_comp_dic_withshift():
             'one': 'one_a'}
     
     
+    series = ['75_n900000_leakbtarnsol_nts5_a', '16_n900000_leakbtarnsol_dot3_a', '27_n900000_leakbtarnsol_dot5_a', 
+              '15_n900000_leakbtarnsol_dot7_a', '32_n100000_m12_one_a']
+    
+    # series = ['75_n900000_leakbsol_nts5_a', '16_n900000_leakbnsol_dot3_a', '27_n900000_leakbsol_dot5_a', 
+    #           '15_n900000_leakbsol_dot7_a', '32_n100000_m12_one_a']
+    
     # series = ['73_n100000_n5e3et1e2_nts5_a', '15_n100000_leakagebou_dot3_a', '26_n100000_leakagebou_dot5_a', 
     #           '14_n100000_leakagebou_dot7_a', '33_n100000_leakagebou_one_a']
     
-    series = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
-              '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
+    # series = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
+    #           '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
     
 
     # series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
