@@ -208,7 +208,63 @@ class poloidal_plot(profile_fit):
             
             else:
                 print('poloidal_plot function has a bug.')
+        
+        
+        def opacity_poloidal_subplot_method(self, itemname):
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            
+            if self.withshift == False and self.withseries == False:
                 
+                result = self.data['opacity_poloidal']
+
+                
+                unit = opm.opacity_study_unit()
+                pol_loc = self.data['angle']['angle_list']
+                xpoint = self.data['angle']['xpoint_angle']
+                a_shift = self.data['dircomp']['a_shift']
+                A_val = A_dic[a_shift]
+                color = color_dic[a_shift]
+                
+                self.opacity_poloidal_plot_method(item = itemname, pol_angle = pol_loc, 
+            result_dic = result, color_code = color, A_value = A_val, unit_dic = unit)
+                
+                self.poloidal_label(angle_fix= pol_loc, item= i, xpoint_fix = xpoint)
+                
+                
+        
+            
+            elif self.withshift == True and self.withseries == False:
+                
+                
+                for aa in self.data['dircomp']['multi_shift']:
+                    
+                    result = self.data['opacity_poloidal'][aa]
+                    unit = opm.opacity_study_unit()
+                    pol_loc = self.data['angle']['angle_list'][aa]
+                    xpoint = self.data['angle']['xpoint_angle'][aa]
+                    A_val = A_dic[aa]
+                    color = color_dic[aa]
+                    ang_fix = self.data['angle']['angle_list']['org']
+                    xp_fix = self.data['angle']['xpoint_angle']['org']
+                    
+                    self.opacity_poloidal_plot_method(item = itemname, pol_angle = pol_loc, 
+                result_dic = result, color_code = color, A_value = A_val, unit_dic = unit)
+                
+                
+                self.poloidal_label(angle_fix= ang_fix, item= i, xpoint_fix = xp_fix)
+        
+        
+        
+                
+                
+                
+        
+        
 
         def data_reorder(iter_list, change_var, data_collect, char):
             withshift = char['withshift']
