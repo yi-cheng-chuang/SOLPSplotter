@@ -429,8 +429,8 @@ class PlotContour(Opacity_study):
                              Z_coord = Z_con, quantity = quant, bounds = bounds, 
                              itername = itername, log_bar = log_bar, ma100= ma100)
             
-            fig_dir  = ss.set_figdir()
-            plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
+            # fig_dir  = ss.set_figdir()
+            # plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
             
             
         
