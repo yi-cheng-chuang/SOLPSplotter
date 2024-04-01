@@ -20,15 +20,19 @@ class radial_plot(profile_fit):
     
     def __init__(self, DefaultSettings, loadDS):
         profile_fit.__init__(self, DefaultSettings, loadDS)
+        
+        self.Publish = DefaultSettings['Publish']
+        self.data['DefaultSettings']['Publish'] = self.Publish
             
     
     def set_plot(self):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 5, markersize= 9)
-            plt.rcParams.update({'font.size': 10})
+            plt.rc('lines', linewidth= 3, markersize= 7)
+            plt.rcParams.update({'font.size': 20})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
+            # plt.rcParams["text.usetex"] = True
   
         else:
             print('Publish setting is incorrect or add another setting')
@@ -74,7 +78,7 @@ class radial_plot(profile_fit):
         # plt.axvline(x= x_m2[0], color='purple',lw=3, ls='--', 
         #             label= 'exp fitting width')
         # plt.axvline(x= x_m2[-1], color='purple',lw=3, ls='--')
-        plt.xlabel('psiN')
+        plt.xlabel('Normalized flux coordinate $\psi_N$')
         # plt.ylabel(P['NeuDen'])
         plt.title('Neutral density with fits')
         plt.legend()
@@ -660,7 +664,7 @@ class radial_plot(profile_fit):
                 axs[0].errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = '-', color = 'g', label= 'ne_solps')
                 axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'b', label= 'ne_exp')
                 # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-                axs[0].set_xlabel('psiN')
+                axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
                 axs[0].set_title('electron density with experimental fit')
                 axs[0].legend()
                 
@@ -668,7 +672,7 @@ class radial_plot(profile_fit):
                 axs[1].errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = '-', color = 'g', label= 'te_solps')
                 axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'b', label= 'te_exp')
                 # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-                axs[1].set_xlabel('psiN')
+                axs[1].set_xlabel('Normalized flux coordinate $\psi_N$')
                 axs[1].set_title('electron temperature with experimental fit')
                 axs[1].legend()
                 
