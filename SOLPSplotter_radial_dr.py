@@ -31,6 +31,7 @@ xl.load_ft44()
 # xl.b2fplasmf_filter()
 # xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
+xl.set_plot()
 
 poloidal_index_list = ['59']
 xl.calc_dsa(pol_loc= poloidal_index_list[0])
