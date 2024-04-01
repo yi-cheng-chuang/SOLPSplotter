@@ -73,7 +73,7 @@ class data_reorder(profile_fit):
             char['withseries'] = self.withseries
             char['series_flag'] = self.DefaultSettings['series_flag']
 
-            self.data_reorder(iter_list = pol_list, change_var = shift_list,
+            self.paper_data_reorder(iter_list = pol_list, change_var = shift_list,
                              data_collect = data_collect_opq, char = char)
             
             unit = opm.opacity_study_unit()
@@ -103,7 +103,7 @@ class data_reorder(profile_fit):
                     plt.scatter(x_cor, data_collect[:, p], color= color_list[p], 
                                     label= 'efold length for different core electron density {}'.format(change_var[p]))
                 plt.xlabel('Electron density: ${n_e}$ (m$^{-3}$)')
-                plt.title('dimensionless opaqueness verses shift core electron density')
+                plt.title('Experimental opaqueness verses shift core electron density')
                 plt.legend()
                 
             elif series_flag == 'eireneN':
@@ -115,7 +115,7 @@ class data_reorder(profile_fit):
                 # plt.yscale('log')
                 plt.xscale('log')
                 # plt.title('dimensionless opaqueness verses different SOL eirene particle number')
-                plt.title('dimensionless opaqueness')
+                plt.title('Experimental opaqueness')
                 # plt.legend()
             
         elif withshift == True and withseries == False:
@@ -134,5 +134,56 @@ class data_reorder(profile_fit):
             # plt.xlabel('aspect ratio')
             # plt.ylabel('dimensionless opaqueness')
             # plt.title('dimensionless opaqueness verses different modify distance')
-            plt.title('dimensionless opaqueness')
+            plt.title('Experimental opaqueness')
             plt.legend()
+    
+    
+    
+    def paper_data_reorder(self, iter_list, change_var, data_collect, char):
+        
+        withshift = char['withshift']
+        withseries = char['withseries']
+        series_flag = char['series_flag']
+        
+        if withshift == False and withseries == True:
+            plt.figure(figsize=(7,7))
+            color_list = ['red', 'salmon', 'orange', 'lime', 'green', 'darkgreen', 
+                          'cyan', 'deepskyblue', 'navy', 'purple']
+            if series_flag == 'change_den':
+                for p in range(len(change_var)):
+                    x_cor = np.ones(len(iter_list))*change_var[p]
+                    plt.scatter(x_cor, data_collect[:, p], color= color_list[p], 
+                                    label= 'efold length for different core electron density {}'.format(change_var[p]))
+                plt.xlabel('Electron density: ${n_e}$ (m$^{-3}$)')
+                plt.title('Experimental opaqueness verses shift core electron density')
+                plt.legend()
+                
+            elif series_flag == 'eireneN':
+                for p in range(len(change_var)):
+                    x_cor = np.ones(len(iter_list))*change_var[p]
+                    plt.scatter(x_cor, data_collect[:, p], color= color_list[p], 
+                                    label= '{}'.format(change_var[p]))
+                plt.xlabel('Eirene SOL particle number')
+                # plt.yscale('log')
+                plt.xscale('log')
+                # plt.title('dimensionless opaqueness verses different SOL eirene particle number')
+                plt.title('Experimental opaqueness')
+                # plt.legend()
+            
+        elif withshift == True and withseries == False:
+            plt.figure(figsize=(7,7))
+            A_list = [1.4, 2.0, 2.4, 2.8, 3.4]
+            color_list = ['red', 'orange', 'green', 'blue', 'purple']
+            for p in range(len(change_var)):
+                x_cor = np.ones(len(iter_list))*A_list[p]
+                plt.scatter(x_cor, data_collect[:, p], color= color_list[p])
+            plt.axvline(x= 0.7/0.5, color='salmon',lw=3, ls='--')
+            plt.axvline(x= 1.67/0.67, color='darkgreen',lw=3, ls='--')
+            plt.axvline(x= 0.68/0.22, color='cyan',lw=3, ls='--')
+            # plt.axvline(x= 3.4, color='black',lw=3, ls='--', label= 'JT-60 aspect ratio')
+            plt.xlabel('aspect ratio')
+            # plt.ylabel('dimensionless opaqueness')
+            # plt.title('dimensionless opaqueness verses different modify distance')
+            plt.title('Experimental opaqueness')
+            plt.legend()
+    
