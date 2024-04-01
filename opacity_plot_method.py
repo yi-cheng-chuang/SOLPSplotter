@@ -9,15 +9,15 @@ import numpy as np
 
 
 def opacity_study_unit():
-    unit = {'efold_length_psiN': 'efold length psiN',
-            'pedestal_width_psiN': 'Pedestal width psiN',
-              'dimensionless_opaqueness': 'dimensionless opaqueness', 
-              'neutral_density': 'neutral density ${n_D}$ (m$^{-3}$)', 
-              'electron_pedestal_density': 'electron pedestal density: $n_{ped}$ (m$^{-3}$)',
-              'temperature_pedestal_width': 'temperature pedestal width: $\Delta T$: [m]',
-              'flux_expansion': 'flux_expansion',
-              'efold_length': 'efold length: $\lambda_{n_D}$: [mm]',
-              'pedestal_width': 'Pedestal width: $\Delta n$: [mm]',
+    unit = {'efold_length_psiN': 'Neutral penetration length ($\psi_N$)',
+            'pedestal_width_psiN': 'Pedestal width ($\psi_N$)',
+              'dimensionless_opaqueness': 'Experimental opaqueness', 
+              'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
+              'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
+              'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$: [m]',
+              'flux_expansion': 'Flux expansion',
+              'efold_length': 'Neutral penetration length: $\lambda_{n_D}$ [mm]',
+              'pedestal_width': 'Pedestal width: $\Delta n$ [mm]',
               
               }
     return unit
