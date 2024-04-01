@@ -13,8 +13,7 @@ d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
 
 
-
-xl = spm.poster_poloidal_plot(DefaultSettings = d, loadDS = lex)
+xl = spm.paper_poloidal_plot(DefaultSettings = d, loadDS = lex)
 
 xl.load_mast_dir()
 xl.load_solpsgeo()
@@ -44,4 +43,4 @@ for i in range(44):
 xl.opacity_data_fit(pol_list = poloidal_index_list)
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
-xl.opacity_poloidal_subplot(log_flag = False, pol_index_list = poloidal_index_list)
+xl.paper_poloidal_subplot(log_flag = False)
