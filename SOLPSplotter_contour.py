@@ -5,7 +5,7 @@ Created on Sun Nov 26 18:24:05 2023
 @author: user
 """
 
-from SOLPSplotter_plot import Opacity_study
+from SOLPSplotter_fit import profile_fit
 import matplotlib.pyplot as plt
 import SOLPS_set as ss
 import Contourplot_method as cpm
@@ -19,9 +19,12 @@ from numpy import ma
 
 
 
-class PlotContour(Opacity_study):
+class PlotContour(profile_fit):
     def __init__(self, DefaultSettings, loadDS):
-        Opacity_study.__init__(self, DefaultSettings, loadDS)
+        profile_fit.__init__(self, DefaultSettings, loadDS)
+        
+        self.Publish = DefaultSettings['Publish']
+        self.data['DefaultSettings']['Publish'] = self.Publish
     
     
     def set_plot(self):
@@ -98,15 +101,13 @@ class PlotContour(Opacity_study):
             
             # datamap = np.abs(plot_2dval)
             
-            if ma100:
-                plot_2dval = ma.masked_where(plot_2dval >= bounds['max'], plot_2dval)
-                plot_2dval = ma.masked_where(plot_2dval <= bounds['min'], plot_2dval)
+            if ma100 == True and bounds != None:
+                NORM = plt.Normalize(vmin = bounds['min'], vmax = bounds['max'])
             else:
-                pass
+                NORM = plt.Normalize(plot_2dval.min(), plot_2dval.max())
             
             
-            CMAP = cm.viridis
-            NORM = plt.Normalize(plot_2dval.min(), plot_2dval.max())
+            CMAP = 'RdBu'
             plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap= CMAP, norm = NORM)
             
             SM= cm.ScalarMappable(NORM,CMAP)    
