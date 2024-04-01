@@ -43,6 +43,7 @@ class profile_fit(RP_mapping):
         # self.load_output_data(param= 'Ne')
         # self.load_output_data(param= 'Te')
         
+        
         Ne_data = b2fstate['ne'].transpose()
         Te_J = b2fstate['te'].transpose()
         ev = 1.6021766339999999 * pow(10, -19)
