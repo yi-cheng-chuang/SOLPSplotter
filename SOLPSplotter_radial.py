@@ -508,9 +508,49 @@ class radial_plot(profile_fit):
             
             print('plot_iout_radial function is in prepare ...')
                   
-              
-              
+        
+                
+    def divertor_te(self):  
+        
+        b2fstate = self.data['b2fstate']
+
+        
+        plt.figure(figsize=(7,7))
+
+        for aa in self.data['dircomp']['multi_shift']:
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            rcood = self.data['psi']['psival'][aa][:, 1]
+            Te_J = b2fstate[aa]['te'].transpose()
+            ev = 1.6021766339999999 * pow(10, -19)
+            te_pro = Te_J / ev
+            te = te_pro[:, 0]
+            plt.plot(rcood, te, '-', color = color_dic[aa], 
+                     label= 'aspect ratio = {}'.format(A_dic[aa]))
+            plt.title('inner target electron temperature')
+            plt.xlabel('psiN')
+            plt.legend()
       
+        
+        plt.figure(figsize=(7,7))
+
+        for aa in self.data['dircomp']['multi_shift']:
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            rcood = self.data['psi']['psival'][aa][:, -2]
+            Te_J = b2fstate[aa]['te'].transpose()
+            ev = 1.6021766339999999 * pow(10, -19)
+            te_pro = Te_J / ev
+            te = te_pro[:, -1]
+            plt.plot(rcood, te, '-', color = color_dic[aa], 
+                     label= 'aspect ratio = {}'.format(A_dic[aa]))
+            plt.title('outer target electron temperature')
+            plt.xlabel('psiN')
+            plt.legend()
       
       
             
@@ -736,6 +776,9 @@ class radial_plot(profile_fit):
             plt.xlabel('psiN')
             plt.title('outer leg neutral density')
             plt.legend()
+        
+        
+
         
 
 
