@@ -6,6 +6,7 @@ Created on Fri Mar  1 16:51:44 2024
 """
 
 import SOLPS_set as sps
+import matplotlib.pyplot as plt
 import SOLPSplotter_contour as spc
 import SOLPS_transcoe_adj as sta
 import numpy as np
@@ -33,7 +34,7 @@ xl.load_b2fstate()
 
 xl.calc_sep_dsa()
 poloidal_index_list = []
-for i in range(44):
+for i in range(20):
     poloidal_index_list.append('{}'.format(25 + i))
     
 xl.opacity_data_fit(pol_list = poloidal_index_list)
@@ -41,19 +42,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 # xl.opacity_poloidal_plot(log_flag = False, save_pdf = False)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+xl.neuden_percent()
 
 topic = 'Q3'
 
@@ -284,9 +273,9 @@ elif topic == 'Q3':
         
         print(res_qu_list)
         
-        for rqu in res_qu_list:
+        # for rqu in res_qu_list:
             
-            xl.iout_contour_plot(quant = rqu, log_bar= True, ma100= False, bounds = {})
+        #     xl.iout_contour_plot(quant = rqu, log_bar= True, ma100= False, bounds = {})
         
         
         for resqu in res_qu_list:
@@ -310,6 +299,11 @@ elif topic == 'Q3':
                                          itername = aa, quant = per_qu, ma100 = True)
                 
             xl.data['iout_data'][per_qu] = resqu_per_dic
+            
+            
+
+            
+
                     
 elif topic == 'Q3-1':
     
@@ -405,7 +399,76 @@ elif topic == 'test':
         print(qu)
 
         xl.iout_contour_plot(quant = qu)
-    
+
+else:
+    print('no topic!')
+
+
+
+
+
+# for aa in xl.data['dircomp']['multi_shift']:
+#     if aa == 'org':
+#         pass
+#     else:
+#         plt.figure(figsize=(7,7))
+#         st = int(poloidal_index_list[0]) -1
+#         ed = int(poloidal_index_list[-1])
+#         x = xl.data['iout_data']['poloidal_flux_change_percent'][aa][19, st:ed]
+#         y = xl.data['neuden_change'][aa]
+#         plt.scatter(x, y)
+#         plt.title('{} percent change correlation'.format(aa))
+
+
+poloidal_index_L = []
+for i in range(40):
+    poloidal_index_L.append('{}'.format(5 + i))
+
+
+
+plt.figure(figsize=(7,7))
+
+for aa in xl.data['dircomp']['multi_shift']:
+    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                 'dot7': 'blue', 'one': 'purple'}
+    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+              'dot7': '2.8', 'one': '3.4'}
+    st = int(poloidal_index_L[0]) -1
+    ed = int(poloidal_index_L[-1])
+    sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][18:21, st:ed]
+    mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+    std_pol_flux = np.std(sol_pol_flux, axis=0)
+    neuden_d = xl.data['ft44'][aa]['dab2'][st:ed, 19, 0]
+    y = np.transpose(neuden_d)
+    plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
+                 color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
+    plt.title('neutral density and ion poloidal flux ')
+    plt.xlabel('ion poloidal flux')
+    plt.legend()
+
+
+plt.figure(figsize=(7,7))
+
+for aa in xl.data['dircomp']['multi_shift']:
+    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                 'dot7': 'blue', 'one': 'purple'}
+    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+              'dot7': '2.8', 'one': '3.4'}
+    st = int(poloidal_index_L[0]) -1
+    ed = int(poloidal_index_L[-1])
+    sol_pol_flux = xl.data['iout_data']['radial_flux'][aa][18:21, st:ed]
+    mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+    std_pol_flux = np.std(sol_pol_flux, axis=0)
+    neuden_d = xl.data['ft44'][aa]['dab2'][st:ed, 19, 0]
+    y = np.transpose(neuden_d)
+    plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
+                color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
+    plt.title('neutral density and ion radial flux correlation')
+    plt.xlabel('ion radial flux')
+    plt.legend()
+
+
+
 
 
     
