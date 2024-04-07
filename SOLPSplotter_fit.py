@@ -187,6 +187,30 @@ class profile_fit(RP_mapping):
         
         else:
             print('opacity_data_fit has a bug')
+    
+    
+    def neuden_percent(self):
+        
+        neu_percent = {}
+        
+        
+        for aa in self.data['dircomp']['multi_shift']:
+            if aa == 'org':
+                pass
+            else:
+                neuden = self.data['opacity_poloidal'][aa]['neutral_density']
+                neuden_std = self.data['opacity_poloidal']['org']['neutral_density']
+                percentage = np.divide((neuden - neuden_std), neuden_std)*100
+                neu_percent[aa] = percentage
+        
+        self.data['neuden_change'] = neu_percent
+        
+            
+                
+        
+        
+        
+        
                 
                 
     def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_list):
@@ -280,6 +304,12 @@ class profile_fit(RP_mapping):
         
         else:
             print('radial_data_fit has a bug')
+    
+    
+    
+
+        
+        
 
 
 
