@@ -231,8 +231,8 @@ class paper_poloidal_plot(profile_fit):
     
     def paper_poloidal_subplot(self, log_flag):
             
-            itemname = ['pedestal_width_psiN', 'efold_length_psiN', 'neutral_density',
-                        'flux_expansion', 'efold_length', 'dimensionless_opaqueness']
+            itemname = ['pedestal_width_psiN', 'pedestal_width', 'efold_length_psiN', 
+                    'flux_expansion', 'efold_length', 'dimensionless_opaqueness']
             # adj_list = list(result_dic.keys())
             
             A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
