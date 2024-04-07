@@ -14,7 +14,7 @@ def opacity_study_unit():
               'dimensionless_opaqueness': 'Experimental opaqueness', 
               'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
               'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
-              'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$: [m]',
+              'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
               'flux_expansion': 'Flux expansion',
               'efold_length': 'Neutral penetration length: $\lambda_{n_D}$ [mm]',
               'pedestal_width': 'Pedestal width: $\Delta n$ [mm]',
