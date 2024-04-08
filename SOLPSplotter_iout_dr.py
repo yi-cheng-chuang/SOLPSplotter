@@ -34,8 +34,8 @@ xl.load_b2fstate()
 
 xl.calc_sep_dsa()
 poloidal_index_list = []
-for i in range(20):
-    poloidal_index_list.append('{}'.format(25 + i))
+for i in range(10):
+    poloidal_index_list.append('{}'.format(28 + i))
     
 xl.opacity_data_fit(pol_list = poloidal_index_list)
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
@@ -281,17 +281,17 @@ elif topic == 'Q3':
         for resqu in res_qu_list:
             
             resqu_per_dic = {}
-            
+            std_cp = 'org'
             for aa in xl.data['dircomp']['multi_shift']:
-                if aa == 'org':
+                if aa == std_cp:
                     pass
                 else:
                     dif_qu = xl.load_differ(name = resqu, itername1 = aa, 
-                                            itername2 = 'org', setname = 'iout_data')
+                                            itername2 = std_cp, setname = 'iout_data')
                     print(dif_qu)
                     
                     data, per_qu = xl.load_iout_name_ratio(name1 = dif_qu, name2 = resqu,
-                                    stdname = 'org', itername = aa, setname = 'iout_data')
+                                    stdname = std_cp, itername = aa, setname = 'iout_data')
                     print(per_qu)
                     resqu_per_dic[aa] = data
                     bon = {'max': 100, 'min': -100}
@@ -299,6 +299,190 @@ elif topic == 'Q3':
                                          itername = aa, quant = per_qu, ma100 = True)
                 
             xl.data['iout_data'][per_qu] = resqu_per_dic
+        
+        
+        
+        plt.figure(figsize=(7,7))
+
+        for aa in xl.data['dircomp']['multi_shift']:
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            st = int(poloidal_index_list[0]) -1
+            ed = int(poloidal_index_list[-1])
+            sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, st:ed]
+            mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+            std_pol_flux = np.std(sol_pol_flux, axis=0)
+            
+            norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
+            neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+            y = np.transpose(neuden_d)/ max(neuden_d)
+            plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
+                         color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
+            plt.title('neutral density and ion poloidal flux ')
+            plt.xlabel('ion poloidal flux')
+            plt.legend()
+
+
+        plt.figure(figsize=(7,7))
+
+        for aa in xl.data['dircomp']['multi_shift']:
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            st = int(poloidal_index_list[0]) -1
+            ed = int(poloidal_index_list[-1])
+            sol_pol_flux = xl.data['iout_data']['radial_flux'][aa][20:, st:ed]
+            mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+            std_pol_flux = np.std(sol_pol_flux, axis=0)
+            norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
+            
+            
+            neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+            y = np.transpose(neuden_d)/ max(neuden_d)
+            plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
+                        color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
+            plt.title('neutral density and ion radial flux correlation')
+            plt.xlabel('ion radial flux')
+            plt.legend()
+        
+        
+        
+    
+        
+        
+        
+        anglemean_pol_flux = []
+        cv_pol_flux = []
+        std_pol_flux = []
+        neuden_list = []
+        cv_neuden = []
+        std_neuden = []
+        anglemean_rad_flux = []
+        std_rad_flux = []
+        st = int(poloidal_index_list[0]) -1
+        ed = int(poloidal_index_list[-1])
+        one_angle = False
+        ind = st + 6
+        for aa in xl.data['dircomp']['multi_shift']:
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            if one_angle:
+                sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, ind]
+                anglemean_pol_flux.append(-1*np.mean(sol_pol_flux, axis=0))
+                std_pol_flux.append(np.std(sol_pol_flux, axis=0))
+                cv_pol_flux.append(-1*np.std(sol_pol_flux, axis=0) / np.mean(sol_pol_flux, axis=0))
+                
+                neuden_d = xl.data['ft44'][aa]['dab2'][ind, 20:, 0]
+                neuden_list.append(np.mean(neuden_d, axis=0))
+                # mean_neuden = np.mean(neuden_d, axis=0)
+                cv_neuden.append(np.std(neuden_d, axis=0) / np.mean(neuden_d, axis=0))
+                std_neuden.append(np.std(neuden_d, axis=0))
+                
+                sol_rad_flux = xl.data['iout_data']['radial_flux'][aa][20:, ind]
+                anglemean_rad_flux.append(np.mean(sol_rad_flux, axis=0))
+                std_rad_flux.append(np.std(sol_rad_flux, axis=0))
+            
+            else:
+                sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, st:ed]
+                mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+                anglemean_pol_flux.append(-1*np.mean(mean_pol_flux, axis=0))
+                
+                cv_pol_flux.append(-1*np.std(mean_pol_flux, axis=0) / np.mean(mean_pol_flux, axis=0))
+                std_pol_flux.append(np.std(mean_pol_flux, axis=0))
+                
+                neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+                neuden_list.append(np.mean(neuden_d, axis=0))
+                # mean_neuden = np.mean(neuden_d, axis=0)
+                cv_neuden.append(np.std(neuden_d, axis=0) / np.mean(neuden_d, axis=0))
+                std_neuden.append(np.std(neuden_d, axis=0))
+                
+                sol_rad_flux = xl.data['iout_data']['radial_flux'][aa][20:, st:ed]
+                mean_rad_flux = np.mean(sol_rad_flux, axis=0)
+                anglemean_rad_flux.append(np.mean(mean_rad_flux, axis=0))
+                std_rad_flux.append(np.std(mean_rad_flux, axis=0))
+                
+                
+            
+        fig, ax1 = plt.subplots()
+        aspect_list = [1.4, 2.0, 2.4, 2.8]
+        color = 'tab:red'
+        
+        print(cv_pol_flux)
+        print(cv_neuden)
+        
+        ax1.errorbar(aspect_list, anglemean_pol_flux, yerr= std_pol_flux, 
+                      fmt = '-', color= color)
+        # ax1.scatter(aspect_list, anglemean_pol_flux, color= color)
+        ax1.set_ylabel('poloidal flux', color= color)
+        ax1.tick_params(axis='y', labelcolor = color)
+        
+        ax2 = ax1.twinx()
+        
+        color2 = 'tab:blue'
+        
+        ax2.errorbar(aspect_list, neuden_list, yerr= std_neuden, 
+                    fmt = '-', color= color2)
+        # ax2.scatter(aspect_list, neuden_list, color= color2)
+        ax2.tick_params(axis='y', labelcolor = color2)
+        
+        ax2.set_ylabel('neutral density', color= color2)
+        
+        ax1.set_title('neutral density and ion poloidal flux ')
+        ax1.set_xlabel('aspect ratio')
+            
+        
+        
+        # fig, ax1 = plt.subplots()
+        # aspect_list = [1.4, 2.0, 2.4, 2.8]
+        # color = 'tab:red'
+        
+        
+        # ax1.scatter(aspect_list, anglemean_pol_flux, color= color)
+        # # ax1.scatter(aspect_list, anglemean_pol_flux, color= color)
+        # ax1.set_ylabel('poloidal flux', color= color)
+        # ax1.tick_params(axis='y', labelcolor = color)
+        
+        # ax2 = ax1.twinx()
+        
+        # color2 = 'tab:blue'
+        
+        # ax2.scatter(aspect_list, neuden_list, color= color2)
+        # # ax2.scatter(aspect_list, neuden_list, color= color2)
+        # ax2.tick_params(axis='y', labelcolor = color2)
+        
+        # ax2.set_ylabel('neutral density', color= color2)
+        
+        # ax1.set_title('neutral density and ion poloidal flux ')
+        # ax1.set_xlabel('aspect ratio')
+            
+            
+            
+        fig, ax1 = plt.subplots()
+        
+        # color = 'tab:red'
+        
+        ax1.errorbar(aspect_list, anglemean_rad_flux, yerr= std_rad_flux, 
+                      fmt = '-', color= color)
+        # ax1.scatter(aspect_list, anglemean_rad_flux, color= 'red')
+        ax1.set_ylabel('radial flux', color= color)
+        ax1.tick_params(axis='y', labelcolor = color)
+        
+        ax2 = ax1.twinx()
+        
+        ax2.errorbar(aspect_list, neuden_list, yerr= std_neuden, 
+                    fmt = '-', color= color2)
+        ax2.set_ylabel('neutral density', color= color2)
+        ax2.tick_params(axis='y', labelcolor = color2)
+        
+        
+        ax1.set_title('neutral density and ion radial flux ')
+        ax1.set_xlabel('aspect ratio')
+        # ax1.legend()
+        
             
             
 
@@ -328,7 +512,7 @@ elif topic == 'Q3-1':
             
             bon = {'max': 100, 'min': -100}
             
-            xl.plot_change_data(data = neuden_data, log_bar = False, bounds = bon, 
+            xl.plot_change_data(data = neuden_data, log_bar = True, bounds = bon, 
                      itername = aa, quant = 'neutral density increase percentage', ma100 = True)
     
     for aa in xl.data['dircomp']['multi_shift']:
@@ -378,12 +562,6 @@ elif topic == 'Q5':
     
     
     
-    
-    
-            
-        
-    
-    
 
 elif topic == 'test':
     
@@ -399,6 +577,7 @@ elif topic == 'test':
         print(qu)
 
         xl.iout_contour_plot(quant = qu)
+        
 
 else:
     print('no topic!')
@@ -420,52 +599,11 @@ else:
 #         plt.title('{} percent change correlation'.format(aa))
 
 
-poloidal_index_L = []
-for i in range(40):
-    poloidal_index_L.append('{}'.format(5 + i))
 
 
 
-plt.figure(figsize=(7,7))
-
-for aa in xl.data['dircomp']['multi_shift']:
-    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                 'dot7': 'blue', 'one': 'purple'}
-    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-              'dot7': '2.8', 'one': '3.4'}
-    st = int(poloidal_index_L[0]) -1
-    ed = int(poloidal_index_L[-1])
-    sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][18:21, st:ed]
-    mean_pol_flux = np.mean(sol_pol_flux, axis=0)
-    std_pol_flux = np.std(sol_pol_flux, axis=0)
-    neuden_d = xl.data['ft44'][aa]['dab2'][st:ed, 19, 0]
-    y = np.transpose(neuden_d)
-    plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
-                 color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
-    plt.title('neutral density and ion poloidal flux ')
-    plt.xlabel('ion poloidal flux')
-    plt.legend()
 
 
-plt.figure(figsize=(7,7))
-
-for aa in xl.data['dircomp']['multi_shift']:
-    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                 'dot7': 'blue', 'one': 'purple'}
-    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-              'dot7': '2.8', 'one': '3.4'}
-    st = int(poloidal_index_L[0]) -1
-    ed = int(poloidal_index_L[-1])
-    sol_pol_flux = xl.data['iout_data']['radial_flux'][aa][18:21, st:ed]
-    mean_pol_flux = np.mean(sol_pol_flux, axis=0)
-    std_pol_flux = np.std(sol_pol_flux, axis=0)
-    neuden_d = xl.data['ft44'][aa]['dab2'][st:ed, 19, 0]
-    y = np.transpose(neuden_d)
-    plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
-                color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
-    plt.title('neutral density and ion radial flux correlation')
-    plt.xlabel('ion radial flux')
-    plt.legend()
 
 
 
