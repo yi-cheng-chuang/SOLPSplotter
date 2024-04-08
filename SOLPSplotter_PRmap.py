@@ -305,6 +305,7 @@ class RP_mapping(load_simu_data):
             angle_dic = {}
             angle_list_dic = {}
             xpoint_angle_dic = {}
+            index_angle_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 
                 rad_grid = self.data['grid']['RadLoc'][aa]
@@ -317,6 +318,7 @@ class RP_mapping(load_simu_data):
                 
                 angle_list_dic[aa] = angle_list
                 xpoint_angle_dic[aa] = xpoint_angle
+                
                 
                 print('xpoint angle is {:.2f} for {} case'.format(xpoint_angle, aa))
                 
