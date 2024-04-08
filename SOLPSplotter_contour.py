@@ -102,13 +102,17 @@ class PlotContour(profile_fit):
             # datamap = np.abs(plot_2dval)
             
             if ma100 == True and bounds != None:
+                plot_2dval = ma.masked_where(plot_2dval >= 1500, plot_2dval)
+                plot_2dval = ma.masked_where(plot_2dval <= -1500, plot_2dval)
                 NORM = plt.Normalize(vmin = bounds['min'], vmax = bounds['max'])
             else:
                 NORM = plt.Normalize(plot_2dval.min(), plot_2dval.max())
             
             
-            CMAP = 'RdBu'
-            plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap= CMAP, norm = NORM)
+            # CMAP = 'RdBu'
+            CMAP = cm.viridis
+            
+            plt.contourf(R_coord, Z_coord, plot_2dval, levels= 40, cmap= CMAP, norm = NORM)
             
             SM= cm.ScalarMappable(NORM,CMAP)    
             plt.colorbar(SM)
