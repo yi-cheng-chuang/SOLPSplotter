@@ -44,6 +44,8 @@ for i in range(44):
 xl.opacity_data_fit(pol_list = poloidal_index_list)
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
+xl.neuden_data_check(pol_list= poloidal_index_list)
+
 xl.opacity_poloidal_plot(log_flag = False, save_pdf = False)
 
 
