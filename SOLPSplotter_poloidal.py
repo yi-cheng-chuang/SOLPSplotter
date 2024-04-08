@@ -96,6 +96,13 @@ class poloidal_plot(profile_fit):
             plt.axvline(x= 180, color='seagreen',lw=3, ls='--', label= 'inner midplane')
         else:
             pass
+        
+        if max(angle_fix) > 240 and item != 'electron_pedestal_density':
+            plt.axvline(x= 240, color='seagreen',lw=3, ls='--', label= 'poloidal angle 240')
+        else:
+            pass
+        
+        
         if min(angle_fix) < 0 and item != 'electron_pedestal_density':
             plt.axvline(x= 0, color='darkorange',lw=3, ls='--', label= 'outer midplane')
         else:
@@ -107,12 +114,49 @@ class poloidal_plot(profile_fit):
         else:
             pass
         # plt.ylabel('{}'.format(unit_dic[i]))
+        
+        
+        
         plt.legend()
         
         
-    
-    
-    
+    def neuden_data_check(self, pol_list):
+        
+        
+        if self.withshift == False and self.withseries == False:
+            
+            list_len = len(pol_list)
+            cp_dat = np.zeros([list_len, 3])
+            
+            
+            neuden_dat = self.data['opacity_poloidal']['neutral_density']
+                        
+            cp_dat[:, 0] = int(pol_list)
+            cp_dat[:, 1] = self.data['angle']['angle_list']
+            cp_dat[:, 2] = neuden_dat
+            
+            self.data['neuden_angle'] = cp_dat
+        
+        elif self.withshift == True and self.withseries == False:
+            cp_dat_dic = {}
+            list_len = len(pol_list)
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                list_len = len(pol_list)
+                cp_dat = np.zeros([list_len, 3])
+                
+                
+                neuden_dat = self.data['opacity_poloidal'][aa]['neutral_density']
+                            
+                cp_dat[:, 0] = [int(i) for i in pol_list]
+                cp_dat[:, 1] = self.data['angle']['angle_list'][aa]
+                cp_dat[:, 2] = neuden_dat
+                
+                cp_dat_dic[aa] = cp_dat
+            
+            self.data['neuden_angle'] = cp_dat_dic
+            
+                
     def opacity_poloidal_plot(self, log_flag, save_pdf):
         
         itemname = self.data['poloidal_itemname']
