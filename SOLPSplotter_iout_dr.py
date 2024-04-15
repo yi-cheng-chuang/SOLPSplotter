@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import SOLPSplotter_contour as spc
 import SOLPS_transcoe_adj as sta
 import numpy as np
+from matplotlib.offsetbox import AnchoredText
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
@@ -407,20 +408,23 @@ elif topic == 'Q3':
                 
                 
             
-        fig, ax1 = plt.subplots()
+        fig, axs = plt.subplots(2, 1)
         aspect_list = [1.4, 2.0, 2.4, 2.8]
         color = 'tab:red'
         
         print(cv_pol_flux)
         print(cv_neuden)
+        anchored_text1 = AnchoredText('(a)', loc= 'upper left')
+        anchored_text2 = AnchoredText('(b)', loc= 'upper center')
+        anchored_text3 = AnchoredText('neutral density', loc=4)
         
-        ax1.errorbar(aspect_list, anglemean_pol_flux, yerr= std_pol_flux, 
+        axs[0].errorbar(aspect_list, anglemean_pol_flux, yerr= std_pol_flux, 
                       fmt = '-', color= color)
         # ax1.scatter(aspect_list, anglemean_pol_flux, color= color)
-        ax1.set_ylabel('poloidal flux', color= color)
-        ax1.tick_params(axis='y', labelcolor = color)
+        # ax1.set_ylabel('poloidal flux', color= color)
+        axs[0].tick_params(axis='y', labelcolor = color)
         
-        ax2 = ax1.twinx()
+        ax2 = axs[0].twinx()
         
         color2 = 'tab:blue'
         
@@ -429,59 +433,31 @@ elif topic == 'Q3':
         # ax2.scatter(aspect_list, neuden_list, color= color2)
         ax2.tick_params(axis='y', labelcolor = color2)
         
-        ax2.set_ylabel('neutral density', color= color2)
-        
-        ax1.set_title('neutral density and ion poloidal flux ')
-        ax1.set_xlabel('aspect ratio')
-            
-        
-        
-        # fig, ax1 = plt.subplots()
-        # aspect_list = [1.4, 2.0, 2.4, 2.8]
-        # color = 'tab:red'
-        
-        
-        # ax1.scatter(aspect_list, anglemean_pol_flux, color= color)
-        # # ax1.scatter(aspect_list, anglemean_pol_flux, color= color)
-        # ax1.set_ylabel('poloidal flux', color= color)
-        # ax1.tick_params(axis='y', labelcolor = color)
-        
-        # ax2 = ax1.twinx()
-        
-        # color2 = 'tab:blue'
-        
-        # ax2.scatter(aspect_list, neuden_list, color= color2)
-        # # ax2.scatter(aspect_list, neuden_list, color= color2)
-        # ax2.tick_params(axis='y', labelcolor = color2)
-        
         # ax2.set_ylabel('neutral density', color= color2)
         
         # ax1.set_title('neutral density and ion poloidal flux ')
-        # ax1.set_xlabel('aspect ratio')
-            
-            
-            
-        fig, ax1 = plt.subplots()
+        axs[0].add_artist(anchored_text1)
+        # axs[0].set_xlabel('aspect ratio')
         
-        # color = 'tab:red'
-        
-        ax1.errorbar(aspect_list, anglemean_rad_flux, yerr= std_rad_flux, 
+        axs[1].errorbar(aspect_list, anglemean_rad_flux, yerr= std_rad_flux, 
                       fmt = '-', color= color)
         # ax1.scatter(aspect_list, anglemean_rad_flux, color= 'red')
-        ax1.set_ylabel('radial flux', color= color)
-        ax1.tick_params(axis='y', labelcolor = color)
+        # ax1.set_ylabel('radial flux', color= color)
+        axs[1].tick_params(axis='y', labelcolor = color)
         
-        ax2 = ax1.twinx()
+        ax3 = axs[1].twinx()
         
-        ax2.errorbar(aspect_list, neuden_list, yerr= std_neuden, 
+        ax3.errorbar(aspect_list, neuden_list, yerr= std_neuden, 
                     fmt = '-', color= color2)
-        ax2.set_ylabel('neutral density', color= color2)
-        ax2.tick_params(axis='y', labelcolor = color2)
+        # ax2.set_ylabel('neutral density', color= color2)
+        ax3.tick_params(axis='y', labelcolor = color2)
         
         
-        ax1.set_title('neutral density and ion radial flux ')
-        ax1.set_xlabel('aspect ratio')
+        axs[1].add_artist(anchored_text2)
+        axs[1].set_xlabel('aspect ratio')
         # ax1.legend()
+        
+        plt.subplots_adjust(hspace=.0)
         
             
             
@@ -526,10 +502,128 @@ elif topic == 'Q3-1':
         
 elif topic == 'Q3-2':
     
-    for rqu in res_qu_list:
-        
-        xl.iout_contour_plot(quant = rqu, log_bar= False, ma100= False, bounds = {})
+    geo_list = []
+    geo_tuple = ('vol.dat', 'sqrt_g')
+    geo_qu = xl.load_iout(filename = geo_tuple[0], simple_quant = geo_tuple[1])
+    print(geo_qu)
+    # print(flux_qu.split('_'))
+    geo_list.append(geo_qu)
     
+    
+    
+    s_list = []
+    source_tuple = [('b2npc11_sna001.dat', 'source'), ('b2stel_sna_ion001.dat', 'source_ion'),
+                    ('b2stel_sna_rec001.dat', 'source_rec'), ('b2stcx_sna_001.dat', 'source_cx'),
+                    ('b2stbr_sna_eir001.dat', 'source_eir')]
+    for s_tpl in source_tuple:
+        
+        s_qu = xl.load_iout(filename = s_tpl[0], simple_quant = s_tpl[1])
+        print(s_qu)
+        # print(flux_qu.split('_'))
+        s_list.append(s_qu)
+    
+    
+    
+    
+    res_key = []
+    
+    # for s_name in s_list:
+    
+    for i in range(len(s_list)):
+        res_qu_dic = {}
+        
+        for aa in xl.data['dircomp']['multi_shift']:
+        
+            data, res_qu = xl.load_iout_divide(name1 = s_list[i], name2 = geo_list[0], 
+                                input_name= '{}_no_jacobian'.format(s_list[i]), itername = aa)
+            
+            res_qu_dic[aa] = data
+            
+            # xl.plot_change_data(data = data, log_bar = True, itername = aa, 
+            #                 quant = res_qu, ma100 = False, bounds = {})
+        
+        xl.data['iout_data'][res_qu] = res_qu_dic
+        res_key.append(res_qu)
+    
+    
+    
+    coe = res_key[0]
+    
+    for aa in xl.data['dircomp']['multi_shift']:
+        if aa == 'org':
+            pass
+        else:
+            dif_qu = xl.load_differ(name = coe, itername1 = aa, 
+                                itername2 = 'org', setname = 'iout_data')
+            print(dif_qu)
+            
+            data, per_qu = xl.load_iout_name_ratio(name1 = dif_qu, name2 = coe,
+                        stdname = 'org', itername = aa, setname = 'iout_data')
+            print(per_qu)
+            
+            bon = {'max': 300, 'min': -300}
+            
+            xl.plot_change_data(data = data, log_bar = False, bounds = bon, 
+                     itername = aa, quant = 'source rate increase percentage', ma100 = True)
+    
+    
+    for res_name in res_key:
+        
+        plt.figure(figsize=(7,7))
+
+        for aa in xl.data['dircomp']['multi_shift']:
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            st = int(poloidal_index_list[0]) -1
+            ed = int(poloidal_index_list[-1])
+            s_term = xl.data['iout_data'][res_name][aa][10:, st:ed]
+            mean_s_term = np.mean(s_term, axis=1)
+            std_s_term = np.std(s_term, axis=1)
+            # norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
+            
+            psi = xl.data['psi']['psival'][aa][10:-2, st-1: ed-1]
+            mean_psi = np.mean(psi, axis=1)
+            std_psi = np.std(psi, axis=1)
+            # neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+            # y = np.transpose(neuden_d)/ max(neuden_d)
+            plt.errorbar(mean_psi, mean_s_term, xerr = std_psi, fmt ='-', 
+            color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
+            plt.title(res_name)
+            plt.xlabel('psiN')
+            plt.legend()
+    
+    
+    
+    
+    fig, ax = plt.subplots()
+    
+    anchored_text = AnchoredText('source rate', loc=2)
+    
+    
+    for aa in xl.data['dircomp']['multi_shift']:
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        st = int(poloidal_index_list[0]) -1
+        ed = int(poloidal_index_list[-1])
+        s_term = xl.data['iout_data']['source_no_jacobian'][aa][10:, st:ed]
+        mean_s_term = np.mean(s_term, axis=1)
+        std_s_term = np.std(s_term, axis=1)
+        # norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
+        
+        psi = xl.data['psi']['psival'][aa][10:-2, st-1: ed-1]
+        mean_psi = np.mean(psi, axis=1)
+        std_psi = np.std(psi, axis=1)
+        # neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+        # y = np.transpose(neuden_d)/ max(neuden_d)
+        ax.errorbar(mean_psi, mean_s_term, xerr = std_psi, fmt ='-', 
+        color = color_dic[aa])
+        ax.set_xlabel('Normalized flux coordinate $\psi_N$')
+    
+    ax.add_artist(anchored_text) 
 
     
 elif topic == 'Q5': 
