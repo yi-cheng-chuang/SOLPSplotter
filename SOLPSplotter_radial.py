@@ -783,6 +783,109 @@ class radial_plot(profile_fit):
             plt.legend()
         
         
+        elif self.withshift == True and self.withseries == False:
+            
+            """
+            
+            # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
+            if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
+                pass
+            else:
+                self.load_output_data(param= 'Ne')
+                self.load_output_data(param= 'Te')
+                self.load_output_data(param= 'NeuDen')
+            
+            ne_pro = self.data['outputdata']['Ne']
+            te_pro = self.data['outputdata']['Te']
+            neu_pro = self.data['outputdata']['NeuDen']
+            
+            """
+            
+            psiN = self.data['experimental_fit']['psiN']
+            ne = self.data['experimental_fit']['ne']*pow(10, 20)
+            te = self.data['experimental_fit']['te']*pow(10, 3)
+            
+            exp = self.data['ExpDict']
+            psi = exp['psi_normal']
+            
+            
+            psi = []
+            exp_ne = []
+            ne_er = []
+            exp_te = []
+            te_er = []
+            for ep in range(len(exp['psi_normal'])):
+                
+                if  exp['psi_normal'][ep] >= min(psiN):
+                    psi.append(exp['psi_normal'][ep])
+                    exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
+                    ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
+                    exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
+                    te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
+            
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            fig, axs = plt.subplots(2, 1)
+            
+            anchored_text = AnchoredText('(a){}'.format('Electron density'), loc=3)
+            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= 'ne_exp')
+            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+            # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
+            # axs[0].set_title('(a)Electron density')
+            axs[0].add_artist(anchored_text)
+            # axs[0].legend(loc='lower left')
+            
+            
+            anchored_text2 = AnchoredText('(b){}'.format('Electron temperature'), loc=3)
+            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= 'te_exp')
+            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+            axs[1].set_xlabel('Normalized flux coordinate $\psi_N$')
+            # axs[1].set_title('(b)Electron temperature')
+            axs[1].add_artist(anchored_text2)
+            # axs[1].legend()
+            
+            plt.subplots_adjust(hspace=.0)
+            
+            
+            for aa in self.data['dircomp']['multi_shift']:
+            
+            
+                b2fstate = self.data['b2fstate'][aa]
+                
+                ne_pro = b2fstate['ne'].transpose()
+                Te_J = b2fstate['te'].transpose()
+                ev = 1.6021766339999999 * pow(10, -19)
+                te_pro = Te_J / ev
+                
+                data = self.data['ft44'][aa]['dab2']
+                neu_pro = np.transpose(data[:, :, 0])
+                leftcut = self.data['b2fgeo'][aa]['leftcut'][0]
+                rightcut = self.data['b2fgeo'][aa]['rightcut'][0]
+                
+                core_ne_pro = ne_pro[:, int(leftcut)+1:int(rightcut)-1]
+                core_te_pro = te_pro[:, int(leftcut)+1:int(rightcut)-1]
+                core_neu_pro = neu_pro[:, int(leftcut)+1:int(rightcut)-1]
+            
+                mean_core_ne = np.mean(core_ne_pro, axis=1)
+                std_core_ne = np.std(core_ne_pro, axis=1)
+                # print(std_core_ne)
+                
+                mean_core_te = np.mean(core_te_pro, axis=1)
+                std_core_te = np.std(core_te_pro, axis=1)
+                
+                mean_core_neu = np.mean(core_neu_pro, axis=1)
+                std_core_neu = np.std(core_neu_pro, axis=1)
+            
+            
+                axs[0].set_yscale('log')
+                axs[0].errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = '-', color = color_dic[aa], label= 'ne_solps')
+                
+                axs[1].set_yscale('log')
+                axs[1].errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = '-', color = color_dic[aa], label= 'te_solps')
+                
+                # axs[1].add_artist(anchored_text2)
+        
 
         
 
