@@ -30,7 +30,7 @@ class radial_plot(profile_fit):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
             plt.rc('lines', linewidth= 3, markersize= 7)
-            plt.rcParams.update({'font.size': 20})
+            plt.rcParams.update({'font.size': 16})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
             # plt.rcParams["text.usetex"] = True
@@ -67,7 +67,7 @@ class radial_plot(profile_fit):
             plt.yscale('log')
         else:
             pass
-        plt.plot(x_coord[1:37], Nd,'-', color = 'green', label= 'solps neutral density')
+        plt.plot(x_coord, Nd,'-', color = 'green', label= 'solps neutral density')
         # plt.plot(psi_RGI, Nd,'-', color = 'b', label= 'RGI_solps neutral density')
         plt.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, ls='-', label= 'exponential fit')
         plt.axvline(x= max(xcoord_cut), color='orange',lw=3)
@@ -171,7 +171,7 @@ class radial_plot(profile_fit):
                 
                 P = self.data['Parameter']
                 self.opacity_radial_method(result_dic = result_dic, SEP = SEP, 
-                x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, P = P, log_flag = True)
+                x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, P = P, log_flag = False)
            
             
         
@@ -511,50 +511,80 @@ class radial_plot(profile_fit):
                   
         
                 
-    def divertor_te(self):  
+    def divertor_te(self, sep_plot):  
         
         b2fstate = self.data['b2fstate']
 
         if self.withshift == True and self.withseries == False:
             
-            plt.figure(figsize=(7,7))
-    
-            for aa in self.data['dircomp']['multi_shift']:
-                color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                             'dot7': 'blue', 'one': 'purple'}
-                A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                          'dot7': '2.8', 'one': '3.4'}
-                rcood = self.data['psi']['psival'][aa][:, 1]
-                Te_J = b2fstate[aa]['te'].transpose()
-                ev = 1.6021766339999999 * pow(10, -19)
-                te_pro = Te_J / ev
-                te = te_pro[:, 0]
-                plt.plot(rcood, te, '-', color = color_dic[aa], 
-                         label= 'aspect ratio = {}'.format(A_dic[aa]))
-                plt.title('inner target electron temperature')
-                plt.xlabel('psiN')
-                plt.legend()
-          
+            if sep_plot:
+                
+                plt.figure(figsize=(7,7))
+        
+                for aa in self.data['dircomp']['multi_shift']:
+                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                                 'dot7': 'blue', 'one': 'purple'}
+                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                              'dot7': '2.8', 'one': '3.4'}
+                    rcood = self.data['psi']['psival'][aa][:, 1]
+                    Te_J = b2fstate[aa]['te'].transpose()
+                    ev = 1.6021766339999999 * pow(10, -19)
+                    te_pro = Te_J / ev
+                    te = te_pro[:, 0]
+                    plt.plot(rcood, te, '-', color = color_dic[aa], 
+                             label= 'aspect ratio = {}'.format(A_dic[aa]))
+                    plt.title('inner target electron temperature')
+                    plt.xlabel('psiN')
+                    plt.legend()
+              
+                
+                plt.figure(figsize=(7,7))
+        
+                for aa in self.data['dircomp']['multi_shift']:
+                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                                 'dot7': 'blue', 'one': 'purple'}
+                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                              'dot7': '2.8', 'one': '3.4'}
+                    rcood = self.data['psi']['psival'][aa][:, -2]
+                    Te_J = b2fstate[aa]['te'].transpose()
+                    ev = 1.6021766339999999 * pow(10, -19)
+                    te_pro = Te_J / ev
+                    te = te_pro[:, -1]
+                    plt.plot(rcood, te, '-', color = color_dic[aa], 
+                             label= 'aspect ratio = {}'.format(A_dic[aa]))
+                    plt.title('outer target electron temperature')
+                    plt.xlabel('psiN')
+                    plt.legend()
+                
+            else:
+                
+                fig, axs = plt.subplots(1, 2)
+                anchored_text_in = AnchoredText('(a){}'.format('inner target'), loc=2)
+                anchored_text_out = AnchoredText('(b){}'.format('outer target'), loc=2)
+                
+                for aa in self.data['dircomp']['multi_shift']:
+                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                                 'dot7': 'blue', 'one': 'purple'}
+                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                              'dot7': '2.8', 'one': '3.4'}
+                    rcood = self.data['psi']['psival'][aa][:, 1]
+                    Te_J = b2fstate[aa]['te'].transpose()
+                    ev = 1.6021766339999999 * pow(10, -19)
+                    te_pro = Te_J / ev
+                    te_in = te_pro[:, 0]
+                    te_out = te_pro[:, -1]
+                    axs[0].plot(rcood, te_in, '-', color = color_dic[aa])
+                    axs[1].plot(rcood, te_out, '-', color = color_dic[aa])
+                
+                
+                axs[0].add_artist(anchored_text_in)
+                axs[0].set_xlabel('$\psi_N$')
+                axs[1].add_artist(anchored_text_out)
+                axs[1].set_xlabel('$\psi_N$')
+                
+      
             
-            plt.figure(figsize=(7,7))
-    
-            for aa in self.data['dircomp']['multi_shift']:
-                color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                             'dot7': 'blue', 'one': 'purple'}
-                A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                          'dot7': '2.8', 'one': '3.4'}
-                rcood = self.data['psi']['psival'][aa][:, -2]
-                Te_J = b2fstate[aa]['te'].transpose()
-                ev = 1.6021766339999999 * pow(10, -19)
-                te_pro = Te_J / ev
-                te = te_pro[:, -1]
-                plt.plot(rcood, te, '-', color = color_dic[aa], 
-                         label= 'aspect ratio = {}'.format(A_dic[aa]))
-                plt.title('outer target electron temperature')
-                plt.xlabel('psiN')
-                plt.legend()
-      
-      
+            
             
     
     
