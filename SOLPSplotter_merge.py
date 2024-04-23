@@ -43,7 +43,16 @@ class paper_poloidal_plot(profile_fit):
                                  A_value, unit_dic, ax, plot_order):
         
         
-        anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), loc=2)
+        
+        
+        if item == 'efold_length_psiN':
+            
+            anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), loc=3)
+        else:
+            
+            anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), loc=2)
+            
+        
         
         if item == 'pedestal_width' or item == 'efold_length':
             new_r = result_dic[item]*1000
@@ -58,7 +67,21 @@ class paper_poloidal_plot(profile_fit):
             ax.plot(pol_angle, result_dic[item], '-', color= color_code)
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
         
-        ax.add_artist(anchored_text)                   
+        if item == 'dimensionless_opaqueness':
+            
+            ax.set_ylim(ymin = 0, ymax = 2 )
+            
+        elif item == 'flux_expansion':
+            
+            ax.set_ylim(ymin = 0, ymax = 10)
+            
+        else:
+            pass
+        
+        
+        
+        ax.add_artist(anchored_text)
+                   
     
     
     def paper_singleplot_method(self, item, pol_angle, result_dic, color_code, 
@@ -265,8 +288,7 @@ class paper_poloidal_plot(profile_fit):
     
     def paper_poloidal_subplot(self, log_flag):
             
-            itemname = ['pedestal_width_psiN', 'efold_length_psiN', 
-                     'dimensionless_opaqueness', 'flux_expansion']
+            itemname = ['efold_length_psiN', 'dimensionless_opaqueness', 'flux_expansion']
             # adj_list = list(result_dic.keys())
             
             A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
@@ -276,7 +298,7 @@ class paper_poloidal_plot(profile_fit):
             alphabat_list = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)']
             # print(adj_list)
             
-            fig_n = 4
+            fig_n = 3
             ax_n = 1
             i_n = 0
             
@@ -307,6 +329,8 @@ class paper_poloidal_plot(profile_fit):
             self.paper_singlepolplot_method(log_flag = log_flag, 
             result = result, i_name = 'neutral_density', 
      A_dic = A_dic, color_dic = color_dic, plot_order = alphabat_list[i_n])
+            
+            plt.ylim(ymin= 0, ymax = 6*10**16)
             
         
         
