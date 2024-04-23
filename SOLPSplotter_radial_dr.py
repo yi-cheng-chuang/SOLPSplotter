@@ -40,7 +40,7 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 xl.opacity_data_fit(pol_list = poloidal_index_list)
 xl.radial_data_fit(pol_list = poloidal_index_list)
-# xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list)
+xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list)
 xl.plot_all_radial(separate = False)
-xl.divertor_te()
+xl.divertor_te(sep_plot = False)
 
