@@ -45,7 +45,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 xl.neuden_percent()
 
-topic = 'Q3'
+topic = 'Q3-2'
 
 
 """
@@ -406,20 +406,21 @@ elif topic == 'Q3':
                 anglemean_rad_flux.append(np.mean(mean_rad_flux, axis=0))
                 std_rad_flux.append(np.std(mean_rad_flux, axis=0))
                 
-                
             
-        fig, axs = plt.subplots(2, 1)
+        fig, axs = plt.subplots(2, 1, figsize = (14, 7))
         aspect_list = [1.4, 2.0, 2.4, 2.8]
         color = 'tab:red'
         
         print(cv_pol_flux)
         print(cv_neuden)
-        anchored_text1 = AnchoredText('(a)', loc= 'upper left')
-        anchored_text2 = AnchoredText('(b)', loc= 'upper center')
+        text1 = 'neutral density, ion poloidal flux verses aspect ratio'
+        text2 = 'neutral density, ion radial flux verses aspect ratio'
+        anchored_text1 = AnchoredText('(a){}'.format(text1), loc= 'upper left')
+        anchored_text2 = AnchoredText('(b){}'.format(text2), loc= 'lower center')
         anchored_text3 = AnchoredText('neutral density', loc=4)
         
         axs[0].errorbar(aspect_list, anglemean_pol_flux, yerr= std_pol_flux, 
-                      fmt = '-', color= color)
+                      fmt = '-', color= color, label= 'poloidal flux')
         # ax1.scatter(aspect_list, anglemean_pol_flux, color= color)
         # ax1.set_ylabel('poloidal flux', color= color)
         axs[0].tick_params(axis='y', labelcolor = color)
@@ -429,18 +430,19 @@ elif topic == 'Q3':
         color2 = 'tab:blue'
         
         ax2.errorbar(aspect_list, neuden_list, yerr= std_neuden, 
-                    fmt = '-', color= color2)
+                    fmt = '-', color= color2, label= 'neutral density')
         # ax2.scatter(aspect_list, neuden_list, color= color2)
         ax2.tick_params(axis='y', labelcolor = color2)
         
         # ax2.set_ylabel('neutral density', color= color2)
         
-        # ax1.set_title('neutral density and ion poloidal flux ')
         axs[0].add_artist(anchored_text1)
+        axs[0].legend(loc= 'upper right')
+        ax2.legend(loc= 'lower center')
         # axs[0].set_xlabel('aspect ratio')
         
         axs[1].errorbar(aspect_list, anglemean_rad_flux, yerr= std_rad_flux, 
-                      fmt = '-', color= color)
+                      fmt = '-', color= color, label= 'radial flux')
         # ax1.scatter(aspect_list, anglemean_rad_flux, color= 'red')
         # ax1.set_ylabel('radial flux', color= color)
         axs[1].tick_params(axis='y', labelcolor = color)
@@ -448,16 +450,20 @@ elif topic == 'Q3':
         ax3 = axs[1].twinx()
         
         ax3.errorbar(aspect_list, neuden_list, yerr= std_neuden, 
-                    fmt = '-', color= color2)
+                    fmt = '-', color= color2, label= 'neutral density')
         # ax2.set_ylabel('neutral density', color= color2)
         ax3.tick_params(axis='y', labelcolor = color2)
         
         
         axs[1].add_artist(anchored_text2)
         axs[1].set_xlabel('aspect ratio')
-        # ax1.legend()
+        axs[1].legend(loc = 'upper center')
         
         plt.subplots_adjust(hspace=.0)
+        
+        
+        # fig_dir  = sps.set_figdir()
+        # plt.savefig('{}/{}.pdf'.format(fig_dir, 'flux&neuden'), format='pdf')
         
             
             
@@ -597,9 +603,9 @@ elif topic == 'Q3-2':
     
     
     
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(7,7))
     
-    anchored_text = AnchoredText('source rate', loc=2)
+    anchored_text = AnchoredText('source rate $m^2 s^{-1}$', loc=2)
     
     
     for aa in xl.data['dircomp']['multi_shift']:
@@ -621,7 +627,7 @@ elif topic == 'Q3-2':
         # y = np.transpose(neuden_d)/ max(neuden_d)
         ax.errorbar(mean_psi, mean_s_term, xerr = std_psi, fmt ='-', 
         color = color_dic[aa])
-        ax.set_xlabel('Normalized flux coordinate $\psi_N$')
+        ax.set_xlabel('$\psi_N$')
     
     ax.add_artist(anchored_text) 
 
