@@ -5,6 +5,7 @@ Created on Thu Jan 11 15:00:38 2024
 @author: user
 """
 from SOLPSplotter_geo import load_geometry
+from matplotlib.offsetbox import AnchoredText
 import SOLPS_set as ss
 import transport_coefficient_adjust_method as tcam
 from scipy import interpolate
@@ -106,7 +107,7 @@ class transport_coefficient_adjustment(load_geometry):
         
         
         
-    def transport_coe_align_plot(self, plot_transcoe, save_eps):
+    def transport_coe_align_plot(self, plot_transcoe, paper_transcoe, save_eps):
         if self.withshift == True and self.withseries == False:
             trans_dic = {}
             jxa = self.data['b2mn']['org']['jxa']
@@ -156,6 +157,58 @@ class transport_coefficient_adjustment(load_geometry):
                     
                     
                 plt.show()
+            else:
+                pass
+            
+            
+            if paper_transcoe:
+                
+                alphabat_list = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)']
+                
+                fig, axs = plt.subplots(1, 2, figsize=(4,7))
+                
+                label_list = ['1', '3']
+                
+                for i, k in enumerate(label_list):
+                    if log_flag:
+                        plt.yscale('log')
+                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                                 'dot7': 'blue', 'one': 'purple'}
+                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                              'dot7': '2.8', 'one': '3.4'}
+                    
+                    coe = coe_label_dic[k]
+                    po = alphabat_list[i]
+                    anchored_text = AnchoredText('{}{}'.format(po, coe), loc= 'center left')
+                    
+                    for ab in self.data['dircomp']['multi_shift']:
+                        
+                        
+                        
+                        # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
+                        #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
+                        axs[i].plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
+                                 'o-', color= color_dic[ab])
+                    
+                    axs[i].add_artist(anchored_text)
+                    
+                    
+                    
+                    
+                    
+                axs[1].set_xlabel('$\psi_N$')
+                
+                # axs[2, 1].set_xlabel('poloidal angle')
+                
+                plt.subplots_adjust(hspace=.0)
+                if save_eps:
+                    
+                    fig_dir  = ss.set_figdir()
+                    plt.savefig('{}/{}.eps'.format(fig_dir, coe_label_dic[k]), format='eps')
+                
+            
+            
+            
         else:
             print('transport_coe_align_plot is not there yet')
     
