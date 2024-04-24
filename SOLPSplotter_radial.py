@@ -836,7 +836,7 @@ class radial_plot(profile_fit):
             te = self.data['experimental_fit']['te']*pow(10, 3)
             
             exp = self.data['ExpDict']
-            psi = exp['psi_normal']
+            # psi = exp['psi_normal']
             
             
             psi = []
@@ -856,7 +856,7 @@ class radial_plot(profile_fit):
             color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                          'dot7': 'blue', 'one': 'purple'}
             
-            fig, axs = plt.subplots(2, 1)
+            fig, axs = plt.subplots(2, 1, figsize= (7, 7))
             
             anchored_text = AnchoredText('(a){}'.format('Electron density'), loc=3)
             axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= 'ne_exp')
@@ -864,7 +864,7 @@ class radial_plot(profile_fit):
             # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
             # axs[0].set_title('(a)Electron density')
             axs[0].add_artist(anchored_text)
-            # axs[0].legend(loc='lower left')
+            axs[0].legend(loc='center left')
             
             
             anchored_text2 = AnchoredText('(b){}'.format('Electron temperature'), loc=3)
@@ -873,7 +873,7 @@ class radial_plot(profile_fit):
             axs[1].set_xlabel('Normalized flux coordinate $\psi_N$')
             # axs[1].set_title('(b)Electron temperature')
             axs[1].add_artist(anchored_text2)
-            # axs[1].legend()
+            axs[1].legend(loc = 'center left')
             
             plt.subplots_adjust(hspace=.0)
             
@@ -907,12 +907,14 @@ class radial_plot(profile_fit):
                 mean_core_neu = np.mean(core_neu_pro, axis=1)
                 std_core_neu = np.std(core_neu_pro, axis=1)
             
+                psi_coord = self.data['psi']['psi_59_val'][aa][:, 1]
             
-                axs[0].set_yscale('log')
-                axs[0].errorbar(psiN, mean_core_ne, yerr= std_core_ne, fmt = '-', color = color_dic[aa], label= 'ne_solps')
+            
+                # axs[0].set_yscale('log')
+                axs[0].errorbar(psi_coord, mean_core_ne, yerr= std_core_ne, fmt = '-', color = color_dic[aa], label= 'ne_solps')
                 
-                axs[1].set_yscale('log')
-                axs[1].errorbar(psiN, mean_core_te, yerr= std_core_te, fmt = '-', color = color_dic[aa], label= 'te_solps')
+                # axs[1].set_yscale('log')
+                axs[1].errorbar(psi_coord, mean_core_te, yerr= std_core_te, fmt = '-', color = color_dic[aa], label= 'te_solps')
                 
                 # axs[1].add_artist(anchored_text2)
         
