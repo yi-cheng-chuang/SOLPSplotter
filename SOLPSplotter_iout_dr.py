@@ -605,7 +605,7 @@ elif topic == 'Q3-2':
     
     fig, ax = plt.subplots(figsize=(7,7))
     
-    anchored_text = AnchoredText('source rate $m^2 s^{-1}$', loc=2)
+    anchored_text = AnchoredText('source rate $m^{-3} s^{-1}$', loc=2)
     
     
     for aa in xl.data['dircomp']['multi_shift']:
