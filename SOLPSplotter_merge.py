@@ -145,6 +145,7 @@ class paper_poloidal_plot(profile_fit):
             pass
         
         if min(angle_fix) < -70 and item != 'electron_pedestal_density':
+
             ax.axvline(x= xpoint_fix, color='black',lw=3, ls='--', label= 'xpoint')
             ax.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
         else:
@@ -152,10 +153,7 @@ class paper_poloidal_plot(profile_fit):
     
     def nolegend_pol_label(self, angle_fix, item, xpoint_fix, ax):
         
-        # if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
-        #     ax.axvline(x= 90, color='black',lw=3, ls='--')
-        # else:
-        #     pass
+
         if max(angle_fix) > 180 and item != 'electron_pedestal_density':
             ax.axvline(x= 180, color='gray',lw=3, ls='--')
         else:
@@ -166,6 +164,7 @@ class paper_poloidal_plot(profile_fit):
             pass
         
         if min(angle_fix) < -70 and item != 'electron_pedestal_density':
+            
             ax.axvline(x= xpoint_fix, color='black',lw=3, ls='--')
             ax.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
         else:
@@ -378,11 +377,13 @@ class paper_poloidal_plot(profile_fit):
             # plt.tight_layout()
             fig.savefig('all_pol.pdf')
             
+
             fig, axs = plt.subplots()
-            
+
             anchored_text = AnchoredText('{}'.format('neutral density $(n_D)_{sep}$ [$m^{-3}$]'), loc='upper center')
             
             axs.add_artist(anchored_text)
+
             result = self.data['opacity_poloidal']
             
             self.paper_singlepolplot_method(log_flag = log_flag, 
@@ -392,6 +393,7 @@ class paper_poloidal_plot(profile_fit):
             plt.legend(loc= 'lower left', fontsize=10)
             
             plt.ylim(ymin= 0, ymax = 6*10**16)
+            plt.title('fitted neutral density')
             
             plt.savefig('neu_den.pdf')
             
