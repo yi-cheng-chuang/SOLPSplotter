@@ -112,49 +112,49 @@ class paper_poloidal_plot(profile_fit):
     
     def paper_poloidal_label(self, angle_fix, item, xpoint_fix, ax):
         
-        if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
-            ax.axvline(x= 90, color='black',lw=3, ls='--')
-        else:
-            pass
+        # if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
+        #     ax.axvline(x= 90, color='black',lw=3, ls='--')
+        # else:
+        #     pass
         if max(angle_fix) > 180 and item != 'electron_pedestal_density':
-            ax.axvline(x= 180, color='darkgreen',lw=3, ls='--')
+            ax.axvline(x= 180, color='gray',lw=3, ls='--')
         else:
             pass
         if min(angle_fix) < 0 and item != 'electron_pedestal_density':
-            ax.axvline(x= 0, color='red',lw=3, ls='--')
+            ax.axvline(x= 0, color='darkred',lw=3, ls='--')
         else:
             pass
         
         if min(angle_fix) < -70 and item != 'electron_pedestal_density':
-            ax.axvline(x= xpoint_fix, color='darkblue',lw=3, ls='--')
-            ax.axvline(x= xpoint_fix + 360, color='darkblue',lw=3, ls='--')
+            ax.axvline(x= xpoint_fix, color='black',lw=3, ls='--')
+            ax.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
         else:
             pass
     
     def neuden_poloidal_label(self, angle_fix, item, xpoint_fix):
         
-        if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
-            plt.axvline(x= 90, color='black',lw=3, ls='--')
-        else:
-            pass
+        # if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
+        #     plt.axvline(x= 90, color='black',lw=3, ls='--')
+        # else:
+        #     pass
         if max(angle_fix) > 180 and item != 'electron_pedestal_density':
-            plt.axvline(x= 180, color='darkgreen',lw=3, ls='--')
+            plt.axvline(x= 180, color='gray',lw=3, ls='--')
         else:
             pass
         
         if max(angle_fix) > 240 and item != 'electron_pedestal_density':
-            plt.axvline(x= 240, color='darkgreen',lw=3, ls='--')
+            plt.axvline(x= 240, color='gray',lw=3, ls='--')
         else:
             pass
         
         if min(angle_fix) < 0 and item != 'electron_pedestal_density':
-            plt.axvline(x= 0, color= 'red',lw=3, ls='--')
+            plt.axvline(x= 0, color= 'darkred',lw=3, ls='--')
         else:
             pass
         
         if min(angle_fix) < -70 and item != 'electron_pedestal_density':
-            plt.axvline(x= xpoint_fix, color='darkblue',lw=3, ls='--')
-            plt.axvline(x= xpoint_fix + 360, color='darkblue',lw=3, ls='--')
+            plt.axvline(x= xpoint_fix, color='black',lw=3, ls='--')
+            plt.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
         else:
             pass
     
@@ -322,6 +322,7 @@ class paper_poloidal_plot(profile_fit):
             # plt.tight_layout()
             
             
+            # fig, axs = plt.subplots(figsize=(7,7))
             plt.figure(figsize=(7,7))
                     
             result = self.data['opacity_poloidal']
@@ -331,6 +332,7 @@ class paper_poloidal_plot(profile_fit):
      A_dic = A_dic, color_dic = color_dic, plot_order = alphabat_list[i_n])
             
             plt.ylim(ymin= 0, ymax = 6*10**16)
+            plt.title('fitted neutral density')
             
         
         
