@@ -30,7 +30,7 @@ class radial_plot(profile_fit):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
             plt.rc('lines', linewidth= 3, markersize= 7)
-            plt.rcParams.update({'font.size': 16})
+            plt.rcParams.update({'font.size': 14})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
             # plt.rcParams["text.usetex"] = True
@@ -120,6 +120,102 @@ class radial_plot(profile_fit):
         # plt.ylabel(P['Te'])
         plt.title('Electron temperature with fits')
         plt.legend()
+    
+    
+    def paper_neuden_radial_method(self, result_dic, SEP, x_coord, Nd, log_flag):
+        
+        tanh_ne_fit = result_dic['tanh_ne_fit']
+        tanh_te_fit = result_dic['tanh_te_fit']
+        exp_an_fit = result_dic['exp_fit']
+        dn = result_dic['pedestal_width'][0]
+        dtn = result_dic['temperature_pedestal_width']
+        efold = result_dic['efold_length'][0]
+        opq = result_dic['dimensionless_opaqueness']
+        xcoord_cut = result_dic['x_coord_cut']
+        sym_pt = result_dic['ne_symmetry_point']
+        te_sym_pt = result_dic['te_symmetry_point']
+        
+                      
+        x = [-efold + max(xcoord_cut), max(xcoord_cut)]
+        y = [min(exp_an_fit), min(exp_an_fit)]
+        xd = [-dn + sym_pt, dn + sym_pt]
+        yd = [tanh_ne_fit[SEP] , tanh_ne_fit[SEP]]
+        xt = [-dtn + te_sym_pt, dtn + te_sym_pt]
+        yt = [tanh_te_fit[SEP], tanh_te_fit[SEP]]
+        
+            
+        plt.figure(figsize=(7,7))
+        if log_flag:
+            plt.yscale('log')
+        else:
+            pass
+        plt.plot(x_coord, Nd,'-', color = 'green', label= 'solps neutral density')
+        # plt.plot(psi_RGI, Nd,'-', color = 'b', label= 'RGI_solps neutral density')
+        plt.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, ls='-', label= 'exponential fit')
+        plt.axvline(x= max(xcoord_cut), color='orange',lw=3)
+        plt.plot(x,y, color='orange', lw=3, ls='-', label= 'Neutral penetration length : $\lambda_{n_D}$')
+        plt.axvline(x=-efold + max(xcoord_cut), color='orange',lw=3)
+        plt.axvline(x= max(xcoord_cut), color='black',lw=3, ls='--', 
+                    label= 'fit range : $\Delta n_e$')
+        plt.axvline(x= min(xcoord_cut), color='black',lw=3, ls='--')
+        # plt.axvline(x= x_m2[0], color='purple',lw=3, ls='--', 
+        #             label= 'exp fitting width')
+        # plt.axvline(x= x_m2[-1], color='purple',lw=3, ls='--')
+        plt.xlabel('Normalized flux coordinate $\psi_N$')
+        # plt.ylabel(P['NeuDen'])
+        plt.title('Neutral density with fits')
+        plt.legend()
+        
+    
+    def paper_neuden_radial_plot(self, pol_loc):
+        
+        
+        
+        if self.withshift == True and self.withseries == False:
+            
+            mix_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+            
+                result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
+                mix_dic[aa] = result_dic
+            
+            self.data['mix_dic'] = mix_dic
+            
+            for aa in self.data['dircomp']['multi_shift']:
+            
+                pol_index = int(pol_loc[0])
+                Nd = self.data['radial_fit_data'][aa]['NeuDen']
+                Ne = self.data['radial_fit_data'][aa]['Ne']
+                Te = self.data['radial_fit_data'][aa]['Te']
+                SEP = int(self.data['DefaultSettings']['sep_index_dsa'][aa])
+                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2]
+                
+                result_dic = self.data['mix_dic'][aa]
+                
+                psi_list = []
+                nd_list = []
+                
+                for ind, coord in enumerate(psi):
+                    
+                    if coord >= 0.95 and coord <= 1.05:
+                        psi_list.append(coord)
+                        nd_list.append(Nd[ind])
+                    
+                
+                self.paper_neuden_radial_method(result_dic = result_dic, SEP = SEP,
+                    x_coord = psi_list, Nd = nd_list, log_flag = True)
+        
+        elif self.withshift == True and self.withseries == True:
+            print('Opacity_study_radial_plot_psi is not there yet, to be continue...')    
+            
+        else:
+            print('Opacity_study_radial_plot_psi has a bug')
+    
+    
+    
+    
+    
     
     
     def Opacity_study_radial_plot(self, pol_loc):
@@ -966,24 +1062,28 @@ class radial_plot(profile_fit):
             color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                          'dot7': 'blue', 'one': 'purple'}
             
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            
             fig, axs = plt.subplots(2, 1)
             
-            anchored_text = AnchoredText('(a){}'.format('Electron density ($m^{-3}$)'), loc=3)
+            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
             axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
             # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
             # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
             # axs[0].set_title('(a)Electron density')
             axs[0].add_artist(anchored_text)
-            axs[0].legend(loc='center left')
+            axs[0].legend(loc='lower left', fontsize=10)
             
             
-            anchored_text2 = AnchoredText('(b){}'.format('Electron temperature (eV)'), loc=3)
+            anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
             axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
             # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
             axs[1].set_xlabel('$\psi_N$')
             # axs[1].set_title('(b)Electron temperature')
             axs[1].add_artist(anchored_text2)
-            axs[1].legend(loc = 'center left')
+            axs[1].legend(loc='lower left', fontsize=10)
             
             plt.subplots_adjust(hspace=.0)
             
@@ -1015,15 +1115,20 @@ class radial_plot(profile_fit):
             
             
                 # axs[0].set_yscale('log')
-                axs[0].plot(psi_coord, mid_ne_pro, color = color_dic[aa])
+                axs[0].plot(psi_coord, mid_ne_pro, color = color_dic[aa], 
+                            label= 'A = {}'.format(A_dic[aa]))
+                
+                axs[0].legend(loc= 'lower left', fontsize=10)
                 
                 # axs[1].set_yscale('log')
-                axs[1].plot(psi_coord, mid_te_pro, color = color_dic[aa])
+                axs[1].plot(psi_coord, mid_te_pro, color = color_dic[aa], 
+                            label= 'A = {}'.format(A_dic[aa]))
+                
+                # axs[1].legend(loc= 'lower left', fontsize=12)
                 
                 # axs[1].add_artist(anchored_text2)
             
-            
-        
+            fig.savefig('profiles.pdf')
         
 
 
