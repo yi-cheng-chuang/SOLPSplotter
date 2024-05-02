@@ -11,6 +11,8 @@ import SOLPSplotter_contour as spc
 import SOLPS_transcoe_adj as sta
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
+import scipy.stats
+
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
@@ -45,7 +47,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 xl.neuden_percent()
 
-topic = 'Q3-2'
+topic = 'Q3'
 
 
 """
@@ -278,6 +280,12 @@ elif topic == 'Q3':
             
         #     xl.iout_contour_plot(quant = rqu, log_bar= True, ma100= False, bounds = {})
         
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        
+        
         
         for resqu in res_qu_list:
             
@@ -297,57 +305,58 @@ elif topic == 'Q3':
                     resqu_per_dic[aa] = data
                     bon = {'max': 100, 'min': -100}
                     xl.plot_change_data(data = data, log_bar = False, bounds = bon,
-                                         itername = aa, quant = per_qu, ma100 = True)
+                            itername = aa, quant = per_qu, ma100 = True,
+                            color_dic = color_dic, A_dic = A_dic)
                 
             xl.data['iout_data'][per_qu] = resqu_per_dic
         
         
         
-        plt.figure(figsize=(7,7))
+        # plt.figure(figsize=(7,7))
 
-        for aa in xl.data['dircomp']['multi_shift']:
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                         'dot7': 'blue', 'one': 'purple'}
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
-            st = int(poloidal_index_list[0]) -1
-            ed = int(poloidal_index_list[-1])
-            sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, st:ed]
-            mean_pol_flux = np.mean(sol_pol_flux, axis=0)
-            std_pol_flux = np.std(sol_pol_flux, axis=0)
+        # for aa in xl.data['dircomp']['multi_shift']:
+        #     color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+        #                  'dot7': 'blue', 'one': 'purple'}
+        #     A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+        #               'dot7': '2.8', 'one': '3.4'}
+        #     st = int(poloidal_index_list[0]) -1
+        #     ed = int(poloidal_index_list[-1])
+        #     sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, st:ed]
+        #     mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+        #     std_pol_flux = np.std(sol_pol_flux, axis=0)
             
-            norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
-            neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
-            y = np.transpose(neuden_d)/ max(neuden_d)
-            plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
-                         color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
-            plt.title('neutral density and ion poloidal flux ')
-            plt.xlabel('ion poloidal flux')
-            plt.legend()
+        #     norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
+        #     neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+        #     y = np.transpose(neuden_d)/ max(neuden_d)
+        #     plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
+        #                  color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
+        #     plt.title('neutral density and ion poloidal flux ')
+        #     plt.xlabel('ion poloidal flux')
+        #     plt.legend()
 
 
-        plt.figure(figsize=(7,7))
+        # plt.figure(figsize=(7,7))
 
-        for aa in xl.data['dircomp']['multi_shift']:
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                         'dot7': 'blue', 'one': 'purple'}
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
-            st = int(poloidal_index_list[0]) -1
-            ed = int(poloidal_index_list[-1])
-            sol_pol_flux = xl.data['iout_data']['radial_flux'][aa][20:, st:ed]
-            mean_pol_flux = np.mean(sol_pol_flux, axis=0)
-            std_pol_flux = np.std(sol_pol_flux, axis=0)
-            norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
+        # for aa in xl.data['dircomp']['multi_shift']:
+        #     color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+        #                  'dot7': 'blue', 'one': 'purple'}
+        #     A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+        #               'dot7': '2.8', 'one': '3.4'}
+        #     st = int(poloidal_index_list[0]) -1
+        #     ed = int(poloidal_index_list[-1])
+        #     sol_pol_flux = xl.data['iout_data']['radial_flux'][aa][20:, st:ed]
+        #     mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+        #     std_pol_flux = np.std(sol_pol_flux, axis=0)
+        #     norm_pol_flux = mean_pol_flux/ max(mean_pol_flux)
             
             
-            neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
-            y = np.transpose(neuden_d)/ max(neuden_d)
-            plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
-                        color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
-            plt.title('neutral density and ion radial flux correlation')
-            plt.xlabel('ion radial flux')
-            plt.legend()
+        #     neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+        #     y = np.transpose(neuden_d)/ max(neuden_d)
+        #     plt.errorbar(mean_pol_flux, y, xerr= std_pol_flux, fmt = '-', 
+        #                 color = color_dic[aa], label= 'aspect ratio = {}'.format(A_dic[aa]))
+        #     plt.title('neutral density and ion radial flux correlation')
+        #     plt.xlabel('ion radial flux')
+        #     plt.legend()
         
         
         
@@ -366,46 +375,29 @@ elif topic == 'Q3':
         st = int(poloidal_index_list[0]) -1
         ed = int(poloidal_index_list[-1])
         one_angle = False
-        ind = st + 6
+        ind = ed
         for aa in xl.data['dircomp']['multi_shift']:
             A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
                       'dot7': '2.8', 'one': '3.4'}
             
-            if one_angle:
-                sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, ind]
-                anglemean_pol_flux.append(-1*np.mean(sol_pol_flux, axis=0))
-                std_pol_flux.append(np.std(sol_pol_flux, axis=0))
-                cv_pol_flux.append(-1*np.std(sol_pol_flux, axis=0) / np.mean(sol_pol_flux, axis=0))
-                
-                neuden_d = xl.data['ft44'][aa]['dab2'][ind, 20:, 0]
-                neuden_list.append(np.mean(neuden_d, axis=0))
-                # mean_neuden = np.mean(neuden_d, axis=0)
-                cv_neuden.append(np.std(neuden_d, axis=0) / np.mean(neuden_d, axis=0))
-                std_neuden.append(np.std(neuden_d, axis=0))
-                
-                sol_rad_flux = xl.data['iout_data']['radial_flux'][aa][20:, ind]
-                anglemean_rad_flux.append(np.mean(sol_rad_flux, axis=0))
-                std_rad_flux.append(np.std(sol_rad_flux, axis=0))
+            sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, st:ed]
+            mean_pol_flux = np.mean(sol_pol_flux, axis=0)
+            anglemean_pol_flux.append(-1*np.mean(mean_pol_flux, axis=0))
             
-            else:
-                sol_pol_flux = xl.data['iout_data']['poloidal_flux'][aa][20:, st:ed]
-                mean_pol_flux = np.mean(sol_pol_flux, axis=0)
-                anglemean_pol_flux.append(-1*np.mean(mean_pol_flux, axis=0))
-                
-                cv_pol_flux.append(-1*np.std(mean_pol_flux, axis=0) / np.mean(mean_pol_flux, axis=0))
-                std_pol_flux.append(np.std(mean_pol_flux, axis=0))
-                
-                neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
-                neuden_list.append(np.mean(neuden_d, axis=0))
-                # mean_neuden = np.mean(neuden_d, axis=0)
-                cv_neuden.append(np.std(neuden_d, axis=0) / np.mean(neuden_d, axis=0))
-                std_neuden.append(np.std(neuden_d, axis=0))
-                
-                sol_rad_flux = xl.data['iout_data']['radial_flux'][aa][20:, st:ed]
-                mean_rad_flux = np.mean(sol_rad_flux, axis=0)
-                anglemean_rad_flux.append(np.mean(mean_rad_flux, axis=0))
-                std_rad_flux.append(np.std(mean_rad_flux, axis=0))
-                
+            cv_pol_flux.append(-1*np.std(mean_pol_flux, axis=0) / np.mean(mean_pol_flux, axis=0))
+            std_pol_flux.append(np.std(mean_pol_flux, axis=0))
+            
+            neuden_d = xl.data['opacity_poloidal'][aa]['neutral_density']
+            neuden_list.append(np.mean(neuden_d, axis=0))
+            # mean_neuden = np.mean(neuden_d, axis=0)
+            cv_neuden.append(np.std(neuden_d, axis=0) / np.mean(neuden_d, axis=0))
+            std_neuden.append(np.std(neuden_d, axis=0))
+            
+            sol_rad_flux = xl.data['iout_data']['radial_flux'][aa][20:, st:ed]
+            mean_rad_flux = np.mean(sol_rad_flux, axis=0)
+            anglemean_rad_flux.append(np.mean(mean_rad_flux, axis=0))
+            std_rad_flux.append(np.std(mean_rad_flux, axis=0))
+            
             
         fig, axs = plt.subplots(2, 1, figsize = (14, 7))
         aspect_list = [1.4, 2.0, 2.4, 2.8]
@@ -465,17 +457,564 @@ elif topic == 'Q3':
         # fig_dir  = sps.set_figdir()
         # plt.savefig('{}/{}.pdf'.format(fig_dir, 'flux&neuden'), format='pdf')
         
+        
+        # st = int(poloidal_index_list[0]) -1
+        # ed = int(poloidal_index_list[-1])
+        
+        
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                          'dot7': 'blue', 'one': 'purple'}
+        
+        anchored_text = AnchoredText('(a){}'.format('HFS poloidal flux [$m^{-1} s^{-1}$]'), 
+                                     loc= 'upper left')
+        
+        rad_text = AnchoredText('(b){}'.format('HFS radial flux [$m^{-1} s^{-1}$]'), 
+                                     loc= 'lower right')
+        
+        LFS_text = AnchoredText('(c){}'.format('LFS poloidal flux [$m^{-1} s^{-1}$]'), 
+                                     loc= 'upper right')
+        
+        pol_list_a = []
+        for i in range(9):
+            pol_list_a.append('{}'.format(28 + i))
+
+        
+        psi_st = 19
+        psi_ed = 36
+        
+        
+        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        
+        fig, axs = plt.subplots(3, 1)
             
+        sk = int(pol_list_a[0])
+        sd = int(pol_list_a[-1])
+            
+            
+        for ab in xl.data['dircomp']['multi_shift']:
+            
+                
+            pol_flux_dat = xl.data['iout_data']['poloidal_flux'][ab][psi_st:psi_ed, sk:sd]
+            nor_pol_flux = pol_flux_dat/(abs(pol_flux_dat).max())
+            
+            
+            neuden_dat = np.transpose(xl.data['ft44'][ab]['dab2'][sk:sd, psi_st:psi_ed, 0])
+            
+            nor_neuden = neuden_dat/(neuden_dat.max())
+            
+            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_pol_flux.flatten())
+            
+            print_regress = True
+            
+            if print_regress:
+                
+                print('case {} slope = {}'.format(ab, slope))
+                print('case {} intercept = {}'.format(ab, intercept))
+                print('case {} std_err = {}'.format(ab, std_err))
+                print('case {} r_value = {}'.format(ab, r_value))
+                print('case {} p_value = {}'.format(ab, p_value))
+            
+            else:
+                pass
+            
+            # print(slope)
+            # print(r_value)
+            
+            # print(intercept)
+            
+            x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+            y = slope*x + intercept
+            
+            
+            axs[0].plot(x, y, '-', color = color_dic[ab], 
+                            label= 'A= {}'.format(A_dic[ab]))
+            axs[0].scatter(nor_neuden.flatten(), nor_pol_flux.flatten(), color= color_dic[ab])
+        
+        
+        for ab in xl.data['dircomp']['multi_shift']:
+            
+                
+            rad_flux_dat = xl.data['iout_data']['radial_flux'][ab][psi_st:psi_ed, sk:sd]
+            
+            nor_rad_flux = rad_flux_dat/(rad_flux_dat.max())
+            
+            
+            neuden_dat = np.transpose(xl.data['ft44'][ab]['dab2'][sk:sd, psi_st:psi_ed, 0])
+            
+            nor_neuden = neuden_dat/(neuden_dat.max())
+            
+            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_rad_flux.flatten())
+            
+            print_regress = True
+            
+            if print_regress:
+                
+                print('case {} slope = {}'.format(ab, slope))
+                print('case {} intercept = {}'.format(ab, intercept))
+                print('case {} std_err = {}'.format(ab, std_err))
+                print('case {} r_value = {}'.format(ab, r_value))
+                print('case {} p_value = {}'.format(ab, p_value))
+            
+            else:
+                pass
+            
+            
+            x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+            y = slope*x + intercept
+            
+            
+            axs[1].plot(x, y, '-', color = color_dic[ab], 
+                            label= 'A= {}'.format(A_dic[ab]))
+            axs[1].scatter(nor_neuden.flatten(), nor_rad_flux.flatten(), color= color_dic[ab])
+        
+        pol_list_b = []
+        for i in range(6):
+            pol_list_b.append('{}'.format(58 + i))
+        
+        sk = int(pol_list_b[0])
+        sd = int(pol_list_b[-1])
+        
+        for ab in xl.data['dircomp']['multi_shift']:
+            
+                
+            pol_flux_dat = xl.data['iout_data']['poloidal_flux'][ab][psi_st:psi_ed, sk:sd]
+            nor_pol_flux = pol_flux_dat/(abs(pol_flux_dat).max())
+            
+            
+            neuden_dat = np.transpose(xl.data['ft44'][ab]['dab2'][sk:sd, psi_st:psi_ed, 0])
+            
+            nor_neuden = neuden_dat/(neuden_dat.max())
+            
+            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_pol_flux.flatten())
+            
+            print_regress = False
+            
+            if print_regress:
+                
+                print('case {} slope = {}'.format(ab, slope))
+                print('case {} intercept = {}'.format(ab, intercept))
+                print('case {} std_err = {}'.format(ab, std_err))
+                print('case {} r_value = {}'.format(ab, r_value))
+                print('case {} p_value = {}'.format(ab, p_value))
+            
+            else:
+                pass
+            
+            # print(slope)
+            # print(r_value)
+            
+            # print(intercept)
+            
+            x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+            y = slope*x + intercept
+            
+            
+            axs[2].plot(x, y, '-', color = color_dic[ab], 
+                            label= 'A= {}'.format(A_dic[ab]))
+            axs[2].scatter(nor_neuden.flatten(), nor_pol_flux.flatten(), color= color_dic[ab])
+            
+            
+        
+        
+        axs[0].add_artist(anchored_text)
+        axs[1].add_artist(rad_text)
+        axs[2].add_artist(LFS_text)
+        axs[0].legend(loc= 'lower right', fontsize=10)
+        
+        axs[2].set_xlabel('Normalized neutral density [$m^{-3}$]')
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        fig.savefig('correlation.pdf')
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                          'dot7': 'blue', 'one': 'purple'}
+        
+        anchored_text = AnchoredText('{}'.format('Normalized poloidal flux [$m^{-1} s^{-1}$]'), loc= 'upper left')
+        
+        
+        pol_list_a = []
+        for i in range(9):
+            pol_list_a.append('{}'.format(28 + i))
+        
+        pol_list_b = []
+        for i in range(6):
+            pol_list_b.append('{}'.format(58 + i))
+        
+        check_target = False
+        
+        if check_target:
+            
+            pol_list_c = []
+            for i in range(10):
+                pol_list_c.append('{}'.format(1 + i))
+            
+            pol_list_d = []
+            for i in range(9):
+                pol_list_d.append('{}'.format(87 + i))
+        else:
+            pass
             
 
+        
+        psi_st = 19
+        psi_ed = 36
+        
+        
+        # xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        
+        iter_list = [pol_list_a, pol_list_b]
+        
+        fig_n = len(iter_list)
+        
+        fig, axs = plt.subplots(fig_n, 1)
+        
+        for i, pl in enumerate(iter_list):
             
-
+            sk = int(pl[0])
+            sd = int(pl[-1])
+            
+            
+        
+        
+            for ab in xl.data['dircomp']['multi_shift']:
+                
+                    
+                pol_flux_dat = xl.data['iout_data']['poloidal_flux'][ab][psi_st:psi_ed, sk:sd]
+                nor_pol_flux = pol_flux_dat/(abs(pol_flux_dat).max())
+                
+                
+                # print(pol_flux_dat.max())
+                # print(pol_flux_dat)
+                
+                
+                
+                neuden_dat = np.transpose(xl.data['ft44'][ab]['dab2'][sk:sd, psi_st:psi_ed, 0])
+                
+                nor_neuden = neuden_dat/(neuden_dat.max())
+                
+                rad_flux_dat = xl.data['iout_data']['radial_flux'][ab][psi_st:psi_ed, sk:sd]
+                
+                nor_rad_flux = rad_flux_dat/(rad_flux_dat.max())
+                
+                cor_list = scipy.stats.pearsonr(nor_neuden.flatten(), nor_pol_flux.flatten())
+                
+                # print(cor_list)
+                
+                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_pol_flux.flatten())
+                
+                print_regress = False
+                
+                if print_regress:
+                    
+                    print(slope)
+                    print(intercept)
+                    print(std_err)
+                    print(r_value)
+                    print(p_value)
+                
+                else:
+                    pass
+                    
+                
+                x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+                y = slope*x + intercept
+                
+                
+                axs[i].plot(x, y, '-', color = color_dic[ab], 
+                                label= 'A= {}'.format(A_dic[ab]))
+                axs[i].scatter(nor_neuden.flatten(), nor_pol_flux.flatten(), color= color_dic[ab])
+            
+            
+            axs[0].add_artist(anchored_text)
+            
+            
+            axs[fig_n -1].set_xlabel('Normalized neutral density [$m^{-3}$]')
+            
+            plt.subplots_adjust(hspace=.0)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        geo_list = []
+        geo_tuple = ('vol.dat', 'sqrt_g')
+        geo_qu = xl.load_iout(filename = geo_tuple[0], simple_quant = geo_tuple[1])
+        print(geo_qu)
+        # print(flux_qu.split('_'))
+        geo_list.append(geo_qu)
+        
+        
+        
+        s_list = []
+        source_tuple = [('b2npc11_sna001.dat', 'source'), ('b2stel_sna_ion001.dat', 'source_ion'),
+                        ('b2stel_sna_rec001.dat', 'source_rec'), ('b2stcx_sna_001.dat', 'source_cx'),
+                        ('b2stbr_sna_eir001.dat', 'source_eir')]
+        for s_tpl in source_tuple:
+            
+            s_qu = xl.load_iout(filename = s_tpl[0], simple_quant = s_tpl[1])
+            print(s_qu)
+            # print(flux_qu.split('_'))
+            s_list.append(s_qu)
+        
+        
+        
+        
+        res_key = []
+        
+        # for s_name in s_list:
+        
+        for i in range(len(s_list)):
+            res_qu_dic = {}
+            
+            for aa in xl.data['dircomp']['multi_shift']:
+            
+                data, res_qu = xl.load_iout_divide(name1 = s_list[i], name2 = geo_list[0], 
+                                    input_name= '{}_no_jacobian'.format(s_list[i]), itername = aa)
+                
+                res_qu_dic[aa] = data
+                
+                # xl.plot_change_data(data = data, log_bar = True, itername = aa, 
+                #                 quant = res_qu, ma100 = False, bounds = {})
+            
+            xl.data['iout_data'][res_qu] = res_qu_dic
+            res_key.append(res_qu)
+        
+        
+        
+        fig_n = len(iter_list)
+        
+        fig, axs = plt.subplots(fig_n, 1)
+        
+        for i, pl in enumerate(iter_list):
+            
+            sk = int(pl[0])
+            sd = int(pl[-1])
+        
+        
+            for at in xl.data['dircomp']['multi_shift']:
+                
+                    
+                pol_flux_dat = xl.data['iout_data']['poloidal_flux'][at][psi_st:psi_ed, sk:sd]
+                nor_pol_flux = pol_flux_dat/(abs(pol_flux_dat).max())
+                
+                
+                # print(pol_flux_dat.max())
+                # print(pol_flux_dat)
+                
+                
+                s_term = xl.data['iout_data']['source_no_jacobian'][at][psi_st:psi_ed, sk:sd]
+                
+                nor_source = s_term/(s_term.max())
+                
+                # print(cor_list)
+                
+                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_source.flatten(), nor_pol_flux.flatten())
+                
+                # print(slope)
+                # print(intercept)
+                # print(std_err)
+                # print(r_value)
+                # print(p_value)
+                
+                x = np.linspace(nor_source.min(), nor_source.max(), 50)
+                y = slope*x + intercept
+                
+                
+                # axs[i].plot(x, y, '-', color = color_dic[at], 
+                #                 label= 'A= {}'.format(A_dic[at]))
+                axs[i].scatter(nor_source.flatten(), nor_pol_flux.flatten(), color= color_dic[at])
+            
+            
+            # axs[0].add_artist(anchored_text)
+            
+            
+            axs[fig_n -1].set_xlabel('Normalized source rate [$m^{-3}$]')
+            
+            plt.subplots_adjust(hspace=.0)
+        
+        
+        fig_n = len(iter_list)
+        
+        fig, axs = plt.subplots(fig_n, 1)
+        
+        for i, pl in enumerate(iter_list):
+            
+            sk = int(pl[0])
+            sd = int(pl[-1])
+        
+        
+            for at in xl.data['dircomp']['multi_shift']:
+                
+                
+                neuden_dat = np.transpose(xl.data['ft44'][at]['dab2'][sk:sd, psi_st:psi_ed, 0])
+                
+                nor_neuden = neuden_dat/(neuden_dat.max())
+                
+                # print(pol_flux_dat.max())
+                # print(pol_flux_dat)
+                
+                
+                s_term = xl.data['iout_data']['source_no_jacobian'][at][psi_st:psi_ed, sk:sd]
+                
+                nor_source = s_term/(s_term.max())
+                
+                # print(cor_list)
+                
+                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_source.flatten())
+                
+                # print(slope)
+                # print(intercept)
+                # print(std_err)
+                # print(r_value)
+                # print(p_value)
+                
+                x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+                y = slope*x + intercept
+                
+                
+                axs[i].plot(x, y, '-', color = color_dic[at], 
+                                label= 'A= {}'.format(A_dic[at]))
+                axs[i].scatter(nor_neuden.flatten(), nor_source.flatten(), color= color_dic[at])
+            
+            
+            # axs[0].add_artist(anchored_text)
+            
+            
+            axs[fig_n -1].set_xlabel('Normalized neutral density [$m^{-3}$]')
+            
+            plt.subplots_adjust(hspace=.0)
+        
+        
+        
+        
+        iter_list = [pol_list_a, pol_list_b]
+        
+        fig_n = len(iter_list)
+        
+        fig, axs = plt.subplots(fig_n, 1)
+        
+        for i, pl in enumerate(iter_list):
+            
+            sk = int(pl[0])
+            sd = int(pl[-1])
+            
+            
+        
+        
+            for ab in xl.data['dircomp']['multi_shift']:
+                
+                    
+                pol_flux_dat = xl.data['iout_data']['poloidal_flux'][ab][psi_st:psi_ed, sk:sd]
+                nor_pol_flux = pol_flux_dat/(abs(pol_flux_dat).max())
+                
+                
+                # print(pol_flux_dat.max())
+                # print(pol_flux_dat)
+                
+                
+                
+                neuden_dat = np.transpose(xl.data['ft44'][ab]['dab2'][sk:sd, psi_st:psi_ed, 0])
+                
+                nor_neuden = neuden_dat/(neuden_dat.max())
+                
+                rad_flux_dat = xl.data['iout_data']['radial_flux'][ab][psi_st:psi_ed, sk:sd]
+                
+                nor_rad_flux = rad_flux_dat/(rad_flux_dat.max())
+                
+                cor_list = scipy.stats.pearsonr(nor_neuden.flatten(), nor_rad_flux.flatten())
+                
+                # print(cor_list)
+                
+                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_rad_flux.flatten())
+                
+                x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+                y = slope*x + intercept
+                
+                
+                axs[i].plot(x, y, '-', color = color_dic[ab], 
+                                label= 'A= {}'.format(A_dic[ab]))
+                axs[i].scatter(nor_neuden.flatten(), nor_rad_flux.flatten(), color= color_dic[ab])
+            
+            axs[fig_n -1].set_xlabel('Normalized neutral density [$m^{-3}$]')
+            
+            plt.subplots_adjust(hspace=.0)
+        
+        
+        
+        
+        
+        
+        pol_list_a = []
+        for i in range(9):
+            pol_list_a.append('{}'.format(28 + i))
+        
+        
+        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        
+        
+        
+        fig, axs = plt.subplots()
+        
+        
+        for ac in xl.data['dircomp']['multi_shift']:
+            
+            sk = int(pol_list_a[0])
+            sd = int(pol_list_a[-1]) + 1
+            
+            # neuden_dat = np.transpose(xl.data['ft44'][ac]['dab2'][sk:sd, psi_st, 0])
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            pol_flux_dat_a = xl.data['iout_data']['poloidal_flux'][ac][psi_st, sk:sd]
+            pol_flux_dat_b = xl.data['iout_data']['poloidal_flux'][ac][psi_ed -1, sk:sd]
+            
+            
+            
+            axs.fill_between(ang_list, pol_flux_dat_a, pol_flux_dat_b, 
+                             color = color_dic[ac], alpha = 0.4)
+        
+        fig, axs = plt.subplots()
+        
+        
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+            data = xl.data['ft44'][aa]['dab2']
+            neuden_data_a = np.transpose(data[sk:sd, psi_st, 0])
+            neuden_data_b = np.transpose(data[sk:sd, psi_ed -1, 0])
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            axs.fill_between(ang_list, neuden_data_a, neuden_data_b, 
+                             color= color_dic[aa], alpha = 0.4)
+        
+        
                     
 elif topic == 'Q3-1':
     
     
     coe = 'dab2'
     
+    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+              'dot7': '2.8', 'one': '3.4'}
+    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                 'dot7': 'blue', 'one': 'purple'}
     
     for aa in xl.data['dircomp']['multi_shift']:
         if aa == 'org':
@@ -495,15 +1034,49 @@ elif topic == 'Q3-1':
             bon = {'max': 100, 'min': -100}
             
             xl.plot_change_data(data = neuden_data, log_bar = True, bounds = bon, 
-                     itername = aa, quant = 'neutral density increase percentage', ma100 = True)
+        itername = aa, quant = 'neutral density increase percentage', ma100 = True,
+                color_dic = color_dic, A_dic = A_dic)
     
     for aa in xl.data['dircomp']['multi_shift']:
         
         data = xl.data['ft44'][aa][coe]
         neuden_data = np.transpose(data[:, :, 0])
         
+        
+        
         xl.plot_change_data(data = neuden_data, log_bar = True, bounds = {}, 
-                 itername = aa, quant = 'neutral density', ma100 = False)
+                 itername = aa, quant = 'neutral density', ma100 = False,
+                 color_dic = color_dic, A_dic = A_dic)
+    
+    pol_list_a = []
+    for i in range(9):
+        pol_list_a.append('{}'.format(28 + i))
+    
+    
+    xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+    
+    xl.data['angle']['angle_list'][aa]
+    
+    psi_st = 18
+    psi_ed = 35
+    sk = int(pol_list_a[0])
+    sd = int(pol_list_a[-1]) + 1
+    
+    fig, axs = plt.subplots()
+    
+    
+    for aa in xl.data['dircomp']['multi_shift']:
+        
+        data = xl.data['ft44'][aa][coe]
+        neuden_data_a = np.transpose(data[sk:sd, psi_st, 0])
+        neuden_data_b = np.transpose(data[sk:sd, psi_ed, 0])
+        
+        ang_list = xl.data['angle']['angle_list'][aa]
+        
+        axs.fill_between(ang_list, neuden_data_a, neuden_data_b, 
+                         color= color_dic[aa], alpha = 0.4)
+    
+    
     
         
 elif topic == 'Q3-2':
