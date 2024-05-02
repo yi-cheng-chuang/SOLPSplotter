@@ -15,6 +15,7 @@ from matplotlib.colors import LogNorm
 import fitting_method as fm
 import numpy as np
 from numpy import ma
+from matplotlib.offsetbox import AnchoredText
 
 
 
@@ -265,7 +266,7 @@ class PlotContour(profile_fit):
             
     
     
-    def plot_vessel_method(self, vessel_data, shift_value, independent, meter):
+    def plot_vessel_method(self, vessel_data, shift_value, independent, meter, color_dic, itername):
         
         if independent:
             plt.figure(figsize=(7,7))
@@ -273,7 +274,7 @@ class PlotContour(profile_fit):
             pass
         
         if meter:
-            plt.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, color = 'g')
+            plt.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, color = color_dic[itername])
             # plt.xlabel('R')
                     
             tick_label = np.arange(0 + shift_value, 2.1 + shift_value, 0.5)
@@ -285,7 +286,7 @@ class PlotContour(profile_fit):
             
             
         else:
-            plt.plot(vessel_data[:,0], vessel_data[:,1], color = 'g')
+            plt.plot(vessel_data[:,0], vessel_data[:,1], color = color_dic[itername])
             # plt.xlabel('R')
                     
             tick_label = np.arange(0 + shift_value, 2100 + shift_value, 500)
@@ -302,7 +303,19 @@ class PlotContour(profile_fit):
         
         else:
             pass
+    
             
+    def paper_vessel_method(self, vessel_data, shift_value, meter, 
+                           color_dic, itername, axs):
+        
+        if meter:
+            axs.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, color = color_dic[itername])
+            
+            
+        else:
+            axs.plot(vessel_data[:,0], vessel_data[:,1], color = color_dic[itername])
+            
+    
             
     def plot_vessel(self, itername, independent, meter):
         
@@ -333,6 +346,35 @@ class PlotContour(profile_fit):
         else:
             
             print('plot_vessel function is not there yet!')
+    
+    
+    def shift_vessel_in_one(self):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            fig, axs = plt.subplots()
+            
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            anchored_text = AnchoredText('{}'.format('vessel cross section'), loc='upper left')
+            
+            ylabel_text = AnchoredText('{}'.format('Z (m)'), loc='center left')
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                vessel = self.data['vessel'][aa]
+                shift = self.data['dircomp']['shift_dic'][aa]*1000
+                
+                self.paper_vessel_method(vessel_data = vessel, shift_value = shift,
+                    meter = True, color_dic = color_dic, itername = aa, axs = axs)
+                
+                axs.add_artist(anchored_text)
+                axs.add_artist(ylabel_text)
+                axs.set_xlabel('R (m)')
+           
+        
+        
         
         
     def iout_contour_plot(self, quant, log_bar, ma100, bounds):

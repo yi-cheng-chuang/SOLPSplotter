@@ -288,7 +288,7 @@ class paper_poloidal_plot(profile_fit):
     
     def paper_poloidal_subplot(self, log_flag):
             
-            itemname = ['efold_length_psiN', 'dimensionless_opaqueness', 'flux_expansion']
+            itemname = ['pedestal_width', 'efold_length', 'dimensionless_opaqueness']
             # adj_list = list(result_dic.keys())
             
             A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
@@ -322,8 +322,8 @@ class paper_poloidal_plot(profile_fit):
             # plt.tight_layout()
             
             
-            # fig, axs = plt.subplots(figsize=(7,7))
-            plt.figure(figsize=(7,7))
+
+            fig, axs = plt.subplots()
                     
             result = self.data['opacity_poloidal']
             
