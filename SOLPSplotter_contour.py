@@ -31,8 +31,8 @@ class PlotContour(profile_fit):
     def set_plot(self):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 3, markersize= 6)
-            plt.rcParams.update({'font.size': 16})
+            plt.rc('lines', linewidth= 4, markersize= 7)
+            plt.rcParams.update({'font.size': 12})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
   
@@ -52,12 +52,12 @@ class PlotContour(profile_fit):
     
     
     def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity, itername, 
-                     log_bar, ma100, bounds):
+                     log_bar, ma100, bounds, color_dic, A_dic):
         
         
         vessel = self.data['vessel'][itername]
         
-        plt.figure(figsize=(6,12))
+        fig, axs = plt.subplots()
         if log_bar:
             if np.all(plot_2dval == 0):
                 print('data_file is an zero matrix')
@@ -128,9 +128,9 @@ class PlotContour(profile_fit):
             plt.title('{} contour plot'.format(quantity))
         
         else:
-            plt.title('{} contour plot for {} case'.format(quantity, itername))
+            plt.title('{} for aspect ratio {}'.format(quantity, A_dic[itername]), )
             
-        plt.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = 'saddlebrown')
+        plt.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = color_dic[itername])
                 
         
         
@@ -306,14 +306,16 @@ class PlotContour(profile_fit):
     
             
     def paper_vessel_method(self, vessel_data, shift_value, meter, 
-                           color_dic, itername, axs):
+                           color_dic, A_dic, itername, axs):
         
         if meter:
-            axs.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, color = color_dic[itername])
+            axs.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, 
+        color = color_dic[itername], label= 'aspect ratio = {}'.format(A_dic[itername]))
             
             
         else:
-            axs.plot(vessel_data[:,0], vessel_data[:,1], color = color_dic[itername])
+            axs.plot(vessel_data[:,0], vessel_data[:,1], 
+    color = color_dic[itername], label= 'aspect ratio = {}'.format(A_dic[itername]))
             
     
             
@@ -348,6 +350,28 @@ class PlotContour(profile_fit):
             print('plot_vessel function is not there yet!')
     
     
+    
+    def shaded_area(self):
+        
+            
+        # CMAP = 'RdBu'
+        CMAP = cm.viridis
+        
+        R_coord = self.data['grid']['RadLoc']['org']
+        Z_coord = self.data['grid']['VertLoc']['org']
+    
+        shade = np.ones([38, 98])
+        
+        plt.contourf(R_coord, Z_coord, shade, levels= 1, cmap= 'Blues')
+        
+        
+        # cs = ax.contourf(X, Y, z, locator=ticker.LogLocator(), cmap=cm.PuBu_r)
+        # cbar = fig.colorbar(cs)
+    
+    
+    
+    
+    
     def shift_vessel_in_one(self):
         
         if self.withshift == True and self.withseries == False:
@@ -357,9 +381,14 @@ class PlotContour(profile_fit):
             color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                          'dot7': 'blue', 'one': 'purple'}
             
-            anchored_text = AnchoredText('{}'.format('vessel cross section'), loc='upper left')
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
             
-            ylabel_text = AnchoredText('{}'.format('Z (m)'), loc='center left')
+            anchored_text = AnchoredText('{}'.format('vessel cross section'), loc='upper right')
+            
+            self.shaded_area()
+            
+            # ylabel_text = AnchoredText('{}'.format('Z [m]'), loc='center left')
             
             for aa in self.data['dircomp']['multi_shift']:
                 
@@ -367,13 +396,18 @@ class PlotContour(profile_fit):
                 shift = self.data['dircomp']['shift_dic'][aa]*1000
                 
                 self.paper_vessel_method(vessel_data = vessel, shift_value = shift,
-                    meter = True, color_dic = color_dic, itername = aa, axs = axs)
+            meter = True, color_dic = color_dic, itername = aa, axs = axs, A_dic = A_dic)
                 
                 axs.add_artist(anchored_text)
-                axs.add_artist(ylabel_text)
-                axs.set_xlabel('R (m)')
-           
-        
+                # axs.add_artist(ylabel_text)
+                axs.set_xlabel('R [m]')
+                axs.set_ylabel('Z [m]')
+                axs.legend(loc= 'center right', fontsize=10)
+            
+            
+            axs.set_aspect('equal')
+            
+            fig.savefig('vessel.pdf')
         
         
         
@@ -461,7 +495,8 @@ class PlotContour(profile_fit):
             plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
     
     
-    def plot_change_data(self, data, log_bar, itername, quant, ma100, bounds):
+    def plot_change_data(self, data, log_bar, itername, quant, ma100, 
+                         bounds, color_dic, A_dic):
         
         if self.withshift == True and self.withseries == False:
             
@@ -474,7 +509,8 @@ class PlotContour(profile_fit):
                         
             self.contour_plot(plot_2dval = data, R_coord = R_con, 
                              Z_coord = Z_con, quantity = quant, bounds = bounds, 
-                             itername = itername, log_bar = log_bar, ma100= ma100)
+                                     itername = itername, log_bar = log_bar, 
+                ma100= ma100, color_dic = color_dic, A_dic= A_dic)
             
             # fig_dir  = ss.set_figdir()
             # plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
