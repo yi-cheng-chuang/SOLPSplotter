@@ -16,8 +16,8 @@ def opacity_study_unit():
               'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
               'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
               'flux_expansion': 'Flux expansion',
-              'efold_length': 'Neutral penetration length: $\lambda_{n_D}$ [mm]',
-              'pedestal_width': 'Pedestal width: $\Delta n$ [mm]',
+              'efold_length': '$\lambda_{n_D}$ [mm]',
+              'pedestal_width': '$\Delta n_e$ [mm]',
               
               }
     return unit
