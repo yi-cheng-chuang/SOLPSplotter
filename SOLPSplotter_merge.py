@@ -50,21 +50,24 @@ class paper_poloidal_plot(profile_fit):
             anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), loc=3)
         else:
             
-            anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), loc=2)
+            anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), 
+                                         loc=2)
             
         
         
         if item == 'pedestal_width' or item == 'efold_length':
             new_r = result_dic[item]*1000
-            ax.plot(pol_angle, new_r, '-', color= color_code)
+            ax.plot(pol_angle, new_r, '-', color= color_code, label= 'A= {}'.format(A_value))
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
                     
         elif item == 'pedestal_width_psiN':
-            ax.plot(pol_angle, np.round_(result_dic[item], 2), '-', color = color_code)
+            ax.plot(pol_angle, np.round_(result_dic[item], 2), '-', 
+                    color = color_code, label= 'A= {}'.format(A_value))
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
         
         else:
-            ax.plot(pol_angle, result_dic[item], '-', color= color_code)
+            ax.plot(pol_angle, result_dic[item], '-', color= color_code,
+                    label= 'A= {}'.format(A_value))
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
         
         if item == 'dimensionless_opaqueness':
@@ -74,9 +77,23 @@ class paper_poloidal_plot(profile_fit):
         elif item == 'flux_expansion':
             
             ax.set_ylim(ymin = 0, ymax = 10)
+        
+        elif item == 'pedestal_width':
+            
+            ax.set_ylim(ymax = 25)
+        
+        elif item == 'efold_length':
+            
+            ax.set_ylim(ymax = 35)
+            ax.legend(loc= 'upper center', fontsize=10)
+        
+        
             
         else:
             pass
+        
+        
+        
         
         
         
@@ -85,25 +102,27 @@ class paper_poloidal_plot(profile_fit):
     
     
     def paper_singleplot_method(self, item, pol_angle, result_dic, color_code, 
-                                 A_value, unit_dic, plot_order):
+                                 A_value, unit_dic, plot_order, axs):
         
         
         # anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), loc=2)
         
         if item == 'pedestal_width' or item == 'efold_length':
             new_r = result_dic[item]*1000
-            plt.plot(pol_angle, new_r, '-', color= color_code)
-            plt.xlabel('poloidal angle')
+            axs.plot(pol_angle, new_r, '-', color= color_code, label= 'A= {}'.format(A_value))
+            axs.set_xlabel('poloidal angle')
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
                     
         elif item == 'pedestal_width_psiN':
-            plt.plot(pol_angle, np.round_(result_dic[item], 2), '-', color = color_code)
-            plt.xlabel('poloidal angle')
+            axs.plot(pol_angle, np.round_(result_dic[item], 2), '-', 
+                     color = color_code, label= 'A= {}'.format(A_value))
+            axs.set_xlabel('poloidal angle')
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
         
         else:
-            plt.plot(pol_angle, result_dic[item], '-', color= color_code)
-            plt.xlabel('poloidal angle')
+            axs.plot(pol_angle, result_dic[item], '-', 
+                     color= color_code, label= 'A= {}'.format(A_value))
+            axs.set_xlabel('poloidal angle')
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
         
         # plt.add_artist(anchored_text)    
@@ -112,51 +131,77 @@ class paper_poloidal_plot(profile_fit):
     
     def paper_poloidal_label(self, angle_fix, item, xpoint_fix, ax):
         
-        if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
-            ax.axvline(x= 90, color='black',lw=3, ls='--')
-        else:
-            pass
+        # if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
+        #     ax.axvline(x= 90, color='black',lw=3, ls='--')
+        # else:
+        #     pass
         if max(angle_fix) > 180 and item != 'electron_pedestal_density':
-            ax.axvline(x= 180, color='darkgreen',lw=3, ls='--')
+            ax.axvline(x= 180, color='gray',lw=3, ls='--', label= 'inner midplane')
         else:
             pass
         if min(angle_fix) < 0 and item != 'electron_pedestal_density':
-            ax.axvline(x= 0, color='red',lw=3, ls='--')
+            ax.axvline(x= 0, color='brown',lw=3, ls='--', label= 'outer midplane')
         else:
             pass
         
         if min(angle_fix) < -70 and item != 'electron_pedestal_density':
-            ax.axvline(x= xpoint_fix, color='darkblue',lw=3, ls='--')
-            ax.axvline(x= xpoint_fix + 360, color='darkblue',lw=3, ls='--')
+            ax.axvline(x= xpoint_fix, color='black',lw=3, ls='--', label= 'xpoint')
+            ax.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
         else:
             pass
     
-    def neuden_poloidal_label(self, angle_fix, item, xpoint_fix):
+    def nolegend_pol_label(self, angle_fix, item, xpoint_fix, ax):
         
-        if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
-            plt.axvline(x= 90, color='black',lw=3, ls='--')
-        else:
-            pass
+        # if max(angle_fix) > 90 and item != 'electron_pedestal_density' and item != 'width_relation':
+        #     ax.axvline(x= 90, color='black',lw=3, ls='--')
+        # else:
+        #     pass
         if max(angle_fix) > 180 and item != 'electron_pedestal_density':
-            plt.axvline(x= 180, color='darkgreen',lw=3, ls='--')
+            ax.axvline(x= 180, color='gray',lw=3, ls='--')
         else:
             pass
-        
-        if max(angle_fix) > 240 and item != 'electron_pedestal_density':
-            plt.axvline(x= 240, color='darkgreen',lw=3, ls='--')
-        else:
-            pass
-        
         if min(angle_fix) < 0 and item != 'electron_pedestal_density':
-            plt.axvline(x= 0, color= 'red',lw=3, ls='--')
+            ax.axvline(x= 0, color='brown',lw=3, ls='--')
         else:
             pass
         
         if min(angle_fix) < -70 and item != 'electron_pedestal_density':
-            plt.axvline(x= xpoint_fix, color='darkblue',lw=3, ls='--')
-            plt.axvline(x= xpoint_fix + 360, color='darkblue',lw=3, ls='--')
+            ax.axvline(x= xpoint_fix, color='black',lw=3, ls='--')
+            ax.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
         else:
             pass
+        
+        
+        
+        
+    
+    def neuden_poloidal_label(self, angle_fix, item, xpoint_fix):
+        
+        # if max(angle_fix) > 90 and item != 'electron_pedestal_density':
+        #     plt.axvline(x= 90, color='black',lw=3, ls='--')
+        # else:
+        #     pass
+        if max(angle_fix) > 180 and item != 'electron_pedestal_density':
+            plt.axvline(x= 180, color='gray',lw=3, ls='--', label= 'inner midplane')
+        else:
+            pass
+        
+        # if max(angle_fix) > 240 and item != 'electron_pedestal_density':
+        #     plt.axvline(x= 240, color='gray',lw=3, ls='--', label= '')
+        # else:
+        #     pass
+        
+        if min(angle_fix) < 0 and item != 'electron_pedestal_density':
+            plt.axvline(x= 0, color= 'brown',lw=3, ls='--', label= 'outer midplane')
+        else:
+            pass
+        
+        if min(angle_fix) < -70 and item != 'electron_pedestal_density':
+            plt.axvline(x= xpoint_fix, color='black',lw=3, ls='--', label= 'xpoint')
+            plt.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
+        else:
+            pass
+        
     
     
         
@@ -193,6 +238,22 @@ class paper_poloidal_plot(profile_fit):
             
             
             # result = self.data['nxny_sep_data']
+            ang_fix = self.data['angle']['angle_list']['org']
+            xp_fix = self.data['angle']['xpoint_angle']['org']
+            
+            
+            
+            if i_name == 'pedestal_width':
+                
+                self.paper_poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix,
+                                    ax = ax)
+                
+                ax.legend(loc= 'upper center', fontsize=10)
+            else:
+                self.nolegend_pol_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix,
+                                    ax = ax)
+                
+                
             
             for aa in self.data['dircomp']['multi_shift']:
                 
@@ -204,20 +265,14 @@ class paper_poloidal_plot(profile_fit):
 
                 A_val = A_dic[aa]
                 color = color_dic[aa]
-                ang_fix = self.data['angle']['angle_list']['org']
-                xp_fix = self.data['angle']['xpoint_angle']['org']
-                
-                
-                
-                
+
                 self.paper_poloidal_method(item = i_name, pol_angle = pol_loc, 
                              result_dic = dat_set, color_code = color, 
                              A_value = A_val, unit_dic = unit[i_name], 
                          ax = ax, plot_order = plot_order)
                 
             
-            self.paper_poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix,
-                                ax = ax)
+            
             
         
         else:
@@ -226,7 +281,7 @@ class paper_poloidal_plot(profile_fit):
     
     
     def paper_singlepolplot_method(self, log_flag, result, 
-                                    i_name, A_dic, color_dic, plot_order):
+                                    i_name, A_dic, color_dic, plot_order, axs):
                     
         if log_flag:
             plt.yscale('log')
@@ -249,7 +304,7 @@ class paper_poloidal_plot(profile_fit):
             
             self.paper_singleplot_method(item = i_name, pol_angle = pol_loc, 
                     result_dic = result, color_code = color, A_value = A_val, 
-                    unit_dic = i_name)
+                    unit_dic = i_name, axs= axs)
             
             self.neuden_poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint)
         
@@ -275,10 +330,11 @@ class paper_poloidal_plot(profile_fit):
                 
                 self.paper_singleplot_method(item = i_name, pol_angle = pol_loc, 
                              result_dic = dat_set, color_code = color, 
-                             A_value = A_val, unit_dic = unit[i_name], plot_order = plot_order)
+                    A_value = A_val, unit_dic = unit[i_name], plot_order = plot_order, axs = axs)
                 
             
             self.neuden_poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix)
+            
             
         
         else:
@@ -320,20 +376,28 @@ class paper_poloidal_plot(profile_fit):
             
             plt.subplots_adjust(hspace=.0)
             # plt.tight_layout()
-            
+            fig.savefig('all_pol.pdf')
             
             fig, axs = plt.subplots()
             
-                    
+            anchored_text = AnchoredText('{}'.format('neutral density $(n_D)_{sep}$ [$m^{-3}$]'), loc='upper center')
+            
+            axs.add_artist(anchored_text)
             result = self.data['opacity_poloidal']
             
             self.paper_singlepolplot_method(log_flag = log_flag, 
             result = result, i_name = 'neutral_density', 
-     A_dic = A_dic, color_dic = color_dic, plot_order = alphabat_list[i_n])
+     A_dic = A_dic, color_dic = color_dic, plot_order = alphabat_list[i_n], axs = axs)
+            
+            plt.legend(loc= 'lower left', fontsize=10)
             
             plt.ylim(ymin= 0, ymax = 6*10**16)
             
-        
+            plt.savefig('neu_den.pdf')
+            
+            
+            
+            
         
         
             
