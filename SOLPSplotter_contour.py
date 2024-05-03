@@ -31,7 +31,7 @@ class PlotContour(profile_fit):
     def set_plot(self):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 4, markersize= 7)
+            plt.rc('lines', linewidth= 3, markersize= 6)
             plt.rcParams.update({'font.size': 12})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
@@ -367,9 +367,8 @@ class PlotContour(profile_fit):
         
         # cs = ax.contourf(X, Y, z, locator=ticker.LogLocator(), cmap=cm.PuBu_r)
         # cbar = fig.colorbar(cs)
-    
-    
-    
+
+      
     
     
     def shift_vessel_in_one(self):
@@ -515,9 +514,77 @@ class PlotContour(profile_fit):
             # fig_dir  = ss.set_figdir()
             # plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
             
+     
+            
+    def paper_contour_method(self, data, log_bar, itername, quant, color_dic,
+                             A_dic, axs, cmap, norm, levels):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            
+            RadLoc = self.data['grid']['RadLoc'][itername]
+            VertLoc = self.data['grid']['VertLoc'][itername]
+            
+            R_con = RadLoc[1:37, 1:97]
+            Z_con = VertLoc[1:37, 1:97]
+            
+            
+
+                
+            self.paper_contour(plot_2dval = data, R_coord = R_con, norm = norm, 
+                                 Z_coord = Z_con, quantity = quant, cmap= cmap,  
+                                  itername = itername, log_bar = log_bar, 
+                    color_dic = color_dic, A_dic= A_dic, axs = axs, levels = levels)
+            
             
         
         
+    def paper_contour(self, plot_2dval, R_coord, Z_coord, quantity, itername, 
+                     log_bar, color_dic, A_dic, axs, cmap, norm, levels):
+        
+        
+        vessel = self.data['vessel'][itername]
+        
+        
+        if log_bar:
+            if np.all(plot_2dval == 0):
+                print('data_file is an zero matrix')
+                
+            elif np.any(plot_2dval == 0):
+                plot_2dval = ma.masked_where(plot_2dval <= 0, plot_2dval)
+                
+                datamap = np.abs(plot_2dval)
+                
+                
+                # CPB = cm.viridis
+                # Lnorm = LogNorm(vmax = datamap.max(), vmin = datamap.min())
+                axs.contourf(R_coord, Z_coord, datamap, levels= levels, 
+                             cmap = cmap, norm = norm)
+                
+                
+            else:
+                
+                datamap = np.abs(plot_2dval)
+                
+                # CPB = cm.viridis
+                # Lnorm = LogNorm(vmax = datamap.max(), vmin = datamap.min())
+                
+                axs.contourf(R_coord, Z_coord, datamap,levels= levels, 
+                             cmap = cmap, norm = norm)
+                
+                
+            
+        else:
+            
+
+            # NORM = axs.Normalize(plot_2dval.min(), plot_2dval.max())
+            
+            # CMAP = cm.viridis
+            
+            axs.contourf(R_coord, Z_coord, plot_2dval, levels= levels, cmap= cmap, norm = norm)
+            
+            
+        axs.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = color_dic[itername])   
     
     
 
@@ -623,81 +690,3 @@ Need to fix!!
         
         
 """       
-        
-        
-        
-"""
-backup:
-    
-def load_vessel_method(self, itername):
-    # try:
-    #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
-    # except:
-    #     print('mesh.extra file not found! Using vvfile.ogr instead')
-    #     WallFile=None
-    
-    if self.withshift == False and self.withseries == False:
-        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
-    
-    elif self.withshift == True and self.withseries == False:
-        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop'][itername]))
-    
-    elif self.withshift == False and self.withseries == True:
-        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(self.data['dirdata']['simutop']))
-
-        
-    elif self.withshift == True and self.withseries == True:
-        print('load_vessel_method function is not there yet!')
-    
-    else:
-        print('load_vessel_method function has a bug')
-    
-    # if plot:
-    #     plt.plot
-    return VVFILE
-
-
-
-def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity):
-    CMAP = cm.viridis
-    NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
-    
-    plt.figure(figsize=(6,12))
-    plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
-    plt.title('{} contour plot'.format(quantity))
-    
-    
-    SM= cm.ScalarMappable(NORM,CMAP)    
-    plt.colorbar(SM)
-
-
-for pol_loc in range(self.data['b2fgeo']['nx']):
-    self.calc_dsa(pol_loc)
-    arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
-    
-    a_flux_exp = self.calc_flux_expansion_line_method(RR_sep = RR_sep, 
-                                                      arcR = arcR)
-    
-    flux_expand_map[:, pol_loc] = a_flux_exp
-
-
-RadLoc = self.data['grid']['RadLoc']
-VertLoc = self.data['grid']['VertLoc']
-
-R_con = RadLoc[1:37, 1:97]
-Z_con = VertLoc[1:37, 1:97]
-
-contour_dic = {'R_coord': R_con, 'Z_coord': Z_con, 
-               'flux_map': flux_expand_map}
-self.data['flux_contour'] = contour_dic
-
-
-# map_flat = flux_expand_map.flatten()
-
-
-cpm.contour_plot(plot_2dval = flux_expand_map, R_coord = RadLoc, 
-                 Z_coord = VertLoc, quantity = 'flux expansion')
-
-
-
-"""
