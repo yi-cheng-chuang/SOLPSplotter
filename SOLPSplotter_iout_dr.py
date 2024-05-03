@@ -12,7 +12,9 @@ import SOLPS_transcoe_adj as sta
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
 import scipy.stats
-
+from matplotlib.colors import LogNorm
+from matplotlib import cm
+from numpy import ma
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
@@ -629,15 +631,6 @@ elif topic == 'Q3':
         fig.savefig('correlation.pdf')
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
         color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                           'dot7': 'blue', 'one': 'purple'}
         
@@ -1036,17 +1029,97 @@ elif topic == 'Q3-1':
             xl.plot_change_data(data = neuden_data, log_bar = True, bounds = bon, 
         itername = aa, quant = 'neutral density increase percentage', ma100 = True,
                 color_dic = color_dic, A_dic = A_dic)
+          
+        
+        
+    fig, axs = plt.subplots(1, 2, sharey= True)  
     
-    for aa in xl.data['dircomp']['multi_shift']:
-        
-        data = xl.data['ft44'][aa][coe]
-        neuden_data = np.transpose(data[:, :, 0])
-        
-        
-        
-        xl.plot_change_data(data = neuden_data, log_bar = True, bounds = {}, 
-                 itername = aa, quant = 'neutral density', ma100 = False,
-                 color_dic = color_dic, A_dic = A_dic)
+    data = xl.data['ft44']['org'][coe]
+    neuden_data = np.transpose(data[:, :, 0])
+    
+    datamap = np.abs(data)
+    
+    log_bar = True
+    plot_2dval = neuden_data
+    
+    if log_bar:
+        if np.all(plot_2dval == 0):
+            print('data_file is an zero matrix')
+            
+        elif np.any(plot_2dval == 0):
+            plot_2dval = ma.masked_where(plot_2dval <= 0, plot_2dval)
+            
+            datamap = np.abs(plot_2dval)
+        else:
+            
+            datamap = np.abs(plot_2dval)
+    
+    
+    
+    CPB = cm.viridis
+    Lnorm = LogNorm(vmin = datamap.min(), vmax = datamap.max())
+    k = np.linspace(np.log10(datamap.min()), np.log10(datamap.max()), 11)
+    
+    lev = np.power(10, k)
+    print(lev)
+    
+    levels = lev
+    
+    RadLoc = xl.data['grid']['RadLoc']['org']
+    VertLoc = xl.data['grid']['VertLoc']['org']
+    
+    R_coord = RadLoc[1:37, 1:97]
+    Z_coord = VertLoc[1:37, 1:97]
+    
+    axs[0].contourf(R_coord, Z_coord, datamap, levels= levels, 
+                 cmap = CPB, norm = Lnorm)
+    
+    
+    
+    vessel = xl.data['vessel']['org']
+    axs[0].plot(vessel[:,0]/1000, vessel[:,1]/1000, color = color_dic['org'])
+    
+    data = xl.data['ft44']['dot7'][coe]
+    neuden_data = np.transpose(data[:, :, 0])
+    
+    log_bar = True
+    plot_2dval = neuden_data
+    
+    if log_bar:
+        if np.all(plot_2dval == 0):
+            print('data_file is an zero matrix')
+            
+        elif np.any(plot_2dval == 0):
+            plot_2dval = ma.masked_where(plot_2dval <= 0, plot_2dval)
+            
+            datamap = np.abs(plot_2dval)
+        else:
+            
+            datamap = np.abs(plot_2dval)
+    
+    RadLoc = xl.data['grid']['RadLoc']['dot7']
+    VertLoc = xl.data['grid']['VertLoc']['dot7']
+    
+    R_coord = RadLoc[1:37, 1:97]
+    Z_coord = VertLoc[1:37, 1:97]
+    
+    axs[1].contourf(R_coord, Z_coord, datamap, levels= levels, 
+                 cmap = CPB, norm = Lnorm)
+    
+    vessel = xl.data['vessel']['dot7']
+    axs[1].plot(vessel[:,0]/1000, vessel[:,1]/1000, color = color_dic['dot7'])
+    
+    axs[0].set_ylabel('Z [m]')
+    fig.supxlabel('R [m]')
+    
+    fig.suptitle('Neutral density [$m^{-3}$] contour plot')
+       
+    smap = cm.ScalarMappable(norm = Lnorm, cmap = CPB)    
+    plt.colorbar(smap, ax= axs)
+    
+    # orientation='horizontal'
+    
+    
     
     pol_list_a = []
     for i in range(9):
