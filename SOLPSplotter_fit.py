@@ -213,7 +213,7 @@ class profile_fit(RP_mapping):
         
                 
                 
-    def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_list):
+    def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_loc):
         
         # self.load_output_data(param= 'NeuDen')
         # self.load_output_data(param= 'Ne')
@@ -223,7 +223,7 @@ class profile_fit(RP_mapping):
         Te_J = b2fstate['te'].transpose()
         ev = 1.6021766339999999 * pow(10, -19)
         Te_data = Te_J / ev
-        pol_in = int(pol_list[0])
+        pol_in = int(pol_loc)
         
         psi = psiN[:, pol_in]
         
@@ -250,6 +250,7 @@ class profile_fit(RP_mapping):
         # self.load_output_data(param= 'NeuDen')
         
         self.load_ft44()
+        self.load_output_data(param= 'NeuDen')
         
         if self.withshift == False and self.withseries == False:
             
@@ -270,14 +271,22 @@ class profile_fit(RP_mapping):
             
             for aa in self.data['dircomp']['multi_shift']:
                 
-                Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                fstate = self.data['b2fstate'][aa]
-                psiN_map = self.data['psi']['psival'][aa]
+                ind_fitresult_dic = {}
                 
-                fitresult = self.radial_data_fit_method(b2fstate = fstate, 
-                            Neuden = Neuden_data, psiN = psiN_map, pol_list = pol_list)
+                for ind in pol_list:
+                    
+                    
+                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    fstate = self.data['b2fstate'][aa]
+                    psiN_map = self.data['psi']['psival'][aa]
+                    
+                                      
+                    fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                                Neuden = Neuden_data, psiN = psiN_map, pol_loc = ind)
+                    
+                    ind_fitresult_dic[ind] = fitresult
                 
-                fitresult_dic[aa] = fitresult
+                fitresult_dic[aa] = ind_fitresult_dic
             
             self.data['radial_fit_data'] = fitresult_dic
         
