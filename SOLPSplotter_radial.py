@@ -122,49 +122,29 @@ class radial_plot(profile_fit):
         plt.legend()
     
     
-    def paper_neuden_radial_method(self, result_dic, SEP, x_coord, Nd, log_flag):
+    def paper_neuden_radial_method(self, fit_dat, x_coord, Nd, log_flag, itername):
         
-        tanh_ne_fit = result_dic['tanh_ne_fit']
-        tanh_te_fit = result_dic['tanh_te_fit']
-        exp_an_fit = result_dic['exp_fit']
-        dn = result_dic['pedestal_width'][0]
-        dtn = result_dic['temperature_pedestal_width']
-        efold = result_dic['efold_length'][0]
-        opq = result_dic['dimensionless_opaqueness']
-        xcoord_cut = result_dic['x_coord_cut']
-        sym_pt = result_dic['ne_symmetry_point']
-        te_sym_pt = result_dic['te_symmetry_point']
+
+        exp_an_fit = fit_dat['exp_fit']
+        xcoord_cut = fit_dat['x_coord_cut']
         
-                      
-        x = [-efold + max(xcoord_cut), max(xcoord_cut)]
-        y = [min(exp_an_fit), min(exp_an_fit)]
-        xd = [-dn + sym_pt, dn + sym_pt]
-        yd = [tanh_ne_fit[SEP] , tanh_ne_fit[SEP]]
-        xt = [-dtn + te_sym_pt, dtn + te_sym_pt]
-        yt = [tanh_te_fit[SEP], tanh_te_fit[SEP]]
+        fig, axs = plt.subplots()
         
-            
-        plt.figure(figsize=(7,7))
+        anchored_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$] with fits'), loc='upper left')
         if log_flag:
-            plt.yscale('log')
+            axs.set_yscale('log')
         else:
             pass
-        plt.plot(x_coord, Nd,'-', color = 'green', label= 'solps neutral density')
-        # plt.plot(psi_RGI, Nd,'-', color = 'b', label= 'RGI_solps neutral density')
-        plt.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, ls='-', label= 'exponential fit')
-        plt.axvline(x= max(xcoord_cut), color='orange',lw=3)
-        plt.plot(x,y, color='orange', lw=3, ls='-', label= 'Neutral penetration length : $\lambda_{n_D}$')
-        plt.axvline(x=-efold + max(xcoord_cut), color='orange',lw=3)
-        plt.axvline(x= max(xcoord_cut), color='black',lw=3, ls='--', 
+        axs.plot(x_coord, Nd,'-', color = 'green', label= 'solps neutral density [$m^{-3}$]')
+        axs.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, ls='-', label= 'exponential fit')
+        axs.axvline(x= max(xcoord_cut), color='black',lw=3, ls='--', 
                     label= 'fit range : $\Delta n_e$')
-        plt.axvline(x= min(xcoord_cut), color='black',lw=3, ls='--')
-        # plt.axvline(x= x_m2[0], color='purple',lw=3, ls='--', 
-        #             label= 'exp fitting width')
-        # plt.axvline(x= x_m2[-1], color='purple',lw=3, ls='--')
-        plt.xlabel('Normalized flux coordinate $\psi_N$')
-        # plt.ylabel(P['NeuDen'])
-        plt.title('Neutral density with fits')
-        plt.legend()
+        axs.axvline(x= min(xcoord_cut), color='black',lw=3, ls='--')
+        axs.set_xlabel('$\psi_N$')
+        axs.add_artist(anchored_text)
+        axs.legend(loc= 'lower right')
+        
+        fig.savefig('neuden_fit_{}.pdf'.format(itername))
         
     
     def paper_neuden_radial_plot(self, pol_loc):
@@ -173,38 +153,62 @@ class radial_plot(profile_fit):
         
         if self.withshift == True and self.withseries == False:
             
-            mix_dic = {}
             
             for aa in self.data['dircomp']['multi_shift']:
-            
-                result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
-                mix_dic[aa] = result_dic
-            
-            self.data['mix_dic'] = mix_dic
-            
-            for aa in self.data['dircomp']['multi_shift']:
-            
-                pol_index = int(pol_loc[0])
-                Nd = self.data['radial_fit_data'][aa]['NeuDen']
-                Ne = self.data['radial_fit_data'][aa]['Ne']
-                Te = self.data['radial_fit_data'][aa]['Te']
-                SEP = int(self.data['DefaultSettings']['sep_index_dsa'][aa])
-                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2]
                 
-                result_dic = self.data['mix_dic'][aa]
+                result_dic = self.data['radial_fit_data'][aa]
+                
+                
+                neu_pro = self.data['outputdata']['NeuDen'][aa]
+                
+                weight = self.data['midplane_calc'][aa]['weight']
+                weight_B = np.ones(len(weight))- weight
+                
+                
+                mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
+                psi_coord = self.data['midplane_calc'][aa]['psi_solps_mid']
+                
+                
                 
                 psi_list = []
                 nd_list = []
                 
-                for ind, coord in enumerate(psi):
+                for ind, coord in enumerate(psi_coord):
                     
                     if coord >= 0.95 and coord <= 1.05:
                         psi_list.append(coord)
-                        nd_list.append(Nd[ind])
-                    
+                        nd_list.append(mid_neu_pro[ind])
                 
-                self.paper_neuden_radial_method(result_dic = result_dic, SEP = SEP,
+                psi_val = self.data['psi']['psival'][aa][:, 59]
+                
+                cut_st = result_dic['59']['x_coord_cut']
+                w_cut = []
+                
+                
+                for ic, coord in enumerate(psi_val):
+                    
+                    if coord >= cut_st.min() and coord <= cut_st.max():
+                        w_cut.append(weight[ic])
+                
+                wcut_B = np.ones(len(w_cut))- w_cut
+                
+                fit_dat = {}
+                
+                expfit_a = result_dic['58']['exp_fit']
+                expfit_b = result_dic['60']['exp_fit']
+                
+                fit_dat['exp_fit'] = np.multiply(expfit_a, w_cut) + np.multiply(expfit_b, wcut_B)
+                
+                cut_a = result_dic['58']['x_coord_cut']
+                cut_b = result_dic['60']['x_coord_cut']
+                
+                fit_dat['x_coord_cut'] = np.multiply(cut_a, w_cut) + np.multiply(cut_b, wcut_B)
+                
+
+                self.paper_neuden_radial_method(fit_dat= fit_dat, itername = aa,
                     x_coord = psi_list, Nd = nd_list, log_flag = True)
+                
+                
         
         elif self.withshift == True and self.withseries == True:
             print('Opacity_study_radial_plot_psi is not there yet, to be continue...')    
@@ -212,11 +216,7 @@ class radial_plot(profile_fit):
         else:
             print('Opacity_study_radial_plot_psi has a bug')
     
-    
-    
-    
-    
-    
+       
     
     def Opacity_study_radial_plot(self, pol_loc):
         
@@ -320,7 +320,7 @@ class radial_plot(profile_fit):
             
             for side in div_side_list:
                 
-                plt.figure(figsize=(7,7))
+                axs.figure(figsize=(7,7))
                 
                 for aa in self.data['dircomp']['multi_shift']:
                     
@@ -352,12 +352,12 @@ class radial_plot(profile_fit):
                     
                     if log_scale:
                         plot_data = np.abs(plot_data)
-                        plt.yscale('log')
+                        axs.yscale('log')
                     else:
                         pass
                     
                         
-                    plt.plot(psiN, plot_data, '-', color = color_dic[aa], 
+                    axs.plot(psiN, plot_data, '-', color = color_dic[aa], 
                                  label = '{}'.format(A_dic[aa]))
                     plt.legend()
                 
@@ -605,8 +605,7 @@ class radial_plot(profile_fit):
             
             print('plot_iout_radial function is in prepare ...')
                   
-        
-                
+                        
     def divertor_te(self, sep_plot):  
         
         b2fstate = self.data['b2fstate']
@@ -678,12 +677,7 @@ class radial_plot(profile_fit):
                 axs[1].add_artist(anchored_text_out)
                 axs[1].set_xlabel('$\psi_N$')
                 
-      
-            
-            
-            
-    
-    
+         
     def plot_divertor_radial(self, r_coord, data, log_scale, quant, div_side):
         
         plt.figure(figsize=(7,7))
