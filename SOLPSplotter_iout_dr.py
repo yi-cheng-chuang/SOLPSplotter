@@ -11,7 +11,7 @@ import SOLPSplotter_contour as spc
 import SOLPS_transcoe_adj as sta
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
-import scipy.stats
+import scipy.stats as stats
 from matplotlib.colors import LogNorm
 from matplotlib import cm
 from numpy import ma
@@ -469,7 +469,7 @@ elif topic == 'Q3':
                           'dot7': 'blue', 'one': 'purple'}
         
         anchored_text = AnchoredText('(a){}'.format('HFS poloidal flux [$m^{-1} s^{-1}$]'), 
-                                     loc= 'upper left')
+                                     loc= 'lower center')
         
         rad_text = AnchoredText('(b){}'.format('HFS radial flux [$m^{-1} s^{-1}$]'), 
                                      loc= 'lower right')
@@ -498,16 +498,22 @@ elif topic == 'Q3':
             
                 
             pol_flux_dat = xl.data['iout_data']['poloidal_flux'][ab][psi_st:psi_ed, sk:sd]
-            nor_pol_flux = pol_flux_dat/(abs(pol_flux_dat).max())
             
+            # nor_pol_flux = (pol_flux_dat - pol_flux_dat.max())/(pol_flux_dat.max() - pol_flux_dat.min())
+            
+            nor_pol_flux = stats.zscore(pol_flux_dat)
             
             neuden_dat = np.transpose(xl.data['ft44'][ab]['dab2'][sk:sd, psi_st:psi_ed, 0])
             
-            nor_neuden = neuden_dat/(neuden_dat.max())
+            # nor_neuden = (neuden_dat - neuden_dat.min()) /(neuden_dat.max() - neuden_dat.min())
             
-            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_pol_flux.flatten())
+            nor_neuden = stats.zscore(neuden_dat)
             
-            print_regress = True
+            # slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(neuden_dat.flatten(), pol_flux_dat.flatten())
+            
+            slope, intercept, r_value, p_value, std_err = stats.linregress(neuden_dat.flatten(), pol_flux_dat.flatten())
+            
+            print_regress = False
             
             if print_regress:
                 
@@ -520,18 +526,14 @@ elif topic == 'Q3':
             else:
                 pass
             
-            # print(slope)
-            # print(r_value)
             
-            # print(intercept)
-            
-            x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+            x = np.linspace(neuden_dat.min(), neuden_dat.max(), 50)
             y = slope*x + intercept
             
             
             axs[0].plot(x, y, '-', color = color_dic[ab], 
                             label= 'A= {}'.format(A_dic[ab]))
-            axs[0].scatter(nor_neuden.flatten(), nor_pol_flux.flatten(), color= color_dic[ab])
+            axs[0].scatter(neuden_dat.flatten(), pol_flux_dat.flatten(), color= color_dic[ab])
         
         
         for ab in xl.data['dircomp']['multi_shift']:
@@ -546,9 +548,9 @@ elif topic == 'Q3':
             
             nor_neuden = neuden_dat/(neuden_dat.max())
             
-            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_rad_flux.flatten())
+            slope, intercept, r_value, p_value, std_err = stats.linregress(neuden_dat.flatten(), rad_flux_dat.flatten())
             
-            print_regress = True
+            print_regress = False
             
             if print_regress:
                 
@@ -562,13 +564,13 @@ elif topic == 'Q3':
                 pass
             
             
-            x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+            x = np.linspace(neuden_dat.min(), neuden_dat.max(), 50)
             y = slope*x + intercept
             
             
             axs[1].plot(x, y, '-', color = color_dic[ab], 
                             label= 'A= {}'.format(A_dic[ab]))
-            axs[1].scatter(nor_neuden.flatten(), nor_rad_flux.flatten(), color= color_dic[ab])
+            axs[1].scatter(neuden_dat.flatten(), rad_flux_dat.flatten(), color= color_dic[ab])
         
         pol_list_b = []
         for i in range(6):
@@ -588,9 +590,9 @@ elif topic == 'Q3':
             
             nor_neuden = neuden_dat/(neuden_dat.max())
             
-            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_pol_flux.flatten())
+            slope, intercept, r_value, p_value, std_err = stats.linregress(neuden_dat.flatten(), pol_flux_dat.flatten())
             
-            print_regress = False
+            print_regress = True
             
             if print_regress:
                 
@@ -608,13 +610,13 @@ elif topic == 'Q3':
             
             # print(intercept)
             
-            x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+            x = np.linspace(neuden_dat.min(), neuden_dat.max(), 50)
             y = slope*x + intercept
             
             
             axs[2].plot(x, y, '-', color = color_dic[ab], 
                             label= 'A= {}'.format(A_dic[ab]))
-            axs[2].scatter(nor_neuden.flatten(), nor_pol_flux.flatten(), color= color_dic[ab])
+            axs[2].scatter(neuden_dat.flatten(), pol_flux_dat.flatten(), color= color_dic[ab])
             
             
         
@@ -624,7 +626,7 @@ elif topic == 'Q3':
         axs[2].add_artist(LFS_text)
         axs[0].legend(loc= 'lower right', fontsize=10)
         
-        axs[2].set_xlabel('Normalized neutral density [$m^{-3}$]')
+        axs[2].set_xlabel('Neutral density [$m^{-3}$]')
         
         plt.subplots_adjust(hspace=.0)
         
@@ -701,11 +703,11 @@ elif topic == 'Q3':
                 
                 nor_rad_flux = rad_flux_dat/(rad_flux_dat.max())
                 
-                cor_list = scipy.stats.pearsonr(nor_neuden.flatten(), nor_pol_flux.flatten())
+                cor_list = stats.pearsonr(nor_neuden.flatten(), nor_pol_flux.flatten())
                 
                 # print(cor_list)
                 
-                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_pol_flux.flatten())
+                slope, intercept, r_value, p_value, std_err = stats.linregress(nor_neuden.flatten(), nor_pol_flux.flatten())
                 
                 print_regress = False
                 
@@ -818,7 +820,7 @@ elif topic == 'Q3':
                 
                 # print(cor_list)
                 
-                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_source.flatten(), nor_pol_flux.flatten())
+                slope, intercept, r_value, p_value, std_err = stats.linregress(nor_source.flatten(), nor_pol_flux.flatten())
                 
                 # print(slope)
                 # print(intercept)
@@ -870,7 +872,7 @@ elif topic == 'Q3':
                 
                 # print(cor_list)
                 
-                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_source.flatten())
+                slope, intercept, r_value, p_value, std_err = stats.linregress(nor_neuden.flatten(), nor_source.flatten())
                 
                 # print(slope)
                 # print(intercept)
@@ -931,11 +933,11 @@ elif topic == 'Q3':
                 
                 nor_rad_flux = rad_flux_dat/(rad_flux_dat.max())
                 
-                cor_list = scipy.stats.pearsonr(nor_neuden.flatten(), nor_rad_flux.flatten())
+                cor_list = stats.pearsonr(nor_neuden.flatten(), nor_rad_flux.flatten())
                 
                 # print(cor_list)
                 
-                slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(nor_neuden.flatten(), nor_rad_flux.flatten())
+                slope, intercept, r_value, p_value, std_err = stats.linregress(nor_neuden.flatten(), nor_rad_flux.flatten())
                 
                 x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
                 y = slope*x + intercept
@@ -975,8 +977,21 @@ elif topic == 'Q3':
             
             ang_list = xl.data['angle']['angle_list'][aa]
             
-            pol_flux_dat_a = xl.data['iout_data']['poloidal_flux'][ac][psi_st, sk:sd]
-            pol_flux_dat_b = xl.data['iout_data']['poloidal_flux'][ac][psi_ed -1, sk:sd]
+            pol_flux_dat_a = []
+            pol_flux_dat_b = []
+            
+            for kk in pol_list_a:
+                
+                pol_flux_dat = xl.data['iout_data']['poloidal_flux'][ac][psi_st:psi_ed, int(kk)]
+                
+                pol_flux_dat_a.append(pol_flux_dat.max())
+                pol_flux_dat_b.append(pol_flux_dat.min())
+                
+            
+                
+            
+            # pol_flux_dat_a = xl.data['iout_data']['poloidal_flux'][ac][psi_st, sk:sd]
+            # pol_flux_dat_b = xl.data['iout_data']['poloidal_flux'][ac][psi_ed -1, sk:sd]
             
             
             
@@ -988,9 +1003,16 @@ elif topic == 'Q3':
         
         for aa in xl.data['dircomp']['multi_shift']:
             
-            data = xl.data['ft44'][aa]['dab2']
-            neuden_data_a = np.transpose(data[sk:sd, psi_st, 0])
-            neuden_data_b = np.transpose(data[sk:sd, psi_ed -1, 0])
+            neuden_data_a = []
+            neuden_data_b = []
+            
+            for kt in pol_list_a:
+                
+                neuden_data = xl.data['ft44'][aa]['dab2'][int(kt), psi_st:psi_ed]
+                
+                neuden_data_a.append(neuden_data.max())
+                neuden_data_b.append(neuden_data.min())
+            
             
             ang_list = xl.data['angle']['angle_list'][aa]
             
