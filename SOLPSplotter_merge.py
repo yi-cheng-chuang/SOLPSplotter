@@ -28,7 +28,7 @@ class paper_poloidal_plot(profile_fit):
         if plot_style == 'pol_subplot':
             plt.rcParams.update({'font.weight': 'normal'})
             plt.rc('lines', linewidth= 4, markersize= 7)
-            plt.rcParams.update({'font.size': 16})
+            plt.rcParams.update({'font.size': 14})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
             # plt.rcParams['figure.figsize'] = 40, 12
@@ -380,7 +380,8 @@ class paper_poloidal_plot(profile_fit):
 
             fig, axs = plt.subplots()
 
-            anchored_text = AnchoredText('{}'.format('neutral density $(n_D)_{sep}$ [$m^{-3}$]'), loc='upper center')
+            anchored_text = AnchoredText('{}'.format('neutral density $(n_D)_{sep}$ [$m^{-3}$]'), 
+                                         loc='upper center')
             
             axs.add_artist(anchored_text)
 
@@ -393,7 +394,6 @@ class paper_poloidal_plot(profile_fit):
             plt.legend(loc= 'lower left', fontsize=10)
             
             plt.ylim(ymin= 0, ymax = 6*10**16)
-            plt.title('fitted neutral density')
             
             plt.savefig('neu_den.pdf')
             
