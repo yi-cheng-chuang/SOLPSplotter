@@ -664,7 +664,7 @@ elif topic == 'Q3':
 
         
         psi_st = 19
-        psi_ed = 36
+        psi_ed = 38
         
         
         # xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
@@ -872,21 +872,21 @@ elif topic == 'Q3':
                 
                 # print(cor_list)
                 
-                slope, intercept, r_value, p_value, std_err = stats.linregress(nor_neuden.flatten(), nor_source.flatten())
+                slope, intercept, r_value, p_value, std_err = stats.linregress(neuden_dat.flatten(), s_term.flatten())
                 
-                # print(slope)
-                # print(intercept)
-                # print(std_err)
-                # print(r_value)
-                # print(p_value)
+                print(slope)
+                print(intercept)
+                print(std_err)
+                print(r_value)
+                print(p_value)
                 
-                x = np.linspace(nor_neuden.min(), nor_neuden.max(), 50)
+                x = np.linspace(neuden_dat.min(), neuden_dat.max(), 50)
                 y = slope*x + intercept
                 
                 
                 axs[i].plot(x, y, '-', color = color_dic[at], 
                                 label= 'A= {}'.format(A_dic[at]))
-                axs[i].scatter(nor_neuden.flatten(), nor_source.flatten(), color= color_dic[at])
+                axs[i].scatter(neuden_dat.flatten(), s_term.flatten(), color= color_dic[at])
             
             
             # axs[0].add_artist(anchored_text)
@@ -957,7 +957,7 @@ elif topic == 'Q3':
         
         
         pol_list_a = []
-        for i in range(9):
+        for i in range(36):
             pol_list_a.append('{}'.format(28 + i))
         
         
@@ -965,8 +965,17 @@ elif topic == 'Q3':
         
         
         
-        fig, axs = plt.subplots()
+        fig, axs = plt.subplots(2, 1)
         
+        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        pol_text = AnchoredText('{}'.format('Poloidal flux $\Gamma_x$ [$m^{-1} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
+                                     loc='upper center')
         
         for ac in xl.data['dircomp']['multi_shift']:
             
@@ -988,17 +997,20 @@ elif topic == 'Q3':
                 pol_flux_dat_b.append(pol_flux_dat.min())
                 
             
-                
+            pol_flux_dat = xl.data['iout_data']['poloidal_flux'][ac][psi_st:psi_ed, sk:sd]
             
             # pol_flux_dat_a = xl.data['iout_data']['poloidal_flux'][ac][psi_st, sk:sd]
             # pol_flux_dat_b = xl.data['iout_data']['poloidal_flux'][ac][psi_ed -1, sk:sd]
             
+            axs[0].add_artist(pol_text)
             
+            axs[0].fill_between(ang_list, pol_flux_dat_a, pol_flux_dat_b, 
+                    color = color_dic[ac], alpha = 0.4, label= 'A = {}'.format(A_dic[ac]))
             
-            axs.fill_between(ang_list, pol_flux_dat_a, pol_flux_dat_b, 
-                             color = color_dic[ac], alpha = 0.4)
-        
-        fig, axs = plt.subplots()
+            axs[0].plot(ang_list, pol_flux_dat[0, :], '--', color= color_dic[ac])
+            
+            axs[0].plot(ang_list, pol_flux_dat[-1, :], '-', color= color_dic[ac])
+            
         
         
         for aa in xl.data['dircomp']['multi_shift']:
@@ -1016,8 +1028,44 @@ elif topic == 'Q3':
             
             ang_list = xl.data['angle']['angle_list'][aa]
             
-            axs.fill_between(ang_list, neuden_data_a, neuden_data_b, 
+            neuden_dat = np.transpose(xl.data['ft44'][aa]['dab2'][sk:sd, psi_st:psi_ed, 0])
+            
+            axs[1].add_artist(neu_text)
+            
+            axs[1].fill_between(ang_list, neuden_data_a, neuden_data_b, 
                              color= color_dic[aa], alpha = 0.4)
+            
+            axs[1].plot(ang_list, neuden_dat[0, :], '--', color= color_dic[aa])
+            
+            axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
+            
+            
+            
+        
+        # for aa in xl.data['dircomp']['multi_shift']:
+            
+        #     rad_data_a = []
+        #     rad_data_b = []
+            
+        #     for kt in pol_list_a:
+                
+        #         rad_data = xl.data['iout_data']['radial_flux'][aa][psi_st:psi_ed, int(kt)]
+                
+        #         rad_data_a.append(rad_data.max())
+        #         rad_data_b.append(rad_data.min())
+            
+            
+        #     ang_list = xl.data['angle']['angle_list'][aa]
+            
+        #     axs[2].fill_between(ang_list, rad_data_a, rad_data_b, 
+        #                      color= color_dic[aa], alpha = 0.4)
+        
+        
+        axs[1].set_xlabel('poloidal angle')
+        axs[0].legend()
+        
+        plt.subplots_adjust(hspace=.0)
+            
         
         
                     
