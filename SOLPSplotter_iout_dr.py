@@ -257,12 +257,16 @@ elif topic == 'Q3':
                 if item.split('_')[1] == 'x':
                     data, res_qu = xl.load_iout_multi(name1 = fcoe_list[0], name2 = item, 
                                         input_name= 'poloidal_flux', itername = aa)
-                    
+                    print('flux check: {}'.format(fcoe_list[0]))
+                    print('flux check: {}'.format(item))
                     res_qu_dic[aa] = data
                 
                 elif item.split('_')[1] == 'y':
                     data, res_qu = xl.load_iout_multi(name1 = fcoe_list[1], name2 = item,
                                         input_name= 'radial_flux', itername = aa)
+                    
+                    print('flux check: {}'.format(fcoe_list[1]))
+                    print('flux check: {}'.format(item))
                     
                     res_qu_dic[aa] = data
           
@@ -962,7 +966,7 @@ elif topic == 'Q3':
               
         xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
         
-        fig, axs = plt.subplots(3, 1)
+        fig, axs = plt.subplots(2, 1)
         
         color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
                      'dot7': 'blue', 'one': 'purple'}
@@ -1008,37 +1012,37 @@ elif topic == 'Q3':
             # axs[0].fill_between(ang_list, pol_flux_dat_a, pol_flux_dat_b, 
             #         color = color_dic[ac], alpha = 0.4, label= 'A = {}'.format(A_dic[ac]))
             
-            axs[0].plot(ang_list, pol_flux_dat[0, :], linestyle='dashdot', color= color_dic[ac])
+            axs[0].plot(ang_list, pol_flux_dat[0, :], linestyle='-', color= color_dic[ac])
             
-            axs[0].plot(ang_list, pol_flux_dat[-1, :], '-', color= color_dic[ac])
+            # axs[0].plot(ang_list, pol_flux_dat[-1, :], '-', color= color_dic[ac])
             
         axs[0].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_x$ = 0')
         
-        for aa in xl.data['dircomp']['multi_shift']:
+        # for aa in xl.data['dircomp']['multi_shift']:
             
-            neuden_data_a = []
-            neuden_data_b = []
+        #     neuden_data_a = []
+        #     neuden_data_b = []
             
-            for kt in pol_list_a:
+        #     for kt in pol_list_a:
                 
-                neuden_data = xl.data['ft44'][aa]['dab2'][int(kt), psi_st:psi_ed]
+        #         neuden_data = xl.data['ft44'][aa]['dab2'][int(kt), psi_st:psi_ed]
                 
-                neuden_data_a.append(neuden_data.max())
-                neuden_data_b.append(neuden_data.min())
+        #         neuden_data_a.append(neuden_data.max())
+        #         neuden_data_b.append(neuden_data.min())
             
             
-            ang_list = xl.data['angle']['angle_list'][aa]
+        #     ang_list = xl.data['angle']['angle_list'][aa]
             
-            neuden_dat = np.transpose(xl.data['ft44'][aa]['dab2'][sk:sd, psi_st:psi_ed, 0])
+        #     neuden_dat = np.transpose(xl.data['ft44'][aa]['dab2'][sk:sd, psi_st:psi_ed, 0])
             
-            axs[1].add_artist(neu_text)
+        #     axs[1].add_artist(neu_text)
             
-            # axs[1].fill_between(ang_list, neuden_data_a, neuden_data_b, 
-            #                  color= color_dic[aa], alpha = 0.4)
+        #     # axs[1].fill_between(ang_list, neuden_data_a, neuden_data_b, 
+        #     #                  color= color_dic[aa], alpha = 0.4)
             
-            axs[1].plot(ang_list, neuden_dat[0, :], linestyle='dashdot', color= color_dic[aa])
+        #     axs[1].plot(ang_list, neuden_dat[0, :], linestyle='-', color= color_dic[aa])
             
-            axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
+            # axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
             
             
             
@@ -1050,7 +1054,7 @@ elif topic == 'Q3':
             
             for kt in pol_list_a:
                 
-                rad_data = xl.data['iout_data']['radial_flux'][aa][psi_st:psi_ed, int(kt)]
+                rad_data = xl.data['iout_data']['flux_y_0'][aa][psi_st:psi_ed, int(kt)]
                 
                 rad_data_a.append(rad_data.max())
                 rad_data_b.append(rad_data.min())
@@ -1062,18 +1066,19 @@ elif topic == 'Q3':
             # axs[2].fill_between(ang_list, rad_data_a, rad_data_b, 
             #                   color= color_dic[aa], alpha = 0.4)
             
-            axs[2].add_artist(rad_text)
+            axs[1].add_artist(rad_text)
             
-            axs[2].plot(ang_list, rad_dat[0, :], linestyle='dashdot', color= color_dic[aa], 
-                        label= 'A = {}'.format(A_dic[ac]))
+            axs[1].plot(ang_list, rad_dat[0, :], linestyle='-', color= color_dic[aa], 
+                        label= 'A = {}'.format(A_dic[aa]))
             
-            axs[2].plot(ang_list, rad_dat[-1, :], '-', color= color_dic[aa])
+            # axs[2].plot(ang_list, rad_dat[-1, :], '-', color= color_dic[aa])
         
         
-        axs[2].set_xlabel('poloidal angle')
-        axs[2].legend(loc= 'upper right')
+        axs[1].set_xlabel('poloidal angle')
+        axs[1].legend(loc= 'upper right')
         axs[0].legend(loc= 'upper right')
-        axs[0].set_title('Particle flux and neutral density at $\psi_N$ = 1, 1.09')
+        axs[0].set_title('Particle flux and neutral density at separatrix')
+        
         
         plt.subplots_adjust(hspace=.0)
         
