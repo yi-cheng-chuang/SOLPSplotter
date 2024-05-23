@@ -965,7 +965,7 @@ elif topic == 'Q3':
         
         
         
-        fig, axs = plt.subplots(2, 1)
+        fig, axs = plt.subplots(3, 1)
         
         color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
                      'dot7': 'blue', 'one': 'purple'}
@@ -975,6 +975,9 @@ elif topic == 'Q3':
                                      loc='upper center')
         
         neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
+                                     loc='upper center')
+        
+        rad_text = AnchoredText('{}'.format('Radial flux $\Gamma_y$ [$m^{-1} s^{-1}$]'), 
                                      loc='upper center')
         
         for ac in xl.data['dircomp']['multi_shift']:
@@ -1042,26 +1045,28 @@ elif topic == 'Q3':
             
             
         
-        # for aa in xl.data['dircomp']['multi_shift']:
+        for aa in xl.data['dircomp']['multi_shift']:
             
-        #     rad_data_a = []
-        #     rad_data_b = []
+            rad_data_a = []
+            rad_data_b = []
             
-        #     for kt in pol_list_a:
+            for kt in pol_list_a:
                 
-        #         rad_data = xl.data['iout_data']['radial_flux'][aa][psi_st:psi_ed, int(kt)]
+                rad_data = xl.data['iout_data']['radial_flux'][aa][psi_st:psi_ed, int(kt)]
                 
-        #         rad_data_a.append(rad_data.max())
-        #         rad_data_b.append(rad_data.min())
+                rad_data_a.append(rad_data.max())
+                rad_data_b.append(rad_data.min())
             
             
-        #     ang_list = xl.data['angle']['angle_list'][aa]
+            ang_list = xl.data['angle']['angle_list'][aa]
             
-        #     axs[2].fill_between(ang_list, rad_data_a, rad_data_b, 
-        #                      color= color_dic[aa], alpha = 0.4)
+            axs[2].add_artist(rad_text)
+            
+            axs[2].fill_between(ang_list, rad_data_a, rad_data_b, 
+                              color= color_dic[aa], alpha = 0.4)
         
         
-        axs[1].set_xlabel('poloidal angle')
+        axs[2].set_xlabel('poloidal angle')
         axs[0].legend()
         
         plt.subplots_adjust(hspace=.0)
