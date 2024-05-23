@@ -165,7 +165,7 @@ class transport_coefficient_adjustment(load_geometry):
                 
                 alphabat_list = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)']
                 
-                fig, axs = plt.subplots(1, 2, figsize=(4,7))
+                fig, axs = plt.subplots(2, 1)
                 
                 label_list = ['1', '3']
                 
@@ -179,7 +179,7 @@ class transport_coefficient_adjustment(load_geometry):
                     
                     coe = coe_label_dic[k]
                     po = alphabat_list[i]
-                    anchored_text = AnchoredText('{}{}'.format(po, coe), loc= 'center left')
+                    anchored_text = AnchoredText('{}{}'.format(po, coe), loc= 'upper left')
                     
                     for ab in self.data['dircomp']['multi_shift']:
                         
@@ -188,7 +188,7 @@ class transport_coefficient_adjustment(load_geometry):
                         # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
                         #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
                         axs[i].plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
-                                 'o-', color= color_dic[ab])
+                                 'o-', color= color_dic[ab], label = 'aspect ratio = {}'.format(A_dic[ab]))
                     
                     axs[i].add_artist(anchored_text)
                     
@@ -197,6 +197,7 @@ class transport_coefficient_adjustment(load_geometry):
                     
                     
                 axs[1].set_xlabel('$\psi_N$')
+                axs[1].legend(loc= 'center left')
                 
                 # axs[2, 1].set_xlabel('poloidal angle')
                 
