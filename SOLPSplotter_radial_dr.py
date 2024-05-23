@@ -50,5 +50,6 @@ xl.radial_data_fit(pol_list = poloidal_index_list)
 xl.paper_neuden_radial_plot(pol_loc = poloidal_index_list)
 
 xl.ne_te_TS_plot()
+xl.plot_tanh_fit(log_flag= False)
 # xl.divertor_te(sep_plot = False)
 
