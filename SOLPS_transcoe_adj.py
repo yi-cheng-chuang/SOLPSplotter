@@ -14,7 +14,6 @@ import numpy as np
 
 
 
-
 class transport_coefficient_adjustment(load_geometry):
     
     def __init__(self, DefaultSettings):
