@@ -5,7 +5,6 @@ Created on Thu Jul 13 11:54:55 2023
 @author: user
 """
 
-
 import numpy as np
 import SOLPS_set as sps
 from SOLPS_load_directory import load_directory 
