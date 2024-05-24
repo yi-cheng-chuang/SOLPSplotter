@@ -67,6 +67,28 @@ def mast_comp_dic_withshift():
     
     return mast_withshift_dic
 
+
+def Ashift_dir_comp():
+    multi_shift = ['MAST', 'D3D']
+    # multi_shift = ['org', 'dot3', 'dot5', 'dot7', 'one']
+    shift_dic = {'MAST': 0, 'D3D': 0.55}
+    shift = ['org_new_series', 'AD3D']
+    tail = {'org': 'nts5_a', 'D3D': 'd3d_a'}
+    
+    
+    series = ['75_n900000_leakbtarnsol_nts5_a']
+    
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    
+    mast_withshift_dic = {'Shot': '027205', 'multi_shift': multi_shift, 'shift_dic': shift_dic, 
+                          'shift_filelist': shift, 'tail': tail, 'series': series,
+                          'Output': outputlist}
+    
+    return mast_withshift_dic
+
+
+
+
 def mast_comp_dir_series():
     a_shift = 'org'
     shift = 0
