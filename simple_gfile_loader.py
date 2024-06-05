@@ -92,14 +92,18 @@ def line_index_finder(file_lines):
             print('rbdry is on line {}'.format(str(j)))
             index_dic['rbdry'] = j
         
+        elif 'ZBDRY' in string:
+            print('zbdry is on line {}'.format(str(j)))
+            index_dic['zbdry'] = j
+        
+        
         elif 'XLIM' in string:
             print('xlim is on line {}'.format(str(j)))
             index_dic['xlim'] = j
-            
         
-        
-        
-        
+        elif 'YLIM' in string:
+            print('ylim is on line {}'.format(str(j)))
+            index_dic['ylim'] = j
     
     return index_dic
 
@@ -196,6 +200,9 @@ writelist = ' '.join(str(a) for a in exp_sp)
 lines[in_rcentr] = writelist + "\n"
 
 
+"====== change rbdry ======"
+
+
 in_rbd = index_dic['rbdry']
 
 
@@ -228,9 +235,10 @@ lines[in_rbd] = write_text + writelist + "\n"
 
 
 rbd_st = index_dic['rbdry'] + 1
+zbd_n = index_dic['zbdry']
+ra_n = zbd_n - rbd_st
 
-
-for ln in range(15):
+for ln in range(ra_n):
     
     aline = lines[rbd_st + ln]
     line_end = rbd_st + ln
@@ -240,13 +248,8 @@ for ln in range(15):
     mylist =[]
     for ii, dat in enumerate(sp_b):
         
-        if float(dat) <= 0:
-            print(dat)
-            b = "{:.6f}".format(float(dat))
-        
-        else:
-            a = float(dat) + shift_value
-            b = "{:.6f}".format(a)
+        a = float(dat) + shift_value
+        b = "{:.6f}".format(a)
             
             
         mylist.append(b)
@@ -295,9 +298,10 @@ lines[in_xlim] = write_text + writelist + "\n"
 
 
 xlim_st = index_dic['xlim'] + 1
+ylim_n = index_dic['ylim']
+rn = ylim_n - xlim_st
 
-
-for ln in range(6):
+for ln in range(rn):
     
     aline = lines[xlim_st + ln]
     line_end = xlim_st + ln
@@ -307,13 +311,8 @@ for ln in range(6):
     mylist =[]
     for ii, dat in enumerate(sp_b):
         
-        if float(dat) <= 0:
-            print(dat)
-            b = "{:.6f}".format(float(dat))
-        
-        else:
-            a = float(dat) + shift_value
-            b = "{:.6f}".format(a)
+        a = float(dat) + shift_value
+        b = "{:.6f}".format(a)
             
             
         mylist.append(b)
