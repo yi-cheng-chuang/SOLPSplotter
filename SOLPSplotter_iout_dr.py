@@ -746,12 +746,6 @@ elif topic == 'Q3':
         
         
         
-        
-        
-        
-        
-        
-        
         geo_list = []
         geo_tuple = ('vol.dat', 'sqrt_g')
         geo_qu = xl.load_iout(filename = geo_tuple[0], simple_quant = geo_tuple[1])
@@ -967,22 +961,105 @@ elif topic == 'Q3':
         xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
         
 
-        fig, axs = plt.subplots(2, 1)
+        fig, axs = plt.subplots(2, 2)
         
         color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
                      'dot7': 'blue', 'one': 'purple'}
         A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
                   'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux $\Gamma_x$ [$m^{-1} s^{-1}$]'), 
+        pol_text = AnchoredText('{}'.format('(c) Poloidal flux $\Gamma_x$ [$m^{-2} s^{-1}$]'), 
                                      loc='upper center')
         
-        neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
+        neu_text = AnchoredText('{}'.format('(a)Neutral density [$m^{-3}$]'), 
                                      loc='upper center')
         
-        rad_text = AnchoredText('{}'.format('Radial flux $\Gamma_y$ [$m^{-1} s^{-1}$]'), 
+        rad_text = AnchoredText('{}'.format('(d) Radial flux $\Gamma_y$ [$m^{-2} s^{-1}$]'), 
                                      loc='upper center')
         
-
+        source_text = AnchoredText('(b) Source rate $[m^{-3} s^{-1}]$', loc= 'upper center')
+        
+        
+        
+        
+        
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+            neuden_data_a = []
+            neuden_data_b = []
+            
+            
+            
+            for kt in pol_list_a:
+                
+                neuden_data = xl.data['ft44'][aa]['dab2'][int(kt), psi_st:psi_ed]
+                
+                neuden_data_a.append(neuden_data.max())
+                neuden_data_b.append(neuden_data.min())
+            
+            sk = int(pol_list_a[0])
+            sd = int(pol_list_a[-1]) + 1
+            
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+        
+        
+            neuden_dat = np.transpose(xl.data['ft44'][aa]['dab2'][sk:sd, psi_st:psi_ed, 0])
+            
+            axs[0, 0].add_artist(neu_text)
+            
+            # axs[1].fill_between(ang_list, neuden_data_a, neuden_data_b, 
+            #                  color= color_dic[aa], alpha = 0.4)
+            
+            axs[0, 0].plot(ang_list, neuden_dat[0, :], linestyle='-', color= color_dic[aa])
+            
+            # axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
+            
+            
+        axs[0, 0].axvline(x= 200, color='brown',lw=3, ls='--', label= 'HFS')
+        axs[0, 0].axvline(x= 240, color='brown',lw=3, ls='--')
+        
+        
+        for ac in xl.data['dircomp']['multi_shift']:
+            
+            sk = int(pol_list_a[0])
+            sd = int(pol_list_a[-1]) + 1
+            
+            # neuden_dat = np.transpose(xl.data['ft44'][ac]['dab2'][sk:sd, psi_st, 0])
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            source_dat_a = []
+            source_dat_b = []
+            
+            for kk in pol_list_a:
+                
+                source_dat = xl.data['iout_data']['source_no_jacobian'][ac][psi_st:psi_ed, int(kk)]
+                
+                source_dat_a.append(pol_flux_dat.max())
+                source_dat_b.append(pol_flux_dat.min())
+                
+            
+            source_dat = xl.data['iout_data']['source_no_jacobian'][ac][psi_st:psi_ed, sk:sd]
+            
+            # pol_flux_dat_a = xl.data['iout_data']['poloidal_flux'][ac][psi_st, sk:sd]
+            # pol_flux_dat_b = xl.data['iout_data']['poloidal_flux'][ac][psi_ed -1, sk:sd]
+            
+            axs[1, 0].add_artist(source_text)
+            
+            # axs[0].fill_between(ang_list, pol_flux_dat_a, pol_flux_dat_b, 
+            #         color = color_dic[ac], alpha = 0.4, label= 'A = {}'.format(A_dic[ac]))
+            
+            axs[1, 0].plot(ang_list, source_dat[0, :], linestyle='-', color= color_dic[ac])
+            
+            # axs[0].plot(ang_list, pol_flux_dat[-1, :], '-', color= color_dic[ac])
+            
+        axs[1, 0].axvline(x= 200, color='brown',lw=3, ls='--')
+        axs[1, 0].axvline(x= 240, color='brown',lw=3, ls='--')
+        
+        
+        
+        
+            
         for ac in xl.data['dircomp']['multi_shift']:
             
             sk = int(pol_list_a[0])
@@ -1008,49 +1085,20 @@ elif topic == 'Q3':
             # pol_flux_dat_a = xl.data['iout_data']['poloidal_flux'][ac][psi_st, sk:sd]
             # pol_flux_dat_b = xl.data['iout_data']['poloidal_flux'][ac][psi_ed -1, sk:sd]
             
-            axs[0].add_artist(pol_text)
+            axs[0, 1].add_artist(pol_text)
             
             # axs[0].fill_between(ang_list, pol_flux_dat_a, pol_flux_dat_b, 
             #         color = color_dic[ac], alpha = 0.4, label= 'A = {}'.format(A_dic[ac]))
             
-            axs[0].plot(ang_list, pol_flux_dat[0, :], linestyle='-', color= color_dic[ac])
+            axs[0, 1].plot(ang_list, pol_flux_dat[0, :], linestyle='-', color= color_dic[ac])
             
             # axs[0].plot(ang_list, pol_flux_dat[-1, :], '-', color= color_dic[ac])
             
-        axs[0].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_x$ = 0')
+        axs[0, 1].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_x$ = 0')    
+        axs[0, 1].axvline(x= 200, color='brown',lw=3, ls='--')
+        axs[0, 1].axvline(x= 240, color='brown',lw=3, ls='--')
         
         
-        
-        
-        # for aa in xl.data['dircomp']['multi_shift']:
-            
-        #     neuden_data_a = []
-        #     neuden_data_b = []
-            
-        #     for kt in pol_list_a:
-                
-        #         neuden_data = xl.data['ft44'][aa]['dab2'][int(kt), psi_st:psi_ed]
-                
-        #         neuden_data_a.append(neuden_data.max())
-        #         neuden_data_b.append(neuden_data.min())
-            
-            
-        #     ang_list = xl.data['angle']['angle_list'][aa]
-        
-        
-        #     neuden_dat = np.transpose(xl.data['ft44'][aa]['dab2'][sk:sd, psi_st:psi_ed, 0])
-            
-        #     axs[1].add_artist(neu_text)
-            
-        #     # axs[1].fill_between(ang_list, neuden_data_a, neuden_data_b, 
-        #     #                  color= color_dic[aa], alpha = 0.4)
-            
-        #     axs[1].plot(ang_list, neuden_dat[0, :], linestyle='-', color= color_dic[aa])
-            
-        #     axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
-            
-            
-            
         
         for aa in xl.data['dircomp']['multi_shift']:
             
@@ -1071,20 +1119,22 @@ elif topic == 'Q3':
             # axs[2].fill_between(ang_list, rad_data_a, rad_data_b, 
             #                   color= color_dic[aa], alpha = 0.4)
             
-            axs[1].add_artist(rad_text)
+            axs[1, 1].add_artist(rad_text)
             
-            axs[1].plot(ang_list, rad_dat[0, :], linestyle='-', color= color_dic[aa], 
+            axs[1, 1].plot(ang_list, rad_dat[0, :], linestyle='-', color= color_dic[aa], 
                         label= 'A = {}'.format(A_dic[aa]))
             
             # axs[2].plot(ang_list, rad_dat[-1, :], '-', color= color_dic[aa])
         
         
-        axs[1].set_xlabel('poloidal angle')
-        axs[1].legend(loc= 'upper right')
-        axs[0].legend(loc= 'upper right')
-        axs[0].set_title('Particle flux and neutral density at separatrix')
+        axs[1, 0].set_xlabel('poloidal angle')
+        axs[1, 1].set_xlabel('poloidal angle')
+        axs[0, 1].legend(loc= 'lower center')
+        axs[0, 0].legend(loc= 'center left')
+        # axs[0, 0].set_title('Neutral density and source rate at separatrix')
+        # axs[0, 1].set_title('Particle flux at separatrix')
         
-        
+        plt.suptitle('Neutral density, source rate and particle flux at separatrix')
         plt.subplots_adjust(hspace=.0)
         
             
