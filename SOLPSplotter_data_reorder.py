@@ -167,23 +167,25 @@ class data_reorder(profile_fit):
                 # plt.yscale('log')
                 plt.xscale('log')
                 # plt.title('dimensionless opaqueness verses different SOL eirene particle number')
-                plt.title('Experimental opaqueness')
+                plt.title('Neutral opaqueness')
                 # plt.legend()
             
         elif withshift == True and withseries == False:
             plt.figure(figsize=(7,7))
             A_list = [1.4, 2.0, 2.4, 2.8, 3.4]
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
             color_list = ['red', 'orange', 'green', 'blue', 'purple']
             for p in range(len(change_var)):
                 x_cor = np.ones(len(iter_list))*A_list[p]
-                plt.scatter(x_cor, data_collect[:, p], color= color_list[p])
-            plt.axvline(x= 0.7/0.5, color='salmon',lw=3, ls='--')
-            plt.axvline(x= 1.67/0.67, color='darkgreen',lw=3, ls='--')
-            plt.axvline(x= 0.68/0.22, color='cyan',lw=3, ls='--')
+                plt.scatter(x_cor, data_collect[:, p], color= color_list[p], label= 'A= {}'.format(A_list[p]))
+            plt.axvline(x= 0.7/0.5, color='salmon',lw=3, ls='--', label= 'MAST')
+            plt.axvline(x= 1.67/0.67, color='lime',lw=3, ls='--', label= 'D3D')
+            plt.axvline(x= 0.68/0.22, color='cyan',lw=3, ls='--', label= 'ITER')
             # plt.axvline(x= 3.4, color='black',lw=3, ls='--', label= 'JT-60 aspect ratio')
             plt.xlabel('aspect ratio')
             # plt.ylabel('dimensionless opaqueness')
             # plt.title('dimensionless opaqueness verses different modify distance')
-            plt.title('Experimental opaqueness')
-            plt.legend()
+            plt.title('Neutral opaqueness')
+            plt.legend(loc= 'upper left')
     
