@@ -32,7 +32,7 @@ class PlotContour(profile_fit):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
             plt.rc('lines', linewidth= 3, markersize= 6)
-            plt.rcParams.update({'font.size': 12})
+            plt.rcParams.update({'font.size': 10})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
   
