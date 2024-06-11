@@ -15,6 +15,9 @@ import scipy.stats as stats
 from matplotlib.colors import LogNorm
 from matplotlib import cm
 from numpy import ma
+from scipy.optimize import curve_fit
+
+
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
@@ -141,7 +144,21 @@ def flux_poloidal_sub(input_dat, itername, pol_list, ang_list, art_text,
             
             for wa in range(len(pol_list)):
                 avg_dat.append((1- wei[wa])*plot_dat[np + 0, wa] + wei[wa]*plot_dat[np + 1, wa])
+        
+        
+        elif input_dat.shape == (38, 98):
+            
+            wei = psi_w_dic[itername]
+            avg_dat = []
+            
+            
+            plot_dat = input_dat[psi_dic['st']:psi_dic['ed'], sk:sd]
+            
+            
+            for wa in range(len(pol_list)):
+                avg_dat.append((1- wei[wa])*plot_dat[np + 1, wa] + wei[wa]*plot_dat[np + 2, wa])
     
+        
         
         if no_A_label:
             
@@ -203,7 +220,6 @@ def derive_no_geo_quant(qu_list, gcoe_list, pol_name, rad_name):
         
     
     return res_qu_list
-
 
 
 def flux_iout_loader():
@@ -300,15 +316,52 @@ def flux_iout_loader():
     ni_list = general_iout_loader(tpl_list = ni_tuple)
     
     
+    "=============== parallel velocity data loader ==========="
+    
+    vp_and_p_tuple = [('b2npmo_ua001.dat', 'vp'), ('b2nppo_po.dat', 'e_potential')]
+    
+    vp_and_p_list = general_iout_loader(tpl_list = vp_and_p_tuple)
+    
+    
+    "=============== transcoe data loader ==========="
+    
+    tcoe_tuple = [('b2trno_cdnax001.dat', 'tcoe_x'), ('b2trno_cdnay001.dat', 'tcoe_x')]
+    
+    tcoe_list = general_iout_loader(tpl_list = tcoe_tuple)
+    
+    derive_tcoe_list = derive_no_geo_quant(qu_list = tcoe_list, gcoe_list = fcoe_list, 
+                                pol_name = 'poloidal_tcoe', 
+                                rad_name = 'radial_tcoe')
+    
+    single_tcoe_tuple = [('b2tqna_dna0001.dat', 'single_tcoe')]
+    
+    single_tcoe_list = general_iout_loader(tpl_list = single_tcoe_tuple)
+    
+    
+    "=============== v_corr_dpc data loader ==========="
+    
+    corrdpc_tuple = [('b2tfnb_dpccornax001.dat', 'corrdpc_x')]
+    
+    corrdpc_list = general_iout_loader(tpl_list = corrdpc_tuple)
+    
+    derive_corrdpc_list = derive_no_geo_quant(qu_list = corrdpc_list, gcoe_list = fcoe_list, 
+                                pol_name = 'poloidal_corrdpc', 
+                                rad_name = 'radial_corrdpc')
+    
+    
     qu_list_dic = {'geo_coe': fcoe_list, 'mag': mag_list, 'flux': flux_qu_list,
                    'psch': psch_list, 'derive psch': derive_psch_list, 
                    'vpara': vpara_list, 'derive vpara': derive_vpara_list,
                    'gradn': gradn_list, 'derive gradn': derive_gradn_list,
-                   'ni': ni_list, 'hz': hz_list,
+                   'ni': ni_list, 'hz': hz_list, 'vp and p': vp_and_p_list,
+                   'tcoe': tcoe_list, 'derive tcoe': derive_tcoe_list,
+                   'single tcoe': single_tcoe_list, 'corrdpc': corrdpc_list, 
+                   'derive corrdpc': derive_corrdpc_list,
                    'derived flux': res_qu_list, 'flux no psch': flux_no_psch_list}
     
     
     xl.data['iout_load_quant'] = qu_list_dic
+
 
                     
 if topic == 'all_fluxes':
@@ -1075,11 +1128,13 @@ if topic == 'varify_vpara':
             # axs[ind].set_yscale("log")
             axs[ind].legend(loc= 'upper right')
         
+        axs[1].axhline(y=0, color = 'black', linestyle = '--', label= '$b_x v_{\parallel} n_i$ = 0')
         axs[1].set_xlabel('poloidal angle')
         axs[0].set_title('v parallel flux at the separatrix')
         
         
         plt.subplots_adjust(hspace=.0)
+        
         
         
         # vpara = xl.data['iout_load_quant']['vpara']
@@ -1178,9 +1233,6 @@ if topic == 'varify_vpara':
                     input_dat = hz_dat, art_text = text_list[0], axs = axs, 
                     color_dic = color_dic, A_dic = A_dic, 
                     no_A_label = A_label_bol, input_ls = '--')
-                
-                
-                
                 
                 
         
@@ -1343,7 +1395,323 @@ if topic == 'varify_vpara':
         print(test.shape)
 
 
+        
+        vpp = xl.data['iout_load_quant']['vp and p']
+        
+        flux_list = vpp
+        
+        
+        fig, axs = plt.subplots(2, 1)
+        
+        vp_text = AnchoredText('{}'.format('parallel velocity: [$m/s$]'), 
+                                     loc='upper center')
+        
+        p_text = AnchoredText('{}'.format('electric potential: [V]'), 
+                                     loc='upper center')
+        
+        text_list = [vp_text, p_text]
+        
+        for ind, dat_name in enumerate(flux_list):
+            
+            for aa in xl.data['dircomp']['multi_shift']:
+                
+                ang_list = xl.data['angle']['angle_list'][aa]
+                
+                vpp_dat = xl.data['iout_data'][dat_name][aa]
+                
+                if ind == 1:
+                    A_label_bol = False
+                else:
+                    A_label_bol = True
+                
+                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                    input_dat = vpp_dat, art_text = text_list[ind], axs = axs[ind], 
+                    color_dic = color_dic, A_dic = A_dic, 
+                    no_A_label = A_label_bol, input_ls = '-')
+            
+            
+            axs[ind].legend(loc= 'upper right')
+        
+        
+        
+        axs[1].set_xlabel('poloidal angle')
+        axs[0].set_title('parallel velocity and potential at the separatrix')
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        
+        fig, axs = plt.subplots()
+        
+        vpd_text = AnchoredText('{}'.format('parallel velocity difference: [$m/s$]'), 
+                                     loc='upper center')
+        
+        text_list = [vpd_text]
+        
+            
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+            if aa == 'org':
+                pass
+            
+            else:
+                
+            
+                ang_list = xl.data['angle']['angle_list'][aa]
+                
+                vpp_dat = xl.data['iout_data'][vpp[0]][aa]
+                vpp_dat_org = xl.data['iout_data'][vpp[0]]['org']
+                
+                sub_vpp_dat = vpp_dat_org - vpp_dat
+                
+                A_label_bol = True
+                
+                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                    input_dat = sub_vpp_dat, art_text = text_list[0], axs = axs, 
+                    color_dic = color_dic, A_dic = A_dic, 
+                    no_A_label = A_label_bol, input_ls = '-')
+            
+            
+        axs.legend(loc= 'upper right')
+        axs.set_xlabel('poloidal angle')
+        axs.set_title('parallel velocity and potential at the separatrix')
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        
+        fig, axs = plt.subplots()
+        
+        R_text = AnchoredText('{}'.format('R: [m]'), 
+                                     loc='upper center')
+        
+        text_list = [R_text]
+        
+            
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+                
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            R_dat = xl.data['grid']['RadLoc'][aa]
+            
+            
+            A_label_bol = True
+            
+            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                input_dat = R_dat, art_text = text_list[0], axs = axs, 
+                color_dic = color_dic, A_dic = A_dic, 
+                no_A_label = A_label_bol, input_ls = '-')
+            
+            
+        axs.legend(loc= 'upper right')
+        axs.set_xlabel('poloidal angle')
+        axs.set_title('R coordinate at the separatrix')
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        
+        def Rfit(x, r, d, z, b): 
+            return r*np.cos(x + d*np.sin(x) - z*np.sin(2*x) + b*np.sin(3*x))
+        
+        ang_list = xl.data['angle']['angle_list']['org']
+        
+        
+        sk = int(pol_list_a[0])
+        sd = int(pol_list_a[-1]) + 1
+            
+        psi_st = 17
+        psi_ed = 38
+        
+        psi_dic = {'st': psi_st, 'ed': psi_ed}
+        nnp = 3
+        
+        R_dat = xl.data['grid']['RadLoc']['org'][psi_dic['st']:psi_dic['ed'], sk:sd]
+        avg_Rdat = []
+        
+        print('len pol_list is :{}, len psi ref is: {}'.format(len(pol_list_a), len(R_dat[0, :])))
+        
+        for xa in range(len(pol_list_a)):
+            avg_Rdat.append(0.5*(float(R_dat[nnp + 1, xa]) + float(R_dat[nnp + 2, xa])))
+        
+        
+        def Fit_R(ang, R_dat, rcenter):
+            
+            ang_rad = np.zeros([len(ang)])
+            
+            for k, at in enumerate(ang):
+                ang_rad[k] = at* np.pi / 180
+            
+            # ar = np.asarray(ang_rad)
+            print(type(ang_rad))
+            # print(ang_rad)
+                
+            R_var = np.zeros([len(R_dat)])
+            for k, avr in enumerate(R_dat):
+                
+                R_var[k] = avr - rcenter
+                
+            
+            # Rvr = np.asarray(R_var)
+            print(type(R_var))
+            # print(R_var)
+            
+            
+            p0 = [0.5, -0.01, 0.01, -0.01]
+            popt_R, pcov_R = curve_fit(Rfit, ang_rad, R_var, p0)
+            
+            Rcoord_fit = rcenter*np.ones([len(R_dat)]) + Rfit(ang_rad, popt_R[0], 
+                                    popt_R[1], popt_R[2], popt_R[3])
+            
+            
+            
+              
+            fit_R_dic = {'Rcoord_fit': Rcoord_fit, 'popt_R': popt_R}
+               
+            return fit_R_dic
+        
+        
+        rct = xl.data['gfile']['g']['rcentr']
+        R_fitdic = Fit_R(ang = ang_list, R_dat = avg_Rdat, rcenter = rct)
+        print(R_fitdic['popt_R'])
+        
+        fig, axs = plt.subplots()
+        
+        Rfit_text = AnchoredText('{}'.format('R and R fit: [m]'), 
+                                     loc='upper center')
+        
+           
+        text_list = [Rfit_text]
+        shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
+        
+        
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            R_dat = xl.data['grid']['RadLoc'][aa]
+            
 
+            A_label_bol = True
+            
+            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                input_dat = R_dat, art_text = text_list[0], axs = axs, 
+                color_dic = color_dic, A_dic = A_dic, 
+                no_A_label = A_label_bol, input_ls = '-')
+            
+            
+            CoordR_fit = R_fitdic['Rcoord_fit'] + shift_dic[aa]
+            
+            axs.plot(ang_list, CoordR_fit, linestyle = '--', 
+                color= color_dic[aa])
+            
+            
+        
+        
+        axs.legend(loc= 'upper right')
+    
+        axs.set_xlabel('poloidal angle')
+        axs.set_title('R and R fit')
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        
+        
+        
+        
+        
+        drtcoe = xl.data['iout_load_quant']['derive tcoe']
+        sing_tcoe = xl.data['iout_load_quant']['single tcoe']
+        
+        
+        flux_list = [sing_tcoe[0]]
+        
+        
+        fig, axs = plt.subplots()
+        
+        drtcoex_text = AnchoredText('{}'.format('transport coefficient x: [$m^2/s^{-1}$]'), 
+                                     loc='upper center')
+        
+        drtcoey_text = AnchoredText('{}'.format('transport coefficient y: [$m^2/s^{-1}$]'), 
+                                     loc='upper center')
+        
+        singletcoe_text = AnchoredText('{}'.format('transport coefficient : [$m^2/s^{-1}$]'), 
+                                     loc='upper center')
+        
+        
+        
+        text_list = [drtcoex_text, drtcoey_text, singletcoe_text]
+        
+        for ind, dat_name in enumerate(flux_list):
+            
+            for aa in xl.data['dircomp']['multi_shift']:
+                
+                ang_list = xl.data['angle']['angle_list'][aa]
+                
+                tcoe_dat = xl.data['iout_data'][dat_name][aa]
+                
+
+                A_label_bol = True
+                
+                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                    input_dat = tcoe_dat, art_text = text_list[ind], axs = axs, 
+                    color_dic = color_dic, A_dic = A_dic, 
+                    no_A_label = A_label_bol, input_ls = '-')
+            
+            
+            axs.legend(loc= 'upper right')
+        
+        
+        
+        axs.set_xlabel('poloidal angle')
+        axs.set_title('transport coefficient at the separatrix')
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        
+        corrdpc = xl.data['iout_load_quant']['corrdpc']
+        drcorrdpc = xl.data['iout_load_quant']['derive corrdpc']
+        
+        
+        flux_list = [corrdpc[0], drcorrdpc[0]]
+        
+        
+        fig, axs = plt.subplots(2, 1)
+        
+        corrdpc_text = AnchoredText('{}'.format('corrdpc flux: [$1/s$]'), 
+                                     loc='upper center')
+        
+        drcorrdpc_text = AnchoredText('{}'.format('derive corrdpc flux: [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        text_list = [corrdpc_text, drcorrdpc_text]
+        
+        for ind, dat_name in enumerate(flux_list):
+            
+            for aa in xl.data['dircomp']['multi_shift']:
+                
+                ang_list = xl.data['angle']['angle_list'][aa]
+                
+                dpc_dat = xl.data['iout_data'][dat_name][aa]
+                
+                if ind == 1:
+                    A_label_bol = False
+                else:
+                    A_label_bol = True
+                
+                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                    input_dat = dpc_dat, art_text = text_list[ind], axs = axs[ind], 
+                    color_dic = color_dic, A_dic = A_dic, 
+                    no_A_label = A_label_bol, input_ls = '-')
+            
+            
+            axs[ind].legend(loc= 'upper right')
+        
+        
+        
+        axs[1].set_xlabel('poloidal angle')
+        axs[0].set_title('parallel velocity and potential at the separatrix')
+        
+        plt.subplots_adjust(hspace=.0)
 
 
 
