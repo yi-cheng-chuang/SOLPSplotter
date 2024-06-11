@@ -53,7 +53,7 @@ xl.neuden_percent()
 ['all_fluxes', 'fluxes_no_geo', 'fluxes_geo', 'neu_den', 
  'coe_check', 'mag_contour', 'fluxes_no_psch', 'mag_pol']
 
-topic = 'mag_pol'
+topic = 'coe_check'
 
 
 """
