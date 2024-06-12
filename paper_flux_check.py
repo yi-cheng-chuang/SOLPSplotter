@@ -53,9 +53,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 xl.neuden_percent()
 
 
-['all_fluxes', 'fluxes_no_geo', 'fluxes_geo', 'neu_den', 'annual_coe',
- 'coe_check', 'mag_contour', 'fluxes_no_psch', 'mag_pol', 'annual_review_mag', 
- 'varify_vpara']
+['geo_coe_fit', 'varify_vpara']
 
 topic = 'varify_vpara'
 
@@ -72,9 +70,61 @@ psi_ed = 38
 psi_dic = {'st': psi_st, 'ed': psi_ed}
 
 
+def weight_generater(pol_list):
+    
+    sk = int(pol_list[0])
+    sd = int(pol_list[-1]) + 1
+        
+    psi_st = 17
+    psi_ed = 38
+    
+    psi_dic = {'st': psi_st, 'ed': psi_ed}
+    np = 1
+    
+    psi_ref = xl.data['psi']['psival']['org'][psi_dic['st']:psi_dic['ed'], sk:sd]
+    avg_psi = []
+    
+    print('len pol_list is :{}, len psi ref is: {}'.format(len(pol_list), len(psi_ref[0, :])))
+    
+    for xa in range(len(pol_list)):
+        avg_psi.append(0.5*(float(psi_ref[np + 1, xa]) + float(psi_ref[np + 2, xa])))
+    # avg_psi = 0.5*(psi_ref[:, np + 1] + psi_ref[:, np + 2])
+    
+    psi_w_dic = {}
+    
+    for aa in xl.data['dircomp']['multi_shift']:
+        
+        psi_dat = xl.data['psi']['psival'][aa][psi_dic['st']:psi_dic['ed'], sk:sd]
+        
+        if aa == 'org':
+            
+            # ln = int(len(pol_list))
+            # print('look at type: {}'.format(type(ln)))
+            w_psi = []
+            for xa in range(len(pol_list)):
+                w_psi.append(0.5)
+            
+            
+        else:
+            
+            # w_psi = np.zeros(len(pol_list))
+            # print('avg shape: {}'.format(avg_psi.shape))
+            w_psi = []
+            for xa in range(len(pol_list)):
+                w_psi.append((avg_psi[xa] - psi_dat[np + 1, xa])/(psi_dat[np + 2, xa] - psi_dat[np + 1, xa]))
+            
+        psi_w_dic[aa] = w_psi
+    
+    return np, psi_st, psi_ed, sk, sd, psi_w_dic
+
+
+
+
+
 
 def flux_poloidal_sub(input_dat, itername, pol_list, ang_list, art_text,
                       axs, color_dic, A_dic, no_A_label, input_ls):
+        """
         
         sk = int(pol_list[0])
         sd = int(pol_list[-1]) + 1
@@ -118,6 +168,11 @@ def flux_poloidal_sub(input_dat, itername, pol_list, ang_list, art_text,
                     w_psi.append((avg_psi[xa] - psi_dat[np + 1, xa])/(psi_dat[np + 2, xa] - psi_dat[np + 1, xa]))
                 
             psi_w_dic[aa] = w_psi 
+        
+        """
+        
+        np, psi_st, psi_ed, sk, sd, psi_w_dic = weight_generater(pol_list)
+        
         
         axs.add_artist(art_text)
         
@@ -348,6 +403,15 @@ def flux_iout_loader():
                                 pol_name = 'poloidal_corrdpc', 
                                 rad_name = 'radial_corrdpc')
     
+    "=============== source data loader ==========="
+    
+    s_tuple = [('b2npc11_sna001.dat', 'source')]
+    
+    s_list = general_iout_loader(tpl_list = s_tuple)
+    
+    
+    
+    
     
     qu_list_dic = {'geo_coe': fcoe_list, 'mag': mag_list, 'flux': flux_qu_list,
                    'psch': psch_list, 'derive psch': derive_psch_list, 
@@ -356,346 +420,63 @@ def flux_iout_loader():
                    'ni': ni_list, 'hz': hz_list, 'vp and p': vp_and_p_list,
                    'tcoe': tcoe_list, 'derive tcoe': derive_tcoe_list,
                    'single tcoe': single_tcoe_list, 'corrdpc': corrdpc_list, 
-                   'derive corrdpc': derive_corrdpc_list,
+                   'derive corrdpc': derive_corrdpc_list, 'source': s_list,
                    'derived flux': res_qu_list, 'flux no psch': flux_no_psch_list}
     
     
     xl.data['iout_load_quant'] = qu_list_dic
 
 
+
+if topic == 'geo_coe_test':
+    
+    if xl.withshift == True and xl.withseries == False:
+        
+        
+        pol_list_a = []
+        for i in range(36):
+            pol_list_a.append('{}'.format(26 + i))
+              
+        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        
+        
+        
+        sk = int(pol_list_a[0])
+        sd = int(pol_list_a[-1]) + 1
+            
+        psi_st = 17
+        psi_ed = 38
+        
+        psi_dic = {'st': psi_st, 'ed': psi_ed}
+        nnp = 3
+        
+        R_dat = xl.data['grid']['RadLoc']['org'][psi_dic['st']:psi_dic['ed'], sk:sd]
+        avg_Rdat = []
+        
+        print('len pol_list is :{}, len psi ref is: {}'.format(len(pol_list_a), len(R_dat[0, :])))
+        
+        for xa in range(len(pol_list_a)):
+            avg_Rdat.append(0.5*(float(R_dat[nnp + 1, xa]) + float(R_dat[nnp + 2, xa])))
+
+
+
+
+
                     
-if topic == 'all_fluxes':
+if topic == 'geo_coe_fit':
+    
     
     if xl.withshift == True and xl.withseries == False:
         
         flux_iout_loader()
     
-        psi_st = 19
-        psi_ed = 38
-        
-        psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
         
         pol_list_a = []
         for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
+            pol_list_a.append('{}'.format(26 + i))
               
         xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
         
-        
-        flux_list = ['poloidal_flux','radial_flux', 'flux_x_0', 'flux_y_0']
-        
-        
-        fig, axs = plt.subplots(4, 1)
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux $\Gamma_x$ [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        rad_text = AnchoredText('{}'.format('Radial flux $\Gamma_y$ [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        x0_text = AnchoredText('{}'.format('Poloidal flux $\sqrt{g}/h_x*\Gamma_x$ [$m*s^{-1}$]'), 
-                                     loc='lower center')
-        
-        y0_text = AnchoredText('{}'.format('radial flux $\sqrt{g}/h_y*\Gamma_y$ [$m*s^{-1}$]'), 
-                                     loc='upper center')
-        
-        text_list = [pol_text, rad_text, x0_text, y0_text]
-        
-        for ind, dat_name in enumerate(flux_list):
-            
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                ang_list = xl.data['angle']['angle_list'][aa]
-                
-                if ind == 3:
-                    A_label_bol = False
-                else:
-                    A_label_bol = True
-                
-                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    i_name = dat_name, art_text = text_list[ind], axs = axs[ind], 
-                    color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = A_label_bol)
-                
-            if ind % 2 == 0:
-                
-                axs[ind].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_x$ = 0')
-            
-            else:
-                pass
-            
-            axs[ind].legend(loc= 'upper right')
-        
-        axs[3].set_xlabel('poloidal angle')
-        axs[0].set_title('Particle flux at separatrix')
-        
-        
-        plt.subplots_adjust(hspace=.0)
-
-
-if topic == 'fluxes_geo':
-    
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-    
-        psi_st = 19
-        psi_ed = 38
-        
-        psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
-        
-        pol_list_a = []
-        for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
-              
-        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
-        
-
-        fig, axs = plt.subplots(2, 1)
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux $\Gamma_x$ [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
-                                     loc='upper center')
-        
-        rad_text = AnchoredText('{}'.format('Radial flux $\Gamma_y$ [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-
-        for aa in xl.data['dircomp']['multi_shift']:
-            
-            ang_list = xl.data['angle']['angle_list'][aa]
-            
-            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-            i_name = 'flux_x_0', art_text = pol_text, axs = axs[0], 
-            color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = True)
-            
-        axs[0].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_x$ = 0')
-        
-        
-        
-        for aa in xl.data['dircomp']['multi_shift']:
-            
-            ang_list = xl.data['angle']['angle_list'][aa]
-            
-            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    i_name = 'flux_y_0', art_text = rad_text, axs = axs[1], 
-            color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = False)
-            
-            
-        axs[1].set_xlabel('poloidal angle')
-        axs[1].legend(loc= 'upper right')
-        axs[0].legend(loc= 'upper right')
-        axs[0].set_title('Particle flux at separatrix')
-        
-        
-        plt.subplots_adjust(hspace=.0)
-
-
-if topic == 'fluxes_no_geo':
-    
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-    
-        psi_st = 19
-        psi_ed = 38
-        
-        psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
-        
-        pol_list_a = []
-        for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
-              
-        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
-        
-
-        fig, axs = plt.subplots(2, 1)
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux $\Gamma_x$ [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
-                                     loc='upper center')
-        
-        rad_text = AnchoredText('{}'.format('Radial flux $\Gamma_y$ [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-
-        for aa in xl.data['dircomp']['multi_shift']:
-            
-            ang_list = xl.data['angle']['angle_list'][aa]
-            
-            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-            i_name = 'poloidal_flux', art_text = pol_text, axs = axs[0], 
-            color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = True)
-            
-        axs[0].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_x$ = 0')
-        
-        
-        
-        for aa in xl.data['dircomp']['multi_shift']:
-            
-            ang_list = xl.data['angle']['angle_list'][aa]
-            
-            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    i_name = 'radial_flux', art_text = rad_text, axs = axs[1], 
-            color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = False)
-            
-            
-        axs[1].set_xlabel('poloidal angle')
-        axs[1].legend(loc= 'upper right')
-        axs[0].legend(loc= 'upper right')
-        axs[0].set_title('Particle flux at separatrix')
-        
-        
-        plt.subplots_adjust(hspace=.0)
-
-
-
-
-if topic == 'neu_den':
-    
-    if xl.withshift == True and xl.withseries == False:
-
-        neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
-                                     loc='upper center')
-
-
-        for aa in xl.data['dircomp']['multi_shift']:
-            
-            neuden_data_a = []
-            neuden_data_b = []
-            
-            for kt in pol_list_a:
-                
-                neuden_data = xl.data['ft44'][aa]['dab2'][int(kt), psi_st:psi_ed]
-                
-                neuden_data_a.append(neuden_data.max())
-                neuden_data_b.append(neuden_data.min())
-            
-            sk = int(pol_list_a[0])
-            sd = int(pol_list_a[-1]) + 1
-            
-            ang_list = xl.data['angle']['angle_list'][aa]
-        
-        
-            neuden_dat = np.transpose(xl.data['ft44'][aa]['dab2'][sk:sd, psi_st:psi_ed, 0])
-            
-            axs[1].add_artist(neu_text)
-            
-            # axs[1].fill_between(ang_list, neuden_data_a, neuden_data_b, 
-            #                  color= color_dic[aa], alpha = 0.4)
-            
-            axs[1].plot(ang_list, neuden_dat[0, :], linestyle='-', color= color_dic[aa])
-            
-            axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
-
-
-if topic == 'coe_check':
-    
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-    
-        psi_st = 19
-        psi_ed = 38
-        
-        psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
-        
-        pol_list_a = []
-        for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
-              
-        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
-        
-        
-        flux_list = ['hx','hx_divide_sqrt_g', 'hy','hy_divide_sqrt_g']
-        
-        
-        fig, axs = plt.subplots(4, 1)
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        hx_text = AnchoredText('{}'.format('$h_x$: [m]'), 
-                                     loc='upper center')
-        
-        hxg_text = AnchoredText('{}'.format('$h_x/ \sqrt{g}$: [$m^{-2}$]'), 
-                                     loc='upper center')
-        
-        hy_text = AnchoredText('{}'.format('$h_y$: [m]'), 
-                                     loc='upper center')
-        
-        hyg_text = AnchoredText('{}'.format('$h_y/ \sqrt{g}$: [$m^{-2}$]'), 
-                                     loc='upper center')
-        
-        text_list = [hx_text, hxg_text, hy_text, hyg_text]
-        
-        for ind, dat_name in enumerate(flux_list):
-            
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                ang_list = xl.data['angle']['angle_list'][aa]
-                
-                if ind == 3:
-                    A_label_bol = False
-                else:
-                    A_label_bol = True
-                
-                
-                coe_dat = xl.data['iout_data'][dat_name][aa]
-                
-                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    input_dat = coe_dat, art_text = text_list[ind], axs = axs[ind], 
-                    color_dic = color_dic, A_dic = A_dic, 
-                    no_A_label = A_label_bol, input_ls = '-')
-                    
-            
-            axs[ind].legend(loc= 'upper right')
-        
-        axs[3].set_xlabel('poloidal angle')
-        axs[0].set_title('coefficients at the separatrix')
-        
-        
-        plt.subplots_adjust(hspace=.0)
-
-
-
-if topic == 'annual_coe':
-    
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-    
-        psi_st = 19
-        psi_ed = 38
-        
-        psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
-        
-        pol_list_a = []
-        for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
-              
-        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
         
         
         flux_list = ['hx', 'hy']
@@ -707,309 +488,13 @@ if topic == 'annual_coe':
                      'dot7': 'blue', 'one': 'purple'}
         A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
                   'dot7': '2.8', 'one': '3.4'}
-        hx_text = AnchoredText('{}'.format('$h_x$'), 
-                                     loc='upper right')
-        
-        hxg_text = AnchoredText('{}'.format('$h_x/ \sqrt{g}$: [$m^{-2}$]'), 
+        vpara_text = AnchoredText('{}'.format('$h_x$: [m]'), 
                                      loc='upper center')
         
-        hy_text = AnchoredText('{}'.format('$h_y$'), 
+        ngvpara_text = AnchoredText('{}'.format('$h_y$: [m]'), 
                                      loc='upper center')
         
-        hyg_text = AnchoredText('{}'.format('$h_y/ \sqrt{g}$: [$m^{-2}$]'), 
-                                     loc='upper center')
-        
-        text_list = [hx_text, hy_text]
-        
-        for ind, dat_name in enumerate(flux_list):
-            
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                ang_list = xl.data['angle']['angle_list'][aa]
-                
-                if ind == 1:
-                    A_label_bol = False
-                else:
-                    A_label_bol = True
-                
-                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    i_name = dat_name, art_text = text_list[ind], axs = axs[ind], 
-                    color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = A_label_bol)
-                    
-            
-            axs[ind].legend(loc= 'upper left')
-        
-        axs[1].set_xlabel('poloidal angle')
-        axs[0].set_title('geometry coefficients at the separatrix')
-        
-        
-        plt.subplots_adjust(hspace=.0)
-
-
-
-
-if topic == 'fluxes_no_psch':
-    
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-    
-        psi_st = 19
-        psi_ed = 38
-        
-        psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
-        
-        pol_list_a = []
-        for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
-              
-        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
-        
-        
-        flux_list = ['pol_flux_no_psch', 'rad_flux_no_psch', 'bx', 'bz']
-        
-        
-        fig, axs = plt.subplots(4, 1)
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux with no PSch $\Gamma_x$: [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        rad_text = AnchoredText('{}'.format('Radial flux with no PSch$\Gamma_y$: [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        bx_text = AnchoredText('{}'.format('$b_x$: [T]'), 
-                                     loc='upper center')
-        
-        bz_text = AnchoredText('{}'.format('$b_z$: [T]'), 
-                                     loc='upper center')
-        
-        text_list = [pol_text, rad_text, bx_text, bz_text]
-        
-        for ind, dat_name in enumerate(flux_list):
-            
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                ang_list = xl.data['angle']['angle_list'][aa]
-                
-                # if ind % 2 == 0:
-                #     text = pol_text
-                    
-                # else:
-                #     text = rad_text
-                
-                if ind == 3:
-                    A_label_bol = False
-                else:
-                    A_label_bol = True
-                
-                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    i_name = dat_name, art_text = text_list[ind], axs = axs[ind], 
-                    color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = A_label_bol)
-                    
-            
-            axs[ind].legend(loc= 'upper right')
-        
-        axs[3].set_xlabel('poloidal angle')
-        axs[0].set_title('fluxes and magnetic strength at the separatrix')
-        
-        
-        plt.subplots_adjust(hspace=.0)
-
-
-if topic == 'mag_pol':
-    
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-    
-        # psi_st = 19
-        # psi_ed = 38
-        
-        # psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
-        
-        pol_list_a = []
-        for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
-              
-        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
-        
-        
-        flux_list = ['B', 'bx', 'bz']
-        
-        
-        fig, axs = plt.subplots(3, 2)
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux with no PSch $\Gamma_x$: [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        B_text = AnchoredText('{}'.format('B: [T]'), 
-                                     loc='upper center')
-        
-        bx_text = AnchoredText('{}'.format('$B_{pol}$: [T]'), 
-                                     loc='upper center')
-        
-        bz_text = AnchoredText('{}'.format('$B_{tor}$: [T]'), 
-                                     loc='lower center')
-        
-        text_list = [B_text, bx_text, bz_text]
-        
-        for ind, dat_name in enumerate(flux_list):
-            
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                ang_list = xl.data['angle']['angle_list'][aa]
-                
-                if ind == 2:
-                    A_label_bol = False
-                else:
-                    A_label_bol = True
-                
-                dat = xl.data['iout_data'][dat_name][aa]
-                
-                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    input_dat = dat, art_text = text_list[ind], axs = axs[ind, 0], 
-                    color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = A_label_bol)
-                    
-            
-            axs[ind, 0].legend(loc= 'lower left')
-        
-        axs[2, 0].set_xlabel('poloidal angle')
-        axs[0, 0].set_title('magnetic strength at the separatrix')
-        
-        plt.subplots_adjust(hspace=.0)
-        
-        
-        Bxratio_text = AnchoredText('{}'.format('$B_{pol}/B_{pol}^{MAST}$'), 
-                                     loc='lower left')
-        
-        Bzratio_text = AnchoredText('{}'.format('$B_{tor}/B_{tor}^{MAST}$'), 
-                                     loc='lower left')
-        
-        xzratio_text = AnchoredText('{}'.format('$B_{pol}/B_{tor}$'), 
-                                     loc='lower center')
-        
-        ratiotext_list = [Bxratio_text, Bzratio_text, xzratio_text]
-        
-        
-        
-        
-        # fig, axs = plt.subplots(3, 1)
-        
-        mag_list = ['bx', 'bz']
-        
-        
-        for ind, dat_name in enumerate(mag_list):
-            
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                if aa == 'org':
-                    
-                    pass
-                
-                else:
-                    ang_list = xl.data['angle']['angle_list'][aa]
-                    
-                    
-                    sk = int(pol_list_a[0])
-                    sd = int(pol_list_a[-1]) + 1
-                        
-                    org_case_mag = xl.data['iout_data'][dat_name]['org'][psi_dic['st']:psi_dic['ed'], sk:sd]
-                    shift_case_mag = xl.data['iout_data'][dat_name][aa][psi_dic['st']:psi_dic['ed'], sk:sd]
-                    
-                    
-                    mag_ratio = np.divide(shift_case_mag[0, :], org_case_mag[0, :])
-                    
-                    axs[ind, 1].add_artist(ratiotext_list[ind])
-                        
-                    # axs.plot(ang_list, plot_dat[0, :], linestyle='-', 
-                    #     color= color_dic[itername])
-                    
-                    axs[ind, 1].plot(ang_list, mag_ratio, linestyle='-', 
-                        color= color_dic[aa])
-                    
-                    
-                    
-                    # axs[ind].plot(org_case_mag[0, :], shift_case_mag[0, :], linestyle='-', 
-                    #     color= color_dic[aa])
-            
-            
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                ang_list = xl.data['angle']['angle_list'][aa]
-                
-                
-                sk = int(pol_list_a[0])
-                sd = int(pol_list_a[-1]) + 1
-                    
-                bx_mag = xl.data['iout_data']['bx'][aa][psi_dic['st']:psi_dic['ed'], sk:sd]
-                bz_mag = xl.data['iout_data']['bz'][aa][psi_dic['st']:psi_dic['ed'], sk:sd]
-                
-                axs[2, 1].add_artist(ratiotext_list[2])
-                
-                mag_ratio = np.divide(bx_mag[0, :], bz_mag[0, :])
-                
-                axs[2, 1].plot(ang_list, mag_ratio, linestyle= '-', 
-                    color= color_dic[aa])
-                
-                axs[2, 1].legend(loc= 'lower left') 
-                
-        axs[2, 1].set_xlabel('poloidal angle')
-        axs[0, 1].set_title('magnetic strength ratio at the separatrix') 
-            
-        plt.subplots_adjust(hspace=.0)
-
-
-if topic == 'annual_review_mag':
-    
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-    
-        # psi_st = 19
-        # psi_ed = 38
-        
-        # psi_dic = {'st': psi_st, 'ed': psi_ed}
-        
-        
-        pol_list_a = []
-        for i in range(36):
-            pol_list_a.append('{}'.format(28 + i))
-              
-        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
-        
-        
-        flux_list = ['bx', 'bz']
-        
-        
-        fig, axs = plt.subplots(3, 1)
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux with no PSch $\Gamma_x$: [$m^{-1} s^{-1}$]'), 
-                                     loc='upper center')
-        
-        bx_text = AnchoredText('{}'.format('(a) $B_{pol}$: [T]'), 
-                                     loc='upper center')
-        
-        bz_text = AnchoredText('{}'.format('(b) $B_{tor}$: [T]'), 
-                                     loc='lower center')
-        
-        xzratio_text = AnchoredText('{}'.format('(c) $B_{pol}/B_{tor}$'), 
-                                     loc='lower center')
-        
-        text_list = [bx_text, bz_text, xzratio_text]
+        text_list = [vpara_text, ngvpara_text]
         
         for ind, dat_name in enumerate(flux_list):
             
@@ -1026,57 +511,27 @@ if topic == 'annual_review_mag':
                 
                 flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
                     input_dat = dat, art_text = text_list[ind], axs = axs[ind], 
-                    color_dic = color_dic, A_dic = A_dic, no_A_label = A_label_bol)
-                
-                axs[ind].legend(loc= 'lower left') 
-                
-            for aa in xl.data['dircomp']['multi_shift']:
-                
-                ang_list = xl.data['angle']['angle_list'][aa]
-                
-                
-                sk = int(pol_list_a[0])
-                sd = int(pol_list_a[-1]) + 1
+                    color_dic = color_dic, A_dic = A_dic, 
+                    no_A_label = A_label_bol, input_ls = '-')
                     
-                bx_mag = xl.data['iout_data']['bx'][aa][psi_dic['st']:psi_dic['ed'], sk:sd]
-                bz_mag = xl.data['iout_data']['bz'][aa][psi_dic['st']:psi_dic['ed'], sk:sd]
-                
-                axs[2].add_artist(text_list[2])
-                
-                mag_ratio = np.divide(bx_mag[0, :], bz_mag[0, :])
-                
-                axs[2].plot(ang_list, mag_ratio, linestyle= '-', 
-                    color= color_dic[aa], label= 'A = {}'.format(A_dic[aa]))
-                
-                 
-                
+            axs[ind].legend(loc= 'upper right')
         
-        axs[2].set_xlabel('poloidal angle')
-        axs[0].set_title('magnetic strength and ratio at the separatrix')
+        
+        axs[1].set_xlabel('poloidal angle')
+        axs[0].set_title('v parallel flux at the separatrix')
+        
         
         plt.subplots_adjust(hspace=.0)
-        
-        
-
-if topic == 'mag_contour':
     
-    if xl.withshift == True and xl.withseries == False:
-        
-        flux_iout_loader()
-        
-        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
-                     'dot7': 'blue', 'one': 'purple'}
-        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                  'dot7': '2.8', 'one': '3.4'}
-        
-        for aa in xl.data['dircomp']['multi_shift']:
-            
-            data = xl.data['iout_data']['bz'][aa]
-            xl.plot_change_data(data = data, log_bar = False, bounds = None,
-                    itername = aa, quant = 'magnetic field z', ma100 = False,
-                    color_dic = color_dic, A_dic = A_dic)
 
-        
+
+
+
+
+
+
+
+
 
 if topic == 'varify_vpara':
     
@@ -1278,6 +733,52 @@ if topic == 'varify_vpara':
         
         
         
+        
+        source = xl.data['iout_load_quant']['source']
+        
+        flux_list = source
+        
+        
+        fig, axs = plt.subplots()
+        
+        source_text = AnchoredText('{}'.format('source: [$m^{-3} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        text_list = [source_text]
+        
+        for ind, dat_name in enumerate(flux_list):
+            
+            for aa in xl.data['dircomp']['multi_shift']:
+                
+                ang_list = xl.data['angle']['angle_list'][aa]
+                
+
+                A_label_bol = False
+
+                    
+                sn_dat = xl.data['iout_data'][dat_name][aa]
+                g_dat = xl.data['iout_data']['sqrt_g'][aa]
+                
+                source_dat = np.divide(sn_dat, g_dat)
+                
+                
+                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                    input_dat = source_dat, art_text = text_list[0], axs = axs, 
+                    color_dic = color_dic, A_dic = A_dic, 
+                    no_A_label = A_label_bol, input_ls = '-')
+                    
+            
+            axs.legend(loc= 'upper right')
+        
+        axs.set_xlabel('poloidal angle')
+        axs.set_title('source at the separatrix')
+        
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        
+        
+        
         ni = xl.data['iout_load_quant']['ni']
         
         flux_list = ni
@@ -1383,7 +884,7 @@ if topic == 'varify_vpara':
         plt.subplots_adjust(hspace=.0)
         
         
-        fig, axs = plt.subplots()
+        fig, axs = plt.subplots(2, 1)
         
         vpp = xl.data['iout_load_quant']['vp and p']
         
@@ -1408,23 +909,23 @@ if topic == 'varify_vpara':
 
                 
                 flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    input_dat = vpp_dat, art_text = text_list[0], axs = axs, 
+                    input_dat = vpp_dat, art_text = text_list[0], axs = axs[0], 
                     color_dic = color_dic, A_dic = A_dic, 
                     no_A_label = A_label_bol, input_ls = '-')
             
             
-            axs.legend(loc= 'upper right')
+            axs[0].legend(loc= 'upper right')
+        
+        
+        axs[0].axhline(y=0, color = 'black', linestyle = '--', label= '$b_x v_{\parallel} n_i$ = 0')
+        # axs.set_xlabel('poloidal angle')
+        axs[0].set_title('parallel velocity and difference at the separatrix')
+        
+        # plt.subplots_adjust(hspace=.0)
         
         
         
-        axs.set_xlabel('poloidal angle')
-        axs.set_title('parallel velocity and potential at the separatrix')
-        
-        plt.subplots_adjust(hspace=.0)
-        
-        
-        
-        fig, axs = plt.subplots()
+        # fig, axs = plt.subplots(2, 1)
         
         vpd_text = AnchoredText('{}'.format('parallel velocity difference: [$m/s$]'), 
                                      loc='upper center')
@@ -1450,14 +951,14 @@ if topic == 'varify_vpara':
                 A_label_bol = True
                 
                 flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    input_dat = sub_vpp_dat, art_text = text_list[0], axs = axs, 
+                    input_dat = sub_vpp_dat, art_text = text_list[0], axs = axs[1], 
                     color_dic = color_dic, A_dic = A_dic, 
                     no_A_label = A_label_bol, input_ls = '-')
             
             
-        axs.legend(loc= 'upper right')
-        axs.set_xlabel('poloidal angle')
-        axs.set_title('parallel velocity difference $v_{\parallel} - v^{MAST}_{\parallel}$ at the separatrix')
+        axs[1].legend(loc= 'upper right')
+        axs[1].set_xlabel('poloidal angle')
+        # axs.set_title('parallel velocity difference $v_{\parallel} - v^{MAST}_{\parallel}$ at the separatrix')
         
         plt.subplots_adjust(hspace=.0)
         
@@ -1575,7 +1076,7 @@ if topic == 'varify_vpara':
             R_dat = xl.data['grid']['RadLoc'][aa]
             
 
-            A_label_bol = True
+            A_label_bol = False
             
             flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
                 input_dat = R_dat, art_text = text_list[0], axs = axs, 
