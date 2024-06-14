@@ -36,7 +36,8 @@ for i in mod:
     print(A)
 
 test_zero = np.zeros(10)
-test_ones = np.ones(10)
+test_ones = np.ones(10)*0.5
+print('try ones: {}'.format(test_ones))
 test_id = np.identity(4, dtype=int)
 
 test_value = np.all(test_id == 0)

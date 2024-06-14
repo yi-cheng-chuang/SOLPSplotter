@@ -181,7 +181,10 @@ def loadg(filename):
     pprime = temp[3 * nw:4 * nw]
     psirz_temp = temp[4 * nw:(4 + nh) * nw]
     qpsi = temp[(4 + nh) * nw:]
-
+    
+    
+    
+    
     # split psirz up into 2D matrix
     count = 0
     psirz = []
@@ -198,11 +201,17 @@ def loadg(filename):
     limitr = int(words[1])
 
     # read boundary and limiter points into temp array
-
+    
+    
+    
     temp = []
     count = 0
     terms = 2 * (nbbbs + limitr)
     lnum += 1
+    
+    
+    print('the line index number for boundary is: {}'.format(str(lnum)))
+    
     while count < terms:
         line = lines[lnum]
         numchar = len(line)

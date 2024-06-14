@@ -351,7 +351,127 @@ class RP_mapping(load_simu_data):
         
         else:
             print('calc_pol_angle function has a bug')
+    
             
+    
+    #calculate the poloidal angle function    
+            
+        def rad_polangle_method(self, RadLoc, VertLoc, gfile, shift, pol_list, plot_angle, rn):
+            
+            
+            mag_axis_z = gfile['zmaxis']
+            # print(mag_axis_z)
+            
+            mag_axis_r = gfile['rmaxis'] + shift
+            
+                             
+            xprloc = RadLoc[:, 72][19]
+            xpzloc = VertLoc[:, 72][19]
+            
+            xpoint_R = xprloc - mag_axis_r
+            xpoint_Z = xpzloc - mag_axis_z
+            xpoint_angle = np.arctan2(xpoint_Z, xpoint_R)*180 / np.pi
+            
+
+            angle_list = []
+            
+            for pol_index in pol_list:
+                rloc = RadLoc[:, int(pol_index)][rn]
+                zloc = VertLoc[:, int(pol_index)][rn]
+                
+                x = rloc - mag_axis_r
+                y = zloc - mag_axis_z
+                
+                
+                angle = np.arctan2(y, x)*180 / np.pi
+                if angle <= xpoint_angle:
+                    angle = angle + 360
+                angle_list.append(angle)
+                
+            pol_loc = np.asarray(list(map(int, pol_list)))
+            
+            if plot_angle: 
+                plt.figure(figsize=(7,7))
+                plt.plot(pol_loc, angle_list, 'o', color = 'r', label= 'poloidal angle')
+                plt.xlabel('poloidal index')
+                plt.title('poloidal angle verses poloidal index')
+                plt.legend()
+                    
+            return angle_list, xpoint_angle
+        
+        
+        
+        def calc_polangle_rad(self, pol_list, plot_angle, input_rloc):
+            
+            if self.withshift == False and self.withseries == False:
+                
+                rad_grid = self.data['grid']['RadLoc']
+                vert_grid = self.data['grid']['VertLoc']     
+                g_data = self.data['gfile']['g']
+                shift_val = self.data['dircomp']['shift_value']
+                
+                            
+                angle_list, xpoint_angle = self.rad_polangle_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                    gfile = g_data, shift = shift_val, plot_angle = plot_angle, 
+                    pol_list = pol_list, rn = input_rloc)
+                
+                print('xpoint angle is {:.2f}'.format(xpoint_angle))
+                
+                angle_dic = {'angle_list': angle_list, 'xpoint_angle': xpoint_angle}
+                
+                self.data['angle'] = angle_dic
+                
+            elif self.withshift == True and self.withseries == False:        
+                angle_dic = {}
+                angle_list_dic = {}
+                xpoint_angle_dic = {}
+                index_angle_dic = {}
+                for aa in self.data['dircomp']['multi_shift']:
+                    
+                    rad_grid = self.data['grid']['RadLoc'][aa]
+                    vert_grid = self.data['grid']['VertLoc'][aa]    
+                    g_data = self.data['gfile']['g']
+                    shift_val = self.data['dircomp']['shift_dic'][aa]
+                    
+                    angle_list, xpoint_angle = self.rad_polangle_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                        gfile = g_data, shift = shift_val, plot_angle = plot_angle, 
+                        pol_list = pol_list, rn = input_rloc)
+                    
+                    angle_list_dic[aa] = angle_list
+                    xpoint_angle_dic[aa] = xpoint_angle
+                    
+                    
+                    print('xpoint angle is {:.2f} for {} case'.format(xpoint_angle, aa))
+                    
+                       
+                angle_dic = {'angle_list': angle_list_dic, 'xpoint_angle': xpoint_angle_dic}
+                
+                self.data['angle'] = angle_dic
+                
+               
+            elif self.withshift == False and self.withseries == True:
+                
+                den_list = list(self.data['dircomp']['Attempt'].keys())
+                aa = den_list[0]
+                
+                rad_grid = self.data['grid']['RadLoc'][aa]
+                vert_grid = self.data['grid']['VertLoc'][aa]    
+                g_data = self.data['gfile']['g']
+                shift_val = self.data['dircomp']['shift_value']
+                
+                
+                angle_list, xpoint_angle = self.calc_pol_angle_method(RadLoc = rad_grid, VertLoc = vert_grid, 
+                    gfile = g_data, shift = shift_val, plot_angle = plot_angle, pol_list = pol_list)
+                
+                angle_dic = {'angle_list': angle_list, 'xpoint_angle': xpoint_angle}
+                
+                self.data['angle'] = angle_dic
+            
+            elif self.withshift == True and self.withseries == True:
+                print('calc_pol_angle function is not there yet!')
+            
+            else:
+                print('calc_pol_angle function has a bug')
             
             
 #-----------------------------------------------------------------------------
