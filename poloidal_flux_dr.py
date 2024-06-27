@@ -57,7 +57,7 @@ xl.neuden_percent()
  'coe_check', 'mag_contour', 'fluxes_no_psch', 'mag_pol', 'annual_review_mag', 
  'varify_vpara']
 
-topic = 'varify_vpara'
+topic = 'neu_den'
 
 
 """
@@ -527,13 +527,13 @@ if topic == 'fluxes_no_geo':
                      'dot7': 'blue', 'one': 'purple'}
         A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
                   'dot7': '2.8', 'one': '3.4'}
-        pol_text = AnchoredText('{}'.format('Poloidal flux $\Gamma_x$ [$m^{-1} s^{-1}$]'), 
+        pol_text = AnchoredText('{}'.format('(a) Poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
                                      loc='upper center')
         
         neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
                                      loc='upper center')
         
-        rad_text = AnchoredText('{}'.format('Radial flux $\Gamma_y$ [$m^{-1} s^{-1}$]'), 
+        rad_text = AnchoredText('{}'.format('(b) Radial flux $\Gamma_r$ [$m^{-2} s^{-1}$]'), 
                                      loc='upper center')
         
 
@@ -541,11 +541,13 @@ if topic == 'fluxes_no_geo':
             
             ang_list = xl.data['angle']['angle_list'][aa]
             
-            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-            i_name = 'poloidal_flux', art_text = pol_text, axs = axs[0], 
-            color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = True)
+            pflux_dat = xl.data['iout_data']['poloidal_flux'][aa]
             
-        axs[0].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_x$ = 0')
+            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+            input_dat = pflux_dat, art_text = pol_text, axs = axs[0], 
+            color_dic = color_dic, A_dic = A_dic, no_A_label = True, input_ls = '-')
+            
+        axs[0].axhline(y=0, color = 'black', linestyle = '--', label= '$\Gamma_{\Theta}$ = 0')
         
         
         
@@ -553,9 +555,11 @@ if topic == 'fluxes_no_geo':
             
             ang_list = xl.data['angle']['angle_list'][aa]
             
+            rflux_dat = xl.data['iout_data']['radial_flux'][aa]
+            
             flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
-                    i_name = 'radial_flux', art_text = rad_text, axs = axs[1], 
-            color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = False)
+                    input_dat = rflux_dat, art_text = rad_text, axs = axs[1], 
+            color_dic = color_dic, A_dic = A_dic, no_A_label = False, input_ls = '-')
             
             
         axs[1].set_xlabel('poloidal angle')
@@ -572,7 +576,11 @@ if topic == 'fluxes_no_geo':
 if topic == 'neu_den':
     
     if xl.withshift == True and xl.withseries == False:
-
+        
+        pol_list_a = []
+        for i in range(36):
+            pol_list_a.append('{}'.format(26 + i))
+        
         neu_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), 
                                      loc='upper center')
 
@@ -604,7 +612,7 @@ if topic == 'neu_den':
             
             axs[1].plot(ang_list, neuden_dat[0, :], linestyle='-', color= color_dic[aa])
             
-            axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
+            # axs[1].plot(ang_list, neuden_dat[-1, :], '-', color= color_dic[aa])
 
 
 if topic == 'coe_check':
@@ -1715,6 +1723,290 @@ if topic == 'varify_vpara':
 
 
 
+if topic == 'geo_coe_test':
+    
+    if xl.withshift == True and xl.withseries == False:
+        
+        pol_list_st = 29
+        pol_list_range = 32
+        
+        
+        
+        pol_list_a = []
+        for i in range(pol_list_range):
+            pol_list_a.append('{}'.format(pol_list_st + i))
+            
+        
+        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        
+        pol_list_b = []
+        for i in range(pol_list_range + 2):
+            pol_list_b.append('{}'.format(pol_list_st -1 + i))
+        
+        
+        fig, axs = plt.subplots()
+        
+        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            R_dat = xl.data['grid']['RadLoc'][aa]
+            Z_dat = xl.data['grid']['VertLoc'][aa]
+            
+            R_avg = weight_generater(pol_list = pol_list_b, input_dat = R_dat, 
+                                     itername = aa, nnp= 1)
+            Z_avg = weight_generater(pol_list = pol_list_b, input_dat = Z_dat, 
+                                     itername = aa, nnp = 1)
+            
+            R_mid = []
+            Z_mid = []
+            
+            for k in range(len(R_avg)-1):
+                
+                R_mid.append(0.5*(R_avg[k]+ R_avg[k + 1]))
+                Z_mid.append(0.5*(Z_avg[k]+ Z_avg[k + 1]))
+            
+            # print(len(R_avg))
+            # print(len(R_mid))
+            
+            R_diff = []
+            Z_diff = []
+            arc = []
+            
+            for k in range(len(R_mid)-1):
+                
+                length_squre = (R_mid[k] - R_mid[k + 1])**2 + (Z_mid[k] - Z_mid[k + 1])**2
+                
+                arc.append(np.sqrt(length_squre))
+                
+                R_length = (R_mid[k] - R_mid[k + 1])**2
+                
+                R_diff.append(np.sqrt(R_length))
+                
+                Z_length = (Z_mid[k] - Z_mid[k + 1])**2
+                
+                Z_diff.append(np.sqrt(Z_length))
+            
+            # print('the length of R_diff is {}'.format(len(R_diff)))
+        
+            
+            axs.plot(ang_list, Z_diff, linestyle = '-', 
+                color= color_dic[aa])
+
+        
+        
+        
+        fig, axs = plt.subplots()
+        
+        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            R_dat = xl.data['grid']['RadLoc'][aa]
+            Z_dat = xl.data['grid']['VertLoc'][aa]
+            
+            R_avg_a = weight_generater(pol_list = pol_list_a, input_dat = R_dat, 
+                                     itername = aa, nnp= 1)
+            R_avg_b = weight_generater(pol_list = pol_list_a, input_dat = R_dat, 
+                                     itername = aa, nnp= 0)
+            
+            Z_avg_a = weight_generater(pol_list = pol_list_a, input_dat = Z_dat, 
+                                     itername = aa, nnp = 1)
+            Z_avg_b = weight_generater(pol_list = pol_list_a, input_dat = Z_dat, 
+                                     itername = aa, nnp = 0)
+            
+            
+            R_diff = []
+            Z_diff = []
+            arc = []
+            
+            for k in range(len(pol_list_a)):
+                
+                length_squre = (R_avg_a[k] - R_avg_b[k])**2 + (Z_avg_a[k] - Z_avg_b[k])**2
+                
+                arc.append(np.sqrt(length_squre))
+                
+                R_length = (R_avg_a[k] - R_avg_b[k])**2
+                
+                R_diff.append(np.sqrt(R_length))
+                
+                Z_length = (Z_avg_a[k] - Z_avg_b[k])**2
+                
+                Z_diff.append(np.sqrt(Z_length))
+            
+            # print('the length of R_diff is {}'.format(len(R_diff)))
+        
+            
+            axs.plot(ang_list, arc, linestyle = '-', 
+                color= color_dic[aa])
+
+
+                    
+if topic == 'geo_coe_fit':
+    
+    
+    if xl.withshift == True and xl.withseries == False:
+        
+        flux_iout_loader()
+    
+        
+        pol_list_a = []
+        for i in range(32):
+            pol_list_a.append('{}'.format(29 + i))
+              
+        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        
+        
+        
+        flux_list = ['hx', 'hy']
+        
+        
+        fig, axs = plt.subplots(2, 1)
+        
+        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        vpara_text = AnchoredText('{}'.format('$h_x$: [m]'), 
+                                     loc='upper center')
+        
+        ngvpara_text = AnchoredText('{}'.format('$h_y$: [m]'), 
+                                     loc='upper center')
+        
+        text_list = [vpara_text, ngvpara_text]
+        
+        for ind, dat_name in enumerate(flux_list):
+            
+            for aa in xl.data['dircomp']['multi_shift']:
+                
+                ang_list = xl.data['angle']['angle_list'][aa]
+                
+                if ind == 1:
+                    A_label_bol = False
+                else:
+                    A_label_bol = True
+                
+                dat = xl.data['iout_data'][dat_name][aa]
+                
+                flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                    input_dat = dat, art_text = text_list[ind], axs = axs[ind], 
+                    color_dic = color_dic, A_dic = A_dic, nnp = 1,
+                    no_A_label = A_label_bol, input_ls = '-')
+                    
+            axs[ind].legend(loc= 'upper right')
+        
+        
+        axs[1].set_xlabel('poloidal angle')
+        axs[0].set_title('v parallel flux at the separatrix')
+        
+        
+        plt.subplots_adjust(hspace=.0)
+    
+
+if topic == 'geo_coe_ymatch':
+    
+    
+    if xl.withshift == True and xl.withseries == False:
+        
+        flux_iout_loader()
+    
+        
+        pol_list_a = []
+        for i in range(30):
+            pol_list_a.append('{}'.format(29 + i))
+              
+        xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        
+        
+        
+        flux_list = ['hy']
+        
+        
+        fig, axs = plt.subplots()
+        
+        color_dic = {'org': 'red', 'dot3': 'darkorange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        vpara_text = AnchoredText('{}'.format('$h_x$: [m]'), 
+                                     loc='upper center')
+        
+        ngvpara_text = AnchoredText('{}'.format('$h_y$: [m]'), 
+                                     loc='upper center')
+        
+        text_list = [vpara_text, ngvpara_text]
+        
+            
+        for aa in xl.data['dircomp']['multi_shift']:
+            
+            ang_list = xl.data['angle']['angle_list'][aa]
+            
+            
+            A_label_bol = False
+
+            
+            dat = xl.data['iout_data']['hy'][aa]
+            
+            flux_poloidal_sub(itername = aa, pol_list = pol_list_a, ang_list = ang_list,
+                input_dat = dat, art_text = text_list[0], axs = axs, 
+                color_dic = color_dic, A_dic = A_dic, nnp = 1,
+                no_A_label = A_label_bol, input_ls = '-')
+            
+            
+            
+            R_dat = xl.data['grid']['RadLoc'][aa]
+            Z_dat = xl.data['grid']['VertLoc'][aa]
+            
+            R_avg_a = weight_generater(pol_list = pol_list_a, input_dat = R_dat, 
+                                     itername = aa, nnp= 1)
+            R_avg_b = weight_generater(pol_list = pol_list_a, input_dat = R_dat, 
+                                     itername = aa, nnp= 0)
+            
+            Z_avg_a = weight_generater(pol_list = pol_list_a, input_dat = Z_dat, 
+                                     itername = aa, nnp = 1)
+            Z_avg_b = weight_generater(pol_list = pol_list_a, input_dat = Z_dat, 
+                                     itername = aa, nnp = 0)
+            
+            
+            R_diff = []
+            Z_diff = []
+            arc = []
+            
+            for k in range(len(pol_list_a)):
+                
+                length_squre = (R_avg_a[k] - R_avg_b[k])**2 + (Z_avg_a[k] - Z_avg_b[k])**2
+                
+                arc.append(np.sqrt(length_squre))
+            
+            # print('the length of R_diff is {}'.format(len(R_diff)))
+        
+            
+            axs.plot(ang_list, arc, linestyle = '--', 
+                color= color_dic[aa])
+            
+            
+            
+            
+            
+                
+        axs.legend(loc= 'upper right')
+        
+        
+        axs.set_xlabel('poloidal angle')
+        axs.set_title('v parallel flux at the separatrix')
+        
+        
+        plt.subplots_adjust(hspace=.0)
 
 
 
