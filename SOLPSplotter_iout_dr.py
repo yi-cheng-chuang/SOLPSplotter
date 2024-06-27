@@ -49,7 +49,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 xl.neuden_percent()
 
-topic = 'Q3'
+topic = 'Q3-1'
 
 
 """
@@ -1151,6 +1151,18 @@ elif topic == 'Q3-1':
     color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                  'dot7': 'blue', 'one': 'purple'}
     
+    
+    a_text = AnchoredText('{}'.format('(a) A= 1.4'), 
+                                 loc='upper center')
+    
+    b_text = AnchoredText('{}'.format('(b) A= 2.8'), 
+                                 loc='upper center')
+    
+    
+    
+    
+    
+    
     for aa in xl.data['dircomp']['multi_shift']:
         if aa == 'org':
             pass
@@ -1215,7 +1227,7 @@ elif topic == 'Q3-1':
     
     axs[0].contourf(R_coord, Z_coord, datamap, levels= levels, 
                  cmap = CPB, norm = Lnorm)
-    
+    axs[0].add_artist(a_text)
     
     
     vessel = xl.data['vessel']['org']
@@ -1245,6 +1257,7 @@ elif topic == 'Q3-1':
     R_coord = RadLoc[1:37, 1:97]
     Z_coord = VertLoc[1:37, 1:97]
     
+    axs[1].add_artist(b_text)
     axs[1].contourf(R_coord, Z_coord, datamap, levels= levels, 
                  cmap = CPB, norm = Lnorm)
     
@@ -1264,16 +1277,16 @@ elif topic == 'Q3-1':
     
     
     pol_list_a = []
-    for i in range(9):
-        pol_list_a.append('{}'.format(28 + i))
+    for i in range(36):
+        pol_list_a.append('{}'.format(26 + i))
     
     
     xl.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
     
     xl.data['angle']['angle_list'][aa]
     
-    psi_st = 18
-    psi_ed = 35
+    psi_st = 17
+    psi_ed = 38
     sk = int(pol_list_a[0])
     sd = int(pol_list_a[-1]) + 1
     
