@@ -45,5 +45,32 @@ test_value = np.all(test_id == 0)
 print('the test result is: {}'.format(test_value))
 
 
+test_dict = {"geeks": 7, "for": 1, "geek": 2}
+dic_list = test_dict.keys()
+
+
+for keys in test_dict:
+    
+    print(keys)
+
+
+
+print('The data type of dic_list is:')
+
+print(type(dic_list))
+
+
+test_array_a = np.array([[1, 3, 5, 7], [2, 4, 6, 8]])
+
+print(test_array_a)
+
+test_array_b = np.array([[2, 4, 2, 8], [2.5, 4.5, 6.5, 8.5]])
+
+print(test_array_b)
+
+ratio_array = np.divide(test_array_a, test_array_b)
+
+print(ratio_array)
+
 
 
