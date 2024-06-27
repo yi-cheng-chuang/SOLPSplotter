@@ -356,7 +356,6 @@ Robert Wilcox and Jeremy Lore
 """
 
 
-
 def read_b2fstate_Bob(fname):
     if not os.path.exists(fname):
         print('ERROR: b2fstate file not found: ',fname)
@@ -434,6 +433,7 @@ def read_b2fstate_Bob(fname):
     return state
 
 
+
 def read_iout_method(fdir, fname, nx, ny):
     
     if not os.path.exists(fdir):
@@ -472,8 +472,183 @@ def read_iout_method(fdir, fname, nx, ny):
     
     return iout
         
+
         
-    
+def read_b2wdat_field(filename):
+# reads a .out file produced by setting b2wdat_iout='4' in b2mn.dat
+    f = open(filename)
+    line = f.readline().rstrip().split()
+    fieldVal = []
+    while (line!=[]):
+        line = f.readline().rstrip().split()
+        if line==[]: break
+        fieldVal.append([float(i) for i in line][1:])
+    return np.array(fieldVal[::-1]).T
+
+
+def is_neutral(a):
+# checks if the species is a neutral 
+# DOESNT WORK WITH MORE THAN TWO TYPES OF IONS
+    if a>=6: print('WARNING: bigger species index than is_neutral was made for, proceed with caution')
+    if a==0 or a==2:
+        return True
+    else:
+        return False
+
+
+
+
+def read_b2wdat(b2wdatLoc,nSpec):
+# reads .out files produced by setting b2wdat_iout='4' in b2mn.dat and returns a class with the data
+# currently only grabs what I have needed there are literally hundreds more
+# this isn't a very robust function, might not work if it isn't a D-only or D+Li case. Be careful
+# adjusting is_neutral to be more robust might be all it needs but not sure
+    nas = []
+    uas = []
+    ues = []
+    b2srdt_smodts = []
+    b2npmo_fmoxs = []
+    b2npmo_fmoys = []
+    b2sigp_smogpis = []
+    b2sigp_smogpos = []
+    b2npmo_smbs = []
+    b2stcx_smqs = []
+    b2npmo_smocfs = []
+    b2stel_smq_ions = []
+    b2stel_smq_recs = []
+    b2npmo_smotfias = []
+    b2npmo_smotfeas = []
+    b2npmo_smofreas = []
+    b2npmo_smofrias = []
+    b2npmo_smoans = []
+    b2stbc_phys_smos = []
+    b2npmo_smovvs = []
+    b2npmo_smovhs = []
+    b2stbr_smos = []
+    b2trcl_luciani_fllim_cvsahzxs = []
+    b2trcl_luciani_cvsahzxs = []
+    b2npmo_resmos = []
+    b2stbr_sna_eirs = []
+    b2stel_sna_ions = []
+    b2stel_sna_recs = []
+    b2npc_snas = []
+    b2npc_fnaxs = []
+    b2npc_fnays = []
+    b2tfnb_dPat_mdf_gradnax = []
+    b2trno_cdnax = []
+    crxs = []
+    crys = []
+    for i in range(4): crxs.append(read_b2wdat_field(b2wdatLoc+'output/'+'crx'+str(i)+'.dat'))
+    for i in range(4): crys.append(read_b2wdat_field(b2wdatLoc+'output/'+'cry'+str(i)+'.dat'))
+    for spIdx in range(nSpec):
+        if is_neutral(spIdx): continue
+        if spIdx==1:nas.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npc11_na00'+str(spIdx)+'.dat'))
+        if spIdx>1: nas.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npc11_na00'+str(spIdx)+'.dat'))
+        uas.append(np.array(read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_ua00'+str(spIdx)+'.dat')))
+        b2srdt_smodts.append( -read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_madnavadt00'+str(spIdx)+'.dat'))
+        b2npmo_fmoxs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_fmox00'+str(spIdx)+'.dat'))
+        b2npmo_fmoys.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_fmoy00'+str(spIdx)+'.dat'))
+        b2sigp_smogpis.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2sigp_smogpi00'+str(spIdx)+'.dat'))
+        b2sigp_smogpos.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2sigp_smogpo00'+str(spIdx)+'.dat'))
+        b2npmo_smbs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smb00'+str(spIdx)+'.dat'))
+        b2stcx_smqs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2stcx_smq00'+str(spIdx)+'.dat'))
+        b2npmo_smocfs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smocf00'+str(spIdx)+'.dat'))
+        b2stel_smq_ions.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_smq_ion00'+str(spIdx)+'.dat'))
+        b2stel_smq_recs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_smq_rec00'+str(spIdx)+'.dat'))
+        b2npmo_smotfias.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smotfia00'+str(spIdx)+'.dat'))
+        b2npmo_smotfeas.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smotfea00'+str(spIdx)+'.dat'))
+        b2npmo_smofreas.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smofrea00'+str(spIdx)+'.dat'))
+        b2npmo_smofrias.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smofria00'+str(spIdx)+'.dat'))
+        b2npmo_smoans.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smoan00'+str(spIdx)+'.dat'))
+        b2stbc_phys_smos.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2stbc_phys_smo00'+str(spIdx)+'.dat'))
+        b2npmo_smovvs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smovv00'+str(spIdx)+'.dat'))
+        b2npmo_smovhs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_smovh00'+str(spIdx)+'.dat'))
+        b2stbr_smos.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2stbr_smo_eir00'+str(spIdx)+'.dat'))
+        b2trcl_luciani_fllim_cvsahzxs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2trcl_luciani_fllim_cvsahzx00'+str(spIdx)+'.dat'))
+        b2trcl_luciani_cvsahzxs.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2trcl_luciani_cvsahzx00'+str(spIdx)+'.dat'))
+        b2npmo_resmos.append( read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_resmo00'+str(spIdx)+'.dat'))
+        b2stbr_sna_eirs.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2stbr_sna_eir00'+str(spIdx)+'.dat'))
+        b2stel_sna_ions.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_sna_ion00'+str(spIdx)+'.dat'))
+        b2stel_sna_recs.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_sna_rec00'+str(spIdx)+'.dat'))
+        b2tfnb_dPat_mdf_gradnax.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2tfnb_dPat_mdf_gradnax00'+str(spIdx)+'.dat'))
+        b2trno_cdnax.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2trno_cdnax00'+str(spIdx)+'.dat'))
+        if spIdx==0 or spIdx==2: b2npc_fnaxs.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npco_fnax00'+str(spIdx)+'.dat'))
+        else: b2npc_fnaxs.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npc11_fnax00'+str(spIdx)+'.dat'))
+
+        if spIdx==0 or spIdx==2: b2npc_fnays.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npco_fnaxy00'+str(spIdx)+'.dat'))
+        else: b2npc_fnays.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npc11_fnay00'+str(spIdx)+'.dat'))
+
+        if spIdx==0 or spIdx==2: b2npc_snas.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npc_sna00'+str(spIdx)+'.dat'))
+        else: b2npc_snas.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npc11_sna00'+str(spIdx)+'.dat'))
+    #initialize class that will hold all the data of bwdat output
+    class b2wdatResults:
+        def __init__(self):
+            #LHS of the momentum eqn
+            self.b2srdt_smodt = b2srdt_smodts
+            self.b2npmo_fmox = b2npmo_fmoxs
+            self.b2npmo_fmoy = b2npmo_fmoys
+            self.b2sigp_smogpi = b2sigp_smogpis
+            self.b2sigp_smogpo = b2sigp_smogpos
+
+            #RHS of the momentum equation
+            self.b2npmo_smb = b2npmo_smbs
+            self.b2stcx_smq = b2stcx_smqs
+            self.b2npmo_smocf = b2npmo_smocfs
+            self.b2stel_smq_ion = b2stel_smq_ions
+            self.b2stel_smq_rec = b2stel_smq_recs
+            self.b2npmo_smotfia = b2npmo_smotfias
+            self.b2npmo_smotfea = b2npmo_smotfeas
+            self.b2npmo_smofrea = b2npmo_smofreas
+            self.b2npmo_smofria = b2npmo_smofrias
+            self.b2npmo_smoan = b2npmo_smoans
+            self.b2stbc_phys_smo = b2stbc_phys_smos
+            self.b2npmo_smovv = b2npmo_smovvs
+            self.b2npmo_smovh = b2npmo_smovhs
+            self.b2stbr_smo = b2stbr_smos
+            self.b2trcl_luciani_fllim_cvsahzx = b2trcl_luciani_fllim_cvsahzxs
+            self.b2trcl_luciani_cvsahzx = b2trcl_luciani_cvsahzxs
+            self.b2npmo_resmo = b2npmo_resmos
+
+            #energy balance terms
+            self.b2stbr_shi_eir = read_b2wdat_field(b2wdatLoc+'output/'+'b2stbr_shi_eir.dat')
+            self.b2stbr_she_eir = read_b2wdat_field(b2wdatLoc+'output/'+'b2stbr_she_eir.dat')
+            self.b2stel_she_rad = read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_she_rad.dat')
+
+            #particle sources
+            self.b2stbr_sna_eir = b2stbr_sna_eirs
+            self.b2stel_sna_ion = b2stel_sna_ions
+            self.b2stel_sna_rec = b2stel_sna_recs
+            self.b2npc_sna = b2npc_snas
+            self.b2npc_fnaxs = b2npc_fnaxs
+            self.b2npc_fnays = b2npc_fnays
+
+            #geo info
+            self.hx  = read_b2wdat_field(b2wdatLoc+'output/'+'hx.dat')
+            self.hy  = read_b2wdat_field(b2wdatLoc+'output/'+'hy.dat')
+            self.hz  = read_b2wdat_field(b2wdatLoc+'output/'+'hz.dat')
+            self.vol = read_b2wdat_field(b2wdatLoc+'output/'+'vol.dat')
+            self.bbx = read_b2wdat_field(b2wdatLoc+'output/'+'bbx.dat')
+            self.bb  = read_b2wdat_field(b2wdatLoc+'output/'+'bb.dat')
+            self.bx  = read_b2wdat_field(b2wdatLoc+'output/'+'bbx.dat')/read_b2wdat_field(b2wdatLoc+'output/'+'bb.dat')
+            self.crx = crxs
+            self.cry = crys
+
+            #plasma parameters
+            self.na = nas
+            self.ua = uas
+            self.ue = read_b2wdat_field(b2wdatLoc+'output/'+'b2npmo_ue.dat')
+            self.phi = read_b2wdat_field(b2wdatLoc+'output/'+'b2nppo_po.dat')
+            self.ti = read_b2wdat_field(b2wdatLoc+'output/'+'ti_eV.dat')
+            #misc
+            self.fchanmly = read_b2wdat_field(b2wdatLoc+'output/'+'b2tfch__fchanmly.dat')
+            self.fchanmlx = read_b2wdat_field(b2wdatLoc+'output/'+'b2tfch__fchanmlx.dat')
+            self.fchdiay  = read_b2wdat_field(b2wdatLoc+'output/'+'b2tfch__fchdiay.dat')
+            self.fchdiax  = read_b2wdat_field(b2wdatLoc+'output/'+'b2tfch__fchdiax.dat')
+
+    b2wdat = b2wdatResults()#instantiate class
+    print('done reading b2wdat files')
+    return b2wdat
+
     
     
     
