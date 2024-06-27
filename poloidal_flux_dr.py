@@ -57,7 +57,10 @@ xl.neuden_percent()
  'coe_check', 'mag_contour', 'fluxes_no_psch', 'mag_pol', 'annual_review_mag', 
  'varify_vpara']
 
-topic = 'neu_den'
+
+topic = 'varify_vpara'
+
+
 
 
 """
@@ -1969,11 +1972,13 @@ if topic == 'geo_coe_ymatch':
             
             R_avg_a = weight_generater(pol_list = pol_list_a, input_dat = R_dat, 
                                      itername = aa, nnp= 1)
+            
             R_avg_b = weight_generater(pol_list = pol_list_a, input_dat = R_dat, 
                                      itername = aa, nnp= 0)
             
             Z_avg_a = weight_generater(pol_list = pol_list_a, input_dat = Z_dat, 
                                      itername = aa, nnp = 1)
+            
             Z_avg_b = weight_generater(pol_list = pol_list_a, input_dat = Z_dat, 
                                      itername = aa, nnp = 0)
             
