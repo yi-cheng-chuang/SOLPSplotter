@@ -380,7 +380,7 @@ class paper_poloidal_plot(profile_fit):
 
             fig, axs = plt.subplots()
 
-            anchored_text = AnchoredText('{}'.format('neutral density $(n_D)_{sep}$ [$m^{-3}$]'), 
+            anchored_text = AnchoredText('{}'.format('neutral density $n_0^{sep}$ [$m^{-3}$]'), 
                                          loc='upper center')
             
             axs.add_artist(anchored_text)
