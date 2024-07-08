@@ -308,236 +308,179 @@ class radial_plot(profile_fit):
         else:
             print('Opacity_study_radial_plot_psi has a bug')
     
+    
+    
+    def nete_TSplotmethod(self, aa):
+            
+        b2fstate = self.data['b2fstate'][aa]
+        
+        ne_pro = b2fstate['ne'].transpose()
+        Te_J = b2fstate['te'].transpose()
+        ev = 1.6021766339999999 * pow(10, -19)
+        te_pro = Te_J / ev
+        
+        data = self.data['ft44'][aa]['dab2']
+        neu_pro = np.transpose(data[:, :, 0])
+        
+        if self.withshift == True and self.withseries == False:
+        
+            leftcut = self.data['b2fgeo'][aa]['leftcut'][0]
+            rightcut = self.data['b2fgeo'][aa]['rightcut'][0]
+            weight = self.data['midplane_calc'][aa]['weight']
+            psi_coord = self.data['midplane_calc'][aa]['psi_solps_mid']
+        
+        elif self.withshift == False and self.withseries == True:
+        
+            leftcut = self.data['b2fgeo']['leftcut'][0]
+            rightcut = self.data['b2fgeo']['rightcut'][0]
+            weight = self.data['midplane_calc']['weight']
+            psi_coord = self.data['midplane_calc']['psi_solps_mid']
+        
+        else:
+            print('nete_TSplotmethod geo cut has a bug!')
+        
+        weight_B = np.ones(len(weight))- weight
+             
+        mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
+        mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
+        mid_neu_pro = neu_pro[:, 58]
+        
+        return psi_coord, mid_ne_pro, mid_te_pro
+    
+    
+    
+    def plot_neteTSdat(self):
+        
+        
+        """     
+        # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
+        if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
+            pass
+        else:
+            self.load_output_data(param= 'Ne')
+            self.load_output_data(param= 'Te')
+            self.load_output_data(param= 'NeuDen')
+        
+        ne_pro = self.data['outputdata']['Ne']
+        te_pro = self.data['outputdata']['Te']
+        neu_pro = self.data['outputdata']['NeuDen']
+        
+        """
+        
+        psiN = self.data['experimental_fit']['psiN']
+        ne = self.data['experimental_fit']['ne']*pow(10, 20)
+        te = self.data['experimental_fit']['te']*pow(10, 3)
+        
+        exp = self.data['ExpDict']
+        # psi = exp['psi_normal']
+        
+        
+        psi = []
+        exp_ne = []
+        ne_er = []
+        exp_te = []
+        te_er = []
+        for ep in range(len(exp['psi_normal'])):
+            
+            if  exp['psi_normal'][ep] >= min(psiN):
+                psi.append(exp['psi_normal'][ep])
+                exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
+                ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
+                exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
+                te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
+        
+        TS_dic = {'psi': psi, 'neTS': exp_ne, 'errne': ne_er,
+                  'teTS': exp_te, 'errte': te_er}
+        
+        return TS_dic
+    
+    
+    
+    def neteTSplot_structure(self, iterlist, cl_dic, A_dic):
+        
+        TS_dic = self.plot_neteTSdat()
+        
+        psi = TS_dic['psi']
+        exp_ne = TS_dic['neTS']
+        ne_er = TS_dic['errne']
+        exp_te = TS_dic['teTS']
+        te_er = TS_dic['errte']
+        
+        
+        fig, axs = plt.subplots(2, 1)
+        
+        anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
+        axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
+        axs[0].add_artist(anchored_text)
+        axs[0].legend(loc='lower left', fontsize=10)
+        
+        
+        anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
+        axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
+        axs[1].set_xlabel('$\psi_N$')
+        axs[1].add_artist(anchored_text2)
+        axs[1].legend(loc='lower left', fontsize=10)
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        
+        for aa in iterlist:
+            
+            psi_coord, mid_ne_pro, mid_te_pro = self.nete_TSplotmethod(aa = aa)
+            
+            axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
+            
+            """
+            label= 'core density {} $10^{19}$'.format(aa)
+            
+            """
+            
+            axs[0].legend(loc= 'lower left', fontsize=10)
+            axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
+                        label= '{}'.format(A_dic[aa]))
+            
+            axs[1].legend()
+        
+        # fig.savefig('profiles.pdf')
+    
+    
+    
         
     def ne_te_TS_plot(self):
         
         if self.withshift == True and self.withseries == False:
             
-            """
-            
-            # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
-            if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
-                pass
-            else:
-                self.load_output_data(param= 'Ne')
-                self.load_output_data(param= 'Te')
-                self.load_output_data(param= 'NeuDen')
-            
-            ne_pro = self.data['outputdata']['Ne']
-            te_pro = self.data['outputdata']['Te']
-            neu_pro = self.data['outputdata']['NeuDen']
-            
-            """
-            
-            psiN = self.data['experimental_fit']['psiN']
-            ne = self.data['experimental_fit']['ne']*pow(10, 20)
-            te = self.data['experimental_fit']['te']*pow(10, 3)
-            
-            exp = self.data['ExpDict']
-            # psi = exp['psi_normal']
-            
-            
-            psi = []
-            exp_ne = []
-            ne_er = []
-            exp_te = []
-            te_er = []
-            for ep in range(len(exp['psi_normal'])):
-                
-                if  exp['psi_normal'][ep] >= min(psiN):
-                    psi.append(exp['psi_normal'][ep])
-                    exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
-                    ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
-                    exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
-                    te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
-            
             color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                          'dot7': 'blue', 'one': 'purple'}
             
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+            label_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
                       'dot7': '2.8', 'one': '3.4'}
             
+            asp_ch = self.data['dircomp']['multi_shift']
             
-            fig, axs = plt.subplots(2, 1)
-            
-            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
-            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
-            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-            # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
-            # axs[0].set_title('(a)Electron density')
-            axs[0].add_artist(anchored_text)
-            axs[0].legend(loc='lower left', fontsize=10)
-            
-            
-            anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
-            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
-            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-            axs[1].set_xlabel('$\psi_N$')
-            # axs[1].set_title('(b)Electron temperature')
-            axs[1].add_artist(anchored_text2)
-            axs[1].legend(loc='lower left', fontsize=10)
-            
-            plt.subplots_adjust(hspace=.0)
-            
-            
-            for aa in self.data['dircomp']['multi_shift']:
-            
-            
-                b2fstate = self.data['b2fstate'][aa]
-                
-                ne_pro = b2fstate['ne'].transpose()
-                Te_J = b2fstate['te'].transpose()
-                ev = 1.6021766339999999 * pow(10, -19)
-                te_pro = Te_J / ev
-                
-                data = self.data['ft44'][aa]['dab2']
-                neu_pro = np.transpose(data[:, :, 0])
-                leftcut = self.data['b2fgeo'][aa]['leftcut'][0]
-                rightcut = self.data['b2fgeo'][aa]['rightcut'][0]
-                
-                weight = self.data['midplane_calc'][aa]['weight']
-                weight_B = np.ones(len(weight))- weight
-                
-                
-                mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
-                mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
-                mid_neu_pro = neu_pro[:, 58]
-            
-                psi_coord = self.data['midplane_calc'][aa]['psi_solps_mid']
-            
-            
-                # axs[0].set_yscale('log')
-                axs[0].plot(psi_coord, mid_ne_pro, color = color_dic[aa], 
-                            label= 'A = {}'.format(A_dic[aa]))
-                
-                axs[0].legend(loc= 'lower left', fontsize=10)
-                
-                # axs[1].set_yscale('log')
-                axs[1].plot(psi_coord, mid_te_pro, color = color_dic[aa], 
-                            label= 'A = {}'.format(A_dic[aa]))
-                
-                # axs[1].legend(loc= 'lower left', fontsize=12)
-                
-                # axs[1].add_artist(anchored_text2)
-            
-            # fig.savefig('profiles.pdf')
-        
+            self.neteTSplot_structure(iterlist = asp_ch, 
+                                      cl_dic = color_dic, A_dic = label_dic)
         
         elif self.withshift == False and self.withseries == True:
             
-            """
-            
-            # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
-            if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
-                pass
-            else:
-                self.load_output_data(param= 'Ne')
-                self.load_output_data(param= 'Te')
-                self.load_output_data(param= 'NeuDen')
-            
-            ne_pro = self.data['outputdata']['Ne']
-            te_pro = self.data['outputdata']['Te']
-            neu_pro = self.data['outputdata']['NeuDen']
-            
-            """
-            
-            psiN = self.data['experimental_fit']['psiN']
-            ne = self.data['experimental_fit']['ne']*pow(10, 20)
-            te = self.data['experimental_fit']['te']*pow(10, 3)
-            
-            exp = self.data['ExpDict']
-            # psi = exp['psi_normal']
-            
-            
-            psi = []
-            exp_ne = []
-            ne_er = []
-            exp_te = []
-            te_er = []
-            for ep in range(len(exp['psi_normal'])):
-                
-                if  exp['psi_normal'][ep] >= min(psiN):
-                    psi.append(exp['psi_normal'][ep])
-                    exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
-                    ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
-                    exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
-                    te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
             
             color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
                          '7.0': 'blue', '8.0': 'purple'}
             
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
+            label_dic = {'4.15': '4.15*$10^{19}$', '5.0': '5.0*$10^{19}$', 
+                '6.0': '6.0*$10^{19}$', '7.0': '7.0*$10^{19}$', 
+                '8.0': '8.0*$10^{19}$'}
+            
+            denscan = list(self.data['dircomp']['Attempt'].keys())
+            
+            self.neteTSplot_structure(iterlist = denscan, 
+                                      cl_dic = color_dic, A_dic = label_dic)
             
             
-            fig, axs = plt.subplots(2, 1)
-            
-            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
-            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
-            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-            # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
-            # axs[0].set_title('(a)Electron density')
-            axs[0].add_artist(anchored_text)
-            axs[0].legend(loc='lower left', fontsize=10)
             
             
-            anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
-            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
-            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-            axs[1].set_xlabel('$\psi_N$')
-            # axs[1].set_title('(b)Electron temperature')
-            axs[1].add_artist(anchored_text2)
-            axs[1].legend(loc='lower left', fontsize=10)
-            
-            plt.subplots_adjust(hspace=.0)
             
             
-            for aa in self.data['dircomp']['Attempt'].keys():
-            
-            
-                b2fstate = self.data['b2fstate'][aa]
-                
-                ne_pro = b2fstate['ne'].transpose()
-                Te_J = b2fstate['te'].transpose()
-                ev = 1.6021766339999999 * pow(10, -19)
-                te_pro = Te_J / ev
-                
-                data = self.data['ft44'][aa]['dab2']
-                neu_pro = np.transpose(data[:, :, 0])
-                leftcut = self.data['b2fgeo']['leftcut'][0]
-                rightcut = self.data['b2fgeo']['rightcut'][0]
-                
-                weight = self.data['midplane_calc']['weight']
-                weight_B = np.ones(len(weight))- weight
-                
-                
-                mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
-                mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
-                mid_neu_pro = neu_pro[:, 58]
-            
-                psi_coord = self.data['midplane_calc']['psi_solps_mid']
-            
-            
-                # axs[0].set_yscale('log')
-                axs[0].plot(psi_coord, mid_ne_pro, color = color_dic[aa])
-                
-                """
-                label= 'core density {} $10^{19}$'.format(aa)
-                
-                """
-                
-                
-                axs[0].legend(loc= 'lower left', fontsize=10)
-                
-                # axs[1].set_yscale('log')
-                axs[1].plot(psi_coord, mid_te_pro, color = color_dic[aa])
-                
-                # axs[1].legend(loc= 'lower left', fontsize=12)
-                
-                # axs[1].add_artist(anchored_text2)
-            
-            # fig.savefig('profiles.pdf')
-    
     
     
     
