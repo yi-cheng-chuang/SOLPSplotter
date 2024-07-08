@@ -37,7 +37,7 @@ class load_geometry(load_directory):
             else:
                 pass
         elif self.withshift == False and self.withseries == True:
-            if self.data['b2mn'][itername]['jxa'] == None:
+            if self.data['b2mn']['jxa'] == None:
                 b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
                                       + '/b2mn.dat')
             else:
@@ -269,10 +269,10 @@ class load_geometry(load_directory):
             psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
             
             
-            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method(geo = b2fgeo, 
+            RadLoc, VertLoc, psival, pol_range, rad_range = self.calcpsi_method_avcr(geo = b2fgeo, 
                                                                 psi_RBS = psiNinterp_RBS)
             
-            coord_dic = {'RadLoc': RadLoc_dic, 'VertLoc': VertLoc_dic}
+            coord_dic = {'RadLoc': RadLoc, 'VertLoc': VertLoc}
             self.data['grid'] = coord_dic
             self.data['psi']['psival'] = psival       
             self.data['DefaultSettings']['XDIM'] = pol_range
@@ -618,7 +618,7 @@ class load_geometry(load_directory):
             
             self.data['psi']['psi_{}_val'.format(pol_loc)] = psival_dic
                    
-        elif self.withshift == True and self.withseries == False:
+        elif self.withshift == False and self.withseries == True:
             
             
             b2fgeo = self.data['b2fgeo']
