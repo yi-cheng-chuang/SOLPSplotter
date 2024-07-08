@@ -33,23 +33,23 @@ xl.load_ft44()
 xl.calc_sep_dsa()
 xl.set_plot()
 
-poloidal_index_list = ['58', '59', '60']
+poloidal_index_list = ['59']
 xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 
 
 xl.opacity_data_fit(pol_list = poloidal_index_list)
-xl.radial_data_fit(pol_list = poloidal_index_list)
+xl.radial_data_fit(pol_loc = poloidal_index_list[0])
 
 
-
-# xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list)
+xl.ne_te_TS_plot()
+# xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list[0])
 # xl.plot_all_radial(separate = False)
 
 
-xl.paper_neuden_radial_plot(pol_loc = poloidal_index_list)
+# xl.paper_neuden_radial_plot(pol_loc = poloidal_index_list)
 
-xl.ne_te_TS_plot()
-xl.plot_tanh_fit(log_flag= False)
+# xl.ne_te_TS_plot()
+# xl.plot_tanh_fit(log_flag= False)
 # xl.divertor_te(sep_plot = False)
 
