@@ -211,9 +211,9 @@ class RP_mapping(load_simu_data):
         elif self.withshift == False and self.withseries == True:
             den_rep = list(self.data['dircomp']['Attempt'].keys())[0]
             
-            b2fgeo = self.data['b2fgeo'][den_rep]
-            radloc = self.data['grid']['RadLoc'][den_rep]
-            vertloc = self.data['grid']['VertLoc'][den_rep]
+            b2fgeo = self.data['b2fgeo']
+            radloc = self.data['grid']['RadLoc']
+            vertloc = self.data['grid']['VertLoc']
             gfile = self.data['gfile']['g']
             psiNinterp_RBS = self.data['gfile']['gcomp']['interp_dic']['RBS']
             
@@ -596,10 +596,10 @@ class RP_mapping(load_simu_data):
             den_list = list(self.data['dircomp']['Attempt'].keys())
             aa = den_list[0]
             
-            rad_grid = self.data['grid']['RadLoc'][aa]
-            vert_grid = self.data['grid']['VertLoc'][aa]     
+            rad_grid = self.data['grid']['RadLoc']
+            vert_grid = self.data['grid']['VertLoc']     
             dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
-            jxa = self.data['b2mn'][aa]['jxa']
+            jxa = self.data['b2mn']['jxa']
             
             dist, index = self.calc_sep_dsa_method(RadLoc = rad_grid, VertLoc = vert_grid, 
                                             dsa = dsa, jxa = jxa)
@@ -683,8 +683,8 @@ class RP_mapping(load_simu_data):
             den_list = list(self.data['dircomp']['Attempt'].keys())
             aa = den_list[0]
             
-            rad_grid = self.data['grid']['RadLoc'][aa]
-            vert_grid = self.data['grid']['VertLoc'][aa]
+            rad_grid = self.data['grid']['RadLoc']
+            vert_grid = self.data['grid']['VertLoc']
             sep_loc = self.data['DefaultSettings']['sep_index_dsa']
             
             arclength, interpfunc_dic, RR_sep = self.calc_dsa_method(RadLoc = rad_grid, 
