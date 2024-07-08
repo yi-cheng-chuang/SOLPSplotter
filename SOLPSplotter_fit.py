@@ -205,13 +205,6 @@ class profile_fit(RP_mapping):
         
         self.data['neuden_change'] = neu_percent
         
-            
-                
-        
-        
-        
-        
-                
                 
     def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_loc):
         
@@ -245,7 +238,73 @@ class profile_fit(RP_mapping):
         return fit_dic
     
     
-    def radial_data_fit(self, pol_list):
+    def radial_data_fit(self, pol_loc):
+        
+        # self.load_output_data(param= 'NeuDen')
+        
+        self.load_ft44()
+        self.load_output_data(param= 'NeuDen')
+        
+        if self.withshift == False and self.withseries == False:
+            
+            data = self.data['ft44']['dab2']
+            Neuden_data = np.transpose(data[:, :, 0])
+            # Neuden_data = self.data['outputdata']['NeuDen']
+            fstate = self.data['b2fstate']
+            psiN_map = self.data['psi']['psival']
+            
+            fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                        Neuden = Neuden_data, psiN = psiN_map, pol_loc = pol_loc)
+            
+            self.data['radial_fit_data'] = fitresult
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            fitresult_dic = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                    
+                    
+                Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                fstate = self.data['b2fstate'][aa]
+                psiN_map = self.data['psi']['psival'][aa]
+                
+                                  
+                fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                            Neuden = Neuden_data, psiN = psiN_map, pol_loc = pol_loc)
+                    
+                
+                fitresult_dic[aa] = fitresult_dic
+            
+            self.data['radial_fit_data'] = fitresult_dic
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            fitresult_dic = {}
+            
+            for aa in list(self.data['dircomp']['Attempt'].keys()):
+                
+                Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                fstate = self.data['b2fstate'][aa]
+                psiN_map = self.data['psi']['psival']
+                
+                fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                            Neuden = Neuden_data, psiN = psiN_map, pol_loc = pol_loc)
+            
+                fitresult_dic[aa] = fitresult
+            
+            self.data['radial_fit_data'] = fitresult_dic
+        
+        elif self.withshift == True and self.withseries == True:
+            print('radial_data_fit is not there yet!')
+        
+        
+        else:
+            print('radial_data_fit has a bug')
+    
+    
+    
+    def multirad_data_fit(self, pol_list):
         
         # self.load_output_data(param= 'NeuDen')
         
@@ -295,15 +354,22 @@ class profile_fit(RP_mapping):
             fitresult_dic = {}
             
             for aa in list(self.data['dircomp']['Attempt'].keys()):
+                           
+                ind_fitresult_dic = {}
                 
-                Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                fstate = self.data['b2fstate'][aa]
-                psiN_map = self.data['psi']['psival']
+                for ind in pol_list:
                 
-                fitresult = self.radial_data_fit_method(b2fstate = fstate, 
-                            Neuden = Neuden_data, psiN = psiN_map, pol_list = pol_list)
                 
-                fitresult_dic[aa] = fitresult
+                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    fstate = self.data['b2fstate'][aa]
+                    psiN_map = self.data['psi']['psival']
+                    
+                    fitresult = self.radial_data_fit_method(b2fstate = fstate, 
+                                Neuden = Neuden_data, psiN = psiN_map, pol_loc = ind)
+                    
+                    ind_fitresult_dic[ind] = fitresult
+            
+                fitresult_dic[aa] = ind_fitresult_dic
             
             self.data['radial_fit_data'] = fitresult_dic
         
@@ -313,8 +379,6 @@ class profile_fit(RP_mapping):
         
         else:
             print('radial_data_fit has a bug')
-    
-    
     
 
         
