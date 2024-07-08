@@ -9,7 +9,7 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
                'Parameters': P, 'series_flag': 'change_den', 
                'Publish': 'b2plottersetting'}
     return set_dic
@@ -92,9 +92,9 @@ def Ashift_dir_comp():
 def mast_comp_dir_series():
     a_shift = 'org'
     shift = 0
-    tail = '_ca_nts5_a'
+    tail = '_leakbsol_nts5_a'
     outputlist = ['Output', 'Output2', 'EirOutput']
-    shift_filename = 'org_new_vd'
+    shift_filename = 'org_densityscan_027205'
     mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
                     'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
     
