@@ -46,9 +46,9 @@ class radial_plot(profile_fit):
         tanh_ne_fit = result_dic['tanh_ne_fit']
         tanh_te_fit = result_dic['tanh_te_fit']
         exp_an_fit = result_dic['exp_fit']
-        dn = result_dic['pedestal_width'][0]
+        dn = result_dic['pedestal_width_psiN'][0]
         dtn = result_dic['temperature_pedestal_width']
-        efold = result_dic['efold_length'][0]
+        efold = result_dic['efold_length_psiN'][0]
         opq = result_dic['dimensionless_opaqueness']
         xcoord_cut = result_dic['x_coord_cut']
         sym_pt = result_dic['ne_symmetry_point']
@@ -74,9 +74,9 @@ class radial_plot(profile_fit):
         plt.axvline(x= max(xcoord_cut), color='orange',lw=3)
         plt.plot(x,y, color='orange', lw=3, ls='-', label= 'Neutral penetration length : $\lambda_{n_D}$')
         plt.axvline(x=-efold + max(xcoord_cut), color='orange',lw=3)
-        plt.axvline(x= max(xcoord_cut), color='black',lw=3, ls='--', 
+        plt.axvline(x= dn + sym_pt, color='black',lw=3, ls='--', 
                     label= 'fit range : $\Delta n_e$')
-        plt.axvline(x= min(xcoord_cut), color='black',lw=3, ls='--')
+        plt.axvline(x= -dn + sym_pt, color='black',lw=3, ls='--')
         # plt.axvline(x= x_m2[0], color='purple',lw=3, ls='--', 
         #             label= 'exp fitting width')
         # plt.axvline(x= x_m2[-1], color='purple',lw=3, ls='--')
@@ -212,10 +212,10 @@ class radial_plot(profile_fit):
                 
         
         elif self.withshift == True and self.withseries == True:
-            print('Opacity_study_radial_plot_psi is not there yet, to be continue...')    
+            print('Opacity_study_radial_plot is not there yet, to be continue...')    
             
         else:
-            print('Opacity_study_radial_plot_psi has a bug')
+            print('Opacity_study_radial_plot has a bug')
     
        
     
@@ -263,8 +263,8 @@ class radial_plot(profile_fit):
                 psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2]
                 
                 
-                result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
-                mix_dic[aa] = result_dic
+                # result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
+                # mix_dic[aa] = result_dic
                 
                 P = self.data['Parameter']
                 self.opacity_radial_method(result_dic = result_dic, SEP = SEP, 
@@ -274,18 +274,28 @@ class radial_plot(profile_fit):
         
         elif self.withshift == False and self.withseries == True:
             
+            mix_dic = {}
+            
+            for aa in self.data['dircomp']['Attempt'].keys():
+            
+                result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
+                mix_dic[aa] = result_dic
+            
+            self.data['mix_dic'] = mix_dic
+            
+            
             
             for aa in self.data['dircomp']['Attempt'].keys():
             
                 pol_index = int(pol_loc[0])
-                Nd = self.data['radial_fit_data'][aa]['NeuDen'][:, pol_index]
-                Ne = self.data['radial_fit_data'][aa]['Ne'][:, pol_index]
-                Te = self.data['radial_fit_data'][aa]['Te'][:, pol_index]
-                SEP = int(self.data['DefaultSettings'][aa]['sep_index_dsa'])
-                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2]
+                Nd = self.data['radial_fit_data'][aa]['NeuDen']
+                Ne = self.data['radial_fit_data'][aa]['Ne']
+                Te = self.data['radial_fit_data'][aa]['Te']
+                SEP = int(self.data['DefaultSettings']['sep_index_dsa'])
+                psi = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 2]
                 
                 
-                result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
+                result_dic = self.data['mix_dic'][aa]
                 
                 
                 P = self.data['Parameter']
@@ -297,7 +307,249 @@ class radial_plot(profile_fit):
             
         else:
             print('Opacity_study_radial_plot_psi has a bug')
+    
         
+    def ne_te_TS_plot(self):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            """
+            
+            # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
+            if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
+                pass
+            else:
+                self.load_output_data(param= 'Ne')
+                self.load_output_data(param= 'Te')
+                self.load_output_data(param= 'NeuDen')
+            
+            ne_pro = self.data['outputdata']['Ne']
+            te_pro = self.data['outputdata']['Te']
+            neu_pro = self.data['outputdata']['NeuDen']
+            
+            """
+            
+            psiN = self.data['experimental_fit']['psiN']
+            ne = self.data['experimental_fit']['ne']*pow(10, 20)
+            te = self.data['experimental_fit']['te']*pow(10, 3)
+            
+            exp = self.data['ExpDict']
+            # psi = exp['psi_normal']
+            
+            
+            psi = []
+            exp_ne = []
+            ne_er = []
+            exp_te = []
+            te_er = []
+            for ep in range(len(exp['psi_normal'])):
+                
+                if  exp['psi_normal'][ep] >= min(psiN):
+                    psi.append(exp['psi_normal'][ep])
+                    exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
+                    ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
+                    exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
+                    te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
+            
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            
+            fig, axs = plt.subplots(2, 1)
+            
+            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
+            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
+            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+            # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
+            # axs[0].set_title('(a)Electron density')
+            axs[0].add_artist(anchored_text)
+            axs[0].legend(loc='lower left', fontsize=10)
+            
+            
+            anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
+            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
+            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+            axs[1].set_xlabel('$\psi_N$')
+            # axs[1].set_title('(b)Electron temperature')
+            axs[1].add_artist(anchored_text2)
+            axs[1].legend(loc='lower left', fontsize=10)
+            
+            plt.subplots_adjust(hspace=.0)
+            
+            
+            for aa in self.data['dircomp']['multi_shift']:
+            
+            
+                b2fstate = self.data['b2fstate'][aa]
+                
+                ne_pro = b2fstate['ne'].transpose()
+                Te_J = b2fstate['te'].transpose()
+                ev = 1.6021766339999999 * pow(10, -19)
+                te_pro = Te_J / ev
+                
+                data = self.data['ft44'][aa]['dab2']
+                neu_pro = np.transpose(data[:, :, 0])
+                leftcut = self.data['b2fgeo'][aa]['leftcut'][0]
+                rightcut = self.data['b2fgeo'][aa]['rightcut'][0]
+                
+                weight = self.data['midplane_calc'][aa]['weight']
+                weight_B = np.ones(len(weight))- weight
+                
+                
+                mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
+                mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
+                mid_neu_pro = neu_pro[:, 58]
+            
+                psi_coord = self.data['midplane_calc'][aa]['psi_solps_mid']
+            
+            
+                # axs[0].set_yscale('log')
+                axs[0].plot(psi_coord, mid_ne_pro, color = color_dic[aa], 
+                            label= 'A = {}'.format(A_dic[aa]))
+                
+                axs[0].legend(loc= 'lower left', fontsize=10)
+                
+                # axs[1].set_yscale('log')
+                axs[1].plot(psi_coord, mid_te_pro, color = color_dic[aa], 
+                            label= 'A = {}'.format(A_dic[aa]))
+                
+                # axs[1].legend(loc= 'lower left', fontsize=12)
+                
+                # axs[1].add_artist(anchored_text2)
+            
+            # fig.savefig('profiles.pdf')
+        
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            """
+            
+            # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
+            if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
+                pass
+            else:
+                self.load_output_data(param= 'Ne')
+                self.load_output_data(param= 'Te')
+                self.load_output_data(param= 'NeuDen')
+            
+            ne_pro = self.data['outputdata']['Ne']
+            te_pro = self.data['outputdata']['Te']
+            neu_pro = self.data['outputdata']['NeuDen']
+            
+            """
+            
+            psiN = self.data['experimental_fit']['psiN']
+            ne = self.data['experimental_fit']['ne']*pow(10, 20)
+            te = self.data['experimental_fit']['te']*pow(10, 3)
+            
+            exp = self.data['ExpDict']
+            # psi = exp['psi_normal']
+            
+            
+            psi = []
+            exp_ne = []
+            ne_er = []
+            exp_te = []
+            te_er = []
+            for ep in range(len(exp['psi_normal'])):
+                
+                if  exp['psi_normal'][ep] >= min(psiN):
+                    psi.append(exp['psi_normal'][ep])
+                    exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
+                    ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
+                    exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
+                    te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
+            
+            color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
+                         '7.0': 'blue', '8.0': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            
+            fig, axs = plt.subplots(2, 1)
+            
+            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
+            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
+            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+            # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
+            # axs[0].set_title('(a)Electron density')
+            axs[0].add_artist(anchored_text)
+            axs[0].legend(loc='lower left', fontsize=10)
+            
+            
+            anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
+            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
+            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
+            axs[1].set_xlabel('$\psi_N$')
+            # axs[1].set_title('(b)Electron temperature')
+            axs[1].add_artist(anchored_text2)
+            axs[1].legend(loc='lower left', fontsize=10)
+            
+            plt.subplots_adjust(hspace=.0)
+            
+            
+            for aa in self.data['dircomp']['Attempt'].keys():
+            
+            
+                b2fstate = self.data['b2fstate'][aa]
+                
+                ne_pro = b2fstate['ne'].transpose()
+                Te_J = b2fstate['te'].transpose()
+                ev = 1.6021766339999999 * pow(10, -19)
+                te_pro = Te_J / ev
+                
+                data = self.data['ft44'][aa]['dab2']
+                neu_pro = np.transpose(data[:, :, 0])
+                leftcut = self.data['b2fgeo']['leftcut'][0]
+                rightcut = self.data['b2fgeo']['rightcut'][0]
+                
+                weight = self.data['midplane_calc']['weight']
+                weight_B = np.ones(len(weight))- weight
+                
+                
+                mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
+                mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
+                mid_neu_pro = neu_pro[:, 58]
+            
+                psi_coord = self.data['midplane_calc']['psi_solps_mid']
+            
+            
+                # axs[0].set_yscale('log')
+                axs[0].plot(psi_coord, mid_ne_pro, color = color_dic[aa])
+                
+                """
+                label= 'core density {} $10^{19}$'.format(aa)
+                
+                """
+                
+                
+                axs[0].legend(loc= 'lower left', fontsize=10)
+                
+                # axs[1].set_yscale('log')
+                axs[1].plot(psi_coord, mid_te_pro, color = color_dic[aa])
+                
+                # axs[1].legend(loc= 'lower left', fontsize=12)
+                
+                # axs[1].add_artist(anchored_text2)
+            
+            # fig.savefig('profiles.pdf')
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     def plot_iout_radial_divertor(self, quant, log_scale):
         
@@ -969,7 +1221,7 @@ class radial_plot(profile_fit):
             plt.subplots_adjust(hspace=.0)
             
             
-            for aa in self.data['dircomp']['multi_shift']:
+            for aa in self.data['dircomp']['Attempt'].keys():
             
             
                 b2fstate = self.data['b2fstate'][aa]
@@ -981,8 +1233,8 @@ class radial_plot(profile_fit):
                 
                 data = self.data['ft44'][aa]['dab2']
                 neu_pro = np.transpose(data[:, :, 0])
-                leftcut = self.data['b2fgeo'][aa]['leftcut'][0]
-                rightcut = self.data['b2fgeo'][aa]['rightcut'][0]
+                leftcut = self.data['b2fgeo']['leftcut'][0]
+                rightcut = self.data['b2fgeo']['rightcut'][0]
                 
                 core_ne_pro = ne_pro[:, int(leftcut)+1:int(rightcut)-1]
                 core_te_pro = te_pro[:, int(leftcut)+1:int(rightcut)-1]
@@ -1012,118 +1264,16 @@ class radial_plot(profile_fit):
 
     
     
-    def ne_te_TS_plot(self):
+    
         
-        if self.withshift == True and self.withseries == False:
-            
-            """
-            
-            # if self.data['outputdata'].any() == None or self.data['outputdata']['Te'].any() == None:
-            if 'Ne' and 'Te' and 'NeuDen' in self.data['outputdata']:
-                pass
-            else:
-                self.load_output_data(param= 'Ne')
-                self.load_output_data(param= 'Te')
-                self.load_output_data(param= 'NeuDen')
-            
-            ne_pro = self.data['outputdata']['Ne']
-            te_pro = self.data['outputdata']['Te']
-            neu_pro = self.data['outputdata']['NeuDen']
-            
-            """
-            
-            psiN = self.data['experimental_fit']['psiN']
-            ne = self.data['experimental_fit']['ne']*pow(10, 20)
-            te = self.data['experimental_fit']['te']*pow(10, 3)
-            
-            exp = self.data['ExpDict']
-            # psi = exp['psi_normal']
+        
             
             
-            psi = []
-            exp_ne = []
-            ne_er = []
-            exp_te = []
-            te_er = []
-            for ep in range(len(exp['psi_normal'])):
-                
-                if  exp['psi_normal'][ep] >= min(psiN):
-                    psi.append(exp['psi_normal'][ep])
-                    exp_ne.append(exp['electron_density(10^20/m^3)'][ep]*pow(10, 20))
-                    ne_er.append(exp['density error(10^20/m^3)'][ep]*pow(10, 20))
-                    exp_te.append(exp['electron_temperature(KeV)'][ep]*pow(10, 3))
-                    te_er.append(exp['temperature error(10^20/m^3)'][ep]*pow(10, 3))
             
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                         'dot7': 'blue', 'one': 'purple'}
-            
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
-            
-            
-            fig, axs = plt.subplots(2, 1)
-            
-            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
-            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
-            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-            # axs[0].set_xlabel('Normalized flux coordinate $\psi_N$')
-            # axs[0].set_title('(a)Electron density')
-            axs[0].add_artist(anchored_text)
-            axs[0].legend(loc='lower left', fontsize=10)
-            
-            
-            anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
-            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
-            # plt.plot(psiN, ne, 'o', color = 'r', label= 'ne_exp_fit')
-            axs[1].set_xlabel('$\psi_N$')
-            # axs[1].set_title('(b)Electron temperature')
-            axs[1].add_artist(anchored_text2)
-            axs[1].legend(loc='lower left', fontsize=10)
-            
-            plt.subplots_adjust(hspace=.0)
-            
-            
-            for aa in self.data['dircomp']['multi_shift']:
-            
-            
-                b2fstate = self.data['b2fstate'][aa]
-                
-                ne_pro = b2fstate['ne'].transpose()
-                Te_J = b2fstate['te'].transpose()
-                ev = 1.6021766339999999 * pow(10, -19)
-                te_pro = Te_J / ev
-                
-                data = self.data['ft44'][aa]['dab2']
-                neu_pro = np.transpose(data[:, :, 0])
-                leftcut = self.data['b2fgeo'][aa]['leftcut'][0]
-                rightcut = self.data['b2fgeo'][aa]['rightcut'][0]
-                
-                weight = self.data['midplane_calc'][aa]['weight']
-                weight_B = np.ones(len(weight))- weight
-                
-                
-                mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
-                mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
-                mid_neu_pro = neu_pro[:, 58]
-            
-                psi_coord = self.data['midplane_calc'][aa]['psi_solps_mid']
-            
-            
-                # axs[0].set_yscale('log')
-                axs[0].plot(psi_coord, mid_ne_pro, color = color_dic[aa], 
-                            label= 'A = {}'.format(A_dic[aa]))
-                
-                axs[0].legend(loc= 'lower left', fontsize=10)
-                
-                # axs[1].set_yscale('log')
-                axs[1].plot(psi_coord, mid_te_pro, color = color_dic[aa], 
-                            label= 'A = {}'.format(A_dic[aa]))
-                
-                # axs[1].legend(loc= 'lower left', fontsize=12)
-                
-                # axs[1].add_artist(anchored_text2)
-            
-            fig.savefig('profiles.pdf')
+        
+        
+        
+        
     
     
     def plot_tanh_fit(self, log_flag):
@@ -1248,6 +1398,9 @@ class radial_plot(profile_fit):
             
             
             axs.legend(loc= 'lower left', fontsize=10)
+        
+        
+        
         
 
 
