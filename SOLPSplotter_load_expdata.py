@@ -39,7 +39,8 @@ class load_expdata(load_geometry):
             
     
     def check_and_loadpsi1D(self, itername):
-        if itername == None:
+        if self.withshift == False and self.withseries == False:
+            
             self.check_b2mn(itername = None)
             jxa = self.data['b2mn']['jxa']
             self.calcpsi_1D(pol_loc= str(jxa), no_coord_avg_check = False)
@@ -47,13 +48,23 @@ class load_expdata(load_geometry):
             
             return psi_solps
         
-        elif itername != None:
+        elif self.withshift == True and self.withseries == False:
             self.check_b2mn(itername = itername)
             jxa = self.data['b2mn'][itername]['jxa']
             self.calcpsi_1D(pol_loc= str(jxa), no_coord_avg_check = False)
             psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))][itername]
             
             return psi_solps
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            self.check_b2mn(itername = itername)
+            jxa = self.data['b2mn']['jxa']
+            self.calcpsi_1D(pol_loc= str(jxa), no_coord_avg_check = False)
+            psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
+            
+            return psi_solps
+        
         else:
             print('check_and_loadpsi1D function has a bug')
     
