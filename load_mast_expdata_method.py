@@ -91,6 +91,8 @@ def mast_series_dir(series_flag):
         mcds = sps.mast_comp_dir_series()
     elif series_flag == 'eireneN':
         mcds = sps.mast_comp_dir_eireneN()
+    elif series_flag == 'change_temp':
+        mcds = sps.mast_comp_dir_tempscan()
     else:
         print('please check series_flag')
        
@@ -109,6 +111,9 @@ def mast_series_dir(series_flag):
             attempt_dic[sps.s_number(i, series_flag)[0][0]] = sps.s_number(i, series_flag)[0][1]
             new_dic[sps.s_number(i, series_flag)[0][0]] = i
         elif series_flag == 'eireneN':
+            attempt_dic[sps.s_number(i, series_flag)[0][1]] = sps.s_number(i, series_flag)[0][0]
+            new_dic[sps.s_number(i, series_flag)[0][1]] = i
+        elif series_flag == 'change_temp':
             attempt_dic[sps.s_number(i, series_flag)[0][1]] = sps.s_number(i, series_flag)[0][0]
             new_dic[sps.s_number(i, series_flag)[0][1]] = i
     # print(attempt_list)
