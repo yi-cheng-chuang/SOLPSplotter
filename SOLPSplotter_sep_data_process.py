@@ -5,7 +5,7 @@ Created on Wed Jan 31 22:41:18 2024
 @author: user
 """
 
-from SOLPSplotter_PRmap import RP_mapping
+from SOLPSplotter_fit import profile_fit
 import opacity_plot_method as opm
 import matplotlib.pyplot as plt
 import load_mast_expdata_method as lmem
@@ -16,10 +16,10 @@ from scipy.optimize import curve_fit
 import numpy as np
 
 
-class sep_data_process(RP_mapping):
+class sep_data_process(profile_fit):
     
     def __init__(self, DefaultSettings, loadDS):
-        RP_mapping.__init__(self, DefaultSettings, loadDS)
+        profile_fit.__init__(self, DefaultSettings, loadDS)
     
     
     
