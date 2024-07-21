@@ -305,9 +305,6 @@ class poloidal_plot(profile_fit):
         
         
                 
-                
-                
-        
         
 
         def data_reorder(iter_list, change_var, data_collect, char):
