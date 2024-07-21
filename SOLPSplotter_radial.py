@@ -396,7 +396,7 @@ class radial_plot(profile_fit):
     
     
     
-    def neteTSplot_structure(self, iterlist, cl_dic, A_dic):
+    def neteTSplot_structure(self, iterlist, cl_dic, A_dic, scan):
         
         TS_dic = self.plot_neteTSdat()
         
@@ -410,13 +410,13 @@ class radial_plot(profile_fit):
         fig, axs = plt.subplots(2, 1)
         
         anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
-        axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
+        axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'black', label= '$n_e$ TS data')
         axs[0].add_artist(anchored_text)
         axs[0].legend(loc='lower left', fontsize=10)
         
         
         anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
-        axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$t_e$ TS data')
+        axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'black', label= '$t_e$ TS data')
         axs[1].set_xlabel('$\psi_N$')
         axs[1].add_artist(anchored_text2)
         axs[1].legend(loc='lower left', fontsize=10)
@@ -428,7 +428,6 @@ class radial_plot(profile_fit):
             
             psi_coord, mid_ne_pro, mid_te_pro = self.nete_TSplotmethod(aa = aa)
             
-            axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
             
             """
             label= 'core density {} $10^{19}$'.format(aa)
@@ -436,10 +435,25 @@ class radial_plot(profile_fit):
             """
             
             axs[0].legend(loc= 'lower left', fontsize=10)
-            axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
-                        label= '{}'.format(A_dic[aa]))
             
-            axs[1].legend()
+            if scan == 'den':
+                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
+                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
+                            label= '{}'.format(A_dic[aa]))
+                axs[1].legend()
+            elif scan == 'temp':
+                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa], 
+                            label= '{}'.format(A_dic[aa]))
+                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa])
+                axs[0].legend()
+            elif scan == 'not':
+                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
+                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
+                            label= '{}'.format(A_dic[aa]))
+                axs[1].legend()
+            
+            
+
         
         # fig.savefig('profiles.pdf')
     
@@ -459,23 +473,39 @@ class radial_plot(profile_fit):
             asp_ch = self.data['dircomp']['multi_shift']
             
             self.neteTSplot_structure(iterlist = asp_ch, 
-                                      cl_dic = color_dic, A_dic = label_dic)
+                                      cl_dic = color_dic, A_dic = label_dic, scan = 'not')
         
         elif self.withshift == False and self.withseries == True:
             
+            series_flag = self.DefaultSettings['series_flag']
             
-            color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
-                         '7.0': 'blue', '8.0': 'purple'}
+            if series_flag == 'change_den':
+                
+                color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
+                             '7.0': 'blue', '8.0': 'purple', '9.0': 'saddlebrown'}
+                
+                label_dic = {'4.15': '4.15*$10^{19} m^{-3}$', '5.0': '5.0*$10^{19} m^{-3}$', 
+                    '6.0': '6.0*$10^{19} m^{-3}$', '7.0': '7.0*$10^{19} m^{-3}$', 
+                    '8.0': '8.0*$10^{19} m^{-3}$', '9.0': '9.0*$10^{19} m^{-3}$'}
+                
+                denscan = list(self.data['dircomp']['Attempt'].keys())
+                
+                self.neteTSplot_structure(iterlist = denscan, 
+                            cl_dic = color_dic, A_dic = label_dic, scan = 'den')
             
-            label_dic = {'4.15': '4.15*$10^{19}$', '5.0': '5.0*$10^{19}$', 
-                '6.0': '6.0*$10^{19}$', '7.0': '7.0*$10^{19}$', 
-                '8.0': '8.0*$10^{19}$'}
-            
-            denscan = list(self.data['dircomp']['Attempt'].keys())
-            
-            self.neteTSplot_structure(iterlist = denscan, 
-                                      cl_dic = color_dic, A_dic = label_dic)
-            
+            elif series_flag == 'change_temp':
+                
+                color_dic = {'460': 'red', '500': 'orange', '600': 'green',
+                             '700': 'blue', '800': 'purple', '900': 'saddlebrown'}
+                
+                label_dic = {'460': '460 eV', '500': '500 eV', 
+                    '600': '600 eV', '700': '700 eV', 
+                    '800': '800 eV', '900': '900 eV'}
+                
+                denscan = list(self.data['dircomp']['Attempt'].keys())
+                
+                self.neteTSplot_structure(iterlist = denscan, 
+                            cl_dic = color_dic, A_dic = label_dic, scan = 'temp')
             
             
             
