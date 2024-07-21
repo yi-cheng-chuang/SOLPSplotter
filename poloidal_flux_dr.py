@@ -50,7 +50,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 # xl.opacity_poloidal_plot(log_flag = False, save_pdf = False)
 
-xl.neuden_percent()
+# xl.neuden_percent()
 
 
 ['all_fluxes', 'fluxes_no_geo', 'fluxes_geo', 'neu_den', 'annual_coe',
