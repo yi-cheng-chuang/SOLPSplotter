@@ -300,23 +300,6 @@ class load_expdata(load_geometry):
         
         
             
-        
-            
-
-            
-            
-            
-            
-            
-    
-    
-         
-    
-    
-    
-    
-    
-            
             
             
 """
