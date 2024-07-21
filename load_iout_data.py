@@ -290,9 +290,6 @@ class Plotiout(PlotContour):
                         input_name = 'pnpx')
             qu_dic[aa] = data
             
-
-            
-            
         
         self.data['iout_data'][qu] = qu_dic
         
@@ -309,9 +306,6 @@ class Plotiout(PlotContour):
     
     
         geoscale_list_dic = {'geo_coe': fcoe_list}
-        
-        
-        
         
         
         
