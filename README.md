@@ -9,7 +9,9 @@ Fig. 1
 Fig. 2 is the future arrangement of each module and class setting. The smaller box is the subclass of the larger box and inherits property from the larger ones.
 
 Fig. 2
-![image](https://github.com/yctok/SOLPSplotter/assets/106120688/0039def9-5777-4bd3-a132-3b0a633d9d7b)
+
+
+
 
 Fig. 3 shows the method function files that are used in each class.
 
