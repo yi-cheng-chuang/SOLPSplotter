@@ -81,6 +81,11 @@ class load_directory:
                     series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
+                elif series_flag == 'change_temp':
+                    self.data['dircomp'] = sps.mast_comp_dir_tempscan()
+                    series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
+                    self.data['dirdata'] = series_dir
+                    self.data['dircomp']['Attempt'] = att_dic
             elif self.withshift == True and self.withseries == True:
                 print('load_mast_dir is not there yet, to be continue...')      
             else:
