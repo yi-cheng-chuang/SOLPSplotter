@@ -14,7 +14,7 @@ def Setting_dic():
                'Publish': 'b2plottersetting'}
     return set_dic
 
-
+series_flag = ['eireneN','change_den','change_temp']
 
 
 def mast_comp_dic():
@@ -199,6 +199,10 @@ def s_number(text, series_flag):
             nu = re.findall('\d+', name)
             nu.append(name.split('_')[0])
             # print(nu)
+        elif series_flag == 'change_temp':
+            name = text.split("\\",-1)[-1]
+            nu = re.findall('\d+', name)
+            nu.append(name.split('_')[0])
     elif sd['withshift'] == True and sd['withseries'] == False:
         name = text.split("/",-1)[-2]
         nu = int(name.split('_')[0])
