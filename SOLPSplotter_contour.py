@@ -8,7 +8,6 @@ Created on Sun Nov 26 18:24:05 2023
 from SOLPSplotter_fit import profile_fit
 import matplotlib.pyplot as plt
 import SOLPS_set as ss
-import Contourplot_method as cpm
 from matplotlib import colors, cm, ticker
 import matplotlib.tri as tri
 from matplotlib.colors import LogNorm
@@ -39,6 +38,40 @@ class PlotContour(profile_fit):
         else:
             print('Publish setting is incorrect or add another setting')
     
+    
+    
+    def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity):
+        CMAP = cm.viridis
+        NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
+        
+        plt.figure(figsize=(6,12))
+        plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
+        plt.title('{} contour plot'.format(quantity))
+        
+        
+        SM= cm.ScalarMappable(NORM,CMAP)    
+        plt.colorbar(SM)
+        plt.show()
+
+
+
+
+    def load_vessel_method(self, fdir):
+        # try:
+        #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
+        # except:
+        #     print('mesh.extra file not found! Using vvfile.ogr instead')
+        #     WallFile=None
+        
+        try:
+            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(fdir))
+        except:
+            print('load_vessel_method has a bug!')
+
+        return VVFILE
+    
+    
+ 
     
     
     def calc_flux_expansion_line_method(self, RR_sep, arcR):
@@ -168,7 +201,7 @@ class PlotContour(profile_fit):
         # map_flat = flux_expand_map.flatten()
         
         
-        cpm.contour_plot(plot_2dval = flux_expand_map, R_coord = R_con, 
+        self.contour_plot(plot_2dval = flux_expand_map, R_coord = R_con, 
                          Z_coord = Z_con, quantity = 'flux expansion')
         
         
@@ -240,14 +273,14 @@ class PlotContour(profile_fit):
     def load_vessel(self):
         if self.withshift == False and self.withseries == False:
             filedir = self.data['dirdata']['simutop']
-            vessel_file = cpm.load_vessel_method(fdir = filedir)
+            vessel_file = self.load_vessel_method(fdir = filedir)
             self.data['vessel'] = vessel_file
         
         elif self.withshift == True and self.withseries == False:
             vessel_file_dic = {}
             for aa in self.data['dircomp']['multi_shift']:
                 filedir = self.data['dirdata']['simutop'][aa]
-                vessel_file = cpm.load_vessel_method(fdir = filedir)
+                vessel_file = self.load_vessel_method(fdir = filedir)
                 vessel_file_dic[aa] = vessel_file
             
             self.data['vessel'] = vessel_file_dic
@@ -255,7 +288,7 @@ class PlotContour(profile_fit):
         elif self.withshift == False and self.withseries == True:
             # series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
             filedir = self.data['dirdata']['simutop']
-            vessel_file = cpm.load_vessel_method(fdir = filedir)
+            vessel_file = self.load_vessel_method(fdir = filedir)
             self.data['vessel'] = vessel_file
         
         elif self.withshift == True and self.withseries == True:
