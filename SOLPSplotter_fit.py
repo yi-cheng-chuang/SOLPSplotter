@@ -5,8 +5,7 @@ Created on Tue Jan 30 23:11:05 2024
 @author: ychuang
 """
 
-from SOLPSplotter_PRmap import RP_mapping
-import opacity_plot_method as opm
+from SOLPSplotter_PRmap import RP_mapping 
 import matplotlib.pyplot as plt
 import load_mast_expdata_method as lmem
 import load_coord_method as lcm
