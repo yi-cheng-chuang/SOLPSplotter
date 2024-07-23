@@ -7,7 +7,6 @@ Created on Wed Jan 31 17:34:38 2024
 
 import SOLPS_set as sps
 import SOLPSplotter_poloidal as spp
-import SOLPS_transcoe_adj as sta
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
