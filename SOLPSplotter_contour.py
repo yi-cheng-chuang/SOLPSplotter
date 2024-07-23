@@ -53,26 +53,7 @@ class PlotContour(profile_fit):
         plt.colorbar(SM)
         plt.show()
 
-
-
-
-    def load_vessel_method(self, fdir):
-        # try:
-        #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
-        # except:
-        #     print('mesh.extra file not found! Using vvfile.ogr instead')
-        #     WallFile=None
-        
-        try:
-            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(fdir))
-        except:
-            print('load_vessel_method has a bug!')
-
-        return VVFILE
-    
-    
- 
-    
+   
     
     def calc_flux_expansion_line_method(self, RR_sep, arcR):
                    
@@ -269,34 +250,6 @@ class PlotContour(profile_fit):
             print('There is a bug')
 
 
-        
-    def load_vessel(self):
-        if self.withshift == False and self.withseries == False:
-            filedir = self.data['dirdata']['simutop']
-            vessel_file = self.load_vessel_method(fdir = filedir)
-            self.data['vessel'] = vessel_file
-        
-        elif self.withshift == True and self.withseries == False:
-            vessel_file_dic = {}
-            for aa in self.data['dircomp']['multi_shift']:
-                filedir = self.data['dirdata']['simutop'][aa]
-                vessel_file = self.load_vessel_method(fdir = filedir)
-                vessel_file_dic[aa] = vessel_file
-            
-            self.data['vessel'] = vessel_file_dic
-        
-        elif self.withshift == False and self.withseries == True:
-            # series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
-            filedir = self.data['dirdata']['simutop']
-            vessel_file = self.load_vessel_method(fdir = filedir)
-            self.data['vessel'] = vessel_file
-        
-        elif self.withshift == True and self.withseries == True:
-            print('load_vessel function is not there yet!')
-        
-        else:
-            print('load_vessel function has a bug')
-            
     
     
     def plot_vessel_method(self, vessel_data, shift_value, independent, meter, color_dic, itername):
@@ -622,6 +575,54 @@ class PlotContour(profile_fit):
     
 
 
+"""
+Retire the load vessel function at contour file:
+    
+def load_vessel(self):
+    if self.withshift == False and self.withseries == False:
+        filedir = self.data['dirdata']['simutop']
+        vessel_file = self.load_vessel_method(fdir = filedir)
+        self.data['vessel'] = vessel_file
+    
+    elif self.withshift == True and self.withseries == False:
+        vessel_file_dic = {}
+        for aa in self.data['dircomp']['multi_shift']:
+            filedir = self.data['dirdata']['simutop'][aa]
+            vessel_file = self.load_vessel_method(fdir = filedir)
+            vessel_file_dic[aa] = vessel_file
+        
+        self.data['vessel'] = vessel_file_dic
+    
+    elif self.withshift == False and self.withseries == True:
+        # series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
+        filedir = self.data['dirdata']['simutop']
+        vessel_file = self.load_vessel_method(fdir = filedir)
+        self.data['vessel'] = vessel_file
+    
+    elif self.withshift == True and self.withseries == True:
+        print('load_vessel function is not there yet!')
+    
+    else:
+        print('load_vessel function has a bug')
+
+
+def load_vessel_method(self, fdir):
+    # try:
+    #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
+    # except:
+    #     print('mesh.extra file not found! Using vvfile.ogr instead')
+    #     WallFile=None
+    
+    try:
+        VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(fdir))
+    except:
+        print('load_vessel_method has a bug!')
+
+    return VVFILE
+
+"""
+
+
 """    
 Need to fix!!
   
@@ -650,76 +651,5 @@ Need to fix!!
         
         Eiratom =np.loadtxt('{}/EirAtom{}'.format(Eirout, str(Attempt)), 
                       usecols = (2))
-        
-        
-        CMAP = cm.viridis
-        
-        NORM_ne = plt.Normalize(ne_pro.min(), ne_pro.max())
-        
-        plt.figure(figsize=(6,12))
-        plt.contourf(RadLoc, VertLoc, ne_pro, levels= 20, cmap=CMAP,norm=NORM_ne)
-        plt.title('electron density contour plot')
-        
-        SM_ne= cm.ScalarMappable(NORM_ne,CMAP)    
-        plt.colorbar(SM_ne)
-        
-        
-        NORM_te = plt.Normalize(te_pro.min(), te_pro.max())
-        
-        plt.figure(figsize=(6,12))
-        plt.contourf(RadLoc, VertLoc, te_pro, levels= 20, cmap=CMAP,norm=NORM_te)
-        plt.title('electron temperature contour plot')
-        
-        SM_te= cm.ScalarMappable(NORM_te,CMAP)    
-        plt.colorbar(SM_te)
-        
-        base_start_core = np.log10(np.nanmin(core_neu_pro))
-        base_end_core = np.log10(np.nanmax(core_neu_pro))
-        log_level_core = np.logspace(base_start_core, base_end_core, num=20, base= 10)
-        print(log_level_core)
-        
-        NORM_neu_core = colors.LogNorm(np.nanmin(core_neu_pro), np.nanmax(core_neu_pro))
-        
-        
-        plt.figure(figsize=(6,12))
-        plt.contourf(RadLoc[:, 25:71], VertLoc[:, 25:71], core_neu_pro,
-                     levels= log_level_core, cmap=CMAP, norm=NORM_neu_core)
-        plt.title('Neutral density contour plot')
-        
-        SM_neu_core= cm.ScalarMappable(NORM_neu_core,CMAP)    
-        plt.colorbar(SM_neu_core)
-        
-        base_start_inleg = np.log10(np.nanmin(innerleg_neu))
-        base_end_inleg = np.log10(np.nanmax(innerleg_neu))
-        log_level_inleg = np.logspace(base_start_inleg, base_end_inleg, num=20, base= 10)
-        # print(log_level_inleg)
-        
-        NORM_neu_inleg = colors.LogNorm(np.nanmin(innerleg_neu), np.nanmax(innerleg_neu))
-        
-        
-        plt.figure(figsize=(6,12))
-        plt.contourf(RadLoc[:, :25], VertLoc[:, :25], innerleg_neu,
-                     levels= log_level_inleg, cmap=CMAP, norm=NORM_neu_inleg)
-        plt.title('Neutral density contour plot innerleg')
-        
-        SM_neu_inleg= cm.ScalarMappable(NORM_neu_inleg, CMAP)    
-        plt.colorbar(SM_neu_inleg)
-        
-        base_start_outleg = np.log10(np.nanmin(outerleg_neu))
-        base_end_outleg = np.log10(np.nanmax(outerleg_neu))
-        log_level_outleg = np.logspace(base_start_outleg, base_end_outleg, num=20, base= 10)
-        # print(log_level_outleg)
-        
-        NORM_neu_outleg = colors.LogNorm(np.nanmin(outerleg_neu), np.nanmax(outerleg_neu))
-        
-        
-        plt.figure(figsize=(6,12))
-        plt.contourf(RadLoc[:, 73:96], VertLoc[:, 73:96], outerleg_neu,
-                     levels= log_level_outleg, cmap=CMAP, norm=NORM_neu_outleg)
-        plt.title('Neutral density contour plot outerleg')
-        
-        SM_neu_outleg= cm.ScalarMappable(NORM_neu_outleg, CMAP)    
-        plt.colorbar(SM_neu_outleg)
-        
         
 """       
