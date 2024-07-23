@@ -9,7 +9,6 @@ import SOLPS_set as sps
 import matplotlib.pyplot as plt
 import load_iout_data as lid
 import load_B2_data_method as lBdm
-import SOLPS_transcoe_adj as sta
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
 import scipy.stats as stats
@@ -45,8 +44,6 @@ xl.calc_sep_dsa()
 poloidal_index_list = []
 for i in range(10):
     poloidal_index_list.append('{}'.format(28 + i))
-    
-xl.opacity_data_fit(pol_list = poloidal_index_list)
 
 topic = 'differantiate result'
 
