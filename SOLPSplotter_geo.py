@@ -640,6 +640,53 @@ class load_geometry(load_directory):
             
 
 
+#---------------------------------------------------------------------------
+
+# load vessel
+
+    def load_vessel_method(self, fdir):
+        # try:
+        #     WallFile = np.loadtxt('{}/mesh.extra'.format(self.data['dirdata']['tbase']))
+        # except:
+        #     print('mesh.extra file not found! Using vvfile.ogr instead')
+        #     WallFile=None
+        
+        try:
+            VVFILE = np.loadtxt('{}/baserun/vvfile.ogr'.format(fdir))
+        except:
+            print('load_vessel_method has a bug!')
+
+        return VVFILE
+    
+    
+    def load_vessel(self):
+        if self.withshift == False and self.withseries == False:
+            filedir = self.data['dirdata']['simutop']
+            vessel_file = self.load_vessel_method(fdir = filedir)
+            self.data['vessel'] = vessel_file
+        
+        elif self.withshift == True and self.withseries == False:
+            vessel_file_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                filedir = self.data['dirdata']['simutop'][aa]
+                vessel_file = self.load_vessel_method(fdir = filedir)
+                vessel_file_dic[aa] = vessel_file
+            
+            self.data['vessel'] = vessel_file_dic
+        
+        elif self.withshift == False and self.withseries == True:
+            # series_rep = list(self.data['dircomp']['Attempt'].keys())[0]
+            filedir = self.data['dirdata']['simutop']
+            vessel_file = self.load_vessel_method(fdir = filedir)
+            self.data['vessel'] = vessel_file
+        
+        elif self.withshift == True and self.withseries == True:
+            print('load_vessel function is not there yet!')
+        
+        else:
+            print('load_vessel function has a bug')
+
+
         
 
 
