@@ -6,7 +6,6 @@ Created on Wed Jan 31 17:25:25 2024
 """
 
 from SOLPSplotter_fit import profile_fit
-import opacity_plot_method as opm
 import matplotlib.pyplot as plt
 import SOLPS_set as ss
 import load_mast_expdata_method as lmem
@@ -35,8 +34,26 @@ class poloidal_plot(profile_fit):
   
         else:
             print('Publish setting is incorrect or add another setting')
+
+
+
+    
+    def opacity_study_unit(self):
+        unit = {'efold_length_psiN': 'Neutral penetration length ($\psi_N$)',
+                'pedestal_width_psiN': 'Pedestal width ($\psi_N$)',
+                  'dimensionless_opaqueness': 'Experimental opaqueness', 
+                  'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
+                  'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
+                  'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
+                  'flux_expansion': 'Flux expansion',
+                  'efold_length': '$\lambda_{n_D}$ [mm]',
+                  'pedestal_width': '$\Delta n_e$ [mm]',
+                  
+                  }
+        return unit
     
     
+   
     def opacity_poloidal_plot_method(self, item, pol_angle, result_dic, color_code, 
                                  A_value, unit_dic):
         
@@ -179,7 +196,7 @@ class poloidal_plot(profile_fit):
                 result = self.data['opacity_poloidal']
 
                 
-                unit = opm.opacity_study_unit()
+                unit = self.opacity_study_unit()
                 pol_loc = self.data['angle']['angle_list']
                 xpoint = self.data['angle']['xpoint_angle']
                 a_shift = self.data['dircomp']['a_shift']
@@ -200,7 +217,7 @@ class poloidal_plot(profile_fit):
                 for aa in self.data['dircomp']['multi_shift']:
                     
                     result = self.data['opacity_poloidal'][aa]
-                    unit = opm.opacity_study_unit()
+                    unit = self.opacity_study_unit()
                     pol_loc = self.data['angle']['angle_list'][aa]
                     xpoint = self.data['angle']['xpoint_angle'][aa]
                     A_val = A_dic[aa]
@@ -231,7 +248,7 @@ class poloidal_plot(profile_fit):
                 for aa in list(self.data['dircomp']['Attempt'].keys()):
                     
                     result = self.data['opacity_poloidal'][aa]
-                    unit = opm.opacity_study_unit()
+                    unit = self.opacity_study_unit()
                     pol_loc = self.data['angle']['angle_list']
                     xpoint = self.data['angle']['xpoint_angle']
                     a_shift = self.data['dircomp']['a_shift']
@@ -267,7 +284,7 @@ class poloidal_plot(profile_fit):
                 result = self.data['opacity_poloidal']
 
                 
-                unit = opm.opacity_study_unit()
+                unit = self.opacity_study_unit()
                 pol_loc = self.data['angle']['angle_list']
                 xpoint = self.data['angle']['xpoint_angle']
                 a_shift = self.data['dircomp']['a_shift']
@@ -288,7 +305,7 @@ class poloidal_plot(profile_fit):
                 for aa in self.data['dircomp']['multi_shift']:
                     
                     result = self.data['opacity_poloidal'][aa]
-                    unit = opm.opacity_study_unit()
+                    unit = self.opacity_study_unit()
                     pol_loc = self.data['angle']['angle_list'][aa]
                     xpoint = self.data['angle']['xpoint_angle'][aa]
                     A_val = A_dic[aa]
