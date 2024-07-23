@@ -49,7 +49,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 # xl.neuden_percent()
 
-topic = 'Q3'
+topic = 'Q1-1'
 
 
 """
