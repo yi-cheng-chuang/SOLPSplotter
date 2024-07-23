@@ -27,7 +27,7 @@ class radial_plot(profile_fit):
     def set_plot(self):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 3, markersize= 7)
+            plt.rc('lines', linewidth= 3, markersize= 5)
             plt.rcParams.update({'font.size': 14})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
@@ -506,17 +506,7 @@ class radial_plot(profile_fit):
             
             
             
-            
-            
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        
     
     
     
@@ -541,9 +531,14 @@ class radial_plot(profile_fit):
                              'inner x point boundary', 'outer x point boundary']
             # qu = self.load_iout(filename = dname, simple_quant = quant)
             
-            for side in div_side_list:
+            
+            fig, axs = plt.subplots(4, 1)
+            
+            
+            
+            for ii, side in enumerate(div_side_list):
                 
-                axs.figure(figsize=(7,7))
+                # axs.figure(figsize=(7,7))
                 
                 for aa in self.data['dircomp']['multi_shift']:
                     
@@ -580,13 +575,15 @@ class radial_plot(profile_fit):
                         pass
                     
                         
-                    axs.plot(psiN, plot_data, '-', color = color_dic[aa], 
+                    axs[ii].plot(psiN, plot_data, '-', color = color_dic[aa], 
                                  label = '{}'.format(A_dic[aa]))
-                    plt.legend()
-                
+                    
+                axs[3].legend()
                 plt.xlabel('psiN')
-                plt.title('{} at {}'.format(quant, side))
-                plt.show()
+                axs[0].set_title('{}'.format(quant))
+                # plt.show()
+            
+            plt.subplots_adjust(hspace=.0)
                 
         
         elif self.withshift == False and self.withseries == True:
