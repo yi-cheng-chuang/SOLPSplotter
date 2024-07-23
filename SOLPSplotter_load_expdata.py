@@ -19,7 +19,8 @@ class load_expdata(load_geometry):
         load_geometry.__init__(self, DefaultSettings)
         # Employee.__init__(self, first, last, pay)
         self.loadDS = loadDS
-        
+    
+    
     def loadmastdata(self, EXP, fit):
         if EXP:
             # mastloc = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
