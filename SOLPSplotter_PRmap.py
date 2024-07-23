@@ -806,7 +806,7 @@ class RP_mapping(load_simu_data):
 
 #-----------------------------------------------------------------------------
       
-# Additional dsa check function 1: left_test           
+# Additional dsa check function 1: left_test          
         
     def left_dsa_test_method(self, geo, pol_index, sep_loc, Attempt, DRT2):
         
@@ -924,6 +924,16 @@ class RP_mapping(load_simu_data):
         else:
             print('left_test function has a bug')
             
+
+
+
+
+
+
+
+
+
+
 
 """
 backup
