@@ -114,8 +114,8 @@ def mast_series_dir(series_flag):
             attempt_dic[sps.s_number(i, series_flag)[0][1]] = sps.s_number(i, series_flag)[0][0]
             new_dic[sps.s_number(i, series_flag)[0][1]] = i
         elif series_flag == 'change_temp':
-            attempt_dic[sps.s_number(i, series_flag)[0][1]] = sps.s_number(i, series_flag)[0][0]
-            new_dic[sps.s_number(i, series_flag)[0][1]] = i
+            attempt_dic[sps.s_number(i, series_flag)[0][0]] = sps.s_number(i, series_flag)[0][1]
+            new_dic[sps.s_number(i, series_flag)[0][0]] = i
     # print(attempt_list)
     
     adir = {}
