@@ -412,6 +412,7 @@ class radial_plot(profile_fit):
         axs[0].legend(loc='lower left', fontsize=10)
         
         
+        
         anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
         axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'black', label= '$t_e$ TS data')
         axs[1].set_xlabel('$\psi_N$')
@@ -435,12 +436,14 @@ class radial_plot(profile_fit):
             
             if scan == 'den':
                 axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
+                axs[0].set_title('Density scan')
                 axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
                             label= '{}'.format(A_dic[aa]))
                 axs[1].legend()
             elif scan == 'temp':
                 axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa], 
                             label= '{}'.format(A_dic[aa]))
+                axs[0].set_title('Temperature scan')
                 axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa])
                 axs[0].legend()
             elif scan == 'not':
@@ -478,12 +481,12 @@ class radial_plot(profile_fit):
             
             if series_flag == 'change_den':
                 
-                color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
-                             '7.0': 'blue', '8.0': 'purple', '9.0': 'saddlebrown'}
+                color_dic = {'3.4': 'red', '4.0': 'orange', '5.0': 'green',
+                             '6.0': 'blue', '7.0': 'purple'}
                 
-                label_dic = {'4.15': '4.15*$10^{19} m^{-3}$', '5.0': '5.0*$10^{19} m^{-3}$', 
-                    '6.0': '6.0*$10^{19} m^{-3}$', '7.0': '7.0*$10^{19} m^{-3}$', 
-                    '8.0': '8.0*$10^{19} m^{-3}$', '9.0': '9.0*$10^{19} m^{-3}$'}
+                label_dic = {'3.4': '4.15*$10^{19} m^{-3}$', 
+            '4.0': '4.37*$10^{19} m^{-3}$', '5.0': '4.62*$10^{19} m^{-3}$',
+            '6.0': '4.9*$10^{19} m^{-3}$', '7.0': '5.16*$10^{19} m^{-3}$'}
                 
                 denscan = list(self.data['dircomp']['Attempt'].keys())
                 
@@ -492,18 +495,18 @@ class radial_plot(profile_fit):
             
             elif series_flag == 'change_temp':
                 
-                color_dic = {'460': 'red', '500': 'orange', '600': 'green',
-                             '700': 'blue', '800': 'purple', '900': 'saddlebrown'}
+                color_dic = {'2.5': 'red', '3.0': 'orange', '4.0': 'green',
+                             '5.0': 'blue', '6.0': 'purple'}
                 
-                label_dic = {'460': '460 eV', '500': '500 eV', 
-                    '600': '600 eV', '700': '700 eV', 
-                    '800': '800 eV', '900': '900 eV'}
+                label_dic = {'2.5': '477 eV', '3.0': '571 eV', '4.0': '732 eV',
+                    '5.0': '884 eV', '6.0': '1037 eV'}
                 
                 denscan = list(self.data['dircomp']['Attempt'].keys())
                 
                 self.neteTSplot_structure(iterlist = denscan, 
                             cl_dic = color_dic, A_dic = label_dic, scan = 'temp')
-            
+                
+                
             
             
         
