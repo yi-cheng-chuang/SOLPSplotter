@@ -9,7 +9,7 @@ import os
 import re
 
 def Setting_dic():
-    set_dic = {'DEV': 'mast', 'withshift': True, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
                'Parameters': P, 'series_flag': 'change_den', 
                'Publish': 'b2plottersetting'}
     return set_dic
@@ -94,7 +94,7 @@ def mast_comp_dir_series():
     shift = 0
     tail = '_leakbsol_nts5_a'
     outputlist = ['Output', 'Output2', 'EirOutput']
-    shift_filename = 'org_densityscan_027205'
+    shift_filename = 'org_denscan_fluxb_027205'
     mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
                     'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
     
@@ -106,7 +106,7 @@ def mast_comp_dir_tempscan():
     shift = 0
     tail = '_leakbsol_nts5_a'
     outputlist = ['Output', 'Output2', 'EirOutput']
-    shift_filename = 'org_tempscan_027205'
+    shift_filename = 'org_tescan_fluxb_027205'
     mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
                     'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
     
@@ -201,7 +201,7 @@ def s_number(text, series_flag):
             # print(nu)
         elif series_flag == 'change_temp':
             name = text.split("\\",-1)[-1]
-            nu = re.findall('\d+', name)
+            nu = re.findall('\d+\.\d+', name)
             nu.append(name.split('_')[0])
     elif sd['withshift'] == True and sd['withseries'] == False:
         name = text.split("/",-1)[-2]
