@@ -188,9 +188,18 @@ class Present_ioutplot(Plotiout):
             text_list_B = [Bxratio_text, Bzratio_text, xzratio_text]
             
             graph_dic = {'xlabel': 'poloidal angle', 
-                         'title_A': 'geometry coefficients at the separatrix'
-                         'title_B': 'geometry coefficients at the separatrix'}
-    
+                         'title_A': 'magnetic strength at the separatrix',
+                         'title_B': 'magnetic strength ratio at the separatrix'}
+            
+            quant_list_dic = {'A': quant_list_A, 'B': quant_list_B}
+            text_list_dic = {'A': text_list_A, 'B': text_list_B}
+            
+            return quant_list_dic, text_list_dic, graph_dic
+        
+        elif topic == 'source':
+            
+            quant_list = 
+        
         
     
     
