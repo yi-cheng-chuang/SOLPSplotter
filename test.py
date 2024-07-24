@@ -8,6 +8,31 @@ Created on Fri Jul 14 22:34:31 2023
 import xarray as xr
 import numpy as np
 
+
+
+
+Te_J = 1.66094e-16
+ev = 1.6021766339999999 * pow(10, -19)
+Te_data = Te_J / ev
+
+print('Te = {}'.format(Te_data))
+
+
+string = '80_cnf6.0_leakbsol_nts5_a'
+
+if 'leakbsol_nts5_a' in string:
+    
+    print('we have tail recognize function')
+
+else:
+    
+    print('we need to look for something else!')
+
+
+
+
+"""
+
 a = np.zeros([2, 2, 1])
 b = np.ones([2, 2])
 a[:, :, 0] = b
@@ -72,5 +97,5 @@ ratio_array = np.divide(test_array_a, test_array_b)
 
 print(ratio_array)
 
-
+"""
 
