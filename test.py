@@ -7,9 +7,34 @@ Created on Fri Jul 14 22:34:31 2023
 
 import xarray as xr
 import numpy as np
+import math
+
+
+startnum = 5.015
+space_num = 4
+
+
+k = np.linspace(startnum, space_num + startnum, space_num + 1)
+print(k)
 
 
 
+number = 3.7e-13
+mantissa, exponent = math.frexp(number)
+# Adjust the exponent to match the scientific notation
+# exponent = exponent - 1
+
+print(f"Mantissa: {mantissa}, Exponent: {exponent}")
+
+
+
+
+
+
+
+
+
+"""
 
 Te_J = 1.66094e-16
 ev = 1.6021766339999999 * pow(10, -19)
@@ -31,7 +56,8 @@ else:
 
 
 
-"""
+
+
 
 a = np.zeros([2, 2, 1])
 b = np.ones([2, 2])
