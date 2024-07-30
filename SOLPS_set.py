@@ -45,9 +45,6 @@ def mast_comp_dic_withshift():
     series = ['75_n900000_leakbtarnsol_nts5_a', '16_n900000_leakbtarnsol_dot3_a', '27_n900000_leakbtarnsol_dot5_a', 
               '15_n900000_leakbtarnsol_dot7_a', '32_n100000_m12_one_a']
     
-    # series = ['75_n900000_leakbsol_nts5_a', '16_n900000_leakbnsol_dot3_a', '27_n900000_leakbsol_dot5_a', 
-    #           '15_n900000_leakbsol_dot7_a', '32_n100000_m12_one_a']
-    
     # series = ['73_n100000_n5e3et1e2_nts5_a', '15_n100000_leakagebou_dot3_a', '26_n100000_leakagebou_dot5_a', 
     #           '14_n100000_leakagebou_dot7_a', '33_n100000_leakagebou_one_a']
     
