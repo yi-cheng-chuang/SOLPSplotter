@@ -104,7 +104,13 @@ class load_geometry(load_directory):
     """     
     def load_solpsgeo(self):
         
-        g_loc = self.data['dirdata']['gbase'] + '/MAST__RMP_results/g027205.00275_efitpp'
+        if self.terminal == True:
+            g_loc = self.data['dirdata']['gdir']
+            
+        elif self.terminal == False:
+            g_loc = self.data['dirdata']['gbase'] + '/MAST__RMP_results/g027205.00275_efitpp'
+            
+
         gfile_data = lcm.loadg(g_loc)
         self.data['gfile']['g'] = gfile_data
         
