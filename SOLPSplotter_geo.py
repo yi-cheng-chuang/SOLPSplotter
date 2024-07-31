@@ -6,12 +6,8 @@ Created on Thu Jul 13 11:54:55 2023
 """
 
 import numpy as np
-import SOLPS_set as sps
 from SOLPS_load_directory import load_directory 
-import load_mast_expdata_method as lmem
-import load_B2_data_method as lbdm
 import load_coord_method as lcm
-import fitting_method as fm 
 from scipy import interpolate
 
 
@@ -105,7 +101,7 @@ class load_geometry(load_directory):
     def load_solpsgeo(self):
         
         if self.terminal == True:
-            g_loc = self.data['dirdata']['gdir']
+            g_loc = self.data['dirdata']['gdir'][0]
             
         elif self.terminal == False:
             g_loc = self.data['dirdata']['gbase'] + '/MAST__RMP_results/g027205.00275_efitpp'
