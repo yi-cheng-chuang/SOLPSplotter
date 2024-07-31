@@ -18,15 +18,28 @@ class load_expdata(load_geometry):
     def __init__(self, DefaultSettings, loadDS):
         load_geometry.__init__(self, DefaultSettings)
         # Employee.__init__(self, first, last, pay)
+        
         self.loadDS = loadDS
+        
+
     
     
     def loadmastdata(self, EXP, fit):
         if EXP:
             # mastloc = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
             #                         self.DEV, self.loadDS['expfilename'])
-            mastloc = '{}/{}'.format(self.data['dirdata']['gbase'], 
-                                    self.loadDS['expfilename'])
+            if self.terminal == True:
+                mastloc = '{}/{}'.format(self.data['dirdata']['topdrt'], 
+                                        self.loadDS['expfilename'])
+            
+            
+            elif self.terminal == False:
+                mastloc = '{}/{}'.format(self.data['dirdata']['gbase'], 
+                                        self.loadDS['expfilename'])
+            
+            else:
+                print('loadmastdata has a bug')
+                
             expdic = lmem.read_mastfile(mastloc)
             self.data['ExpDict'] = expdic
             self.data['dirdata']['mastloc'] = mastloc
@@ -257,9 +270,17 @@ class load_expdata(load_geometry):
             
         if writefile == True:
             w_datalist = []
-            filename = 'wsh_027205_275.dat'
-            fdir = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
-                                    self.DEV, self.loadDS['fitfname'])
+            filename = 'fit_027205_275.dat'
+            
+            if self.terminal == True:
+                fdir = '{}/{}'.format(self.data['dirdata']['topdrt'], self.loadDS['fitfname'])
+                
+            elif self.terminal == False:
+                fdir = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
+                                        self.DEV, self.loadDS['fitfname'])
+            else:
+                print('exp fit file writing has a bug')
+            
             for j in range(n_tot):
                 w_list =[]
                 w_list.append("{: .6f}".format(x_model[j]))
