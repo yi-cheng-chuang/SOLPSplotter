@@ -15,7 +15,7 @@ od = sps.Setting_dic()
 # print(type(d))
 
 def mast_base_dir():
-    basedrt, topdrt, tpdrt= sps.set_wdir()
+    basedrt, topdrt = sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
     
@@ -46,7 +46,7 @@ mwd = sps.mast_comp_dic_withshift()
 
 
 def mast_withshift_dir():
-    basedrt, topdrt, tpdrt= sps.set_wdir()
+    basedrt, topdrt = sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
     shift_list = list(mwd['shift_dic'].keys())
@@ -96,7 +96,7 @@ def mast_series_dir(series_flag):
     else:
         print('please check series_flag')
        
-    basedrt, topdrt, tpdrt= sps.set_wdir()
+    basedrt, topdrt = sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], mcds['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, mcds['Shot']))
     newbase = glob.glob('{}/{}/{}/{}/*{}'.format(basedrt,od['DEV'], mcds['Shot'], 
@@ -129,6 +129,54 @@ def mast_series_dir(series_flag):
                     'outputdir': adir}
 
     return mast_basedir, attempt_dic
+
+
+
+
+def series_terminal_dir(series_flag):
+
+    
+    if series_flag == 'terminal_test':
+        mcds = sps.terminal_series_comp_dir(tail = '_leakbsol_nts5_a', 
+                            filename = 'org_densityscan_027205')
+    else:
+        print('please check series_flag')
+       
+    basedrt, topdrt = sps.set_wdir()
+    gdir = glob.glob('{}/g{}*'.format(topdrt, mcds['Shot']))
+    newbase = glob.glob('{}/{}/*{}'.format(basedrt, mcds['filename'], 
+                                                 mcds['tail']))
+    tbase = '{}/{}'.format(basedrt, mcds['filename'])
+
+    attempt_dic = {}
+    new_dic = {}
+    for i in newbase:
+        if series_flag == 'terminal_test':
+            attempt_dic[sps.s_number(i, series_flag)[0][0]] = sps.s_number(i, series_flag)[0][1]
+            new_dic[sps.s_number(i, series_flag)[0][0]] = i
+        
+        elif series_flag == 'terminal_test':
+            attempt_dic[sps.s_number(i, series_flag)[0][0]] = sps.s_number(i, series_flag)[0][1]
+            new_dic[sps.s_number(i, series_flag)[0][0]] = i
+        
+        else:
+            print('please check series_flag')
+    # print(attempt_list)
+    
+    adir = {}
+    for ii in attempt_dic.keys():
+        adir[ii] = {}
+        for j in mcds['Output']:
+            adir[ii][j] = '{}/{}'.format(new_dic[ii], j)
+    
+    mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 
+                    'gdir': gdir, 'simudir': new_dic, 'simutop': tbase, 
+                    'outputdir': adir}
+
+    return mast_basedir, attempt_dic
+
+
+
 
 
 def read_mastfile(mastfile_loc):
