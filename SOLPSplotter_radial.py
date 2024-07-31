@@ -505,6 +505,24 @@ class radial_plot(profile_fit):
                 
                 self.neteTSplot_structure(iterlist = denscan, 
                             cl_dic = color_dic, A_dic = label_dic, scan = 'temp')
+            
+            elif series_flag == 'terminal_test':
+                
+                color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
+                             '7.0': 'blue', '8.0': 'purple', '9.0': 'brown'}
+                
+                label_dic = {'4.15': '4.15*$10^{19} m^{-3}$', 
+            '5.0': '5.0*$10^{19} m^{-3}$', '6.0': '6.0*$10^{19} m^{-3}$',
+            '7.0': '7.0*$10^{19} m^{-3}$', '8.0': '8.0*$10^{19} m^{-3}$',
+            '9.0': '9.0*$10^{19} m^{-3}$'}
+                
+                denscan = list(self.data['dircomp']['Attempt'].keys())
+                
+                self.neteTSplot_structure(iterlist = denscan, 
+                            cl_dic = color_dic, A_dic = label_dic, scan = 'den')
+            
+            else:
+                print('ne_te_TS_plot, please check the series flag')
                 
                 
             
