@@ -8,9 +8,6 @@ Created on Mon Jan 22 11:10:50 2024
 import numpy as np
 import SOLPS_set as sps
 import load_mast_expdata_method as lmem
-import load_coord_method as lcm
-import fitting_method as fm 
-from scipy import interpolate
 
 
 class load_directory:
@@ -19,6 +16,9 @@ class load_directory:
         self.DEV = DefaultSettings['DEV']
         self.withshift = DefaultSettings['withshift']
         self.withseries = DefaultSettings['withseries']
+        self.terminal = DefaultSettings['terminal']
+        self.series_filename = DefaultSettings['series_filename']
+        self.series_tail = DefaultSettings['_leakbsol_nts5_a']
                  
             
         "DefaultSettings"    
@@ -78,16 +78,26 @@ class load_directory:
                     series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
+                    
                 elif series_flag == 'eireneN':
                     self.data['dircomp'] = sps.mast_comp_dir_eireneN()
                     series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
+                    
                 elif series_flag == 'change_temp':
                     self.data['dircomp'] = sps.mast_comp_dir_tempscan()
                     series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
+                
+                elif series_flag == 'twin_scan':
+                    self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                                        filename = self.series_filename)
+                    series_dir, att_dic = lmem.series_terminal_dir(series_flag = series_flag)
+                    self.data['dirdata'] = series_dir
+                    self.data['dircomp']['Attempt'] = att_dic
+                
             elif self.withshift == True and self.withseries == True:
                 print('load_mast_dir is not there yet, to be continue...')      
             else:
