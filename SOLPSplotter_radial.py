@@ -446,7 +446,7 @@ class radial_plot(profile_fit):
                 axs[0].set_title('Temperature scan')
                 axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa])
                 axs[0].legend()
-            elif scan == 'not':
+            elif scan == self.series_flag:
                 axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
                 axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
                             label= '{}'.format(A_dic[aa]))
@@ -477,9 +477,9 @@ class radial_plot(profile_fit):
         
         elif self.withshift == False and self.withseries == True:
             
-            series_flag = self.DefaultSettings['series_flag']
+            # series_flag = self.DefaultSettings['series_flag']
             
-            if series_flag == 'change_den':
+            if self.series_flag == 'change_den':
                 
                 color_dic = {'3.4': 'red', '4.0': 'orange', '5.0': 'green',
                              '6.0': 'blue', '7.0': 'purple'}
@@ -493,7 +493,7 @@ class radial_plot(profile_fit):
                 self.neteTSplot_structure(iterlist = denscan, 
                             cl_dic = color_dic, A_dic = label_dic, scan = 'den')
             
-            elif series_flag == 'change_temp':
+            elif self.series_flag == 'change_temp':
                 
                 color_dic = {'2.5': 'red', '3.0': 'orange', '4.0': 'green',
                              '5.0': 'blue', '6.0': 'purple'}
@@ -506,7 +506,7 @@ class radial_plot(profile_fit):
                 self.neteTSplot_structure(iterlist = denscan, 
                             cl_dic = color_dic, A_dic = label_dic, scan = 'temp')
             
-            elif series_flag == 'terminal_test':
+            elif self.series_flag == 'terminal_test':
                 
                 color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
                              '7.0': 'blue', '8.0': 'purple', '9.0': 'brown'}
@@ -521,15 +521,36 @@ class radial_plot(profile_fit):
                 self.neteTSplot_structure(iterlist = denscan, 
                             cl_dic = color_dic, A_dic = label_dic, scan = 'den')
             
+            
+            
+            elif self.series_flag == 'twin_scan':
+                
+                scan_key = 
+                
+                for tp in list(self.data['dircomp']['Attempt'].keys()):
+                    
+                    
+                
+                
+                color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
+                             '7.0': 'blue', '8.0': 'purple', '9.0': 'brown'}
+                
+                label_dic = {'4.15': '4.15*$10^{19} m^{-3}$', 
+            '5.0': '5.0*$10^{19} m^{-3}$', '6.0': '6.0*$10^{19} m^{-3}$',
+            '7.0': '7.0*$10^{19} m^{-3}$', '8.0': '8.0*$10^{19} m^{-3}$',
+            '9.0': '9.0*$10^{19} m^{-3}$'}
+                
+                denscan = 
+                
+                self.neteTSplot_structure(iterlist = denscan, 
+                            cl_dic = color_dic, A_dic = label_dic, scan = 'den')
+            
+            
+            
             else:
                 print('ne_te_TS_plot, please check the series flag')
                 
                 
-            
-            
-        
-    
-    
     
     
     def plot_iout_radial_divertor(self, quant, log_scale):
