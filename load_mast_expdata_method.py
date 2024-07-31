@@ -133,14 +133,15 @@ def mast_series_dir(series_flag):
 
 
 
-def series_terminal_dir(series_flag):
+def series_terminal_dir(series_flag, dir_comp_dic):
 
+    mcds = dir_comp_dic
     
-    if series_flag == 'terminal_test':
-        mcds = sps.terminal_series_comp_dir(tail = '_leakbsol_nts5_a', 
-                            filename = 'org_densityscan_027205')
-    else:
-        print('please check series_flag')
+    # if series_flag == 'terminal_test':
+    #     mcds = sps.terminal_series_comp_dir(tail = '_leakbsol_nts5_a', 
+    #                         filename = 'org_densityscan_027205')
+    # else:
+    #     print('please check series_flag')
        
     basedrt, topdrt = sps.set_wdir()
     gdir = glob.glob('{}/g{}*'.format(topdrt, mcds['Shot']))
@@ -150,28 +151,59 @@ def series_terminal_dir(series_flag):
 
     attempt_dic = {}
     new_dic = {}
+    twinscan_dic = {}
+    
+    ds_key = [str(x) for x in mcds['denscan_list']]
+    ts_key = [str(x) for x in mcds['tempscan_list']]
+    
+    
+    # Initialize an empty dictionary
+    twinscan_dic = {}
+    
+    # Populate the dictionary using nested loops
+    for ka in ds_key:
+        
+        twinscan_dic[ka] = {}
+        
+        for kb in ts_key:
+            
+            twinscan_dic[ka][kb] = {}
+    
+    
     for i in newbase:
         if series_flag == 'terminal_test':
             attempt_dic[sps.s_number(i, series_flag)[0][0]] = sps.s_number(i, series_flag)[0][1]
             new_dic[sps.s_number(i, series_flag)[0][0]] = i
         
-        elif series_flag == 'terminal_test':
-            attempt_dic[sps.s_number(i, series_flag)[0][0]] = sps.s_number(i, series_flag)[0][1]
-            new_dic[sps.s_number(i, series_flag)[0][0]] = i
+        elif series_flag == 'twin_scan':
+            attempt_dic[sps.atp_number(i, series_flag)[0]] = sps.atp_number(i, series_flag)[1]
+            st = sps.atp_number(i, series_flag)[0]
+            twinscan_dic[st[0]][st[1]] = i
         
         else:
             print('please check series_flag')
     # print(attempt_list)
     
     adir = {}
-    for ii in attempt_dic.keys():
-        adir[ii] = {}
-        for j in mcds['Output']:
-            adir[ii][j] = '{}/{}'.format(new_dic[ii], j)
     
-    mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 
-                    'gdir': gdir, 'simudir': new_dic, 'simutop': tbase, 
-                    'outputdir': adir}
+    if series_flag != 'twin_scan':
+        for ii in attempt_dic.keys():
+            adir[ii] = {}
+            for j in mcds['Output']:
+                adir[ii][j] = '{}/{}'.format(new_dic[ii], j)
+    elif series_flag == 'twin_scan':
+        pass
+    else:
+        print('series_terminal_dir, please check series_flag!')
+    
+    if series_flag == 'twin_scan':
+        mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 
+                        'gdir': gdir, 'simudir': twinscan_dic, 'simutop': tbase}
+    else:
+        mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 
+                        'gdir': gdir, 'simudir': new_dic, 'simutop': tbase, 
+                        'outputdir': adir}
+        
 
     return mast_basedir, attempt_dic
 
