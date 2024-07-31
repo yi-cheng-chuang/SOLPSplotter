@@ -20,9 +20,53 @@ class profile_fit(RP_mapping):
     def __init__(self, DefaultSettings, loadDS):
         RP_mapping.__init__(self, DefaultSettings, loadDS)
     
-       
     
-    def opacity_data_fit_method(self, b2fstate, Neuden, psiN, 
+    def data_support(self, data_source):
+        
+        if data_source == 'output':
+            
+            self.load_output_data(param= 'NeuDen')
+            self.load_output_data(param= 'Ne')
+            self.load_output_data(param= 'Te')
+        
+        elif data_source == 'b2f':
+            
+            print('wait for improvement')
+            
+            
+            """
+            
+            if self.data['b2fstate'] == None:
+                self.load_b2fstate()
+                
+                b2fstate = self.data['b2fstate']
+                
+                Ne_data = b2fstate['ne'].transpose()
+                Te_J = b2fstate['te'].transpose()
+                ev = 1.6021766339999999 * pow(10, -19)
+                Te_data = Te_J / ev
+                
+            elif self.data['b2fstate'] != None:
+                
+                Ne_data = b2fstate['ne'].transpose()
+                Te_J = b2fstate['te'].transpose()
+                ev = 1.6021766339999999 * pow(10, -19)
+                Te_data = Te_J / ev
+                
+            if self.data['b2fplasmf'] == None:
+                self.load_b2fplasmf()
+                Neuden_data = 
+                
+                
+            elif self.data['b2fstate'] != None:
+                
+               
+            
+            """
+    
+    
+    
+    def opacity_data_fit_method(self, psiN, b2fstate, Neuden,
                 psi_dsa_ratio, pol_list, itername): 
         # i = 0
         ln = len(pol_list)
@@ -36,12 +80,6 @@ class profile_fit(RP_mapping):
         ne_ped = np.zeros(ln)
         tdelta = np.zeros(ln)
         fluxexp = np.zeros(ln)
-        
-        
-        # self.load_output_data(param= 'NeuDen')
-        # self.load_output_data(param= 'Ne')
-        # self.load_output_data(param= 'Te')
-        
         
         Ne_data = b2fstate['ne'].transpose()
         Te_J = b2fstate['te'].transpose()
@@ -246,9 +284,9 @@ class profile_fit(RP_mapping):
         
         if self.withshift == False and self.withseries == False:
             
-            data = self.data['ft44']['dab2']
-            Neuden_data = np.transpose(data[:, :, 0])
-            # Neuden_data = self.data['outputdata']['NeuDen']
+            # data = self.data['ft44']['dab2']
+            # Neuden_data = np.transpose(data[:, :, 0])
+            Neuden_data = self.data['outputdata']['NeuDen']
             fstate = self.data['b2fstate']
             psiN_map = self.data['psi']['psival']
             
