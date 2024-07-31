@@ -7,11 +7,14 @@ Created on Thu Jul 13 12:38:48 2023
 
 import os
 import re
+import numpy as np
+
+
 
 def Setting_dic():
     set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
-               'Parameters': P, 'series_flag': 'twin_scan', 
-    'series_filename': 'testrun_org027205', 'series_tail': '_leakbsol_nts5_a',
+               'Parameters': P, 'series_flag': 'twin_scan',
+    'series_filename': 'org_save1_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
                'Publish': 'b2plottersetting', 'terminal': True}
     return set_dic
 
@@ -123,12 +126,20 @@ def mast_comp_dir_eireneN():
     return mast_eireneN_dir_dic
 
 
-def terminal_series_comp_dir(tail, filename):
+def terminal_series_comp_dir(tail, filename, ):
     a_shift = 'org'
     shift = 0
     outputlist = ['Output', 'Output2', 'EirOutput']
+    
+    ds_dic = {'start': 5.02, 'stop': 9.02, 'space': 5}
+    ts_dic = {'start': 3.73, 'stop': 7.73, 'space': 5}
+    
+    ds_list, ts_list = scan_list(denscan_dic = ds_dic, tempscan_dic = ts_dic)
+    
+    
     mast_eireneN_dir_dic = {'Shot': '027205', 'filename': filename, 'shift_value': shift,
-                    'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
+                    'tail': tail, 'a_shift': a_shift, 'Output': outputlist, 
+            'denscan_list': ds_list, 'tempscan_list': ts_list}
     
     return mast_eireneN_dir_dic
 
@@ -230,6 +241,11 @@ def s_number(text, series_flag):
             nu = re.findall('\d+\.\d+', name)
             nu.append(name.split('_')[0])
         
+        elif series_flag == 'twin_scan':
+            name = text.split("/",-1)[-1]
+            nu = re.findall('\d+\.\d+', name)
+            nu.append(name.split('_')[0])
+        
         else:
             print('check the series flag')
         
@@ -243,6 +259,56 @@ def s_number(text, series_flag):
 
     return [nu, name]
         
+
+
+
+def atp_number(text, series_flag):
+    sd = Setting_dic()
+    if sd['withshift'] == False and sd['withseries'] == False:
+        name = text.split("/",-1)[-2]
+        nu = int(name.split('_')[0])
+    elif sd['withshift'] == False and sd['withseries'] == True:
+      
+        if series_flag == 'twin_scan':
+            name = text.split("/",-1)[-1]
+            nu_list = re.findall('\d+\.\d+', name)
+            nu_tuple = (nu_list[0], nu_list[1])
+            nu = [nu_tuple, name.split('_')[0]]
+        
+        else:
+            print('check the series flag')
+        
+    elif sd['withshift'] == True and sd['withseries'] == False:
+        name = text.split("/",-1)[-2]
+        nu = int(name.split('_')[0])
+    elif sd['withshift'] == True and sd['withseries'] == True:
+        print('unexpected situation, please check the parameter setting')
+    else:
+        print('There is a bug in s_number function')
+
+    return nu
+
+
+
+
+def scan_list(denscan_dic, tempscan_dic):
+    
+    ds_start_num = denscan_dic['start']
+    ds_stop_num = denscan_dic['stop']
+    ds_space_num = denscan_dic['space']
+
+    ds_list = np.linspace(ds_start_num, ds_stop_num, ds_space_num)
+
+    ts_start_num = tempscan_dic['start']
+    ts_stop_num = tempscan_dic['stop']
+    ts_space_num = tempscan_dic['space']
+
+    ts_list = np.linspace(ts_start_num, ts_stop_num, ts_space_num)
+    
+    return ds_list, ts_list
+    
+    
+
 
 def loadDS_dic(DEV):
     "New DefaultSettings for loading experimental data"
