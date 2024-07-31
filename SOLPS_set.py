@@ -10,8 +10,9 @@ import re
 
 def Setting_dic():
     set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
-               'Parameters': P, 'series_flag': 'change_den', 
-               'Publish': 'b2plottersetting'}
+               'Parameters': P, 'series_flag': 'twin_scan', 
+    'series_filename': 'testrun_org027205', 'series_tail': '_leakbsol_nts5_a',
+               'Publish': 'b2plottersetting', 'terminal': True}
     return set_dic
 
 series_flag = ['eireneN','change_den','change_temp']
@@ -122,6 +123,18 @@ def mast_comp_dir_eireneN():
     return mast_eireneN_dir_dic
 
 
+def terminal_series_comp_dir(tail, filename):
+    a_shift = 'org'
+    shift = 0
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    mast_eireneN_dir_dic = {'Shot': '027205', 'filename': filename, 'shift_value': shift,
+                    'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
+    
+    return mast_eireneN_dir_dic
+
+
+
+
 def mast_comp_dir_compare():
     
     a_shift = 'org'
@@ -152,19 +165,30 @@ def set_wdir(): #Function to set correct Working Directory Path depending on whi
         if os.environ['USERNAME'] == 'Yi-Cheng':
             basedrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Simulation_Data"
             topdrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Experimental_Data"
-            tpdrt = r"C:/Users/Yi-Cheng/Documents/SOLPS_Data/Experimental_Data"
+
+
         elif os.environ['USERNAME'] == 'user':
             basedrt = r"C:/Users/user/Documents/SOLPS data/simulation data"
             topdrt = r"C:/Users/user/Documents/SOLPS data/experiment data"
-            tpdrt = r"C:/Users/user/Documents/GitHub/load-plot/poster_plot_generator"
+            
+            
         elif os.environ['USERNAME'] == 'ychuang':
             basedrt = r"C:/Users/ychuang/Documents/SOLPS_data/simulation_data"
             topdrt = r"C:/Users/ychuang/Documents/SOLPS_data/experimental_data"
-            tpdrt = r"C:/Users/ychuang/Documents/GitHub/load-plot/poster_plot_generator"
+           
+
+    elif os.environ['OS'] == '3.10.0-1160.31.1.el7.x86_64':
+        if os.environ['USER'] == 'ychuang':
+            basedrt = r"/sciclone/data10/ychuang/solps-iter/runs/mast"
+            topdrt = r"/sciclone/data10/ychuang/solps-iter/runs/mast/gnpfiles"
+           
     else:
         print('please add new directory in tools')
     
-    return basedrt, topdrt, tpdrt
+    return basedrt, topdrt
+
+
+
 
 
 def set_figdir(): #Function to set correct Working Directory Path depending on which machine is in use
@@ -200,6 +224,15 @@ def s_number(text, series_flag):
             name = text.split("\\",-1)[-1]
             nu = re.findall('\d+\.\d+', name)
             nu.append(name.split('_')[0])
+        
+        elif series_flag == 'terminal_test':
+            name = text.split("/",-1)[-1]
+            nu = re.findall('\d+\.\d+', name)
+            nu.append(name.split('_')[0])
+        
+        else:
+            print('check the series flag')
+        
     elif sd['withshift'] == True and sd['withseries'] == False:
         name = text.split("/",-1)[-2]
         nu = int(name.split('_')[0])
@@ -219,10 +252,11 @@ def loadDS_dic(DEV):
     # bload = {'TimeRange' : [1.10,1.30], 'AVG': False, 'multishift': False,
     #          'EXP': False, 'fit': True, 'ROOTSHOT': ''}
     if DEV == 'mast':
-        fndic = {'expfilename': 'yag_27205_275.dat', 'fitfname': 'wsh_027205_275.dat'}
+        fndic = {'expfilename': 'yag_27205_275.dat', 'fitfname': 'fit_027205_275.dat'}
     else:
         print('please add the experimental file name')
-    loadDS = bload | fndic
+        
+    loadDS = {**bload, **fndic} 
     
     return loadDS
     
