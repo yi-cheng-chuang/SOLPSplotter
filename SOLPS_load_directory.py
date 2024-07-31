@@ -18,7 +18,8 @@ class load_directory:
         self.withseries = DefaultSettings['withseries']
         self.terminal = DefaultSettings['terminal']
         self.series_filename = DefaultSettings['series_filename']
-        self.series_tail = DefaultSettings['_leakbsol_nts5_a']
+        self.series_tail = DefaultSettings['series_tail']
+        self.series_flag = DefaultSettings['series_flag']
                  
             
         "DefaultSettings"    
@@ -72,29 +73,38 @@ class load_directory:
                 self.data['dircomp']['Attempt'] = att_dic
             
             elif self.withshift == False and self.withseries == True:
-                series_flag = self.DefaultSettings['series_flag']
-                if series_flag == 'change_den':
+                
+                
+                
+                # series_flag = self.DefaultSettings['series_flag']
+                
+                if self.series_flag == 'change_den':
                     self.data['dircomp'] = sps.mast_comp_dir_series()
-                    series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
+                    series_dir, att_dic = lmem.mast_series_dir(series_flag= self.series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
                     
-                elif series_flag == 'eireneN':
+                elif self.series_flag == 'eireneN':
                     self.data['dircomp'] = sps.mast_comp_dir_eireneN()
-                    series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
+                    series_dir, att_dic = lmem.mast_series_dir(series_flag= self.series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
                     
-                elif series_flag == 'change_temp':
+                elif self.series_flag == 'change_temp':
                     self.data['dircomp'] = sps.mast_comp_dir_tempscan()
-                    series_dir, att_dic = lmem.mast_series_dir(series_flag= series_flag)
+                    series_dir, att_dic = lmem.mast_series_dir(series_flag= self.series_flag)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
                 
-                elif series_flag == 'twin_scan':
+                elif self.series_flag == 'twin_scan':
                     self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
                                         filename = self.series_filename)
-                    series_dir, att_dic = lmem.series_terminal_dir(series_flag = series_flag)
+                    
+                    dir_comp = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                                        filename = self.series_filename)
+                    
+                    series_dir, att_dic = lmem.series_terminal_dir(series_flag = self.series_flag,
+                                                                  dir_comp_dic = dir_comp)
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
                 
