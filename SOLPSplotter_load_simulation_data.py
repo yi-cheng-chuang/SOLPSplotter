@@ -95,7 +95,17 @@ class load_simu_data(load_expdata):
             YDIM = int(self.data['DefaultSettings']['YDIM'][itername])
             
         elif self.withshift == False and self.withseries == True:
-            BASEDRT = self.data['dirdata']['outputdir'][itername]['Output']
+            if self.series_flag == 'twin_scan':
+                
+                nf = itername[0]
+                tf = itername[1]
+                
+                simu_dir = self.data['dirdata']['simudir'][nf][tf]
+                
+                BASEDRT = '{}/{}'.format(simu_dir, 'Output')
+            else:
+                BASEDRT = self.data['dirdata']['outputdir'][itername]['Output']
+
             Attempt = self.data['dircomp']['Attempt'][itername]
             XGrid = int(self.data['b2fgeo']['nx'])
             # print(XGrid)
@@ -171,6 +181,25 @@ class load_simu_data(load_expdata):
             print('There is a bug')
     
     
+    
+    def one_dim_scan_b2fstate(self, iterlist):
+        
+        state_dic = {}
+        dim_dic = {}
+        
+        for aa in iterlist:
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
+            state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+            state_dic[aa] = vars(state)
+            dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+        
+        return state_dic, dim_dic
+    
+    
+    
+    
+    
+    
     def load_b2fstate(self):
         if self.withshift == False and self.withseries == False:
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], 'b2fstate')
@@ -182,32 +211,31 @@ class load_simu_data(load_expdata):
             # self.b2fstate = state
         
         elif self.withshift == True and self.withseries == False:
-            state_dic = {}
-            dim_dic = {}
             
-            for aa in self.data['dircomp']['multi_shift']:
-                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
-                state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
-                state_dic[aa] = vars(state)
-                dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+            scan = self.data['dircomp']['multi_shift']
+            
+            state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
 
             self.data['b2fstate'] = state_dic
             self.data['DefaultSettings']['dims'] = dim_dic
-            # self.b2fstate = state
         
         elif self.withshift == False and self.withseries == True:
-            state_dic = {}
-            dim_dic = {}
             
-            for aa in list(self.data['dircomp']['Attempt'].keys()):
-                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
-                state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
-                state_dic[aa] = vars(state)
-                dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
 
             self.data['b2fstate'] = state_dic
             self.data['DefaultSettings']['dims'] = dim_dic
-            # self.b2fstate = state
+            
+            
+            
+
+            
+            
+            
+        
+        
         
         
         
@@ -608,7 +636,34 @@ class load_simu_data(load_expdata):
             
             
             
-        
+"""
+
+state_dic = {}
+dim_dic = {}
+
+for aa in self.data['dircomp']['multi_shift']:
+    file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
+    state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+    state_dic[aa] = vars(state)
+    dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+
+
+
+state_dic = {}
+dim_dic = {}
+
+for aa in list(self.data['dircomp']['Attempt'].keys()):
+    file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
+    state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+    state_dic[aa] = vars(state)
+    dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+
+self.data['b2fstate'] = state_dic
+self.data['DefaultSettings']['dims'] = dim_dic
+# self.b2fstate = state
+
+
+"""     
         
             
         
