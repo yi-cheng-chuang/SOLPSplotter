@@ -597,8 +597,21 @@ class RP_mapping(load_simu_data):
             aa = den_list[0]
             
             rad_grid = self.data['grid']['RadLoc']
-            vert_grid = self.data['grid']['VertLoc']     
-            dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+            vert_grid = self.data['grid']['VertLoc']
+            
+            if self.series_flag == 'twin_scan':
+                
+                nf = aa[0]
+                tf = aa[1]
+                
+                dsa = lcm.read_dsa(self.data['dirdata']['simudir'][nf][tf] + '/dsa')
+            
+            else:
+                
+                dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+
+
+           
             jxa = self.data['b2mn']['jxa']
             
             dist, index = self.calc_sep_dsa_method(RadLoc = rad_grid, VertLoc = vert_grid, 
