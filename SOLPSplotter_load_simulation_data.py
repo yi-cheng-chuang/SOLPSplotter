@@ -7,6 +7,7 @@ Created on Tue Jan 30 14:11:08 2024
 
 
 from SOLPSplotter_load_expdata import load_expdata
+import load_mast_expdata_method as lmem
 import load_B2_data_method as lbdm
 import load_Eirene_data_method as lEdm
 import numpy as np
@@ -95,6 +96,7 @@ class load_simu_data(load_expdata):
             YDIM = int(self.data['DefaultSettings']['YDIM'][itername])
             
         elif self.withshift == False and self.withseries == True:
+            
             if self.series_flag == 'twin_scan':
                 
                 nf = itername[0]
@@ -152,6 +154,28 @@ class load_simu_data(load_expdata):
         
         return output_data
     
+    def one_dim_scan_output(self, iterlist, param):
+        
+        param_data_dic = {}
+        for aa in iterlist:
+            param_data_dic[aa] = self.load_output_data_method(param = param, itername = aa)
+        
+        return param_data_dic
+    
+    
+    def two_dim_scan_output(self, iterlist, iterlist_a, iterlist_b, param):
+        
+
+
+        param_data_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        
+        for tp in iterlist:
+            aa = tp[0]
+            ab = tp[1]
+            
+            param_data_dic[aa][ab] = self.load_output_data_method(param = param, itername = tp)
+        
+        return param_data_dic
        
     def load_output_data(self, param):
         if self.withshift == False and self.withseries == False:
@@ -160,17 +184,31 @@ class load_simu_data(load_expdata):
             
             
         elif self.withshift == True and self.withseries == False:
-            param_data_dic = {}
-            for aa in self.data['dircomp']['multi_shift']:
-                param_data_dic[aa] = self.load_output_data_method(param = param, itername = aa)
+            
+            
+            scan = self.data['dircomp']['multi_shift']
+            
+            param_data_dic = self.one_dim_scan_output(iterlist = scan, param = param)
                       
             self.data['outputdata'][param] = param_data_dic
             
             
         elif self.withshift == False and self.withseries == True:
-            param_data_dic = {}
-            for aa in self.data['dircomp']['Attempt'].keys():
-                param_data_dic[aa] = self.load_output_data_method(param = param, itername = aa)
+            
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            if self.series_flag == 'twin_scan':
+                
+                mcds = self.data['dircomp']
+                
+                ds_list = [str(x) for x in mcds['denscan_list']]
+                ts_list = [str(x) for x in mcds['tempscan_list']]
+                
+                
+                param_data_dic = self.two_dim_scan_output(iterlist = scan, iterlist_a = ds_list, 
+                                    iterlist_b = ts_list, param = param)
+            else:
+                param_data_dic = self.one_dim_scan_output(iterlist = scan, param = param)
         
             self.data['outputdata'][param] = param_data_dic
         
@@ -196,7 +234,23 @@ class load_simu_data(load_expdata):
         return state_dic, dim_dic
     
     
-    
+    def two_dim_scan_b2fstate(self, iterlist, iterlist_a, iterlist_b):
+        
+
+
+        state_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        dim_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        
+        for tp in iterlist:
+            aa = tp[0]
+            ab = tp[1]
+            
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'b2fstate')
+            state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+            state_dic[aa][ab] = vars(state)
+            dim_dic[aa][ab] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+        
+        return state_dic, dim_dic
     
     
     
@@ -223,21 +277,22 @@ class load_simu_data(load_expdata):
             
             scan = list(self.data['dircomp']['Attempt'].keys())
             
-            state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
+            if self.series_flag == 'twin_scan':
+                
+                mcds = self.data['dircomp']
+                
+                ds_list = [str(x) for x in mcds['denscan_list']]
+                ts_list = [str(x) for x in mcds['tempscan_list']]
+                
+                state_dic, dim_dic = self.two_dim_scan_b2fstate(iterlist = scan, 
+                                    iterlist_a = ds_list, iterlist_b = ts_list)
+            else:
+                state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
+                
 
             self.data['b2fstate'] = state_dic
             self.data['DefaultSettings']['dims'] = dim_dic
             
-            
-            
-
-            
-            
-            
-        
-        
-        
-        
         
         else:
             print('load_b2fstate function is not there yet!')
@@ -347,6 +402,38 @@ class load_simu_data(load_expdata):
             print('load_b2fplasmf function is not there yet!')
     
     
+    
+    def one_dim_scan_ft44(self, iterlist):
+        
+        ft44_dic = {}
+        
+        for aa in iterlist:
+            
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'fort.44.i')
+            ft44 = lEdm.read_ft44(fileName = file_loc)
+            ft44_dic[aa] = vars(ft44)
+        
+        return ft44_dic
+    
+    
+    def two_dim_scan_ft44(self, iterlist, iterlist_a, iterlist_b):
+        
+
+
+        ft44_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        
+        for tp in iterlist:
+            aa = tp[0]
+            ab = tp[1]
+            
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'fort.44.i')
+            ft44 = lEdm.read_ft44(fileName = file_loc)
+            ft44_dic[aa][ab] = vars(ft44)
+        
+        return ft44_dic
+     
+    
+    
     def load_ft44(self):
         
         ftname = 'fort.44.i'
@@ -361,27 +448,32 @@ class load_simu_data(load_expdata):
             # print(type(k))
         
         elif self.withshift == True and self.withseries == False:
-            ft44_dic = {}
             
-            for aa in self.data['dircomp']['multi_shift']:
-                
-                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
-                ft44 = lEdm.read_ft44(fileName = file_loc)
-                ft44_dic[aa] = vars(ft44)
-                
-                
+            
+            scan = self.data['dircomp']['multi_shift']
+            
+            ft44_dic = self.one_dim_scan_ft44(iterlist = scan)
+            
             self.data['ft44'] = ft44_dic
         
         elif self.withshift == False and self.withseries == True:
-            ft44_dic = {}
             
-            for aa in list(self.data['dircomp']['Attempt'].keys()):
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            if self.series_flag == 'twin_scan':
                 
-                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
-                ft44 = lEdm.read_ft44(fileName = file_loc)
-                ft44_dic[aa] = vars(ft44)
+                mcds = self.data['dircomp']
                 
+                ds_list = [str(x) for x in mcds['denscan_list']]
+                ts_list = [str(x) for x in mcds['tempscan_list']]
                 
+                ft44_dic = self.two_dim_scan_ft44(iterlist = scan, 
+                                    iterlist_a = ds_list, iterlist_b = ts_list)
+            
+            else:
+                ft44_dic = self.one_dim_scan_ft44(iterlist = scan)
+                
+                            
             self.data['ft44'] = ft44_dic
             
                 
@@ -661,6 +753,14 @@ for aa in list(self.data['dircomp']['Attempt'].keys()):
 self.data['b2fstate'] = state_dic
 self.data['DefaultSettings']['dims'] = dim_dic
 # self.b2fstate = state
+
+
+for aa in self.data['dircomp']['multi_shift']:
+    
+    file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
+    ft44 = lEdm.read_ft44(fileName = file_loc)
+    ft44_dic[aa] = vars(ft44)
+
 
 
 """     
