@@ -145,7 +145,18 @@ class load_geometry(load_directory):
         elif self.withshift == False and self.withseries == True:
             
             seriesname = list(self.data['dircomp']['Attempt'].keys())[0]
-            simudir = self.data['dirdata']['simudir'][seriesname]
+            
+            if self.series_flag == 'twin_scan':
+                
+                nf = seriesname[0]
+                tf = seriesname[1]
+                        
+                simudir = self.data['dirdata']['simudir'][nf][tf]
+            
+            else:
+                
+                simudir = self.data['dirdata']['simudir'][seriesname]
+                
             simutop = self.data['dirdata']['simutop']
             shift = self.data['dircomp']['shift_value']                          
             b2mn, geo, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
