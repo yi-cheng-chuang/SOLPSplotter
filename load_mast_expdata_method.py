@@ -130,7 +130,21 @@ def mast_series_dir(series_flag):
 
     return mast_basedir, attempt_dic
 
-
+def two_layer_dic(key_a, key_b):
+    
+    # Initialize an empty dictionary
+    twinscan_dic = {}
+    
+    # Populate the dictionary using nested loops
+    for ka in key_a:
+        
+        twinscan_dic[ka] = {}
+        
+        for kb in key_b:
+            
+            twinscan_dic[ka][kb] = {}
+    
+    return twinscan_dic
 
 
 def series_terminal_dir(series_flag, dir_comp_dic):
@@ -157,17 +171,7 @@ def series_terminal_dir(series_flag, dir_comp_dic):
     ts_key = [str(x) for x in mcds['tempscan_list']]
     
     
-    # Initialize an empty dictionary
-    twinscan_dic = {}
-    
-    # Populate the dictionary using nested loops
-    for ka in ds_key:
-        
-        twinscan_dic[ka] = {}
-        
-        for kb in ts_key:
-            
-            twinscan_dic[ka][kb] = {}
+    twinscan_dic = two_layer_dic(key_a = ds_key, key_b = ts_key)
     
     
     for i in newbase:
@@ -178,7 +182,7 @@ def series_terminal_dir(series_flag, dir_comp_dic):
         elif series_flag == 'twin_scan':
             attempt_dic[sps.atp_number(i, series_flag)[0]] = sps.atp_number(i, series_flag)[1]
             st = sps.atp_number(i, series_flag)[0]
-            twinscan_dic[st[0]][st[1]] = i
+            twinscan_dic[str(st[0])][str(st[1])] = i
         
         else:
             print('please check series_flag')
