@@ -307,24 +307,43 @@ class radial_plot(profile_fit):
     
     
     
-    def nete_TSplotmethod(self, aa):
+    def nete_TSplotmethod(self, itername):
+        
+        
+
+        if self.withshift == True and self.withseries == False:
             
-        b2fstate = self.data['b2fstate'][aa]
+            b2fstate = self.data['b2fstate'][itername]
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            if self.series_flag == 'twin_scan':
+                
+                nf = itername[0]
+                tf = itername[1]
+                
+                b2fstate = self.data['b2fstate'][nf][tf]
+                neu_pro = self.data['outputdata']['NeuDen'][nf][tf]
+            
+            else:
+                
+                b2fstate = self.data['b2fstate'][itername]
+                neu_pro = self.data['outputdata']['NeuDen'][itername]
+                
         
         ne_pro = b2fstate['ne'].transpose()
         Te_J = b2fstate['te'].transpose()
         ev = 1.6021766339999999 * pow(10, -19)
         te_pro = Te_J / ev
         
-        data = self.data['ft44'][aa]['dab2']
-        neu_pro = np.transpose(data[:, :, 0])
+        # neu_pro = np.transpose(data[:, :, 0])
         
         if self.withshift == True and self.withseries == False:
         
-            leftcut = self.data['b2fgeo'][aa]['leftcut'][0]
-            rightcut = self.data['b2fgeo'][aa]['rightcut'][0]
-            weight = self.data['midplane_calc'][aa]['weight']
-            psi_coord = self.data['midplane_calc'][aa]['psi_solps_mid']
+            leftcut = self.data['b2fgeo'][itername]['leftcut'][0]
+            rightcut = self.data['b2fgeo'][itername]['rightcut'][0]
+            weight = self.data['midplane_calc'][itername]['weight']
+            psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
         
         elif self.withshift == False and self.withseries == True:
         
@@ -340,9 +359,9 @@ class radial_plot(profile_fit):
              
         mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
         mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
-        mid_neu_pro = neu_pro[:, 58]
+        mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
         
-        return psi_coord, mid_ne_pro, mid_te_pro
+        return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
     
     
     
@@ -404,7 +423,7 @@ class radial_plot(profile_fit):
         te_er = TS_dic['errte']
         
         
-        fig, axs = plt.subplots(2, 1)
+        fig, axs = plt.subplots(3, 1)
         
         anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
         axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'black', label= '$n_e$ TS data')
@@ -424,7 +443,7 @@ class radial_plot(profile_fit):
         
         for aa in iterlist:
             
-            psi_coord, mid_ne_pro, mid_te_pro = self.nete_TSplotmethod(aa = aa)
+            psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_TSplotmethod(itername = aa)
             
             
             """
@@ -434,29 +453,53 @@ class radial_plot(profile_fit):
             
             axs[0].legend(loc= 'lower left', fontsize=10)
             
-            if scan == 'den':
-                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
+            if self.series_flag == 'twin_scan':
+                
+                ad = aa[1]
+            
+            else:
+                ad = aa
+                
+            
+
+            if scan == 'denscan':
+                
+                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad])
                 axs[0].set_title('Density scan')
-                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
-                            label= '{}'.format(A_dic[aa]))
+                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad],
+                            label= '{}'.format(A_dic[ad]))
+                
+                axs[2].plot(psi_coord, mid_neu_pro, color = cl_dic[ad])
                 axs[1].legend()
-            elif scan == 'temp':
-                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa], 
-                            label= '{}'.format(A_dic[aa]))
+
+                            
+            elif scan == 'tempscan':
+                
+                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad], 
+                            label= '{}'.format(A_dic[ad]))
                 axs[0].set_title('Temperature scan')
-                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa])
+                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad])
                 axs[0].legend()
-            elif scan == self.series_flag:
-                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[aa])
-                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[aa],
-                            label= '{}'.format(A_dic[aa]))
-                axs[1].legend()
+                axs[2].plot(psi_coord, mid_neu_pro, color = cl_dic[ad])
+            
+            else:
+                print('neteTSplot_structure, please check the scan parameter')
             
             
 
         
         # fig.savefig('profiles.pdf')
     
+    
+    def pair_dic(self, keys, values):
+        
+        # Use zip() to pair the keys with the values
+        zipped_pairs = zip(keys, values)
+        
+        # Convert the zipped pairs into a dictionary
+        result_dic = dict(zipped_pairs)
+        
+        return result_dic
     
     
         
@@ -516,7 +559,9 @@ class radial_plot(profile_fit):
             '7.0': '7.0*$10^{19} m^{-3}$', '8.0': '8.0*$10^{19} m^{-3}$',
             '9.0': '9.0*$10^{19} m^{-3}$'}
                 
-                denscan = list(self.data['dircomp']['Attempt'].keys())
+                dencan = list(self.data['dircomp']['Attempt'].keys())
+                
+                
                 
                 self.neteTSplot_structure(iterlist = denscan, 
                             cl_dic = color_dic, A_dic = label_dic, scan = 'den')
@@ -525,28 +570,44 @@ class radial_plot(profile_fit):
             
             elif self.series_flag == 'twin_scan':
                 
-                scan_key = 
+                dircomp = self.data['dircomp']
                 
-                for tp in list(self.data['dircomp']['Attempt'].keys()):
+                ds_key = [str(x) for x in dircomp['denscan_list']]
+                
+                for td in ds_key:
+                    
+                    ts_key = [str(x) for x in dircomp['tempscan_list']]
+                    color_list = ['red', 'orange', 'green', 'blue', 'purple']
+                    
+                    color_dic = self.pair_dic(keys = ts_key, values = color_list)
+                    
+                    temp_list = []
+                    iter_key = []
+                    
+                    for ts in ts_key:
+                        
+                        it_in = (td, ts)
+                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_TSplotmethod(itername = it_in)
+                        
+                        
+                        temp_add = '{:.1f} eV'.format(mid_te_pro[0])
+                        
+                        temp_list.append(temp_add)
+                        iter_key.append(it_in)
+                        
                     
                     
-                
-                
-                color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
-                             '7.0': 'blue', '8.0': 'purple', '9.0': 'brown'}
-                
-                label_dic = {'4.15': '4.15*$10^{19} m^{-3}$', 
-            '5.0': '5.0*$10^{19} m^{-3}$', '6.0': '6.0*$10^{19} m^{-3}$',
-            '7.0': '7.0*$10^{19} m^{-3}$', '8.0': '8.0*$10^{19} m^{-3}$',
-            '9.0': '9.0*$10^{19} m^{-3}$'}
-                
-                denscan = 
-                
-                self.neteTSplot_structure(iterlist = denscan, 
-                            cl_dic = color_dic, A_dic = label_dic, scan = 'den')
+                    label_dic = self.pair_dic(keys = ts_key, values = temp_list)
+                    
+                    self.neteTSplot_structure(iterlist = iter_key, 
+                            cl_dic = color_dic, A_dic = label_dic, scan = 'tempscan')
+                        
+                    print(temp_list)
+                     
+                        
+                    
             
-            
-            
+                    
             else:
                 print('ne_te_TS_plot, please check the series flag')
                 
