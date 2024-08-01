@@ -202,10 +202,23 @@ class profile_fit(RP_mapping):
             
             for aa in list(self.data['dircomp']['Attempt'].keys()):
                 
-                Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                # data = self.data['ft44'][aa]['dab2']
-                # Neuden_data = np.transpose(data[:, :, 0])
-                fstate = self.data['b2fstate'][aa]
+                if self.series_flag == 'twin_scan':
+                    
+                    nf = aa[0]
+                    tf = aa[1]
+                              
+                    Neuden_data = self.data['outputdata']['NeuDen'][nf][tf]
+                    # data = self.data['ft44'][aa]['dab2']
+                    # Neuden_data = np.transpose(data[:, :, 0])
+                    fstate = self.data['b2fstate'][nf][tf]
+                
+                else:
+                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    # data = self.data['ft44'][aa]['dab2']
+                    # Neuden_data = np.transpose(data[:, :, 0])
+                    fstate = self.data['b2fstate'][aa]
+                    
+                
                 psiN_map = self.data['psi']['psival']
                 pd = self.data['DefaultSettings']['psi_dsa']
                 
@@ -321,8 +334,20 @@ class profile_fit(RP_mapping):
             
             for aa in list(self.data['dircomp']['Attempt'].keys()):
                 
-                Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                fstate = self.data['b2fstate'][aa]
+                if self.series_flag == 'twin_scan':
+                    
+                    nf = aa[0]
+                    tf = aa[1]
+                    
+                    Neuden_data = self.data['outputdata']['NeuDen'][nf][tf]
+                    fstate = self.data['b2fstate'][nf][tf]
+                
+                else:
+                    
+                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    fstate = self.data['b2fstate'][aa]
+                    
+                
                 psiN_map = self.data['psi']['psival']
                 
                 fitresult = self.radial_data_fit_method(b2fstate = fstate, 
