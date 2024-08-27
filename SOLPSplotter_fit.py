@@ -5,13 +5,8 @@ Created on Tue Jan 30 23:11:05 2024
 @author: ychuang
 """
 
-from SOLPSplotter_PRmap import RP_mapping 
-import matplotlib.pyplot as plt
-import load_mast_expdata_method as lmem
-import load_coord_method as lcm
+from SOLPSplotter_PRmap import RP_mapping
 import fitting_method as fm 
-from scipy import interpolate
-from scipy.optimize import curve_fit
 import numpy as np
 
 
@@ -19,51 +14,6 @@ class profile_fit(RP_mapping):
     
     def __init__(self, DefaultSettings, loadDS):
         RP_mapping.__init__(self, DefaultSettings, loadDS)
-    
-    
-    def data_support(self, data_source):
-        
-        if data_source == 'output':
-            
-            self.load_output_data(param= 'NeuDen')
-            self.load_output_data(param= 'Ne')
-            self.load_output_data(param= 'Te')
-        
-        elif data_source == 'b2f':
-            
-            print('wait for improvement')
-            
-            
-            """
-            
-            if self.data['b2fstate'] == None:
-                self.load_b2fstate()
-                
-                b2fstate = self.data['b2fstate']
-                
-                Ne_data = b2fstate['ne'].transpose()
-                Te_J = b2fstate['te'].transpose()
-                ev = 1.6021766339999999 * pow(10, -19)
-                Te_data = Te_J / ev
-                
-            elif self.data['b2fstate'] != None:
-                
-                Ne_data = b2fstate['ne'].transpose()
-                Te_J = b2fstate['te'].transpose()
-                ev = 1.6021766339999999 * pow(10, -19)
-                Te_data = Te_J / ev
-                
-            if self.data['b2fplasmf'] == None:
-                self.load_b2fplasmf()
-                Neuden_data = 
-                
-                
-            elif self.data['b2fstate'] != None:
-                
-               
-            
-            """
-    
     
     
     def opacity_data_fit_method(self, psiN, b2fstate, Neuden,
@@ -75,7 +25,6 @@ class profile_fit(RP_mapping):
         delta = np.zeros(ln)
         delta_l = np.zeros(ln)
         opq = np.zeros(ln)
-        # pol_loc = np.zeros(ln)
         neu_den = np.zeros(ln)
         ne_ped = np.zeros(ln)
         tdelta = np.zeros(ln)
@@ -166,19 +115,33 @@ class profile_fit(RP_mapping):
         if self.withshift == False and self.withseries == False:
             
             
-            self.load_output_data(param= 'NeuDen')
+            
             for p in pol_list:
                 self.calc_dsa(pol_loc= p)
-            # data = self.data['ft44']['dab2']
-            # Neuden_data = np.transpose(data[:, :, 0])
-            Neuden_data = self.data['outputdata']['NeuDen']
-            fstate = self.data['b2fstate']
+
+            
+            nx = self.data['b2fgeo']['nx']
+            ny = self.data['b2fgeo']['ny']
+            
+            if dat_size == 'full':
+                
+                self.load_output_data(param= 'NeuDen')
+                Neuden_data = self.data['outputdata']['NeuDen']
+                dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+            
+            elif dat_size == 'small':
+                
+                data = self.data['ft44']['dab2']
+                Neuden_data = np.transpose(data[:, :, 0])
+                dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                
             psiN_map = self.data['psi']['psival']
+            fstate = self.data['b2fstate']         
             pd = self.data['DefaultSettings']['psi_dsa']
             
             fitresult = self.opacity_data_fit_method(b2fstate = fstate, Neuden = Neuden_data, 
                        psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list, 
-                                    itername = None)
+                                    itername = None, data_struc = dat_struc)
             
             self.data['opacity_poloidal'] = fitresult
             self.data['poloidal_itemname'] = list(fitresult.keys())
@@ -285,9 +248,7 @@ class profile_fit(RP_mapping):
                 
     def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_loc, data_struc):
         
-        # self.load_output_data(param= 'NeuDen')
-        # self.load_output_data(param= 'Ne')
-        # self.load_output_data(param= 'Te')
+
         
         nx = data_struc['nx']
         ny = data_struc['ny']
@@ -312,9 +273,7 @@ class profile_fit(RP_mapping):
         elif data_struc['size'] == 'small':
             psi = psiN[1:ny+1, pol_in]
             
-
-        
-        
+            
         Nd = Neuden[:, pol_in]
         Ne = Ne_data[:, pol_in]
         Te = Te_data[:, pol_in]
@@ -337,16 +296,29 @@ class profile_fit(RP_mapping):
         
         if self.withshift == False and self.withseries == False:
             
-            self.load_output_data(param= 'NeuDen')
             
-            # data = self.data['ft44']['dab2']
-            # Neuden_data = np.transpose(data[:, :, 0])
-            Neuden_data = self.data['outputdata']['NeuDen']
+            nx = self.data['b2fgeo']['nx']
+            ny = self.data['b2fgeo']['ny']
+            
+            if dat_size == 'full':
+                
+                self.load_output_data(param= 'NeuDen')
+                Neuden_data = self.data['outputdata']['NeuDen']
+                dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+            
+            elif dat_size == 'small':
+                
+                data = self.data['ft44']['dab2']
+                Neuden_data = np.transpose(data[:, :, 0])
+                dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+            
+            
             fstate = self.data['b2fstate']
             psiN_map = self.data['psi']['psival']
             
             fitresult = self.radial_data_fit_method(b2fstate = fstate, 
-                        Neuden = Neuden_data, psiN = psiN_map, pol_loc = pol_loc)
+                        Neuden = Neuden_data, psiN = psiN_map, 
+                        pol_loc = pol_loc, data_struc = dat_struc)
             
             self.data['radial_fit_data'] = fitresult
         
@@ -507,11 +479,6 @@ class profile_fit(RP_mapping):
 
         
         
-
-
-
-
-
             
 # ----------------------------------------------------------------------------           
     
@@ -687,5 +654,51 @@ class profile_fit(RP_mapping):
         self.data['xcoord_cut'] = xcoord_cut_dic
         
         return result
+
+
+    def data_support(self, data_source):
+        
+        if data_source == 'output':
+            
+            self.load_output_data(param= 'NeuDen')
+            self.load_output_data(param= 'Ne')
+            self.load_output_data(param= 'Te')
+        
+        elif data_source == 'b2f':
+            
+            print('wait for improvement')
+            
+            
+
+            
+            if self.data['b2fstate'] == None:
+                self.load_b2fstate()
+                
+                b2fstate = self.data['b2fstate']
+                
+                Ne_data = b2fstate['ne'].transpose()
+                Te_J = b2fstate['te'].transpose()
+                ev = 1.6021766339999999 * pow(10, -19)
+                Te_data = Te_J / ev
+                
+            elif self.data['b2fstate'] != None:
+                
+                Ne_data = b2fstate['ne'].transpose()
+                Te_J = b2fstate['te'].transpose()
+                ev = 1.6021766339999999 * pow(10, -19)
+                Te_data = Te_J / ev
+                
+            if self.data['b2fplasmf'] == None:
+                self.load_b2fplasmf()
+                Neuden_data = 
+                
+                
+            elif self.data['b2fstate'] != None:
+                
+              
+
+
+
+
 
     """
