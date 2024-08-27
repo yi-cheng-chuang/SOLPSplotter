@@ -60,7 +60,7 @@ class radial_plot(profile_fit):
         yt = [tanh_te_fit[SEP], tanh_te_fit[SEP]]
         
         
-        plt.figure(figsize=(7,7))
+        plt.figure()
         if log_flag:
             plt.yscale('log')
         else:
@@ -79,7 +79,7 @@ class radial_plot(profile_fit):
         plt.legend()
             
 
-        plt.figure(figsize=(7,7))
+        plt.figure()
         if log_flag:
             plt.yscale('log')
         else:
@@ -98,7 +98,7 @@ class radial_plot(profile_fit):
         plt.title('Electron density with fits')
         plt.legend()
         
-        plt.figure(figsize=(7,7))
+        plt.figure()
         if log_flag:
             plt.yscale('log')
         else:
@@ -209,7 +209,7 @@ class radial_plot(profile_fit):
     
        
     
-    def Opacity_study_radial_plot(self, pol_loc):
+    def Opacity_study_radial_plot(self, pol_loc, dat_size):
         
         if self.withshift == False and self.withseries == False:
             
@@ -221,8 +221,19 @@ class radial_plot(profile_fit):
             Ne = self.data['radial_fit_data']['Ne']
             Te = self.data['radial_fit_data']['Te']
             SEP = int(self.data['DefaultSettings']['sep_index_dsa'])
-            psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 2]
             
+            
+            nx = self.data['b2fgeo']['nx']
+            ny = self.data['b2fgeo']['ny']
+            
+            if dat_size == 'full':
+                
+                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 2]
+            
+            elif dat_size == 'small':
+                
+                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 2][1:ny+1]
+                
             
             result_dic = self.data['radial_fit_data'] | self.data['opacity_poloidal']
             
