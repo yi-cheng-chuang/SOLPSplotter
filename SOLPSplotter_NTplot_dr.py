@@ -7,7 +7,6 @@ Created on Thu Aug  1 15:09:47 2024
 
 import SOLPS_set as sps
 import SOLPSplotter_NTplot as spn
-import SOLPS_transcoe_adj as sta
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
