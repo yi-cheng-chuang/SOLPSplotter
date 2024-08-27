@@ -8,11 +8,6 @@ Created on Wed Jan 31 17:25:25 2024
 from SOLPSplotter_fit import profile_fit
 import matplotlib.pyplot as plt
 import SOLPS_set as ss
-import load_mast_expdata_method as lmem
-import load_coord_method as lcm
-import fitting_method as fm 
-from scipy import interpolate
-from scipy.optimize import curve_fit
 import numpy as np
 
 
@@ -173,7 +168,9 @@ class poloidal_plot(profile_fit):
             
             self.data['neuden_angle'] = cp_dat_dic
             
-                
+    
+    
+    
     def opacity_poloidal_plot(self, log_flag, save_pdf):
         
         itemname = self.data['poloidal_itemname']
