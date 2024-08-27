@@ -143,7 +143,7 @@ def flux_expand_fit(RRsep, arclength):
     return flux_fit_dic
 
 
-def Opacity_calculator(x_coord, ne, te, neuden):
+def Opacity_calculator(x_coord, ne, te, neuden, check_ne, minor_rad):
 
         fit_tanh_dic = tanh_fit(x_coord, ne, te)
         tanh_ne_fit = fit_tanh_dic['tanh_ne_fit']
@@ -151,10 +151,20 @@ def Opacity_calculator(x_coord, ne, te, neuden):
         tanh_te_fit = fit_tanh_dic['tanh_te_fit']
         dtn = fit_tanh_dic['popt_te'][2]  
         ne_ped = (fit_tanh_dic['popt_ne'][1] + fit_tanh_dic['popt_ne'][3])*pow(10, 19)
-        # avg_ne = 0.5*(ne_ped + )
         sym_pt_te = fit_tanh_dic['popt_te'][0]
         sym_pt_ne = fit_tanh_dic['popt_ne'][0]
         # print(sym_pt_te + dn)
+        
+        popt_ne = fit_tanh_dic['popt_ne']
+        
+        ne_sep = tanh(1, popt_ne[0], popt_ne[1], 
+                               popt_ne[2], popt_ne[3], popt_ne[4])*pow(10, 19)
+        
+        # print(ne_sep)
+        avg_ne = 0.5*(ne_ped + ne_sep)
+        approxi_opq = avg_ne*minor_rad
+        
+        
         
         "fitting choice 1: in the width, symmetry point +- width/2"
         xcoord_exp = []
@@ -176,13 +186,20 @@ def Opacity_calculator(x_coord, ne, te, neuden):
         # print(xcoord_exp)
         
         "plot to check the tanh fit result"
-        # plt.figure()
-        # plt.plot(x_coord, ne,'o-', color = 'b', label= 'solps electron density')
-        # plt.plot(x_coord, tanh_ne_fit, color='r',lw= 3, label= 'tanh fit')
-        # plt.xlabel('Radial coordinate: $R- R_{sep}$')
-        # plt.ylabel('Electron Density $n_e\;(m^{-3})$')
-        # plt.title('Electron density with fits')
-        # plt.legend()
+        
+        if check_ne:
+            
+            plt.figure()
+            plt.plot(x_coord, ne,'o-', color = 'b', label= 'solps electron density')
+            plt.plot(x_coord, tanh_ne_fit, color='r',lw= 3, label= 'tanh fit')
+            plt.scatter(1, ne_sep, color = 'g', label = 'separatrix density')
+            plt.xlabel('Radial coordinate: $R- R_{sep}$')
+            plt.ylabel('Electron Density $n_e\;(m^{-3})$')
+            plt.title('Electron density with fits')
+            plt.legend()
+            
+        
+
         
         "print to check the exp fit result"
         # print(dn)
@@ -209,7 +226,8 @@ def Opacity_calculator(x_coord, ne, te, neuden):
                       'temperature_pedestal_width': dtn,
                       'efold_length': efold, 'dimensionless_opaqueness': opq,
                       'ne_symmetry_point': sym_pt, 'te_symmetry_point': sym_pt_te,
-                      'n_sep_fit': n_sep_fit, 'sep_index': index_cut
+                      'n_sep_fit': n_sep_fit, 'sep_index': index_cut,
+                      'opaqueness_approximation': approxi_opq
                       }
         
         
