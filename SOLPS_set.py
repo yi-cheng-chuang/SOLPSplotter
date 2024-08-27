@@ -22,7 +22,7 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
+    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
                'Parameters': P, 'series_flag': 'twin_scan',
     'series_filename': 'org_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
@@ -36,7 +36,7 @@ def mast_comp_dic():
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
-    series_dic = {'org': '75_n900000_leakbtarnsol_nts5_a', 'dot3': '16_n900000_leakbtarnsol_dot3_a', 
+    series_dic = {'org': '76_n900000_leakbsol_nts5_a', 'dot3': '16_n900000_leakbtarnsol_dot3_a', 
                   'dot5': '26_n100000_leakagebou_dot5_a', 'dot7': '14_n100000_leakagebou_dot7_a', 
                   'one': '33_n100000_leakagebou_one_a'}
     
