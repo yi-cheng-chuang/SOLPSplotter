@@ -12,10 +12,20 @@ import numpy as np
 
 
 def Setting_dic():
+    
+    if os.environ['OS'] == 'Windows_NT':
+        terminal = False
+    elif os.environ['OS'] == '3.10.0-1160.31.1.el7.x86_64':
+        terminal = True
+    else:
+        print('there is a bug at Setting_dic function or unrecognized operating system')
+    
+    
+    
     set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': True,
                'Parameters': P, 'series_flag': 'twin_scan',
-    'series_filename': 'org_save1_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
-               'Publish': 'b2plottersetting', 'terminal': True}
+    'series_filename': 'org_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
+               'Publish': 'b2plottersetting', 'terminal': terminal}
     return set_dic
 
 series_flag = ['eireneN','change_den','change_temp']
@@ -126,7 +136,7 @@ def mast_comp_dir_eireneN():
     return mast_eireneN_dir_dic
 
 
-def terminal_series_comp_dir(tail, filename, ):
+def terminal_series_comp_dir(tail, filename):
     a_shift = 'org'
     shift = 0
     outputlist = ['Output', 'Output2', 'EirOutput']
@@ -270,7 +280,14 @@ def atp_number(text, series_flag):
     elif sd['withshift'] == False and sd['withseries'] == True:
       
         if series_flag == 'twin_scan':
-            name = text.split("/",-1)[-1]
+            divider = "\\"
+            if divider in text:
+                # print('{} is in directory'.format(divider))
+                name = text.split("\\",-1)[-1]
+            else:
+                name = text.split("/",-1)[-1]
+                # print(name)
+            
             nu_list = re.findall('\d+\.\d+', name)
             nu_tuple = (nu_list[0], nu_list[1])
             nu = [nu_tuple, name.split('_')[0]]
