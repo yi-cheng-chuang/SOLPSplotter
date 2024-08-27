@@ -14,6 +14,7 @@ class load_directory:
     def __init__(self, DefaultSettings):
         
         self.DEV = DefaultSettings['DEV']
+        self.a = DefaultSettings['minor_rad']
         self.withshift = DefaultSettings['withshift']
         self.withseries = DefaultSettings['withseries']
         self.terminal = DefaultSettings['terminal']
