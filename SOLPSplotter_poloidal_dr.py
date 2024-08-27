@@ -37,10 +37,10 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 xl.set_plot()
 poloidal_index_list = []
-for i in range(44):
-    poloidal_index_list.append('{}'.format(25 + i))
+for i in range(10):
+    poloidal_index_list.append('{}'.format(50 + i))
     
-xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small')
+xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 # xl.neuden_data_check(pol_list= poloidal_index_list)
