@@ -151,6 +151,7 @@ def Opacity_calculator(x_coord, ne, te, neuden):
         tanh_te_fit = fit_tanh_dic['tanh_te_fit']
         dtn = fit_tanh_dic['popt_te'][2]  
         ne_ped = (fit_tanh_dic['popt_ne'][1] + fit_tanh_dic['popt_ne'][3])*pow(10, 19)
+        # avg_ne = 0.5*(ne_ped + )
         sym_pt_te = fit_tanh_dic['popt_te'][0]
         sym_pt_ne = fit_tanh_dic['popt_ne'][0]
         # print(sym_pt_te + dn)
@@ -175,7 +176,7 @@ def Opacity_calculator(x_coord, ne, te, neuden):
         # print(xcoord_exp)
         
         "plot to check the tanh fit result"
-        # plt.figure(figsize=(7,7))
+        # plt.figure()
         # plt.plot(x_coord, ne,'o-', color = 'b', label= 'solps electron density')
         # plt.plot(x_coord, tanh_ne_fit, color='r',lw= 3, label= 'tanh fit')
         # plt.xlabel('Radial coordinate: $R- R_{sep}$')
@@ -208,7 +209,7 @@ def Opacity_calculator(x_coord, ne, te, neuden):
                       'temperature_pedestal_width': dtn,
                       'efold_length': efold, 'dimensionless_opaqueness': opq,
                       'ne_symmetry_point': sym_pt, 'te_symmetry_point': sym_pt_te,
-                      'n_sep_fit': n_sep_fit, 'sep_index': index_cut                                  
+                      'n_sep_fit': n_sep_fit, 'sep_index': index_cut
                       }
         
         
