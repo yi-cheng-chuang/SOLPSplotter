@@ -22,9 +22,9 @@ class NT_plot(radial_plot):
         
     
     
-    def nete_midprof(self, itername):
+    def nete_midprof(self, itername, data_struc):
         
-        
+
 
         if self.withshift == True and self.withseries == False:
             
@@ -38,16 +38,37 @@ class NT_plot(radial_plot):
                 tf = itername[1]
                 
                 b2fstate = self.data['b2fstate'][nf][tf]
-                neu_pro = self.data['outputdata']['NeuDen'][nf][tf]
+                
+                nx = data_struc['nx']
+                ny = data_struc['ny']
+                
+                if data_struc['size'] == 'full':
+                    neu_pro = self.data['outputdata']['NeuDen'][nf][tf]
+                elif data_struc['size'] == 'small':
+                    data = self.data['ft44'][nf][tf]['dab2']
+                    neu_pro = np.transpose(data[:, :, 0])
+                
+                
             
             else:
                 
                 b2fstate = self.data['b2fstate'][itername]
                 neu_pro = self.data['outputdata']['NeuDen'][itername]
-                
         
-        ne_pro = b2fstate['ne'].transpose()
-        Te_J = b2fstate['te'].transpose()
+        nx = data_struc['nx']
+        ny = data_struc['ny']
+        
+        if data_struc['size'] == 'full':
+            ne_pro = b2fstate['ne'].transpose()
+            Te_J = b2fstate['te'].transpose()
+            
+        elif data_struc['size'] == 'small':
+            ne_pro = b2fstate['ne'][1:nx+1, 1:ny+1].transpose()
+            Te_J = b2fstate['te'][1:nx+1, 1:ny+1].transpose()
+            
+        
+            
+        
         ev = 1.6021766339999999 * pow(10, -19)
         te_pro = Te_J / ev
         
@@ -59,13 +80,21 @@ class NT_plot(radial_plot):
             rightcut = self.data['b2fgeo'][itername]['rightcut'][0]
             weight = self.data['midplane_calc'][itername]['weight']
             psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
-        
+            
+            
         elif self.withshift == False and self.withseries == True:
         
             leftcut = self.data['b2fgeo']['leftcut'][0]
             rightcut = self.data['b2fgeo']['rightcut'][0]
-            weight = self.data['midplane_calc']['weight']
-            psi_coord = self.data['midplane_calc']['psi_solps_mid']
+            
+            
+            if data_struc['size'] == 'full':
+                psi_coord = self.data['midplane_calc']['psi_solps_mid']
+                weight = self.data['midplane_calc']['weight']
+                
+            elif data_struc['size'] == 'small':
+                psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:ny+1]
+                weight = self.data['midplane_calc']['weight'][1:ny+1]
         
         else:
             print('nete_TSplotmethod geo cut has a bug!')
@@ -127,7 +156,7 @@ class NT_plot(radial_plot):
     
     
     
-    def neteTSplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail):
+    def neteTSplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, dat_size):
         
         TS_dic = self.plot_neteTSdat()
         
@@ -156,9 +185,23 @@ class NT_plot(radial_plot):
         plt.subplots_adjust(hspace=.0)
         
         
+        nx = self.data['b2fgeo']['nx']
+        ny = self.data['b2fgeo']['ny']
+        
+        
+        if dat_size == 'full':
+
+            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+        
+        elif dat_size == 'small':
+            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+        
+        
+        
         for aa in iterlist:
             
-            psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = aa)
+            psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = aa, 
+                                                    data_struc = dat_struc)
             
             
             """
@@ -224,7 +267,7 @@ class NT_plot(radial_plot):
     
     
         
-    def neteTS_plot(self, scan_style):
+    def neteTS_plot(self, scan_style, dat_size):
         
         if self.withshift == True and self.withseries == False:
             
@@ -287,7 +330,21 @@ class NT_plot(radial_plot):
                             print('twinscan_plot_method, please check the scan_style!')
                         
                         
-                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = it_in)
+                        nx = self.data['b2fgeo']['nx']
+                        ny = self.data['b2fgeo']['ny']
+                        
+                        
+                        if dat_size == 'full':
+            
+                            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                        
+                        elif dat_size == 'small':
+                            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                            
+                            
+                            
+                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = it_in, 
+                                                                data_struc = dat_struc)
                         
                         
                         if scan_style == 'tempscan':
@@ -305,11 +362,13 @@ class NT_plot(radial_plot):
                         iter_key.append(it_in)
                         
                     if scan_style == 'tempscan':
-                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = (ta, '3.73'))
+                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = (ta, '3.73'),
+                                                                   data_struc = dat_struc)
                         scan_title = '{:.2E}'.format(mid_ne_pro[0])
                     
                     elif scan_style == 'denscan':
-                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = ('5.02', ta))
+                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = ('5.02', ta), 
+                                                            data_struc = dat_struc)
                         scan_title = '{:.1f}'.format(mid_te_pro[0])
                     
                     else:
@@ -318,7 +377,8 @@ class NT_plot(radial_plot):
                     label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
                     
                     self.neteTSplot_method(iterlist = iter_key, scandetail = scan_title,
-                            cl_dic = color_dic, A_dic = label_dic, scan_style = scan_style)
+                            cl_dic = color_dic, A_dic = label_dic, 
+                            scan_style = scan_style, dat_size = dat_size)
                         
                     print(scan_list)
              
