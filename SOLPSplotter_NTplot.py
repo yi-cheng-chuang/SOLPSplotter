@@ -380,7 +380,7 @@ class NT_plot(radial_plot):
                             cl_dic = color_dic, A_dic = label_dic, 
                             scan_style = scan_style, dat_size = dat_size)
                         
-                    print(scan_list)
+                    # print(scan_list)
              
             else:
                 print('neteTS_plot, please check the series flag')
