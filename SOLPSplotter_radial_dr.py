@@ -38,12 +38,11 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 
 
-xl.opacity_data_fit(pol_list = poloidal_index_list)
-xl.radial_data_fit(pol_loc = poloidal_index_list[0])
+xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small')
+xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small')
 
 
-xl.ne_te_TS_plot()
-# xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list[0])
+xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list, dat_size = 'small')
 # xl.plot_all_radial(separate = False)
 
 
