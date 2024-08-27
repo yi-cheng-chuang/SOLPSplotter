@@ -130,6 +130,7 @@ def mast_series_dir(series_flag):
 
     return mast_basedir, attempt_dic
 
+
 def two_layer_dic(key_a, key_b):
     
     # Initialize an empty dictionary
@@ -210,6 +211,45 @@ def series_terminal_dir(series_flag, dir_comp_dic):
         
 
     return mast_basedir, attempt_dic
+
+
+def twinscan_local_dir(series_flag, dir_comp_dic):
+
+    mcds = dir_comp_dic
+       
+    basedrt, topdrt = sps.set_wdir()
+    gbase = '{}/{}/{}'.format(topdrt, od['DEV'], mcds['Shot']) 
+    gdir = glob.glob('{}/g{}*'.format(gbase, mcds['Shot']))
+    simbase = '{}/{}/{}'.format(basedrt, od['DEV'], d['Shot'])
+    newbase = glob.glob('{}/{}/*{}'.format(simbase, mcds['filename'], 
+                                                 mcds['tail']))
+    tbase = '{}/{}'.format(simbase, mcds['filename'])
+
+    attempt_dic = {}
+    new_dic = {}
+    twinscan_dic = {}
+    
+    ds_key = [str(x) for x in mcds['denscan_list']]
+    ts_key = [str(x) for x in mcds['tempscan_list']]
+    
+    
+    twinscan_dic = two_layer_dic(key_a = ds_key, key_b = ts_key)
+    
+    
+    for i in newbase:
+        attempt_dic[sps.atp_number(i, series_flag)[0]] = sps.atp_number(i, series_flag)[1]
+        # print(sps.atp_number(i, series_flag))
+        st = sps.atp_number(i, series_flag)[0]
+        twinscan_dic[str(st[0])][str(st[1])] = i
+    
+    
+    mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
+                    'gdir': gdir, 'simudir': twinscan_dic, 'simutop': tbase}
+        
+
+    return mast_basedir, attempt_dic
+
+
 
 
 
