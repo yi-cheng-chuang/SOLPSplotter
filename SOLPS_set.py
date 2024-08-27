@@ -22,7 +22,7 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'withshift': False, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
                'Parameters': P, 'series_flag': 'twin_scan',
     'series_filename': 'org_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
