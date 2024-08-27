@@ -16,7 +16,7 @@ class profile_fit(RP_mapping):
         RP_mapping.__init__(self, DefaultSettings, loadDS)
     
     
-    def opacity_data_fit_method(self, psiN, b2fstate, Neuden,
+    def opacity_data_fit_method(self, psiN, b2fstate, Neuden, check_ne,
                 psi_dsa_ratio, pol_list, itername, data_struc): 
         # i = 0
         ln = len(pol_list)
@@ -59,16 +59,15 @@ class profile_fit(RP_mapping):
             elif data_struc['size'] == 'small':
                 psi = psiN[1:ny+1, pol_in]
                 
-
-            
-            
+                
             Nd = Neuden[:, pol_in]
             Ne = Ne_data[:, pol_in]
             Te = Te_data[:, pol_in]
             
 
             rd = fm.Opacity_calculator(x_coord= psi, ne = Ne, te = Te, 
-                                   neuden = Nd)
+                                   neuden = Nd, check_ne = check_ne, minor_rad = self.a)
+            
             ped_index = rd['sep_index']
             
             
@@ -107,7 +106,7 @@ class profile_fit(RP_mapping):
         return result
     
     
-    def opacity_data_fit(self, pol_list, dat_size):
+    def opacity_data_fit(self, pol_list, dat_size, check_ne):
         
         # self.load_ft44()
         
@@ -141,7 +140,7 @@ class profile_fit(RP_mapping):
             
             fitresult = self.opacity_data_fit_method(b2fstate = fstate, Neuden = Neuden_data, 
                        psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list, 
-                                    itername = None, data_struc = dat_struc)
+                      itername = None, data_struc = dat_struc, check_ne = check_ne)
             
             self.data['opacity_poloidal'] = fitresult
             self.data['poloidal_itemname'] = list(fitresult.keys())
