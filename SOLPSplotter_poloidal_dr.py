@@ -28,7 +28,7 @@ xl.load_b2fstate()
 xl.load_b2fplasmf()
 # xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
-
+xl.load_ft44()
 
 poloidal_index_list = ['59']
 xl.calc_dsa(pol_loc= poloidal_index_list[0])
@@ -40,10 +40,10 @@ poloidal_index_list = []
 for i in range(44):
     poloidal_index_list.append('{}'.format(25 + i))
     
-xl.opacity_data_fit(pol_list = poloidal_index_list)
+xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small')
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
-xl.neuden_data_check(pol_list= poloidal_index_list)
+# xl.neuden_data_check(pol_list= poloidal_index_list)
 
 xl.opacity_poloidal_plot(log_flag = False, save_pdf = False)
 
