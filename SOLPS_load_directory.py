@@ -97,16 +97,34 @@ class load_directory:
                     self.data['dircomp']['Attempt'] = att_dic
                 
                 elif self.series_flag == 'twin_scan':
-                    self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
-                                        filename = self.series_filename)
                     
-                    dir_comp = sps.terminal_series_comp_dir(tail = self.series_tail, 
-                                        filename = self.series_filename)
+                    if self.terminal == True:
+                        
+                        self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                                            filename = self.series_filename)
+                        
+                        dir_comp = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                                            filename = self.series_filename)
+                        
+                        series_dir, att_dic = lmem.series_terminal_dir(series_flag = self.series_flag,
+                                                                      dir_comp_dic = dir_comp)
+                        self.data['dirdata'] = series_dir
+                        self.data['dircomp']['Attempt'] = att_dic
                     
-                    series_dir, att_dic = lmem.series_terminal_dir(series_flag = self.series_flag,
-                                                                  dir_comp_dic = dir_comp)
-                    self.data['dirdata'] = series_dir
-                    self.data['dircomp']['Attempt'] = att_dic
+                    elif self.terminal == False:
+                    
+                        self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                                            filename = self.series_filename)
+                        
+                        dir_comp = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                                            filename = self.series_filename)
+                        
+                        series_dir, att_dic = lmem.twinscan_local_dir(series_flag = self.series_flag,
+                                                                      dir_comp_dic = dir_comp)
+                        self.data['dirdata'] = series_dir
+                        self.data['dircomp']['Attempt'] = att_dic
+                        
+                        
                 
             elif self.withshift == True and self.withseries == True:
                 print('load_mast_dir is not there yet, to be continue...')      
