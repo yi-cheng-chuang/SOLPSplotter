@@ -643,85 +643,14 @@ class NT_plot(radial_plot):
 
 
 
+
+
+
+
+
 """
 
-ds_key = [str(x) for x in dircomp['denscan_list']]
 
-for td in ds_key:
-    
-    ts_key = [str(x) for x in dircomp['tempscan_list']]
-    color_list = ['red', 'orange', 'green', 'blue', 'purple']
-    
-    color_dic = self.pair_dic(keys = ts_key, values = color_list)
-    
-    temp_list = []
-    iter_key = []
-    
-    for ts in ts_key:
-        
-        it_in = (td, ts)
-        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = it_in)
-        
-        
-        temp_add = '{:.1f} eV'.format(mid_te_pro[0])
-        
-        temp_list.append(temp_add)
-        iter_key.append(it_in)
-        
-    scan_title = '{:.2E}'.format(mid_ne_pro[0])
-    
-    label_dic = self.pair_dic(keys = ts_key, values = temp_list)
-    
-    self.AM_NTplot_method(iterlist = iter_key, AM_flag = AM_flag,
-            cl_dic = color_dic, A_dic = label_dic, scan = 'tempscan',
-            scandetail = scan_title)
-        
-    print(temp_list)
-
-
-if self.series_flag == 'change_den':
-    
-    color_dic = {'3.4': 'red', '4.0': 'orange', '5.0': 'green',
-                 '6.0': 'blue', '7.0': 'purple'}
-    
-    label_dic = {'3.4': '4.15*$10^{19} m^{-3}$', 
-'4.0': '4.37*$10^{19} m^{-3}$', '5.0': '4.62*$10^{19} m^{-3}$',
-'6.0': '4.9*$10^{19} m^{-3}$', '7.0': '5.16*$10^{19} m^{-3}$'}
-    
-    denscan = list(self.data['dircomp']['Attempt'].keys())
-    
-    self.neteTSplot_structure(iterlist = denscan, 
-                cl_dic = color_dic, A_dic = label_dic, scan = 'den')
-
-elif self.series_flag == 'change_temp':
-    
-    color_dic = {'2.5': 'red', '3.0': 'orange', '4.0': 'green',
-                 '5.0': 'blue', '6.0': 'purple'}
-    
-    label_dic = {'2.5': '477 eV', '3.0': '571 eV', '4.0': '732 eV',
-        '5.0': '884 eV', '6.0': '1037 eV'}
-    
-    denscan = list(self.data['dircomp']['Attempt'].keys())
-    
-    self.neteTSplot_structure(iterlist = denscan, 
-                cl_dic = color_dic, A_dic = label_dic, scan = 'temp')
-
-elif self.series_flag == 'terminal_test':
-    
-    color_dic = {'4.15': 'red', '5.0': 'orange', '6.0': 'green',
-                 '7.0': 'blue', '8.0': 'purple', '9.0': 'brown'}
-    
-    label_dic = {'4.15': '4.15*$10^{19} m^{-3}$', 
-'5.0': '5.0*$10^{19} m^{-3}$', '6.0': '6.0*$10^{19} m^{-3}$',
-'7.0': '7.0*$10^{19} m^{-3}$', '8.0': '8.0*$10^{19} m^{-3}$',
-'9.0': '9.0*$10^{19} m^{-3}$'}
-    
-    dencan = list(self.data['dircomp']['Attempt'].keys())
-    
-    
-    
-    self.neteTSplot_structure(iterlist = denscan, 
-                cl_dic = color_dic, A_dic = label_dic, scan = 'den')
 
 """
     
