@@ -245,7 +245,7 @@ class profile_fit(RP_mapping):
         self.data['neuden_change'] = neu_percent
         
                 
-    def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_loc, data_struc):
+    def radial_data_fit_method(self, b2fstate, Neuden, psiN, pol_loc, data_struc, check_ne):
         
 
         
@@ -279,7 +279,7 @@ class profile_fit(RP_mapping):
         
 
         rd = fm.Opacity_calculator(x_coord= psi, ne = Ne, te = Te, 
-                               neuden = Nd)
+                               neuden = Nd, check_ne= check_ne, minor_rad = self.a)
              
         fit_dic = {'tanh_ne_fit': rd['tanh_ne_fit'], 'tanh_te_fit': rd['tanh_te_fit'],
              'exp_fit': rd['exp_fit'], 'x_coord_cut': rd['x_coord_cut'],
@@ -290,7 +290,7 @@ class profile_fit(RP_mapping):
         return fit_dic
     
     
-    def radial_data_fit(self, pol_loc, dat_size):
+    def radial_data_fit(self, pol_loc, dat_size, check_ne):
         
         
         if self.withshift == False and self.withseries == False:
@@ -317,7 +317,7 @@ class profile_fit(RP_mapping):
             
             fitresult = self.radial_data_fit_method(b2fstate = fstate, 
                         Neuden = Neuden_data, psiN = psiN_map, 
-                        pol_loc = pol_loc, data_struc = dat_struc)
+                        pol_loc = pol_loc, data_struc = dat_struc, check_ne = check_ne)
             
             self.data['radial_fit_data'] = fitresult
         
@@ -335,7 +335,8 @@ class profile_fit(RP_mapping):
                 
                                   
                 fitresult = self.radial_data_fit_method(b2fstate = fstate, 
-                            Neuden = Neuden_data, psiN = psiN_map, pol_loc = pol_loc)
+                            Neuden = Neuden_data, psiN = psiN_map, 
+                            pol_loc = pol_loc)
                     
                 
                 fitresult_dic[aa] = fitresult_dic
@@ -384,7 +385,7 @@ class profile_fit(RP_mapping):
                 
                 fitresult = self.radial_data_fit_method(b2fstate = fstate, 
                     Neuden = Neuden_data, psiN = psiN_map, pol_loc = pol_loc,
-                    data_struc = dat_struc)
+                    data_struc = dat_struc, check_ne = check_ne)
             
                 fitresult_dic[aa] = fitresult
             
