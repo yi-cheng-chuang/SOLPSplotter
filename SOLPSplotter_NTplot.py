@@ -6,13 +6,9 @@ Created on Thu Aug  1 14:02:21 2024
 """
 
 from SOLPSplotter_radial import radial_plot
-import matplotlib.pyplot as plt
-import fitting_method as fm 
-from scipy import interpolate
-from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
-import fitting_method as fm
 
 
 class NT_plot(radial_plot):
