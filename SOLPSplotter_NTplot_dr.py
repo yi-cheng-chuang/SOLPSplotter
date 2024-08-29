@@ -33,8 +33,8 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 
 
-xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small')
-xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small')
+xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
+xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_ne = False)
 
 
 xl.neteTS_plot(scan_style = 'denscan', dat_size = 'small')
