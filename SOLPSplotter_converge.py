@@ -10,6 +10,7 @@ from SOLPSplotter_fit import profile_fit
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
+from scipy import interpolate
 
 
 class SOLPS_converge(profile_fit):
@@ -166,7 +167,7 @@ class SOLPS_converge(profile_fit):
         self.data['nete_ref'] = std_dic
     
     
-    def solution_compare(self):
+    def solution_compare(self, plot):
         
         std_dic = self.data['nete_ref']
         nete_mid_dic = self.data['nete_midpro']
@@ -184,22 +185,98 @@ class SOLPS_converge(profile_fit):
         mid_te = nete_mid_dic['midplane_te']
         
         
-        fig, axs = plt.subplots(1, 2)
-        
-        anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
-        axs[0].plot(psiN_std, ne_std, color = 'blue', label= '$n_e$ solution')
-        axs[0].plot(mid_psiN, mid_ne, color = 'red', label= '$n_e$ numerical')
-        axs[0].add_artist(anchored_text)
-        axs[0].legend(loc='lower left', fontsize=10)
-        
-        anchored_text = AnchoredText('(b){}'.format('$t_e$ [$m^{-3}$]'), loc='upper right')
-        axs[1].plot(psiN_std, te_std, color = 'blue', label= '$t_e$ solution')
-        axs[1].plot(mid_psiN, mid_te, color = 'red', label= '$t_e$ numerical')
-        axs[1].add_artist(anchored_text)
-        axs[1].legend(loc='lower left', fontsize=10)
+        f_ne = interpolate.interp1d(psiN_std, ne_std)
+        f_te = interpolate.interp1d(psiN_std, te_std)
         
         
         
+        mat_psiN = []
+        mat_ne = []
+        mat_te = []
+        
+        for ii, pN in enumerate(mid_psiN):
+            
+            if pN <= max(psiN_std) and pN >= min(psiN_std):
+                
+                mat_psiN.append(pN)
+                mat_ne.append(mid_ne[ii])
+                mat_te.append(mid_te[ii])
+        
+        
+        
+        ne_c = f_ne(mat_psiN)
+        te_c = f_te(mat_psiN)
+        
+        if plot:
+            
+            fig, axs = plt.subplots(1, 2)
+            
+            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
+            axs[0].plot(psiN_std, ne_std, color = 'blue', label= '$n_e$ solution')
+            axs[0].plot(mid_psiN, mid_ne, color = 'red', label= '$n_e$ numerical')
+            axs[0].add_artist(anchored_text)
+            axs[0].legend(loc='lower left', fontsize=10)
+            
+            anchored_text = AnchoredText('(b){}'.format('$t_e$ [$m^{-3}$]'), loc='upper right')
+            axs[1].plot(psiN_std, te_std, color = 'blue', label= '$t_e$ solution')
+            axs[1].plot(mid_psiN, mid_te, color = 'red', label= '$t_e$ numerical')
+            axs[1].add_artist(anchored_text)
+            axs[1].legend(loc='lower left', fontsize=10)
+            
+            
+            fig, axs = plt.subplots(1, 2)
+            
+            anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
+            axs[0].scatter(mat_psiN, ne_c, color = 'blue', label= '$n_e$ solution')
+            axs[0].scatter(mat_psiN, mat_ne, color = 'red', label= '$n_e$ numerical')
+            axs[0].add_artist(anchored_text)
+            axs[0].legend(loc='lower left', fontsize=10)
+            
+            anchored_text = AnchoredText('(b){}'.format('$t_e$ [$m^{-3}$]'), loc='upper right')
+            axs[1].scatter(mat_psiN, te_c, color = 'blue', label= '$t_e$ solution')
+            axs[1].scatter(mat_psiN, mat_te, color = 'red', label= '$t_e$ numerical')
+            axs[1].add_artist(anchored_text)
+            axs[1].legend(loc='lower left', fontsize=10)
+            
+        
+        
+        
+        
+        prof_compare_dic = {'x_coord': mat_psiN, 'ne_std': ne_c, 'ne_numerical': mat_ne,
+                            'te_std': te_c, 'te_numerical': mat_te }
+        
+        self.data['profile compare'] = prof_compare_dic
+        
+    
+    
+    def error_calculation(self):
+        
+        pc_dic = self.data['profile compare']
+        
+        psiN = pc_dic['x_coord']
+        ne_std = pc_dic['ne_std']
+        ne_num = pc_dic['ne_numerical']
+        te_std = pc_dic['te_std']
+        te_num = pc_dic['te_numerical']
+        
+        ne_qsum = 0
+        te_qsum = 0
+        
+        for ii in range(len(psiN)):
+            
+            ne_qsum = ne_qsum + (ne_std[ii] - ne_num[ii])**2
+            te_qsum = te_qsum + (te_std[ii] - te_num[ii])**2
+        
+        ne_err = np.sqrt(ne_qsum / len(psiN))
+        te_err = np.sqrt(te_qsum / len(psiN))
+        
+        print('ne error percentage')
+        print(ne_err/ max(ne_num))
+        print('te error percentage')
+        print(te_err/ max(te_num))
+        
+        
+    
         
         
         
