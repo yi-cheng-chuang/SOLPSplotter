@@ -8,14 +8,7 @@ Created on Thu Feb  1 16:36:57 2024
 from SOLPSplotter_b2fplasmf_dataprocess import sep_data_process
 import SOLPS_set as ss
 import os
-import opacity_plot_method as opm
 import matplotlib.pyplot as plt
-import load_mast_expdata_method as lmem
-import load_coord_method as lcm
-import fitting_method as fm 
-from scipy import interpolate
-from scipy.optimize import curve_fit
-import numpy as np
 
 
 class sep_poloidal_plot(sep_data_process):
@@ -126,7 +119,19 @@ class sep_poloidal_plot(sep_data_process):
         # ax.ylabel('{}'.format(unit_dic[i]))
         ax.legend()
     
-    
+    def opacity_study_unit(self):
+        unit = {'efold_length_psiN': 'Neutral penetration length ($\psi_N$)',
+                'pedestal_width_psiN': 'Pedestal width ($\psi_N$)',
+                  'dimensionless_opaqueness': 'Experimental opaqueness', 
+                  'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
+                  'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
+                  'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
+                  'flux_expansion': 'Flux expansion',
+                  'efold_length': '$\lambda_{n_D}$ [mm]',
+                  'pedestal_width': '$\Delta n_e$ [mm]',
+                  
+                  }
+        return unit
         
     def iteminput_seppolsubplot_method(self, index_list, log_flag, result, 
                                     i_name, ax, A_dic, color_dic):
@@ -151,7 +156,7 @@ class sep_poloidal_plot(sep_data_process):
             # result = self.data['nxny_sep_data']
 
             
-            unit = opm.opacity_study_unit()
+            unit = self.opacity_study_unit()
             pol_loc = self.data['angle']['angle_list']
             xpoint = self.data['angle']['xpoint_angle']
             a_shift = self.data['dircomp']['a_shift']
@@ -175,7 +180,7 @@ class sep_poloidal_plot(sep_data_process):
                 
                 dat_set = result[aa]
                 
-                unit = opm.opacity_study_unit()
+                unit = self.opacity_study_unit()
                 pol_loc = self.data['angle']['angle_list'][aa]
                 xpoint = self.data['angle']['xpoint_angle'][aa]
 
@@ -216,7 +221,7 @@ class sep_poloidal_plot(sep_data_process):
             result = self.data['nxny_sep_data']
 
             
-            unit = opm.opacity_study_unit()
+            unit = self.opacity_study_unit()
             pol_loc = self.data['angle']['angle_list']
             xpoint = self.data['angle']['xpoint_angle']
             a_shift = self.data['dircomp']['a_shift']
@@ -240,7 +245,7 @@ class sep_poloidal_plot(sep_data_process):
                 
                 dat_set = result[aa]
                 
-                unit = opm.opacity_study_unit()
+                unit = self.opacity_study_unit()
                 pol_loc = self.data['angle']['angle_list'][aa]
                 xpoint = self.data['angle']['xpoint_angle'][aa]
 
