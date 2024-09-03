@@ -212,8 +212,8 @@ class profile_fit(RP_mapping):
                 pd = self.data['DefaultSettings']['psi_dsa']
                 
                 fitresult = self.opacity_data_fit_method(b2fstate = fstate, Neuden = Neuden_data,
-                            psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list,
-                                        itername = None, data_struc = dat_struc)
+                        psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list,
+                        itername = None, data_struc = dat_struc, check_ne = check_ne)
                 
                 fitresult_dic[aa] = fitresult
             
