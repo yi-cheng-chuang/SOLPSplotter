@@ -15,7 +15,7 @@ def Setting_dic():
     
     if os.environ['OS'] == 'Windows_NT':
         terminal = False
-    elif os.environ['OS'] == '3.10.0-1160.31.1.el7.x86_64':
+    elif os.environ['OS'] == '5.14.0-362.24.1.el9_3.0.1.x86_64':
         terminal = True
     else:
         print('there is a bug at Setting_dic function or unrecognized operating system')
@@ -198,7 +198,7 @@ def set_wdir(): #Function to set correct Working Directory Path depending on whi
             topdrt = r"C:/Users/ychuang/Documents/SOLPS_data/experimental_data"
            
 
-    elif os.environ['OS'] == '3.10.0-1160.31.1.el7.x86_64':
+    elif os.environ['OS'] == '5.14.0-362.24.1.el9_3.0.1.x86_64':
         if os.environ['USER'] == 'ychuang':
             basedrt = r"/sciclone/data10/ychuang/solps-iter/runs/mast"
             topdrt = r"/sciclone/data10/ychuang/solps-iter/runs/mast/gnpfiles"
