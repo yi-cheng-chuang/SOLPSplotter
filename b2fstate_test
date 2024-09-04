@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Sep  3 15:33:13 2024
+
+@author: ychuang
+"""
+
+import SOLPS_set as sps
+import matplotlib.pyplot as plt
+import SOLPSplotter_fit as spf
+import SOLPS_transcoe_adj as sta
+import numpy as np
+import scipy.stats as stats
+from matplotlib.colors import LogNorm
+from matplotlib import cm
+from numpy import ma
+from scipy.optimize import curve_fit
+
+
+
+d = sps.Setting_dic()
+lex = sps.loadDS_dic(d['DEV'])
+
+
+
+xl = spf.profile_fit(DefaultSettings = d, loadDS = lex)
+
+xl.load_mast_dir()
+xl.load_solpsgeo()
+# xl.calcpsi()
+xl.calcpsi_avcr()
+xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
+fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
+                          'plot_exp_and_fit': False, 'plot_shift_compare': False,
+                          'data_print': True}
+xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
+xl.load_vessel()
+xl.load_ft44()
+xl.load_b2fstate()
+
+xl.load_b2fstate_fna()
+
+
+
