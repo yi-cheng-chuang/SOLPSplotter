@@ -42,8 +42,36 @@ def mast_base_dir():
 
     return mast_basedir, attempt, shift_value
 
-mwd = sps.mast_comp_dic_withshift()
 
+def terminal_single_dir():
+    basedrt, topdrt = sps.set_wdir()
+    gdir = glob.glob('{}/g{}*'.format(topdrt, d['Shot']))
+    
+    aa = d['a_shift']
+ 
+    filename = d['series_dic'][aa]
+    shift = d['shift_file_dic'][aa]
+    newbase = '{}/{}/{}'.format(basedrt, shift, filename)
+    tbase = '{}/{}'.format(basedrt, shift)
+    adir = {}
+    for i in d['Output']:
+        adir[i] = '{}/{}'.format(newbase, i)
+     
+    attempt = str(sps.s_number(adir['Output'], series_flag= None)[0])
+    shift_value = d['shift_dic'][aa]
+    
+    mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 
+                    'gdir': gdir, 'simudir': newbase, 'simutop': tbase, 
+                    'outputdir': adir}
+
+    return mast_basedir, attempt, shift_value
+
+
+
+
+
+
+mwd = sps.mast_comp_dic_withshift()
 
 def mast_withshift_dir():
     basedrt, topdrt = sps.set_wdir()
