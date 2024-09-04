@@ -15,7 +15,7 @@ def Setting_dic():
     
     if os.environ['OS'] == 'Windows_NT':
         terminal = False
-    elif os.environ['OS'] == '3.10.0-1160.31.1.el7.x86_64':
+    elif os.environ['OS'] == '5.14.0-362.24.1.el9_3.0.1.x86_64':
         terminal = True
     else:
         print('there is a bug at Setting_dic function or unrecognized operating system')
@@ -34,7 +34,7 @@ series_flag = ['eireneN','change_den','change_temp']
 def mast_comp_dic():
     a_shift = 'org'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
-    shift_file_dic = {'org': 'org_new_series','dot3': 'dot3','dot5': 'dot5',
+    shift_file_dic = {'org': 'org_cfluxb_027205','dot3': 'dot3','dot5': 'dot5',
                       'dot7': 'dot7','one': 'one_LS'}
     series_dic = {'org': '76_n900000_leakbsol_nts5_a', 'dot3': '16_n900000_leakbtarnsol_dot3_a', 
                   'dot5': '26_n100000_leakagebou_dot5_a', 'dot7': '14_n100000_leakagebou_dot7_a', 
@@ -46,6 +46,8 @@ def mast_comp_dic():
                     'a_shift': a_shift, 'Output': outputlist}
     
     return mast_dir_dic
+
+
 
 def mast_comp_dic_withshift():
     multi_shift = ['org', 'dot3', 'dot5', 'dot7']
@@ -198,7 +200,7 @@ def set_wdir(): #Function to set correct Working Directory Path depending on whi
             topdrt = r"C:/Users/ychuang/Documents/SOLPS_data/experimental_data"
            
 
-    elif os.environ['OS'] == '3.10.0-1160.31.1.el7.x86_64':
+    elif os.environ['OS'] == '5.14.0-362.24.1.el9_3.0.1.x86_64':
         if os.environ['USER'] == 'ychuang':
             basedrt = r"/sciclone/data10/ychuang/solps-iter/runs/mast"
             topdrt = r"/sciclone/data10/ychuang/solps-iter/runs/mast/gnpfiles"
