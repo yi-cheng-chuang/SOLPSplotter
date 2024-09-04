@@ -61,11 +61,24 @@ class load_directory:
     def load_mast_dir(self):
         if self.DEV == 'mast':
             if self.withshift == False and self.withseries == False:
-                self.data['dircomp'] = sps.mast_comp_dic()
-                mast_basedir, Attempt_dic, shift_value = lmem.mast_base_dir()
-                self.data['dirdata'] = mast_basedir
-                self.data['dircomp']['Attempt'] = Attempt_dic
-                self.data['dircomp']['shift_value'] = shift_value
+                
+                
+                if self.terminal == False:
+                    self.data['dircomp'] = sps.mast_comp_dic()
+                    mast_basedir, Attempt_dic, shift_value = lmem.mast_base_dir()
+                    self.data['dirdata'] = mast_basedir
+                    self.data['dircomp']['Attempt'] = Attempt_dic
+                    self.data['dircomp']['shift_value'] = shift_value
+                
+                elif self.terminal == True:
+                    
+                    self.data['dircomp'] = sps.mast_comp_dic()
+                    mast_basedir, Attempt_dic, shift_value = lmem.terminal_single_dir()
+                    self.data['dirdata'] = mast_basedir
+                    self.data['dircomp']['Attempt'] = Attempt_dic
+                    self.data['dircomp']['shift_value'] = shift_value
+        
+        
                 
             elif self.withshift == True and self.withseries == False:
                 self.data['dircomp'] = sps.mast_comp_dic_withshift()
