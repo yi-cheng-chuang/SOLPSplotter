@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Sep  3 19:05:29 2024
+
+@author: ychuang
+"""
+
+import matplotlib.pyplot as plt
+from SOLPSplotter_PRmap import RP_mapping
+import numpy as np
+
+
+class iout_flux(RP_mapping):
+    def __init__(self, DefaultSettings, loadDS):
+        RP_mapping.__init__(self, DefaultSettings, loadDS)
+        
+    
+    
+    def load_b2fstate_fna(self):
+        
+        if self.withshift == False and self.withseries == False:
+            
+            fna_data = self.data['b2fstate']['fna']
+            fna_a = fna_data[:, :, 0, 0]
+            fna_b = fna_data[:, :, 0, 1]
+            fna_c = fna_data[:, :, 1, 0]
+            fna_d = fna_data[:, :, 1, 1]
+            
+            fna_dic = {'fna_a': fna_a, 'fna_b': fna_b, 'fna_c': fna_c, 'fna_d': fna_d}
+            
+            self.data['fna_check'] = fna_dic
+    
+    
+    
+    
