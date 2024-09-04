@@ -6,15 +6,7 @@ Created on Mon Jul 22 19:38:20 2024
 """
 
 import SOLPS_set as sps
-import matplotlib.pyplot as plt
-import SOLPSplotter_iout_polplot as sip
-import SOLPS_transcoe_adj as sta
-import numpy as np
-import scipy.stats as stats
-from matplotlib.colors import LogNorm
-from matplotlib import cm
-from numpy import ma
-from scipy.optimize import curve_fit
+import SOLPSplotter_iout_plotpresent as sip
 
 
 
@@ -23,7 +15,7 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-xl = sip.Plotiout(DefaultSettings = d, loadDS = lex)
+xl = sip.Present_ioutplot(DefaultSettings = d, loadDS = lex)
 
 xl.load_mast_dir()
 xl.load_solpsgeo()
@@ -61,13 +53,11 @@ A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
 
 
 
-
-
 ['all_fluxes', 'fluxes_geo', 'fluxes_no_geo', 'neu_den', 'coe_check', 'annual_coe',
  'mag_contour', 'fluxes_no_psch', 'mag_pol', 'annual_review_mag', 'varify_vpara']
 
 
-topic = 'annual_coe'
+topic = 'all_fluxes'
 
 
 topic_label_dic = {'all_fluxes': '4', 'fluxes_geo': '2', 'fluxes_no_geo': '2', 
