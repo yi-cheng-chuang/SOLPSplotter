@@ -159,6 +159,63 @@ def mast_series_dir(series_flag):
     return mast_basedir, attempt_dic
 
 
+mcds = sps.mast_comp_dir_series()
+
+def series_twocompare_dir(series_flag):
+    if series_flag == 'two_compare':
+        mcds = sps.mast_twocompare_dir()
+    else:
+        print('please check series_flag')
+       
+    basedrt, topdrt = sps.set_wdir()
+    gbase = '{}/{}/{}'.format(topdrt, od['DEV'], mcds['Shot'])
+    gdir = glob.glob('{}/g{}*'.format(gbase, mcds['Shot']))
+    newbase = []
+    for aa in mcds['fname_list']:
+        newbase.append('{}/{}/{}/{}/{}'.format(basedrt,od['DEV'], mcds['Shot'], 
+                                           mcds['series_name'], aa))
+        
+    
+    tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], mcds['Shot'], mcds['series_name'])
+
+    attempt_dic = {}
+    new_dic = {}
+    
+    if series_flag == 'two_compare':
+        for ab in newbase:
+            
+            if 'std_a' in ab:
+                
+                shotnum = sps.s_number(ab, series_flag)[0][1]
+                print('std shotnum is {}'.format(str(shotnum)))
+                attempt_dic['std'] = shotnum
+                new_dic['std'] = ab
+            
+            elif 'save_a' in ab:
+                
+                shotnum = sps.s_number(ab, series_flag)[0][1]
+                print('save shotnum is {}'.format(str(shotnum)))
+                attempt_dic['save'] = shotnum
+                new_dic['save'] = ab
+                
+            
+    # print(attempt_list)
+    
+    adir = {}
+    for ii in attempt_dic.keys():
+        adir[ii] = {}
+        for j in mcds['Output']:
+            adir[ii][j] = '{}/{}'.format(new_dic[ii], j)
+    
+    mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
+                    'gdir': gdir, 'simudir': new_dic, 'simutop': tbase, 
+                    'outputdir': adir}
+
+    return mast_basedir, attempt_dic
+
+
+
+
 def two_layer_dic(key_a, key_b):
     
     # Initialize an empty dictionary
