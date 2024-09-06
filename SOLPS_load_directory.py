@@ -110,6 +110,13 @@ class load_directory:
                     self.data['dirdata'] = series_dir
                     self.data['dircomp']['Attempt'] = att_dic
                 
+                elif self.series_flag == 'two_compare':
+                    self.data['dircomp'] = sps.mast_twocompare_dir()
+                    series_dir, att_dic = lmem.series_twocompare_dir(series_flag= self.series_flag)
+                    self.data['dirdata'] = series_dir
+                    self.data['dircomp']['Attempt'] = att_dic
+                
+                
                 elif self.series_flag == 'twin_scan':
                     
                     if self.terminal == True:
