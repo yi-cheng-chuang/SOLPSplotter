@@ -22,8 +22,8 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
-               'Parameters': P, 'series_flag': 'twin_scan',
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': True,
+               'Parameters': P, 'series_flag': 'two_compare',
     'series_filename': 'org_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
     return set_dic
@@ -34,9 +34,24 @@ series_flag = ['eireneN','change_den','change_temp']
 def mast_comp_dic():
     a_shift = 'org'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
-    shift_file_dic = {'org': 'org_cfluxb_027205','dot3': 'dot3','dot5': 'dot5',
-                      'dot7': 'dot7','one': 'one_LS'}
-    series_dic = {'org': '76_n900000_leakbsol_nts5_a', 'dot3': '16_n900000_leakbtarnsol_dot3_a', 
+    
+    twinscan = True
+    
+    if twinscan:
+        series_name = 'org_cfluxb_std'
+        file_name = '77_nf5.52tf4.11_save_a'
+    
+    else:
+        series_name = 'org_cfluxb_std'
+        file_name = '76_nf5.52tf4.11_std_a'
+        
+    
+    
+    shift_file_dic = {'org': series_name,'dot3': 'dot3','dot5': 'dot5',
+                          'dot7': 'dot7','one': 'one_LS'}
+    
+    
+    series_dic = {'org': file_name, 'dot3': '16_n900000_leakbtarnsol_dot3_a', 
                   'dot5': '26_n100000_leakagebou_dot5_a', 'dot7': '14_n100000_leakagebou_dot7_a', 
                   'one': '33_n100000_leakagebou_one_a'}
     
@@ -46,6 +61,19 @@ def mast_comp_dic():
                     'a_shift': a_shift, 'Output': outputlist}
     
     return mast_dir_dic
+
+
+def mast_twocompare_dir():
+    a_shift = 'org'
+    shift = 0
+    series_name = 'org_cfluxb_std'
+    fname_list = ['76_nf5.52tf4.11_std_a', '79_nf5.52tf4.11_save_a']
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    mast_series_dir_dic = {'Shot': '027205', 'series_name': series_name, 'shift_value': shift,
+                    'fname_list': fname_list, 'a_shift': a_shift, 'Output': outputlist}
+    
+    return mast_series_dir_dic
+
 
 
 
@@ -248,10 +276,11 @@ def s_number(text, series_flag):
             nu = re.findall('\d+\.\d+', name)
             nu.append(name.split('_')[0])
         
-        elif series_flag == 'terminal_test':
-            name = text.split("/",-1)[-1]
-            nu = re.findall('\d+\.\d+', name)
+        elif series_flag == 'two_compare':
+            name = text.split("\\",-1)[-1]
+            nu = re.findall('\d+', name)
             nu.append(name.split('_')[0])
+            # print(nu)
         
         elif series_flag == 'twin_scan':
             name = text.split("/",-1)[-1]
