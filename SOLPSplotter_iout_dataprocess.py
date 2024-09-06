@@ -143,39 +143,112 @@ class iout_process(RP_mapping):
         return qu_list
     
     
-    def derive_no_geo_quant(self, qu_list, gcoe_list, pol_name, rad_name):
+    def derive_no_geo_quant(self, qu_list, gcoe_list, pol_name, rad_name, iterlist):
         
         res_qu_list = []
         
         for item in qu_list:
             
-            res_qu_dic = {}
-            for aa in self.data['dircomp']['multi_shift']:
+            if self.withshift == False and self.withseries == False:
+                
                 if item.split('_')[1] == 'x':
                     data, res_qu = self.load_iout_multi(name1 = gcoe_list[0], name2 = item, 
-                                        input_name= pol_name, itername = aa)
+                                        input_name= pol_name, itername = None)
                     print('flux check: {}'.format(gcoe_list[0]))
                     print('flux check: {}'.format(item))
-                    res_qu_dic[aa] = data
+                    
+                    self.data['iout_data'][res_qu] = data
                 
                 elif item.split('_')[1] == 'y':
                     data, res_qu = self.load_iout_multi(name1 = gcoe_list[1], name2 = item,
-                                        input_name= rad_name, itername = aa)
+                                        input_name= rad_name, itername = None)
                     
                     print('flux check: {}'.format(gcoe_list[1]))
                     print('flux check: {}'.format(item))
                     
-                    res_qu_dic[aa] = data
+                    self.data['iout_data'][res_qu] = data
+                    
+                    y1_input = rad_name + '_y1'
+                    
+                    data_y1, res_qu_y1 = self.load_iout_multi(name1 = gcoe_list[2], name2 = item,
+                                        input_name= y1_input, itername = None)
+                    
+                    print('flux check: {}'.format(gcoe_list[2]))
+                    print('flux check: {}'.format(item))
+                    
+                    self.data['iout_data'][res_qu_y1] = data_y1
           
                 else:
                     print('a bug! flag is {}'.format(item.split('_')[1]))
-            
-            self.data['iout_data'][res_qu] = res_qu_dic
-            
-        
-            print(res_qu)
-            res_qu_list.append(res_qu)
-            
+                
+                
+            elif self.withshift == True and self.withseries == False:
+                
+                res_qu_dic = {}
+                for aa in iterlist:
+                    if item.split('_')[1] == 'x':
+                        data, res_qu = self.load_iout_multi(name1 = gcoe_list[0], name2 = item, 
+                                            input_name= pol_name, itername = aa)
+                        print('flux check: {}'.format(gcoe_list[0]))
+                        print('flux check: {}'.format(item))
+                        res_qu_dic[aa] = data
+                    
+                    elif item.split('_')[1] == 'y':
+                        data, res_qu = self.load_iout_multi(name1 = gcoe_list[1], name2 = item,
+                                            input_name= rad_name, itername = aa)
+                        
+                        print('flux check: {}'.format(gcoe_list[1]))
+                        print('flux check: {}'.format(item))
+                        
+                        res_qu_dic[aa] = data
+              
+                    else:
+                        print('a bug! flag is {}'.format(item.split('_')[1]))
+                
+                self.data['iout_data'][res_qu] = res_qu_dic
+                
+                
+            elif self.withshift == False and self.withseries == False:
+                
+                res_qu_dic = {}
+                for aa in iterlist:
+                
+                
+                    if item.split('_')[1] == 'x':
+                        data, res_qu = self.load_iout_multi(name1 = gcoe_list[0], name2 = item, 
+                                            input_name= pol_name, itername = aa)
+                        print('flux check: {}'.format(gcoe_list[0]))
+                        print('flux check: {}'.format(item))
+                        
+                        res_qu_dic[aa] = data
+                    
+                    elif item.split('_')[1] == 'y':
+                        data, res_qu = self.load_iout_multi(name1 = gcoe_list[1], name2 = item,
+                                            input_name= rad_name, itername = aa)
+                        
+                        print('flux check: {}'.format(gcoe_list[1]))
+                        print('flux check: {}'.format(item))
+                        
+                        res_qu_dic[aa] = data
+                        
+                        y1_input = rad_name + '_y1'
+                        
+                        data, res_qu = self.load_iout_multi(name1 = gcoe_list[2], name2 = item,
+                                            input_name= y1_input, itername = aa)
+                        
+                        print('flux check: {}'.format(gcoe_list[2]))
+                        print('flux check: {}'.format(item))
+                        
+                        res_qu_dic[aa] = data
+              
+                    else:
+                        print('a bug! flag is {}'.format(item.split('_')[1]))
+                         
+                    print(res_qu)
+                    res_qu_list.append(res_qu)
+                
+                
+                self.data['iout_data'][res_qu] = res_qu_dic
             
         
         return res_qu_list
