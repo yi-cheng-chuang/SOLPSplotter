@@ -599,6 +599,16 @@ class load_simu_data(load_expdata):
             self.data['iout_data'][quantname] = multi_data
             # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
         
+        elif input_name != None and itername == None:
+            
+            data1 = self.data['iout_data'][name1]
+            
+            data2 = self.data['iout_data'][name2]
+            
+            multi_data = np.multiply(data1, data2)
+            quantname = '{}'.format(input_name)
+            
+        
         elif input_name != None and itername != None:
             data1 = self.data['iout_data'][name1][itername]
             
@@ -624,6 +634,15 @@ class load_simu_data(load_expdata):
             self.data['iout_data'][quantname] = multi_data
             # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
         
+        elif input_name != None and itername == None:
+            data1 = self.data['iout_data'][name1]
+            
+            data2 = self.data['iout_data'][name2]
+            
+            multi_data = np.divide(data1, data2)
+            quantname = '{}'.format(input_name)
+        
+            
         elif input_name != None and itername != None:
             data1 = self.data['iout_data'][name1][itername]
             
