@@ -128,7 +128,12 @@ class iout_flux(iout_process):
 
         ioutq_dic = {'hz': [('hz.dat', 'hz')], 'hy1': [('hy1.dat', 'hy1')], 'mag': [('bbx.dat', 'bx'), ('bbz.dat', 'bz'), ('bb.dat', 'B')],
                   'flux_no_psch': [('b2tfnb_fnbx001.dat', 'pol_flux_no_psch'), 
-                                  ('b2tfnb_fnby001.dat', 'rad_flux_no_psch')]}
+                                  ('b2tfnb_fnby001.dat', 'rad_flux_no_psch')],
+                   'particle_source': [('b2npc11_sna001.dat', 'source')],
+                   'heat_source': [('b2nph9_she.dat', 'electron_heatsource'), 
+                                   ('b2nph9_shi.dat', 'ion_heatsource')],
+                  
+                  }
         
         
         qu_list_dic = {}
@@ -411,8 +416,6 @@ class iout_flux(iout_process):
     def plot_flux_compare(self):
         
         
-        
-        
         # outputfna = self.data['outputdata']['IonFlx']['D_1']
         # ioutfna = self.data['iout_data']['flux_y_0']
         # nogeo_ioutfna = self.data['iout_data']['radial_particle_flux']
@@ -437,6 +440,37 @@ class iout_flux(iout_process):
         
         axs.add_artist(anchored_text)
         axs.legend(loc='lower left', fontsize=10)
+    
+
+    def calculate_balance(self):
+        
+        rad_fna = self.data['iout_data']['flux_y_0']
+        hx = self.data['iout_data']['hx']
+        rad_fna_sol = rad_fna[35, :]
+        hx_sol = hx[35, :]
+        
+        solrad_fna = np.multiply(rad_fna_sol, hx_sol)
+        
+        sol_sum = sum(solrad_fna)
+        
+        
+        core_fna_sol = (-1) * rad_fna[0, 24:72]
+        hx_core = hx[0, 24:72]
+        
+        # print(core_fna_sol)
+        
+        corerad_fna = np.multiply(core_fna_sol, hx_core)
+        
+        core_sum = sum(corerad_fna)
+        
+        
+        rad_fna_pfr1 = rad_fna[0, 24:72]
+        hx_pfr1 = hx[0, 24:72]
+        
+        
+        pfr1rad_fna = np.multiply(rad_fna_pfr1, hx_pfr1)
+        
+        pfr1_sum = sum(pfr1rad_fna)
         
         
         
