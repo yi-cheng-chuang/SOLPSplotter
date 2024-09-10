@@ -36,8 +36,59 @@ xl.load_b2fstate_fna()
 
 xl.load_fluxes_iout()
 
-xl.plot_flux_compare()
+function_flag = 'balance'
+
+if xl.withseries == True:
+    
+    if function_flag == 'two_compare':
+        
+        xl.plot_flux_compare()
+    
+    else:
+        print('ioutflux_test, please check function flag')
+    
+    
+
+elif xl.withseries == False:
+    
+    if function_flag == 'plot_flux':
+        
+        xl.plot_radial_particleflux()
+        
+        xl.radial_cell_plot()
+    
+    elif function_flag == 'balance':
+        
+        # print('balance flag is not there yet!')
+        
+        xl.calculate_balance()
+    
+    else:
+        
+        print('ioutflux_test, please check function flag')
+
+else:
+    
+    print('ioutflux_test, there is a bug!')
+        
+        
+        
+        
+    
+    
+        
 
 
-# xl.plot_radial_particleflux()
-# xl.radial_cell_plot()
+
+
+
+
+
+
+
+
+
+
+
+
+
