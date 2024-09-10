@@ -22,7 +22,7 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': True,
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
                'Parameters': P, 'series_flag': 'two_compare',
     'series_filename': 'org_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
@@ -35,7 +35,7 @@ def mast_comp_dic():
     a_shift = 'org'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     
-    twinscan = True
+    twinscan = False
     
     if twinscan:
         series_name = 'org_cfluxb_std'
