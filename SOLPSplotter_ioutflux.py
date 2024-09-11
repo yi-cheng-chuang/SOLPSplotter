@@ -149,8 +149,8 @@ class iout_flux(iout_process):
         
         quwithder_dic = {'particle_flux': [('b2npc11_fnax001.dat', 'flux_x_0'), 
                                 ('b2npc11_fnay001.dat', 'flux_y_0')],
-             'heat_flux': [('b2nph9_fhex.dat', 'heatflux_x_0'), 
-                                     ('b2nph9_fhey.dat', 'heatflux_y_0')],
+             'electron_heat_flux': [('b2nph9_fhex.dat', 'eheatflux_x_0'), 
+                                     ('b2nph9_fhey.dat', 'eheatflux_y_0')],
              'ion_heat_flux': [('b2nph9_fhix.dat', 'ionheatflux_x_0'), 
                                      ('b2nph9_fhiy.dat', 'ionheatflux_y_0')]
             }
@@ -446,36 +446,122 @@ class iout_flux(iout_process):
         
         rad_fna = self.data['iout_data']['flux_y_0']
         hx = self.data['iout_data']['hx']
+        
         rad_fna_sol = rad_fna[35, :]
         hx_sol = hx[35, :]
-        
+
         solrad_fna = np.multiply(rad_fna_sol, hx_sol)
-        
+
         sol_sum = sum(solrad_fna)
-        
-        
+        # print(sol_sum)
+
         core_fna_sol = (-1) * rad_fna[0, 24:72]
         hx_core = hx[0, 24:72]
-        
+
         # print(core_fna_sol)
-        
+
         corerad_fna = np.multiply(core_fna_sol, hx_core)
-        
+
         core_sum = sum(corerad_fna)
-        
-        
-        rad_fna_pfr1 = rad_fna[0, 24:72]
-        hx_pfr1 = hx[0, 24:72]
-        
-        
+        # print(core_sum)
+
+
+        rad_fna_pfr1 = (-1) * rad_fna[0, :24]
+        hx_pfr1 = hx[0, :24]
+
+
         pfr1rad_fna = np.multiply(rad_fna_pfr1, hx_pfr1)
-        
+
         pfr1_sum = sum(pfr1rad_fna)
+        # print(pfr1_sum)
+
+        rad_fna_pfr2 = (-1) * rad_fna[0, 72:]
+        hx_pfr2 = hx[0, 72:]
+
+
+        pfr2rad_fna = np.multiply(rad_fna_pfr2, hx_pfr2)
+
+        pfr2_sum = sum(pfr1rad_fna)
+
+        pol_fna = self.data['iout_data']['flux_x_0']
+        hy = self.data['iout_data']['hy']
+
+        pol_fna_t1 = (-1) * pol_fna[:, 0]
+        hy_t1 = hy[0, 0]
+
+
+        t1pol_fna = np.multiply(pol_fna_t1, hy_t1)
+
+        t1_sum = sum(t1pol_fna)
+
+
+        pol_fna_t2 = pol_fna[:, 95]
+        hy_t2 = hy[0, 95]
+
+
+        t2pol_fna = np.multiply(pol_fna_t2, hy_t2)
+
+        t2_sum = sum(t2pol_fna)
+
+
+        fluxlist = [sol_sum, core_sum, pfr1_sum, pfr2_sum, t1_sum, t2_sum]
+
+        flux_sum = sum(fluxlist)
+
+        print('The flux sum is:')
+        print(flux_sum)
         
         
+        source = self.data['iout_data']['source']
+        geo_factor = self.data['iout_data']['sqrt_g']
         
+        g_source = np.multiply(geo_factor, source)
+
+        g_source_sol = sum(np.multiply(g_source[35, :], hx_sol))
+        
+        g_source_core = sum(np.multiply(g_source[0, 24:72], hx_core))
+
+        g_source_pfr1 = sum(np.multiply(g_source[0, :24], hx_pfr1))
+        
+        g_source_pfr2 = sum(np.multiply(g_source[0, 72:], hx_pfr2))
+
+        g_source_t1 = sum(np.multiply(g_source[:, 0], hy_t1))
+        
+        g_source_t2 = sum(np.multiply(g_source[:, 95], hy_t2))
+        
+        
+        source_list = [g_source_sol, g_source_core, g_source_pfr1, g_source_pfr2,
+                       g_source_t1, g_source_t2]
+        
+        source_sum = sum(source_list)
+        
+        print('The source sum is:')
+        print(source_sum)
     
 
-    
+
+"""
+
+rad_fna_tot = np.multiply(rad_fna, hx)
+rad_fna_sum = np.sum(rad_fna_tot)
+print(rad_fna_sum)
+
+pol_fna = self.data['iout_data']['flux_x_0']
+hy = self.data['iout_data']['hy']
+
+pol_fna_tot = np.multiply(pol_fna, hy)
+pol_fna_sum = np.sum(pol_fna_tot)
+print(pol_fna_sum)
+
+
+fluxlist = [pol_fna_sum, rad_fna_sum]
+
+flux_sum = np.sum(fluxlist)
+
+print('The flux sum is:')
+print(flux_sum)
+
+
+"""
     
    
