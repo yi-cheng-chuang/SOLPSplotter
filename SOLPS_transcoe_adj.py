@@ -46,7 +46,7 @@ class transport_coefficient_adjustment(load_geometry):
                 if j<= ki_SOL:
                     mod_yki[j] = coki[j,1]  
                 else:
-                    mod_yki[j] = 10.0
+                    mod_yki[j] = 18.0
             coki[:,1] = mod_yki
 
             mod_yke = np.zeros(m)
