@@ -43,7 +43,7 @@ def mast_comp_dic():
     
     else:
         series_name = 'org_cfluxb_std'
-        file_name = '79_nf5.52tf4.11_convstd_a'
+        file_name = '80_nf5.32tf4.11_convtalli_a'
         
     
     
