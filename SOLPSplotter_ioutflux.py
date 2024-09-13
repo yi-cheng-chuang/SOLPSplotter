@@ -286,6 +286,9 @@ class iout_flux(iout_process):
             pol_list_a.append('{}'.format(24 + i))
         
         
+        self.calc_pol_angle(pol_list = pol_list_a, plot_angle= False)
+        ang_list = self.data['angle']['angle_list']
+        
         b2fna_core = b2fna[25:73, 1]
         outputfna_core = outputfna[0, 25:73]
         ioutfna_core = ioutfna[0, 24:72]
@@ -299,8 +302,8 @@ class iout_flux(iout_process):
         
         
         b2fhe = self.data['b2fstate']['fhe'][:, :, 1]
-        ioutfhe = self.data['iout_data']['heatflux_y_0']
-        nogeo_ioutfhe = self.data['iout_data']['radial_heat_flux']
+        ioutfhe = self.data['iout_data']['eheatflux_y_0']
+        nogeo_ioutfhe = self.data['iout_data']['radial_electron_heat_flux']
         fpfhe = self.data['b2fplasmf']['fhe'][:, :, 1]
         
         b2fhe_core = b2fhe[25:73, 1]
@@ -349,10 +352,10 @@ class iout_flux(iout_process):
         fig, axs = plt.subplots()
         
         anchored_text = AnchoredText('(a){}'.format('Particle flux [$s^{-1}$]'), loc='upper right')
-        axs.plot(pol_list_a, b2fna_core, color = 'black', label= 'b2fstate_radial flux')
-        axs.plot(pol_list_a, outputfna_core, color = 'red', label= 'output_radial flux')
-        axs.plot(pol_list_a, ioutfna_core, color = 'blue', label= 'iout_radial flux')
-        axs.plot(pol_list_a, fpfna_core, color = 'green', label= 'fplasmf_radial flux')
+        axs.plot(ang_list, b2fna_core, color = 'black', label= 'b2fstate_radial flux')
+        axs.plot(ang_list, outputfna_core, color = 'red', label= 'output_radial flux')
+        axs.plot(ang_list, ioutfna_core, color = 'blue', label= 'iout_radial flux')
+        axs.plot(ang_list, fpfna_core, color = 'green', label= 'fplasmf_radial flux')
         axs.add_artist(anchored_text)
         axs.legend(loc='lower left', fontsize=10)
         
@@ -360,18 +363,18 @@ class iout_flux(iout_process):
         fig, axs = plt.subplots()
         
         anchored_text = AnchoredText('(b){}'.format('Particle flux [$s^{-1}$]'), loc='upper right')
-        axs.plot(pol_list_a, nogeo_ioutfna_core, color = 'black', label= 'iout_radial flux')
+        axs.plot(ang_list, nogeo_ioutfna_core, color = 'black', label= 'iout_radial flux')
         axs.add_artist(anchored_text)
         axs.legend(loc='lower left', fontsize=10)
         
         
         fig, axs = plt.subplots()
         
-        anchored_text = AnchoredText('(c){}'.format('Heat flux [$s^{-1}$]'), loc='upper right')
-        axs.plot(pol_list_a, ioutfhe_core, color = 'red', label= 'iout_radheatflux')
-        axs.plot(pol_list_a, b2fhe_core, color = 'black', label= 'b2fstate_radheatflux')
-        axs.plot(pol_list_a, core_qe_dat, color = 'blue', label= 'b2pl_radheatflux')
-        axs.plot(pol_list_a, fpfhe_core, color = 'green', label= 'fplasmf_radheatflux')
+        anchored_text = AnchoredText('(c){}'.format('Heat flux [$W$]'), loc='upper right')
+        axs.plot(ang_list, ioutfhe_core, color = 'red', label= 'iout_radheatflux')
+        axs.plot(ang_list, b2fhe_core, color = 'black', label= 'b2fstate_radheatflux')
+        axs.plot(ang_list, core_qe_dat, color = 'blue', label= 'b2pl_radheatflux')
+        axs.plot(ang_list, fpfhe_core, color = 'green', label= 'fplasmf_radheatflux')
         axs.add_artist(anchored_text)
         axs.legend(loc='lower left', fontsize=10)
         
@@ -395,19 +398,19 @@ class iout_flux(iout_process):
         
         fig, axs = plt.subplots()
         
-        anchored_text = AnchoredText('(d){}'.format('Heat flux [$s^{-1}$]'), loc='upper right')
-        axs.plot(pol_list_a, nogeo_ioutfhe_core, color = 'black', label= 'iout_radheatflux')
-        axs.plot(pol_list_a, b2plot_core_qe, color = 'green', label= 'iout_radheatflux')
+        anchored_text = AnchoredText('(d){}'.format('Heat flux [$W$]'), loc='upper right')
+        axs.plot(ang_list, nogeo_ioutfhe_core, color = 'black', label= 'iout_radheatflux')
+        axs.plot(ang_list, b2plot_core_qe, color = 'green', label= 'iout_radheatflux')
         axs.add_artist(anchored_text)
         axs.legend(loc='lower left', fontsize=10)
         
         
         fig, axs = plt.subplots()
         
-        anchored_text = AnchoredText('(e){}'.format('Ion Heat flux [$s^{-1}$]'), loc='upper right')
-        axs.plot(pol_list_a, b2fhi_core, color = 'black', label= 'b2fstate_ionradheatflux')
-        axs.plot(pol_list_a, ioutfhi_core, color = 'blue', label= 'iout_ionradheatflux')
-        axs.plot(pol_list_a, fpfhi_core, color = 'green', label= 'fplasmf_ionradheatflux')
+        anchored_text = AnchoredText('(e){}'.format('Ion Heat flux [$W$]'), loc='upper right')
+        axs.plot(ang_list, b2fhi_core, color = 'black', label= 'b2fstate_ionradheatflux')
+        axs.plot(ang_list, ioutfhi_core, color = 'blue', label= 'iout_ionradheatflux')
+        axs.plot(ang_list, fpfhi_core, color = 'green', label= 'fplasmf_ionradheatflux')
         axs.add_artist(anchored_text)
         axs.legend(loc='lower left', fontsize=10)
     
