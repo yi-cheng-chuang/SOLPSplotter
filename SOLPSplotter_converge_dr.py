@@ -36,6 +36,6 @@ xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_n
 
 xl.profile_combine(p_check = True)
 xl.load_numerical_midplane(data_size = 'small', plot = False)
-xl.solution_compare(plot = False)
+xl.solution_compare(plot = True)
 xl.error_calculation()
 
