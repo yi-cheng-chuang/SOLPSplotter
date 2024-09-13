@@ -36,7 +36,7 @@ xl.load_b2fstate_fna()
 
 xl.load_fluxes_iout()
 
-function_flag = 'balance'
+function_flag = 'plot_flux'
 
 if xl.withseries == True:
     
