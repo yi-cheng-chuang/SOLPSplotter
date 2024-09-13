@@ -270,9 +270,9 @@ class SOLPS_converge(profile_fit):
         ne_err = np.sqrt(ne_qsum / len(psiN))
         te_err = np.sqrt(te_qsum / len(psiN))
         
-        print('ne error percentage')
+        print('ne error')
         print(ne_err/ max(ne_num))
-        print('te error percentage')
+        print('te error')
         print(te_err/ max(te_num))
         
         
