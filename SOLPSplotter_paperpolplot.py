@@ -7,15 +7,7 @@ Created on Wed Mar 27 14:25:17 2024
 
 from SOLPSplotter_fit import profile_fit
 from matplotlib.offsetbox import AnchoredText
-import SOLPS_set as ss
-import os
-import opacity_plot_method as opm
 import matplotlib.pyplot as plt
-import load_mast_expdata_method as lmem
-import load_coord_method as lcm
-import fitting_method as fm 
-from scipy import interpolate
-from scipy.optimize import curve_fit
 import numpy as np
 
 
@@ -37,6 +29,7 @@ class paper_poloidal_plot(profile_fit):
         else:
             print('Publish setting is incorrect or add another setting')
     
+
     
      
     def paper_poloidal_method(self, item, pol_angle, result_dic, color_code, 
@@ -218,7 +211,7 @@ class paper_poloidal_plot(profile_fit):
             # result = self.data['nxny_sep_data']
 
             
-            unit = opm.opacity_study_unit()
+            unit = self.opacity_study_unit()
             pol_loc = self.data['angle']['angle_list']
             xpoint = self.data['angle']['xpoint_angle']
             a_shift = self.data['dircomp']['a_shift']
@@ -245,7 +238,7 @@ class paper_poloidal_plot(profile_fit):
             if i_name == 'pedestal_width':
                 
                 self.paper_poloidal_label(angle_fix= ang_fix, item= i_name, xpoint_fix = xp_fix,
-                                    ax = ax, plot_order = plot_order)
+                                    ax = ax)
                 
                 ax.legend(loc= 'upper center', fontsize=10)
             else:
@@ -258,7 +251,7 @@ class paper_poloidal_plot(profile_fit):
                 
                 dat_set = result[aa]
                 
-                unit = opm.opacity_study_unit()
+                unit = self.opacity_study_unit()
                 pol_loc = self.data['angle']['angle_list'][aa]
                 xpoint = self.data['angle']['xpoint_angle'][aa]
 
@@ -293,7 +286,7 @@ class paper_poloidal_plot(profile_fit):
             # result = self.data['nxny_sep_data']
 
             
-            unit = opm.opacity_study_unit()
+            unit = self.opacity_study_unit()
             pol_loc = self.data['angle']['angle_list']
             xpoint = self.data['angle']['xpoint_angle']
             a_shift = self.data['dircomp']['a_shift']
@@ -317,7 +310,7 @@ class paper_poloidal_plot(profile_fit):
                 
                 dat_set = result[aa]
                 
-                unit = opm.opacity_study_unit()
+                unit = self.opacity_study_unit()
                 pol_loc = self.data['angle']['angle_list'][aa]
                 xpoint = self.data['angle']['xpoint_angle'][aa]
 
