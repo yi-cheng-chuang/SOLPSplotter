@@ -101,8 +101,9 @@ class NT_plot(radial_plot):
         mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
         mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
         
-        return psi_coord, mid_ne_pro, mid_te_pro
+        return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
     
+
     
     
     def plot_neteTSdat(self):
@@ -193,10 +194,12 @@ class NT_plot(radial_plot):
             dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
         
         
+        print('this is 201:')
+        print(dat_size)
         
         for aa in iterlist:
             
-            psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = aa, 
+            psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = aa, 
                                                     data_struc = dat_struc)
             
             
@@ -251,6 +254,79 @@ class NT_plot(radial_plot):
         # fig.savefig('profiles.pdf')
     
     
+    def neudenplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, dat_size):
+        
+       
+        fig, axs = plt.subplots()
+        
+        
+        nx = self.data['b2fgeo']['nx']
+        ny = self.data['b2fgeo']['ny']
+        
+        
+        if dat_size == 'full':
+
+            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+        
+        elif dat_size == 'small':
+            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+        
+        
+        
+        for aa in iterlist:
+            
+            psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = aa, 
+                                                    data_struc = dat_struc)
+            
+            
+            """
+            label= 'core density {} $10^{19}$'.format(aa)
+            
+            """
+            
+            axs.legend(loc= 'lower left', fontsize=10)
+            
+            if self.series_flag == 'twin_scan':
+                
+                if scan_style == 'tempscan':
+                    
+                    ad = aa[1]
+                
+                elif scan_style == 'denscan':
+                    
+                    ad = aa[0]
+                
+                else:
+                    print('neteTSplot_method, please check scan_style')
+            
+            else:
+                ad = aa
+                
+            
+
+            if scan_style == 'denscan':
+                
+                axs.plot(psi_coord, mid_neu_pro, color = cl_dic[ad], 
+                         label= '{}'.format(A_dic[ad]))
+                axs.set_title('Density scan with Te = {} eV'.format(scandetail))
+                axs.legend()
+            
+            elif scan_style == 'tempscan':
+                
+                axs.plot(psi_coord, mid_neu_pro, color = cl_dic[ad], 
+                            label= '{}'.format(A_dic[ad]))
+                axs.set_title('Temperature scan with Ne = {}'.format(scandetail))
+                axs.legend()
+
+                
+            
+            else:
+                print('neudenplot_method, please check the scan parameter')
+    
+    
+    
+    
+    
     def pair_dic(self, keys, values):
         
         # Use zip() to pair the keys with the values
@@ -260,6 +336,97 @@ class NT_plot(radial_plot):
         result_dic = dict(zipped_pairs)
         
         return result_dic
+    
+    
+    def twinscan_prep(self, ta, keylist_b, scan_style, dat_size):
+    
+        if self.withshift == False and self.withseries == True:
+            
+            if self.series_flag == 'twin_scan':
+                
+                # keylist_b = []
+                
+                # for x in dircomp[key_b]:
+                #     keylist_b.append('{:.3f}'.format(x))
+                
+                color_list = ['red', 'orange', 'green', 'blue', 'purple']
+                
+                color_dic = self.pair_dic(keys = keylist_b, values = color_list)
+                
+                # print('check color dic:')
+                # print(color_dic)
+                
+                scan_list = []
+                iter_key = []
+                
+                
+                for tb in keylist_b:
+                    
+                    if scan_style == 'tempscan':
+                        
+                        it_in = (ta, tb)
+                    
+                    elif scan_style == 'denscan':
+                        
+                        it_in = (tb, ta)
+                    
+                    else:
+                        print('twinscan_plot_method, please check the scan_style!')
+                    
+                    
+                    nx = self.data['b2fgeo']['nx']
+                    ny = self.data['b2fgeo']['ny']
+                    
+                    
+                    if dat_size == 'full':
+        
+                        dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    
+                    elif dat_size == 'small':
+                        dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                        
+                        
+                        
+                    psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = it_in, 
+                                                            data_struc = dat_struc)
+                    
+                    
+                    if scan_style == 'tempscan':
+                        
+                        scan_add = '{:.1f} eV'.format(mid_te_pro[0])
+                    
+                    elif scan_style == 'denscan':
+                        
+                        scan_add = '{:.2E} '.format(mid_ne_pro[0])
+                    
+                    else:
+                        print('twinscan_plot_method, please check the scan_style!')
+                    
+                    scan_list.append(scan_add)
+                    iter_key.append(it_in)
+                
+                
+                # print('NT scan list: {}'.format(ta))
+                # print(scan_list)
+                
+                
+                if scan_style == 'tempscan':
+                    psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = (ta, '4.115'),
+                                                               data_struc = dat_struc)
+                    scan_title = '{:.2E}'.format(mid_ne_pro[0])
+                
+                elif scan_style == 'denscan':
+                    psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = ('5.512', ta), 
+                                                        data_struc = dat_struc)
+                    scan_title = '{:.1f}'.format(mid_te_pro[0])
+                
+                else:
+                    print('twinscan_plot_method, please check the scan_style!')
+                
+                label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
+            
+            
+                return iter_key, color_dic, scan_title, label_dic
     
     
         
@@ -275,7 +442,7 @@ class NT_plot(radial_plot):
             
             asp_ch = self.data['dircomp']['multi_shift']
             
-            self.neteTSplot_structure(iterlist = asp_ch, 
+            self.neteTSplot_method(iterlist = asp_ch, 
                                       cl_dic = color_dic, A_dic = label_dic, scan = 'not')
         
         elif self.withshift == False and self.withseries == True:
@@ -300,17 +467,28 @@ class NT_plot(radial_plot):
                 else:
                     print('twinscan_plot_method, please check the scan_style!')
                 
-                keylist_a = [str(x) for x in dircomp[key_a]]
+                keylist_a = []
+                
+                
+                for x in dircomp[key_a]:
+                    keylist_a.append('{:.3f}'.format(x))
                 
                 for ta in keylist_a:
                     
-                    keylist_b = [str(x) for x in dircomp[key_b]]
+                    keylist_b = []
+                    
+                    for x in dircomp[key_b]:
+                        keylist_b.append('{:.3f}'.format(x))
+                    
                     color_list = ['red', 'orange', 'green', 'blue', 'purple']
                     
                     color_dic = self.pair_dic(keys = keylist_b, values = color_list)
                     
                     scan_list = []
+                    # print('scan_list after initial:')
+                    # print(scan_list)
                     iter_key = []
+                    
                     
                     for tb in keylist_b:
                         
@@ -339,7 +517,7 @@ class NT_plot(radial_plot):
                             
                             
                             
-                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = it_in, 
+                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = it_in, 
                                                                 data_struc = dat_struc)
                         
                         
@@ -349,21 +527,26 @@ class NT_plot(radial_plot):
                         
                         elif scan_style == 'denscan':
                             
-                            scan_add = '{:.2E}'.format(mid_ne_pro[0])
+                            scan_add = '{:.2E} '.format(mid_ne_pro[0])
                         
                         else:
                             print('twinscan_plot_method, please check the scan_style!')
                         
                         scan_list.append(scan_add)
                         iter_key.append(it_in)
-                        
+                    
+                    
+                    print('NT scan list: {}'.format(ta))
+                    print(scan_list)
+                    
+                    
                     if scan_style == 'tempscan':
-                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = (ta, '3.73'),
+                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = (ta, '4.115'),
                                                                    data_struc = dat_struc)
                         scan_title = '{:.2E}'.format(mid_ne_pro[0])
                     
                     elif scan_style == 'denscan':
-                        psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = ('5.02', ta), 
+                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = ('5.512', ta), 
                                                             data_struc = dat_struc)
                         scan_title = '{:.1f}'.format(mid_te_pro[0])
                     
@@ -375,12 +558,18 @@ class NT_plot(radial_plot):
                     self.neteTSplot_method(iterlist = iter_key, scandetail = scan_title,
                             cl_dic = color_dic, A_dic = label_dic, 
                             scan_style = scan_style, dat_size = dat_size)
-                        
-                    # print(scan_list)
+                    
+                    self.neudenplot_method(iterlist = iter_key, cl_dic = color_dic, 
+                                A_dic = label_dic, scan_style = scan_style, 
+                                scandetail = scan_title, dat_size = dat_size)
+                    
              
             else:
                 print('neteTS_plot, please check the series flag')
                 
+    
+    
+
     
         
     def AM_NT_midprof(self, itername, AM_flag):
