@@ -253,8 +253,26 @@ def series_terminal_dir(series_flag, dir_comp_dic):
     new_dic = {}
     twinscan_dic = {}
     
-    ds_key = [str(x) for x in mcds['denscan_list']]
-    ts_key = [str(x) for x in mcds['tempscan_list']]
+    ds_key = []
+    ts_key = []
+    
+    
+    print('this is mcds')
+    print(type(mcds['denscan_list'][3]))
+    
+    for x in mcds['denscan_list']:
+        ds_key.append('{:.3f}'.format(x))
+        
+    print(ds_key)
+    for x in mcds['tempscan_list']:
+        ts_key.append('{:.3f}'.format(x))
+        
+
+    print(ts_key)
+    
+    
+    # ds_key = [str(x) for x in mcds['denscan_list']]
+    # ts_key = [str(x) for x in mcds['tempscan_list']]
     
     
     twinscan_dic = two_layer_dic(key_a = ds_key, key_b = ts_key)
@@ -313,18 +331,32 @@ def twinscan_local_dir(series_flag, dir_comp_dic):
     attempt_dic = {}
     new_dic = {}
     twinscan_dic = {}
+    ds_key = []
+    ts_key = []
     
-    ds_key = [str(x) for x in mcds['denscan_list']]
-    ts_key = [str(x) for x in mcds['tempscan_list']]
+    print('this is mcds')
+    print(type(mcds['denscan_list'][3]))
+    
+    for x in mcds['denscan_list']:
+        ds_key.append('{:.3f}'.format(x))
+        
+    print(ds_key)
+    for x in mcds['tempscan_list']:
+        ts_key.append('{:.3f}'.format(x))
+        
+
+    print(ts_key)
     
     
     twinscan_dic = two_layer_dic(key_a = ds_key, key_b = ts_key)
-    
+    print(twinscan_dic)
     
     for i in newbase:
         attempt_dic[sps.atp_number(i, series_flag)[0]] = sps.atp_number(i, series_flag)[1]
         # print(sps.atp_number(i, series_flag))
         st = sps.atp_number(i, series_flag)[0]
+        # print(st)
+        # print(i)
         twinscan_dic[str(st[0])][str(st[1])] = i
     
     
