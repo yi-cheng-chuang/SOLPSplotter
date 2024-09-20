@@ -140,6 +140,8 @@ class load_directory:
                         dir_comp = sps.terminal_series_comp_dir(tail = self.series_tail, 
                                             filename = self.series_filename)
                         
+                        print(dir_comp['denscan_list'])
+                        
                         series_dir, att_dic = lmem.twinscan_local_dir(series_flag = self.series_flag,
                                                                       dir_comp_dic = dir_comp)
                         self.data['dirdata'] = series_dir
