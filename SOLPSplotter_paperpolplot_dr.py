@@ -6,14 +6,14 @@ Created on Wed Mar 27 15:01:33 2024
 """
 
 import SOLPS_set as sps
-import SOLPSplotter_merge as spm
+import SOLPSplotter_paperpolplot as spp
 import SOLPS_transcoe_adj as sta
 
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
 
 
-xl = spm.paper_poloidal_plot(DefaultSettings = d, loadDS = lex)
+xl = spp.paper_poloidal_plot(DefaultSettings = d, loadDS = lex)
 
 xl.load_mast_dir()
 xl.load_solpsgeo()
@@ -26,6 +26,7 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
 xl.load_b2fplasmf()
+xl.load_ft44()
 # xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
 
@@ -40,7 +41,7 @@ poloidal_index_list = []
 for i in range(44):
     poloidal_index_list.append('{}'.format(25 + i))
     
-xl.opacity_data_fit(pol_list = poloidal_index_list)
+xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 xl.paper_poloidal_subplot(log_flag = False)
