@@ -16,6 +16,22 @@ class profile_fit(RP_mapping):
         RP_mapping.__init__(self, DefaultSettings, loadDS)
     
     
+    def opacity_study_unit(self):
+        unit = {'efold_length_psiN': 'Neutral penetration length ($\psi_N$)',
+                'pedestal_width_psiN': 'Pedestal width ($\psi_N$)',
+                  'dimensionless_opaqueness': 'Experimental opaqueness', 
+                  'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
+                  'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
+                  'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
+                  'flux_expansion': 'Flux expansion',
+                  'efold_length': '$\lambda_{n_D}$ [mm]',
+                  'pedestal_width': '$\Delta n_e$ [mm]',
+                  
+                  }
+        return unit
+    
+    
+    
     def opacity_data_fit_method(self, psiN, b2fstate, Neuden, check_ne,
                 psi_dsa_ratio, pol_list, itername, data_struc): 
         # i = 0
@@ -156,16 +172,30 @@ class profile_fit(RP_mapping):
             
             for aa in self.data['dircomp']['multi_shift']:
                 
-                Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                # data = self.data['ft44'][aa]['dab2']
-                # Neuden_data = np.transpose(data[:, :, 0])
+                
+                nx = self.data['b2fgeo'][aa]['nx']
+                ny = self.data['b2fgeo'][aa]['ny']
+                
+                
+                
+                if dat_size == 'full':
+                    self.load_output_data(param= 'NeuDen')
+                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                
+                elif dat_size == 'small':
+                    data = self.data['ft44'][aa]['dab2']
+                    Neuden_data = np.transpose(data[:, :, 0])
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                
+                
                 fstate = self.data['b2fstate'][aa]
                 psiN_map = self.data['psi']['psival'][aa]
                 pd = self.data['DefaultSettings']['psi_dsa'][aa]
                 
                 fitresult = self.opacity_data_fit_method(b2fstate = fstate, Neuden = Neuden_data,
                         psiN = psiN_map, psi_dsa_ratio = pd, pol_list = pol_list,
-                                        itername = aa)
+                       itername = aa, data_struc = dat_struc, check_ne = check_ne)
                 
                 fitresult_dic[aa] = fitresult
             
@@ -328,19 +358,38 @@ class profile_fit(RP_mapping):
             fitresult_dic = {}
             
             for aa in self.data['dircomp']['multi_shift']:
+                
+                
+                nx = self.data['b2fgeo'][aa]['nx']
+                ny = self.data['b2fgeo'][aa]['ny']
+                
+                
+                if dat_size == 'full':
                     
+                    self.load_output_data(param= 'NeuDen')
                     
-                Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                
+                elif dat_size == 'small':
+                    data = self.data['ft44'][aa]['dab2']
+                    Neuden_data = np.transpose(data[:, :, 0])
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                
+                    
+                # Neuden_data = self.data['outputdata']['NeuDen'][aa]
                 fstate = self.data['b2fstate'][aa]
                 psiN_map = self.data['psi']['psival'][aa]
                 
                                   
                 fitresult = self.radial_data_fit_method(b2fstate = fstate, 
                             Neuden = Neuden_data, psiN = psiN_map, 
-                            pol_loc = pol_loc)
+                pol_loc = pol_loc, data_struc = dat_struc, check_ne = check_ne)
+                
+                print('this is {}'.format(aa))
                     
                 
-                fitresult_dic[aa] = fitresult_dic
+                fitresult_dic[aa] = fitresult
             
             self.data['radial_fit_data'] = fitresult_dic
         
@@ -401,7 +450,7 @@ class profile_fit(RP_mapping):
     
     
     
-    def multirad_data_fit(self, pol_list):
+    def multirad_data_fit(self, pol_list, dat_size, check_ne):
         
         # self.load_output_data(param= 'NeuDen')
         
@@ -432,13 +481,31 @@ class profile_fit(RP_mapping):
                 for ind in pol_list:
                     
                     
-                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    nx = self.data['b2fgeo'][aa]['nx']
+                    ny = self.data['b2fgeo'][aa]['ny']
+                    
+                    
+                    if dat_size == 'full':
+                        
+                        self.load_output_data(param= 'NeuDen')
+                        
+                        Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                        dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    
+                    elif dat_size == 'small':
+                        data = self.data['ft44'][aa]['dab2']
+                        Neuden_data = np.transpose(data[:, :, 0])
+                        dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    
+                    
+                    
+                    # Neuden_data = self.data['outputdata']['NeuDen'][aa]
                     fstate = self.data['b2fstate'][aa]
                     psiN_map = self.data['psi']['psival'][aa]
                     
-                                      
                     fitresult = self.radial_data_fit_method(b2fstate = fstate, 
-                                Neuden = Neuden_data, psiN = psiN_map, pol_loc = ind)
+                                Neuden = Neuden_data, psiN = psiN_map, pol_loc = ind,
+                                data_struc = dat_struc, check_ne = check_ne)
                     
                     ind_fitresult_dic[ind] = fitresult
                 
@@ -469,6 +536,13 @@ class profile_fit(RP_mapping):
                 fitresult_dic[aa] = ind_fitresult_dic
             
             self.data['radial_fit_data'] = fitresult_dic
+            
+            
+            
+            
+            
+            
+            
         
         elif self.withshift == True and self.withseries == True:
             print('radial_data_fit is not there yet!')
