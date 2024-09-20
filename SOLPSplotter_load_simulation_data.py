@@ -201,12 +201,25 @@ class load_simu_data(load_expdata):
                 
                 mcds = self.data['dircomp']
                 
-                ds_list = [str(x) for x in mcds['denscan_list']]
-                ts_list = [str(x) for x in mcds['tempscan_list']]
+                ds_key = []
+                ts_key = []
+                
+                print('this is mcds')
+                print(type(mcds['denscan_list'][3]))
+                
+                for x in mcds['denscan_list']:
+                    ds_key.append('{:.3f}'.format(x))
+                    
+                print(ds_key)
+                for x in mcds['tempscan_list']:
+                    ts_key.append('{:.3f}'.format(x))
+                    
+
+                print(ts_key)
                 
                 
-                param_data_dic = self.two_dim_scan_output(iterlist = scan, iterlist_a = ds_list, 
-                                    iterlist_b = ts_list, param = param)
+                param_data_dic = self.two_dim_scan_output(iterlist = scan, iterlist_a = ds_key, 
+                                    iterlist_b = ts_key, param = param)
             else:
                 param_data_dic = self.one_dim_scan_output(iterlist = scan, param = param)
         
@@ -239,6 +252,7 @@ class load_simu_data(load_expdata):
 
 
         state_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        print(state_dic)
         dim_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
         
         for tp in iterlist:
@@ -281,11 +295,24 @@ class load_simu_data(load_expdata):
                 
                 mcds = self.data['dircomp']
                 
-                ds_list = [str(x) for x in mcds['denscan_list']]
-                ts_list = [str(x) for x in mcds['tempscan_list']]
+                ds_key = []
+                ts_key = []
+                
+                print('this is mcds')
+                print(type(mcds['denscan_list'][3]))
+                
+                for x in mcds['denscan_list']:
+                    ds_key.append('{:.3f}'.format(x))
+                    
+                print(ds_key)
+                for x in mcds['tempscan_list']:
+                    ts_key.append('{:.3f}'.format(x))
+                    
+
+                print(ts_key)
                 
                 state_dic, dim_dic = self.two_dim_scan_b2fstate(iterlist = scan, 
-                                    iterlist_a = ds_list, iterlist_b = ts_list)
+                                    iterlist_a = ds_key, iterlist_b = ts_key)
             else:
                 state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
                 
@@ -464,11 +491,24 @@ class load_simu_data(load_expdata):
                 
                 mcds = self.data['dircomp']
                 
-                ds_list = [str(x) for x in mcds['denscan_list']]
-                ts_list = [str(x) for x in mcds['tempscan_list']]
+                ds_key = []
+                ts_key = []
+                
+                print('this is mcds')
+                print(type(mcds['denscan_list'][3]))
+                
+                for x in mcds['denscan_list']:
+                    ds_key.append('{:.3f}'.format(x))
+                    
+                print(ds_key)
+                for x in mcds['tempscan_list']:
+                    ts_key.append('{:.3f}'.format(x))
+                    
+
+                print(ts_key)
                 
                 ft44_dic = self.two_dim_scan_ft44(iterlist = scan, 
-                                    iterlist_a = ds_list, iterlist_b = ts_list)
+                                    iterlist_a = ds_key, iterlist_b = ts_key)
             
             else:
                 ft44_dic = self.one_dim_scan_ft44(iterlist = scan)
