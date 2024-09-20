@@ -16,9 +16,9 @@ xt = sta.transport_coefficient_adjustment(DefaultSettings = d)
 xt.load_mast_dir()
 xt.load_solpsgeo()
 xt.calcpsi_avcr()
-xt.mod_transco(withmod = True, de_SOL = 24, ki_SOL = 23, ke_SOL = 23, log_flag = False)
+xt.mod_transco(withmod = False, de_SOL = 24, ki_SOL = 23, ke_SOL = 23, log_flag = False)
 xt.transport_coe_align_plot(plot_transcoe = True, paper_transcoe = True, save_eps = True)
-xt.align_transco(plot_align = False)
+xt.align_transco(plot_align = True)
 
 
 extra = False
