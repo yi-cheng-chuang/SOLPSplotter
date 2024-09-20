@@ -22,9 +22,9 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
-               'Parameters': P, 'series_flag': 'two_compare',
-    'series_filename': 'org_25scan_027205', 'series_tail': '_leakbsol_nts5_a',
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': True,
+               'Parameters': P, 'series_flag': 'twin_scan',
+    'series_filename': 'org_new25scan_fast', 'series_tail': '_fast_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
     return set_dic
 
@@ -43,7 +43,7 @@ def mast_comp_dic():
     
     else:
         series_name = 'org_cfluxb_std'
-        file_name = '80_nf5.32tf4.11_convtalli_a'
+        file_name = '80_nf5.512tf4.115_fast_a'
         
     
     
@@ -171,10 +171,14 @@ def terminal_series_comp_dir(tail, filename):
     shift = 0
     outputlist = ['Output', 'Output2', 'EirOutput']
     
-    ds_dic = {'start': 5.02, 'stop': 9.02, 'space': 5}
-    ts_dic = {'start': 3.73, 'stop': 7.73, 'space': 5}
+    ds_dic = {'start': 5.512, 'stop': 9.512, 'space': 5}
+    ts_dic = {'start': 4.115, 'stop': 8.115, 'space': 5}
     
     ds_list, ts_list = scan_list(denscan_dic = ds_dic, tempscan_dic = ts_dic)
+    
+    print('this is from sps')
+    print(ds_list)
+    
     
     
     mast_eireneN_dir_dic = {'Shot': '027205', 'filename': filename, 'shift_value': shift,
