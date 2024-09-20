@@ -98,6 +98,7 @@ class radial_plot(profile_fit):
         plt.title('Electron density with fits')
         plt.legend()
         
+        
         plt.figure()
         if log_flag:
             plt.yscale('log')
@@ -114,8 +115,7 @@ class radial_plot(profile_fit):
     
     
     def paper_neuden_radial_method(self, fit_dat, x_coord, Nd, log_flag, itername):
-        
-
+            
         exp_an_fit = fit_dat['exp_fit']
         xcoord_cut = fit_dat['x_coord_cut']
         
@@ -135,10 +135,13 @@ class radial_plot(profile_fit):
         axs.add_artist(anchored_text)
         axs.legend(loc= 'lower right')
         
-        fig.savefig('neuden_fit_{}.pdf'.format(itername))
+        
+        
+        # fig.savefig('neuden_fit_{}.pdf'.format(itername))
         
     
-    def paper_neuden_radial_plot(self, pol_loc):
+    
+    def paper_neuden_radial_plot(self, pol_loc, dat_size):
         
         
         
@@ -147,67 +150,122 @@ class radial_plot(profile_fit):
             
             for aa in self.data['dircomp']['multi_shift']:
                 
-                result_dic = self.data['radial_fit_data'][aa]
+                
+                nx = self.data['b2fgeo'][aa]['nx']
+                ny = self.data['b2fgeo'][aa]['ny']
+                
+                if dat_size == 'full':
+            
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                
+                elif dat_size == 'small':
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
                 
                 
-                neu_pro = self.data['outputdata']['NeuDen'][aa]
+                psi_list, nd_list, fit_dat = self.neuden_midprof(iter_index = aa, 
+                                                        data_struc = dat_struc)
                 
-                weight = self.data['midplane_calc'][aa]['weight']
-                weight_B = np.ones(len(weight))- weight
-                
-                
-                mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
-                psi_coord = self.data['midplane_calc'][aa]['psi_solps_mid']
-                
-                
-                
-                psi_list = []
-                nd_list = []
-                
-                for ind, coord in enumerate(psi_coord):
-                    
-                    if coord >= 0.95 and coord <= 1.05:
-                        psi_list.append(coord)
-                        nd_list.append(mid_neu_pro[ind])
-                
-                psi_val = self.data['psi']['psival'][aa][:, 59]
-                
-                cut_st = result_dic['59']['x_coord_cut']
-                w_cut = []
-                
-                
-                for ic, coord in enumerate(psi_val):
-                    
-                    if coord >= cut_st.min() and coord <= cut_st.max():
-                        w_cut.append(weight[ic])
-                
-                wcut_B = np.ones(len(w_cut))- w_cut
-                
-                fit_dat = {}
-                
-                expfit_a = result_dic['58']['exp_fit']
-                expfit_b = result_dic['60']['exp_fit']
-                
-                fit_dat['exp_fit'] = np.multiply(expfit_a, w_cut) + np.multiply(expfit_b, wcut_B)
-                
-                cut_a = result_dic['58']['x_coord_cut']
-                cut_b = result_dic['60']['x_coord_cut']
-                
-                fit_dat['x_coord_cut'] = np.multiply(cut_a, w_cut) + np.multiply(cut_b, wcut_B)
-                
-
+    
                 self.paper_neuden_radial_method(fit_dat= fit_dat, itername = aa,
                     x_coord = psi_list, Nd = nd_list, log_flag = True)
-                
-                
         
-        elif self.withshift == True and self.withseries == True:
-            print('Opacity_study_radial_plot is not there yet, to be continue...')    
+        else:
+            print('this is the modify major radius version')
+    
+    
+    def neuden_midprof(self, iter_index, data_struc):
+        
+        result_dic = self.data['radial_fit_data'][iter_index]
+        
+        
+        if self.series_flag == 'twin_scan':
+            
+            nf = iter_index[0]
+            tf = iter_index[1]
+            
+            # b2fstate = self.data['b2fstate'][nf][tf]
+            
+            # nx = data_struc['nx']
+            # ny = data_struc['ny']
+            
+            if data_struc['size'] == 'full':
+                neu_pro = self.data['outputdata']['NeuDen'][nf][tf]
+                weight = self.data['midplane_calc']['weight']
+                psi_coord = self.data['midplane_calc']['psi_solps_mid']
+            elif data_struc['size'] == 'small':
+                nx = data_struc['nx']
+                ny = data_struc['ny']
+                data = self.data['ft44'][nf][tf]['dab2']
+                neu_pro = np.transpose(data[:, :, 0])
+                weight = self.data['midplane_calc']['weight'][1:ny+1]
+                psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:ny+1]
             
         else:
-            print('Opacity_study_radial_plot has a bug')
+            
+            if data_struc['size'] == 'full':
+                neu_pro = self.data['outputdata']['NeuDen'][iter_index]
+                weight = self.data['midplane_calc'][iter_index]['weight']
+                psi_coord = self.data['midplane_calc'][iter_index]['psi_solps_mid']
+                
+            elif data_struc['size'] == 'small':
+                nx = data_struc['nx']
+                ny = data_struc['ny']
+                data = self.data['ft44'][iter_index]['dab2']
+                neu_pro = np.transpose(data[:, :, 0])
+                weight = self.data['midplane_calc'][iter_index]['weight'][1:ny+1]
+                psi_coord = self.data['midplane_calc'][iter_index]['psi_solps_mid'][1:ny+1]
+            
+            
     
-       
+        
+        # neu_pro = self.data['outputdata']['NeuDen'][iter_index]
+        
+        # weight = self.data['midplane_calc'][iter_index]['weight']
+        weight_B = np.ones(len(weight))- weight
+        
+        
+        mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
+        
+        
+        
+        
+        psi_list = []
+        nd_list = []
+        
+        for ind, coord in enumerate(psi_coord):
+            
+            if coord >= 0.95 and coord <= 1.05:
+                psi_list.append(coord)
+                nd_list.append(mid_neu_pro[ind])
+        
+        psi_val = self.data['psi']['psival'][iter_index][:, 59]
+        
+        cut_st = result_dic['59']['x_coord_cut']
+        w_cut = []
+        
+        
+        for ic, coord in enumerate(psi_val):
+            
+            if coord >= cut_st.min() and coord <= cut_st.max():
+                w_cut.append(weight[ic])
+        
+        wcut_B = np.ones(len(w_cut))- w_cut
+        
+        fit_dat = {}
+        
+        expfit_a = result_dic['58']['exp_fit']
+        expfit_b = result_dic['60']['exp_fit']
+        
+        fit_dat['exp_fit'] = np.multiply(expfit_a, w_cut) + np.multiply(expfit_b, wcut_B)
+        
+        cut_a = result_dic['58']['x_coord_cut']
+        cut_b = result_dic['60']['x_coord_cut']
+        
+        fit_dat['x_coord_cut'] = np.multiply(cut_a, w_cut) + np.multiply(cut_b, wcut_B)
+        
+        return psi_list, nd_list, fit_dat
+    
+    
     
     def Opacity_study_radial_plot(self, pol_loc, dat_size):
         
@@ -257,18 +315,46 @@ class radial_plot(profile_fit):
             for aa in self.data['dircomp']['multi_shift']:
             
                 pol_index = int(pol_loc[0])
-                Nd = self.data['radial_fit_data'][aa]['NeuDen']
-                Ne = self.data['radial_fit_data'][aa]['Ne']
-                Te = self.data['radial_fit_data'][aa]['Te']
+                
+                
+                nx = self.data['b2fgeo'][aa]['nx']
+                ny = self.data['b2fgeo'][aa]['ny']
+                
+                
+                fstate = self.data['b2fstate'][aa]
+                
+                if dat_size == 'full':
+                    
+                    psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2]
+                    Nd = self.data['outputdata']['NeuDen'][aa]
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    Ne = fstate['ne'].transpose()
+                    Te_J = fstate['te'].transpose()
+                
+                elif dat_size == 'small':
+                    
+                    psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2][1:ny+1]
+                    data = self.data['ft44'][aa]['dab2']
+                    Nd = np.transpose(data[:, :, 0])
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    Ne = fstate['ne'][1:nx+1, 1:ny+1].transpose()
+                    Te_J = fstate['te'][1:nx+1, 1:ny+1].transpose()
+                
+                
+                ev = 1.6021766339999999 * pow(10, -19)
+                Te = Te_J / ev
+                
+                Nd = Nd[:, pol_index]
+                Ne = Ne[:, pol_index]
+                Te = Te[:, pol_index]
                 SEP = int(self.data['DefaultSettings']['sep_index_dsa'][aa])
-                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2]
                 
                 
                 # result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
                 # mix_dic[aa] = result_dic
                 
                 P = self.data['Parameter']
-                self.opacity_radial_method(result_dic = result_dic, SEP = SEP, 
+                self.opacity_radial_method(result_dic = mix_dic[aa], SEP = SEP, 
                 x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, P = P, log_flag = False)
            
             
