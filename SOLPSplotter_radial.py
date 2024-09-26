@@ -28,7 +28,7 @@ class radial_plot(profile_fit):
         if self.Publish == 'b2plottersetting':
             plt.rcParams.update({'font.weight': 'normal'})
             plt.rc('lines', linewidth= 3, markersize= 5)
-            plt.rcParams.update({'font.size': 14})
+            plt.rcParams.update({'font.size': 10})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
             # plt.rcParams["text.usetex"] = True
