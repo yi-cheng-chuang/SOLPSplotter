@@ -22,7 +22,7 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': True,
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': True, 'withseries': False,
                'Parameters': P, 'series_flag': 'twin_scan',
     'series_filename': 'org_new25scan_fast', 'series_tail': '_fast_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
