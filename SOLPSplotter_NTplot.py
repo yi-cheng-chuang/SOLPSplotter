@@ -164,16 +164,16 @@ class NT_plot(radial_plot):
         te_er = TS_dic['errte']
         
         
-        fig, axs = plt.subplots(2, 1)
+        fig, axs = plt.subplots(3, 1)
         
-        anchored_text = AnchoredText('(a){}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
+        anchored_text = AnchoredText('{}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
         axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'black', label= '$n_e$ TS data')
         axs[0].add_artist(anchored_text)
         axs[0].legend(loc='lower left', fontsize=10)
         
         
         
-        anchored_text2 = AnchoredText('(b){}'.format('$t_e$ [eV]'), loc= 'upper right')
+        anchored_text2 = AnchoredText('{}'.format('$t_e$ [eV]'), loc= 'upper right')
         axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'black', label= '$t_e$ TS data')
         axs[1].set_xlabel('$\psi_N$')
         axs[1].add_artist(anchored_text2)
@@ -181,7 +181,7 @@ class NT_plot(radial_plot):
         
         plt.subplots_adjust(hspace=.0)
         
-        
+        anchored_text3 = AnchoredText('{}'.format('$P_e$ [eV * $m^{-3}$]'), loc= 'upper right')
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
         
@@ -202,11 +202,12 @@ class NT_plot(radial_plot):
             psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = aa, 
                                                     data_struc = dat_struc)
             
-            
+            mid_pe_pro = np.multiply(mid_ne_pro, mid_te_pro)
             """
             label= 'core density {} $10^{19}$'.format(aa)
             
             """
+            
             
             axs[0].legend(loc= 'lower left', fontsize=10)
             
@@ -215,10 +216,12 @@ class NT_plot(radial_plot):
                 if scan_style == 'tempscan':
                     
                     ad = aa[1]
+                    ap = aa[0]
                 
                 elif scan_style == 'denscan':
                     
                     ad = aa[0]
+                    ap = aa[1]
                 
                 else:
                     print('neteTSplot_method, please check scan_style')
@@ -230,25 +233,36 @@ class NT_plot(radial_plot):
 
             if scan_style == 'denscan':
                 
+                title_ap = float(ap)*pow(10, 5)
+                
                 axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad])
-                axs[0].set_title('Density scan with Te = {} eV'.format(scandetail))
-                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad],
-                            label= '{}'.format(A_dic[ad]))
-                axs[1].legend()
+                axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
+                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad])       
+                axs[2].plot(psi_coord, mid_pe_pro, color = cl_dic[ad], label= '{}'.format(ad))
+                axs[2].add_artist(anchored_text3)
+                axs[2].set_xlabel('$\psi_N$')
+                axs[2].legend(loc = 'lower left')
 
                             
             elif scan_style == 'tempscan':
                 
-                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad], 
-                            label= '{}'.format(A_dic[ad]))
-                axs[0].set_title('Temperature scan with Ne = {}'.format(scandetail))
+                title_ap = float(ap)*pow(10, 20)
+                
+                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad])
+                axs[0].set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
                 axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad])
-                axs[0].legend()
+                axs[2].plot(psi_coord, mid_pe_pro, color = cl_dic[ad], label= '{}'.format(ad))
+                axs[2].add_artist(anchored_text3)
+                axs[2].set_xlabel('$\psi_N$')
+                axs[2].legend(loc = 'lower left')
             
             else:
                 print('neteTSplot_structure, please check the scan parameter')
-            
-            
+        
+        n_sym = self.data['radial_fit_data'][aa]['ne_symmetry_point']
+        dn = self.data['opacity_poloidal'][aa]['pedestal_width_psiN']
+        axs[0].axvline(x= n_sym + dn, color='gray',lw=3)
+        axs[0].axvline(x= n_sym - dn, color='gray',lw=3)
 
         
         # fig.savefig('profiles.pdf')
@@ -480,80 +494,15 @@ class NT_plot(radial_plot):
                     for x in dircomp[key_b]:
                         keylist_b.append('{:.3f}'.format(x))
                     
-                    color_list = ['red', 'orange', 'green', 'blue', 'purple']
                     
-                    color_dic = self.pair_dic(keys = keylist_b, values = color_list)
-                    
-                    scan_list = []
-                    # print('scan_list after initial:')
-                    # print(scan_list)
-                    iter_key = []
+                    iter_key, color_dic, scan_title, label_dic = self.twinscan_prep(ta = ta, 
+                    keylist_b = keylist_b, scan_style = scan_style, dat_size = dat_size)
                     
                     
-                    for tb in keylist_b:
-                        
-                        if scan_style == 'tempscan':
-                            
-                            it_in = (ta, tb)
-                        
-                        elif scan_style == 'denscan':
-                            
-                            it_in = (tb, ta)
-                        
-                        else:
-                            print('twinscan_plot_method, please check the scan_style!')
-                        
-                        
-                        nx = self.data['b2fgeo']['nx']
-                        ny = self.data['b2fgeo']['ny']
-                        
-                        
-                        if dat_size == 'full':
-            
-                            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                        
-                        elif dat_size == 'small':
-                            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                            
-                            
-                            
-                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = it_in, 
-                                                                data_struc = dat_struc)
-                        
-                        
-                        if scan_style == 'tempscan':
-                            
-                            scan_add = '{:.1f} eV'.format(mid_te_pro[0])
-                        
-                        elif scan_style == 'denscan':
-                            
-                            scan_add = '{:.2E} '.format(mid_ne_pro[0])
-                        
-                        else:
-                            print('twinscan_plot_method, please check the scan_style!')
-                        
-                        scan_list.append(scan_add)
-                        iter_key.append(it_in)
-                    
-                    
-                    print('NT scan list: {}'.format(ta))
-                    print(scan_list)
-                    
-                    
-                    if scan_style == 'tempscan':
-                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = (ta, '4.115'),
-                                                                   data_struc = dat_struc)
-                        scan_title = '{:.2E}'.format(mid_ne_pro[0])
-                    
-                    elif scan_style == 'denscan':
-                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = ('5.512', ta), 
-                                                            data_struc = dat_struc)
-                        scan_title = '{:.1f}'.format(mid_te_pro[0])
-                    
-                    else:
-                        print('twinscan_plot_method, please check the scan_style!')
-                    
-                    label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
+                    print('check:')
+                    print(iter_key)
+                    print(color_dic)
+                    print(label_dic)
                     
                     self.neteTSplot_method(iterlist = iter_key, scandetail = scan_title,
                             cl_dic = color_dic, A_dic = label_dic, 
