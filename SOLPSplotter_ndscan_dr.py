@@ -41,11 +41,12 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
 xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_ne = False)
 
-
+xl.load_fluxes_iout()
 # pol_list = []
 # for i in range(10):
 #     pol_list.append('{}'.format(52 + i))
     
 # xl.multirad_data_fit(pol_list = pol_list, dat_size = 'small', check_ne = False)
 
-xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = True)
+
+xl.twinscan_ndrad_plot(scan_style = 'tempscan', dat_size = 'small', log_flag = True, format_option= '1x1')
