@@ -520,7 +520,24 @@ class load_simu_data(load_expdata):
         else:
             print('load_b2fplasmf function is not there yet!')
     
-    
+    def twinscan_iout(self, iterlist, iterlist_a, iterlist_b, filename):
+        
+
+        iout_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        # print(iout_dic)
+        ny = self.data['b2fgeo']['ny']
+        nx = self.data['b2fgeo']['nx']
+        
+        for tp in iterlist:
+            aa = tp[0]
+            ab = tp[1]
+            
+            file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'output', filename)
+            iout = lbdm.read_iout_method(fdir = file_loc, fname = filename, 
+                                  ny = ny, nx = nx)
+            
+            iout_dic[aa][ab] = iout
+        return iout_dic
     
     def load_iout(self, filename, simple_quant):
         filename_list = filename.split('.')
@@ -559,16 +576,46 @@ class load_simu_data(load_expdata):
                 
         
         elif self.withshift == False and self.withseries == True:
-            iout_dic = {}
             
-            for aa in list(self.data['dircomp']['Attempt'].keys()):
-                ny = self.data['b2fgeo']['ny']
-                nx = self.data['b2fgeo']['nx']
-                file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'][aa], 'output', filename)           
-                iout = lbdm.read_iout_method(fdir = file_loc, fname = filename, 
-                                      ny = ny, nx = nx)
+            
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            
+            if self.series_flag == 'twin_scan':
                 
-                iout_dic[aa] = iout
+                mcds = self.data['dircomp']
+                
+                ds_key = []
+                ts_key = []
+                
+                print('this is mcds')
+                print(type(mcds['denscan_list'][3]))
+                
+                for x in mcds['denscan_list']:
+                    ds_key.append('{:.3f}'.format(x))
+                    
+                print(ds_key)
+                for x in mcds['tempscan_list']:
+                    ts_key.append('{:.3f}'.format(x))
+                    
+
+                print(ts_key)
+                iout_dic = self.twinscan_iout(iterlist = scan, iterlist_a = ds_key, 
+                              iterlist_b = ts_key, filename = filename)
+            else:
+                
+                iout_dic = {}
+                for aa in list(self.data['dircomp']['Attempt'].keys()):
+                    ny = self.data['b2fgeo']['ny']
+                    nx = self.data['b2fgeo']['nx']
+                    
+                    file_loc = '{}/{}/{}'.format(self.data['dirdata']['simudir'][aa], 'output', filename)           
+                    iout = lbdm.read_iout_method(fdir = file_loc, fname = filename, 
+                                          ny = ny, nx = nx)
+                    
+                    iout_dic[aa] = iout
+                
+            
             
             self.data['iout_data'][quant] = iout_dic
             
@@ -603,6 +650,24 @@ class load_simu_data(load_expdata):
                 
                 self.data['iout_data'][quantname] = ratio_data
                 # self.data['iout_data']['{}_abs'.format(quantname)] = np.abs(ratio_data)
+            
+            elif self.series_flag == 'twin_scan':
+                
+                
+                name1 = file_tuple[0][1]
+                nf = itername[0]
+                tf = itername[1]
+                
+                print(itername)
+                
+                data1 = self.data['iout_data'][name1][nf][tf]
+                
+                name2 = file_tuple[1][1]
+                data2 = self.data['iout_data'][name2][nf][tf]
+                
+                ratio_data = np.divide(data1, data2)
+                quantname = '{}_divide_{}'.format(name1, name2)
+            
             
             else:
                 
