@@ -28,4 +28,4 @@ xl.load_ft44()
 xl.calc_sep_dsa()
 
 
-xl.plot_PB(scan_style = 'denscan', dat_size = 'small')
+xl.plot_PB(scan_style = 'tempscan', dat_size = 'small')
