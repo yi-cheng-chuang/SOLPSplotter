@@ -38,13 +38,13 @@ class transport_coefficient_adjustment(load_geometry):
                 if j<= de_SOL:
                     mod_y[j] = cod[j,1]
                 else:
-                    mod_y[j] = 12.0
+                    mod_y[j] = 8.0
             cod[:,1] = mod_y
 
             mod_yki = np.zeros(m)
             for j in range(m):
                 if j<= ki_SOL:
-                    mod_yki[j] = coki[j,1]  
+                    mod_yki[j] = coke[j,1]  
                 else:
                     mod_yki[j] = 18.0
             coki[:,1] = mod_yki
@@ -100,7 +100,7 @@ class transport_coefficient_adjustment(load_geometry):
         
         elif self.withshift == True and self.withseries == False:
             simudir = self.data['dirdata']['simudir']['org']
-            fileloc = '{}/b2.transport.inputfile_new'.format(simudir)
+            fileloc = '{}/b2.transport.inputfile'.format(simudir)
             self.mod_transco_method(file_loc = fileloc, withmod = withmod, de_SOL = de_SOL, 
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
         
@@ -271,7 +271,7 @@ class transport_coefficient_adjustment(load_geometry):
     
     
     
-    def align_transcoe_method(self, std_file_loc, input_file_loc, itername, plot_align):
+    def align_transcoe_method(self, std_file_loc, input_file_loc, itername, plot_align, log_flag):
         
         # one_list, n , filename_a, shift_a = tl.mast_tranco_dir('one')
         # print(one_list)
@@ -312,10 +312,10 @@ class transport_coefficient_adjustment(load_geometry):
 
         
         # tcam.Generate_transcoefile_method(cod, CoeffID=1, SpeciesID=2, M=[1])
-        tcam.Write_transcoefile_method(file='{}/b2.transport.inputfile_align{}_{}_{}'.format(simu_dir, char, itername, n), 
+        tcam.Write_transcoefile_method(file='{}/b2.transport.inputfile_align_{}_{}_{}'.format(simu_dir, char, itername, n), 
                                        points= input_trans ,M_1 = True, M=[1])
 
-        log_flag = True
+        # log_flag = True
         specieslist = ['1','3','4']
         d = tcam.transport_coe_unit()
         
@@ -338,7 +338,7 @@ class transport_coefficient_adjustment(load_geometry):
         
 
 
-    def align_transco(self, plot_align):
+    def align_transco(self, plot_align, log_flag):
         # folder = '72_n100000_m12n8e3_nts5_a'
         
         if self.withshift == True and self.withseries == False:
@@ -353,7 +353,7 @@ class transport_coefficient_adjustment(load_geometry):
                     
                     self.align_transcoe_method(std_file_loc = stdfileloc, 
                                     input_file_loc = inpfileloc, itername = shiftname,
-                                    plot_align = plot_align)
+                                    plot_align = plot_align, log_flag = log_flag)
                     
                 
         
