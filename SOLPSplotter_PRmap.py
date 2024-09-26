@@ -333,8 +333,8 @@ class RP_mapping(load_simu_data):
             den_list = list(self.data['dircomp']['Attempt'].keys())
             aa = den_list[0]
             
-            rad_grid = self.data['grid']['RadLoc'][aa]
-            vert_grid = self.data['grid']['VertLoc'][aa]    
+            rad_grid = self.data['grid']['RadLoc']
+            vert_grid = self.data['grid']['VertLoc']  
             g_data = self.data['gfile']['g']
             shift_val = self.data['dircomp']['shift_value']
             
