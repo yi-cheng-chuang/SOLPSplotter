@@ -81,12 +81,12 @@ def mast_comp_dic_withshift():
     multi_shift = ['org', 'dot3', 'dot5', 'dot7']
     # multi_shift = ['org', 'dot3', 'dot5', 'dot7', 'one']
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
-    shift = ['org_new_series', 'dot3', 'dot5', 'dot7', 'one_LS']
+    shift = ['org_cfluxb_std', 'dot3', 'dot5', 'dot7', 'one_LS']
     tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
             'one': 'one_a'}
     
     
-    series = ['75_n900000_leakbtarnsol_nts5_a', '16_n900000_leakbtarnsol_dot3_a', '27_n900000_leakbtarnsol_dot5_a', 
+    series = ['76_n900000_leakbsol_nts5_a', '16_n900000_leakbtarnsol_dot3_a', '27_n900000_leakbtarnsol_dot5_a', 
               '15_n900000_leakbtarnsol_dot7_a', '32_n100000_m12_one_a']
     
     # series = ['73_n100000_n5e3et1e2_nts5_a', '15_n100000_leakagebou_dot3_a', '26_n100000_leakagebou_dot5_a', 
