@@ -9,15 +9,17 @@ Created on Thu Sep 19 00:45:40 2024
 
 
 from SOLPSplotter_NTplot import NT_plot
+from SOLPSplotter_ioutflux import iout_flux
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
 
 
-class neuden_scan(NT_plot):
+class neuden_scan(NT_plot, iout_flux):
     
     def __init__(self, DefaultSettings, loadDS):
         NT_plot.__init__(self, DefaultSettings, loadDS)
+        iout_flux.__init__(self, DefaultSettings, loadDS)
 
     
     def twinscan_ndmid(self, iter_index, data_struc):
@@ -85,14 +87,69 @@ class neuden_scan(NT_plot):
         
         
         return psi_list, nd_list
+    
+    
+    def twinscan_Smid(self, iter_index, data_struc):
+        
+        result_dic = self.data['radial_fit_data'][iter_index]
+        
+        
+        if self.series_flag == 'twin_scan':
+            
+            nf = iter_index[0]
+            tf = iter_index[1]
+            
+            # b2fstate = self.data['b2fstate'][nf][tf]
+            
+            # nx = data_struc['nx']
+            # ny = data_struc['ny']
+            nx = data_struc['nx']
+            ny = data_struc['ny']
+            source = self.data['iout_data']['source'][nf][tf][:, :]
+            weight = self.data['midplane_calc']['weight'][1:ny+1]
+            psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:ny+1]
+
+            
+        else:
+            
+            print('twinscan_Smid is not there yet!')
+            
+            
+    
+        
+        # neu_pro = self.data['outputdata']['NeuDen'][iter_index]
+        
+        # weight = self.data['midplane_calc'][iter_index]['weight']
+        weight_B = np.ones(len(weight))- weight
+        
+        
+        mid_S_pro = np.multiply(source[:, 58], weight) + np.multiply(source[:, 60], weight_B)
+        
+        psi_list = []
+        S_list = []
+        
+        for ind, coord in enumerate(psi_coord):
+            
+            if coord >= 0.95 and coord <= 1.05:
+                psi_list.append(coord)
+                S_list.append(mid_S_pro[ind])
+        
+        
+        
+        return psi_list, S_list
 
     
 
     def twinscan_ndrad_method(self, log_flag, cl_dic, A_dic
-                                   ,scandetail, iterlist, dat_size, scan_style):
+                                   ,scandetail, iterlist, dat_size, scan_style, format_option):
         
+        if format_option == '2x1':
+            fig, axs = plt.subplots(2, 1)
         
-        fig, axs = plt.subplots()
+        elif format_option == '1x1':
+            fig, axs = plt.subplots()
+            
+        
         
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
@@ -105,32 +162,37 @@ class neuden_scan(NT_plot):
         elif dat_size == 'small':
             dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
         
-        
-        print('this is 201:')
-        print(dat_size)
+        plt.subplots_adjust(hspace=.0)
+        anchored_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), loc='upper left')
+        anchored_text_2 = AnchoredText('{}'.format('Source [$s^{-1}$]'), loc='upper left')
+        # print('this is 201:')
+        # print(dat_size)
         
         for aa in iterlist:
             
             psi_list, nd_list = self.twinscan_ndmid(iter_index = aa, 
                                                             data_struc = dat_struc)
             
+            psi_list, S_list = self.twinscan_Smid(iter_index = aa, 
+                                                            data_struc = dat_struc)
             
             """
             label= 'core density {} $10^{19}$'.format(aa)
             
             """
             
-            axs.legend(loc= 'lower left', fontsize=10)
             
             if self.series_flag == 'twin_scan':
                 
                 if scan_style == 'tempscan':
                     
                     ad = aa[1]
+                    ap = aa[0]
                 
                 elif scan_style == 'denscan':
                     
                     ad = aa[0]
+                    ap = aa[1]
                 
                 else:
                     print('neteTSplot_method, please check scan_style')
@@ -142,56 +204,95 @@ class neuden_scan(NT_plot):
     
             if scan_style == 'denscan':
                 
-                # exp_an_fit = fit_dat['exp_fit']
-                # xcoord_cut = fit_dat['x_coord_cut']
+                title_ap = float(ap)*pow(10, 5)
                 
-                if log_flag:
-                    axs.set_yscale('log')
-                else:
-                    pass
                 
-                axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(A_dic[ad]))
-                # axs.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, ls='-', label= 'exponential fit')
-                # axs.axvline(x= max(xcoord_cut), color='black',lw=3, ls='--', 
-                #             label= 'fit range : $\Delta n_e$')
-                # axs.axvline(x= min(xcoord_cut), color='black',lw=3, ls='--')
-                axs.set_title('Density scan with Te = {} eV'.format(scandetail))
-                axs.set_xlabel('$\psi_N$')
+                if format_option == '2x1':
+                    
+                    if log_flag:
+                        axs[0].set_yscale('log')
+                    else:
+                        pass
+                    
+                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    axs[0].axvline(x= 1, color='black', lw=3, ls='--')
+                    axs[1].axvline(x= 1, color='black', lw=3, ls='--')
+                    axs[0].add_artist(anchored_text)
+                    axs[1].add_artist(anchored_text_2)
+                    axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
+                    axs[1].set_xlabel('$\psi_N$')
+                    axs[0].legend(loc= 'lower right')
                 
-                axs.legend(loc= 'lower right')
+                elif format_option == '1x1':
+                    
+                    if log_flag:
+                        axs.set_yscale('log')
+                    else:
+                        pass
+                    
+                    axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    axs.add_artist(anchored_text)
+                    axs.set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
+                    axs.set_xlabel('$\psi_N$')
+                    axs.legend(loc= 'lower right')
+                    
+                    
+                
     
                             
             elif scan_style == 'tempscan':
                 
-    
+                title_ap = float(ap)*pow(10, 20)
+                
                 # exp_an_fit = fit_dat['exp_fit']
                 # xcoord_cut = fit_dat['x_coord_cut']
+                if format_option == '2x1':
+                    
+                    if log_flag:
+                        axs[0].set_yscale('log')
+                    else:
+                        pass
+                    
+                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    axs[0].axvline(x= 1, color='black', lw=3, ls='--')
+                    axs[1].axvline(x= 1, color='black', lw=3, ls='--')
+                    axs[0].add_artist(anchored_text)
+                    axs[1].add_artist(anchored_text_2)
+                    axs[0].set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
+                    axs[1].set_xlabel('$\psi_N$')
+                    axs[0].legend(loc= 'lower right')
                 
-                if log_flag:
-                    axs.set_yscale('log')
-                else:
-                    pass
                 
-                axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(A_dic[ad]))
-                # axs.plot(xcoord_cut, exp_an_fit, color='r',lw= 5, ls='-', label= 'exponential fit')
-                # axs.axvline(x= max(xcoord_cut), color='black',lw=3, ls='--', 
-                #             label= 'fit range : $\Delta n_e$')
-                # axs.axvline(x= min(xcoord_cut), color='black',lw=3, ls='--')
-                axs.set_title('Temperature scan with Ne = {}'.format(scandetail))
-                axs.set_xlabel('$\psi_N$')
-                
-                axs.legend(loc= 'lower right')
-            
+                elif format_option == '1x1':
+                    
+                    if log_flag:
+                        axs.set_yscale('log')
+                    else:
+                        pass
+                    
+                    axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    axs.add_artist(anchored_text)
+                    axs.set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
+                    axs.set_xlabel('$\psi_N$')
+                    axs.legend(loc= 'lower right')
             else:
                 print('neteTSplot_structure, please check the scan parameter')
         
     
+        if format_option == '1x1':
+            
+            n_sym = self.data['radial_fit_data'][aa]['ne_symmetry_point']
+            dn = self.data['opacity_poloidal'][aa]['pedestal_width_psiN']
+            axs.axvline(x= n_sym + dn, color='gray',lw=3)
+            axs.axvline(x= n_sym - dn, color='gray',lw=3)
+            
     
     
     
     
-    
-    def twinscan_ndrad_plot(self, scan_style, dat_size, log_flag):
+    def twinscan_ndrad_plot(self, scan_style, dat_size, log_flag, format_option):
         
         
         
@@ -320,7 +421,7 @@ class neuden_scan(NT_plot):
                     
                     self.twinscan_ndrad_method(iterlist = iter_key, cl_dic = color_dic, 
                                 A_dic = label_dic, scan_style = scan_style, log_flag = log_flag,
-                                scandetail = scan_title, dat_size = dat_size)
+                                scandetail = scan_title, dat_size = dat_size,format_option = format_option)
             
             
         else:
