@@ -433,8 +433,8 @@ class PlotContour(profile_fit):
                                  Z_coord = Z_con, quantity = quant, ma100 = ma100,
                                  itername = aa, log_bar = log_bar, bounds = bounds)
                 
-                fig_dir  = ss.set_figdir()
-                plt.savefig('{}/{}_{}.png'.format(fig_dir, quant, aa), format='png')
+                # fig_dir  = ss.set_figdir()
+                # plt.savefig('{}/{}_{}.png'.format(fig_dir, quant, aa), format='png')
         
         elif self.withshift == False and self.withseries == True:
             
