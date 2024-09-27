@@ -22,7 +22,7 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': True, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
                'Parameters': P, 'series_flag': 'twin_scan',
     'series_filename': 'org_new25scan_fast', 'series_tail': '_fast_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
@@ -32,7 +32,7 @@ series_flag = ['eireneN','change_den','change_temp']
 
 
 def mast_comp_dic():
-    a_shift = 'org'
+    a_shift = 'dot7'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     
     twinscan = False
@@ -52,7 +52,7 @@ def mast_comp_dic():
     
     
     series_dic = {'org': file_name, 'dot3': '16_n900000_leakbtarnsol_dot3_a', 
-                  'dot5': '26_n100000_leakagebou_dot5_a', 'dot7': '14_n100000_leakagebou_dot7_a', 
+                  'dot5': '29_n9E5_tallies_dot5_a', 'dot7': '17_n9E5_tallies_dot7_a', 
                   'one': '33_n100000_leakagebou_one_a'}
     
     outputlist = ['Output', 'Output2', 'EirOutput']
