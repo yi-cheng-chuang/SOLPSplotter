@@ -218,7 +218,7 @@ class twinscan_ioutflux(iout_flux, NT_plot):
                     axs[1, 0].add_artist(anchored_text_2)
                     axs[0, 1].add_artist(anchored_text_3)
                     axs[1, 1].add_artist(anchored_text_4)
-                    axs[1, 0].set_yscale('log')
+                    # axs[1, 0].set_yscale('log')
                     axs[0, 0].axvline(x= 0, color='black', lw=3, ls='-')
                     axs[1, 0].axvline(x= 0, color='black', lw=3, ls='-')
                     axs[0, 1].axvline(x= 0, color='black', lw=3, ls='-')
@@ -240,17 +240,10 @@ class twinscan_ioutflux(iout_flux, NT_plot):
              
              if self.series_flag == 'twin_scan':
                  
-                 # keylist_b = []
-                 
-                 # for x in dircomp[key_b]:
-                 #     keylist_b.append('{:.3f}'.format(x))
-                 
                  color_list = ['red', 'orange', 'green', 'blue', 'purple']
                  
                  color_dic = self.pair_dic(keys = keylist_b, values = color_list)
                  
-                 # print('check color dic:')
-                 # print(color_dic)
                  
                  scan_list = []
                  iter_key = []
@@ -273,54 +266,7 @@ class twinscan_ioutflux(iout_flux, NT_plot):
                      nx = self.data['b2fgeo']['nx']
                      ny = self.data['b2fgeo']['ny']
                      
-                     
-                     # if dat_size == 'full':
-         
-                     #     dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                     
-                     # elif dat_size == 'small':
-                     #     dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                         
-                         
-                         
-                     # psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = it_in, 
-                     #                                         data_struc = dat_struc)
-                     
-                     
-                     # if scan_style == 'tempscan':
-                         
-                     #     scan_add = '{:.1f} eV'.format(mid_te_pro[0])
-                     
-                     # elif scan_style == 'denscan':
-                         
-                     #     scan_add = '{:.2E} '.format(mid_ne_pro[0])
-                     
-                     # else:
-                     #     print('twinscan_plot_method, please check the scan_style!')
-                     
-                     # scan_list.append(scan_add)
                      iter_key.append(it_in)
-                 
-                 
-                 # print('NT scan list: {}'.format(ta))
-                 # print(scan_list)
-                 
-                 
-                 # if scan_style == 'tempscan':
-                 #     psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = (ta, '4.115'),
-                 #                                                data_struc = dat_struc)
-                 #     scan_title = '{:.2E}'.format(mid_ne_pro[0])
-                 
-                 # elif scan_style == 'denscan':
-                 #     psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = ('5.512', ta), 
-                 #                                         data_struc = dat_struc)
-                 #     scan_title = '{:.1f}'.format(mid_te_pro[0])
-                 
-                 # else:
-                 #     print('twinscan_plot_method, please check the scan_style!')
-                 
-                 # label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
-             
              
                  return iter_key, color_dic
 
