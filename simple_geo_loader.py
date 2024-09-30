@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 
 simu_loc = 'C:/Users/ychuang/Documents/SOLPS_data/simulation_data/mast/027205'
-simu_case = 'dot3'
+simu_case = 'AD3D'
 file_dir = '{}/{}/baserun'.format(simu_loc, simu_case)
 geo_dir = '{}/b2fgmtry'.format(file_dir)
 
