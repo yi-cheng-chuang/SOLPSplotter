@@ -22,9 +22,9 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': True,
                'Parameters': P, 'series_flag': 'twin_scan',
-    'series_filename': 'org_new25scan_fast', 'series_tail': '_fast_a',
+    'series_filename': 'org_new25scan_fast_save', 'series_tail': '_fast_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
     return set_dic
 
@@ -32,7 +32,7 @@ series_flag = ['eireneN','change_den','change_temp']
 
 
 def mast_comp_dic():
-    a_shift = 'dot7'
+    a_shift = 'org'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
     
     twinscan = False
@@ -43,7 +43,7 @@ def mast_comp_dic():
     
     else:
         series_name = 'org_cfluxb_std'
-        file_name = '80_nf5.512tf4.115_fast_a'
+        file_name = '80_newt15_a'
         
     
     
