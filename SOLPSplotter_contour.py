@@ -75,6 +75,7 @@ class PlotContour(profile_fit):
         if log_bar:
             if np.all(plot_2dval == 0):
                 print('data_file is an zero matrix')
+                
             elif np.any(plot_2dval == 0):
                 plot_2dval = ma.masked_where(plot_2dval <= 0, plot_2dval)
                 
@@ -476,8 +477,8 @@ class PlotContour(profile_fit):
                              Z_coord = Z_con, quantity = quant, 
                              itername = itername, log_bar = log_bar, ma100= ma100)
             
-            fig_dir  = ss.set_figdir()
-            plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
+            # fig_dir  = ss.set_figdir()
+            # plt.savefig('{}/{}.png'.format(fig_dir, quant), format='png')
     
     
     def plot_change_data(self, data, log_bar, itername, quant, ma100, 
