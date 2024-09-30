@@ -38,7 +38,7 @@ class transport_coefficient_adjustment(load_geometry):
                 if j<= de_SOL:
                     mod_y[j] = cod[j,1]
                 else:
-                    mod_y[j] = 8.0
+                    mod_y[j] = 12.0
             cod[:,1] = mod_y
 
             mod_yki = np.zeros(m)
@@ -100,7 +100,7 @@ class transport_coefficient_adjustment(load_geometry):
         
         elif self.withshift == True and self.withseries == False:
             simudir = self.data['dirdata']['simudir']['org']
-            fileloc = '{}/b2.transport.inputfile'.format(simudir)
+            fileloc = '{}/b2.transport.inputfile_new'.format(simudir)
             self.mod_transco_method(file_loc = fileloc, withmod = withmod, de_SOL = de_SOL, 
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
         
