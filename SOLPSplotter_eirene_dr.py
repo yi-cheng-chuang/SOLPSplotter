@@ -6,7 +6,7 @@ Created on Fri Mar 15 18:55:14 2024
 """
 
 import SOLPS_set as sps
-import SOLPSplotter_poloidal as spp
+import SOLPSplotter_eirene as spe
 import SOLPS_transcoe_adj as sta
 
 d = sps.Setting_dic()
@@ -14,7 +14,7 @@ lex = sps.loadDS_dic(d['DEV'])
 
 
 
-xl = spp.poloidal_plot(DefaultSettings = d, loadDS = lex)
+xl = spe.Eirene_contour(DefaultSettings = d, loadDS = lex)
 
 xl.load_mast_dir()
 xl.load_solpsgeo()
@@ -25,7 +25,7 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'plot_exp_and_fit': False, 'plot_shift_compare': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
-xl.load_ft44()
+xl.load_ft46()
 xl.calc_sep_dsa()
 
 
@@ -34,9 +34,10 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 
 
-xl.set_plot()
+# xl.set_plot()
 
-
+# xl.eirene_contour_plot()
+xl.twcontourplot(scan_style = 'tempscan', plot_option = 'Neuden contour', format_option = '1x1')
 
 # xl.calcpsi()
 # poloidal_index_list = []
