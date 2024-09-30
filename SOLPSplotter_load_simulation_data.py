@@ -385,6 +385,36 @@ class load_simu_data(load_expdata):
           
     """
     
+    def one_dim_scan_ft46(self, iterlist):
+        
+        ft46_dic = {}
+        
+        for aa in iterlist:
+            
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'fort.46.i')
+            ft46 = lEdm.read_ft46(fileName = file_loc)
+            ft46_dic[aa] = vars(ft46)
+            
+            
+        return ft46_dic
+        
+    
+    
+    def two_dim_scan_ft46(self, iterlist, iterlist_a, iterlist_b):
+        
+
+        ft46_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        
+        for tp in iterlist:
+            aa = tp[0]
+            ab = tp[1]
+            
+            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'fort.46.i')
+            ft46 = lEdm.read_ft46(fileName = file_loc)
+            ft46_dic[aa][ab] = vars(ft46)
+        
+        return ft46_dic
+    
     
     
     def load_ft46(self):
@@ -413,18 +443,55 @@ class load_simu_data(load_expdata):
             self.data['ft46'] = ft46_dic
         
         elif self.withshift == False and self.withseries == True:
-            ft46_dic = {}
+            # ft46_dic = {}
             
-            for aa in list(self.data['dircomp']['Attempt'].keys()):
+            # for aa in list(self.data['dircomp']['Attempt'].keys()):
                 
-                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
-                ft46 = lEdm.read_ft46(fileName = file_loc)
-                ft46_dic[aa] = vars(ft46)
+            #     file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
+            #     ft46 = lEdm.read_ft46(fileName = file_loc)
+            #     ft46_dic[aa] = vars(ft46)
                 
                 
+            # self.data['ft46'] = ft46_dic
+            
+            
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            if self.series_flag == 'twin_scan':
+                
+                mcds = self.data['dircomp']
+                
+                ds_key = []
+                ts_key = []
+                
+                print('this is mcds')
+                print(type(mcds['denscan_list'][3]))
+                
+                for x in mcds['denscan_list']:
+                    ds_key.append('{:.3f}'.format(x))
+                    
+                print(ds_key)
+                for x in mcds['tempscan_list']:
+                    ts_key.append('{:.3f}'.format(x))
+                    
+
+                print(ts_key)
+                
+                ft46_dic = self.two_dim_scan_ft46(iterlist = scan, iterlist_a = ds_key, 
+                                       iterlist_b = ts_key)
+                
+                # state_dic, dim_dic = self.two_dim_scan_b2fstate(iterlist = scan, 
+                #                     iterlist_a = ds_key, iterlist_b = ts_key)
+                
+            else:
+                
+                ft46_dic = self.one_dim_scan_ft46(iterlist = scan)
+                # state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
+            
+            
             self.data['ft46'] = ft46_dic
             
-                
+            
         else:
             print('load_b2fplasmf function is not there yet!')
     
