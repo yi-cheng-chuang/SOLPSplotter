@@ -28,7 +28,7 @@ if extra:
     
     basedrt, topdrt = sps.set_wdir()
 
-    FL = basedrt + '/mast/027205/org_cfluxb_std/76_n900000_leakbsol_nts5_a'
+    FL = basedrt + '/mast/027205/org_cfluxb_std/80_lfbcheck_1e3_a'
     FL2 = basedrt + '/mast/027205/org_cfluxb_std/80_nf5.512tf4.115_fast_a'
     # xt.calcpsi_block_method(file_loc = FL, shift = 0)
     flist = [FL, FL2]
