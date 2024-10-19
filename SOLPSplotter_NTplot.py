@@ -9,6 +9,7 @@ from SOLPSplotter_radial import radial_plot
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
+from scipy import interpolate
 
 
 class NT_plot(radial_plot):
@@ -24,7 +25,15 @@ class NT_plot(radial_plot):
 
         if self.withshift == True and self.withseries == False:
             
+            
+            
             b2fstate = self.data['b2fstate'][itername]
+            
+            if data_struc['size'] == 'full':
+                neu_pro = self.data['outputdata']['NeuDen'][itername]
+            elif data_struc['size'] == 'small':
+                data = self.data['ft44'][itername]['dab2']
+                neu_pro = np.transpose(data[:, :, 0])
         
         elif self.withshift == False and self.withseries == True:
             
@@ -44,11 +53,9 @@ class NT_plot(radial_plot):
                     data = self.data['ft44'][nf][tf]['dab2']
                     neu_pro = np.transpose(data[:, :, 0])
                 
-                
-            
             else:
                 
-                b2fstate = self.data['b2fstate'][itername]
+                b2fstate = self.data['b2fstate'][itername]           
                 neu_pro = self.data['outputdata']['NeuDen'][itername]
         
         nx = data_struc['nx']
@@ -63,7 +70,6 @@ class NT_plot(radial_plot):
             Te_J = b2fstate['te'][1:nx+1, 1:ny+1].transpose()
             
         
-            
         
         ev = 1.6021766339999999 * pow(10, -19)
         te_pro = Te_J / ev
@@ -74,8 +80,14 @@ class NT_plot(radial_plot):
         
             leftcut = self.data['b2fgeo'][itername]['leftcut'][0]
             rightcut = self.data['b2fgeo'][itername]['rightcut'][0]
-            weight = self.data['midplane_calc'][itername]['weight']
-            psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
+            
+            if data_struc['size'] == 'full':
+                psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
+                weight = self.data['midplane_calc'][itername]['weight']
+                
+            elif data_struc['size'] == 'small':
+                psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid'][1:ny+1]
+                weight = self.data['midplane_calc'][itername]['weight'][1:ny+1]
             
             
         elif self.withshift == False and self.withseries == True:
@@ -103,7 +115,70 @@ class NT_plot(radial_plot):
         
         return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
     
+    
+    
+    def nete_midprof_cp(self, itername, cptag, data_struc):
+        
 
+
+        if self.withshift == True and self.withseries == False:
+            
+            
+            
+            b2fstate = self.data['b2fstate'][itername][cptag]
+            
+            if data_struc['size'] == 'full':
+                neu_pro = self.data['outputdata']['NeuDen'][itername]
+            elif data_struc['size'] == 'small':
+                data = self.data['ft44'][itername][cptag]['dab2']
+                neu_pro = np.transpose(data[:, :, 0])
+        
+        
+        
+        nx = data_struc['nx']
+        ny = data_struc['ny']
+        
+        if data_struc['size'] == 'full':
+            ne_pro = b2fstate['ne'].transpose()
+            Te_J = b2fstate['te'].transpose()
+            
+        elif data_struc['size'] == 'small':
+            ne_pro = b2fstate['ne'][1:nx+1, 1:ny+1].transpose()
+            Te_J = b2fstate['te'][1:nx+1, 1:ny+1].transpose()
+            
+        
+        
+        ev = 1.6021766339999999 * pow(10, -19)
+        te_pro = Te_J / ev
+        
+        # neu_pro = np.transpose(data[:, :, 0])
+        
+        if self.withshift == True and self.withseries == False:
+        
+            leftcut = self.data['b2fgeo'][itername]['leftcut'][0]
+            rightcut = self.data['b2fgeo'][itername]['rightcut'][0]
+            
+            if data_struc['size'] == 'full':
+                psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
+                weight = self.data['midplane_calc'][itername]['weight']
+                
+            elif data_struc['size'] == 'small':
+                psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid'][1:ny+1]
+                weight = self.data['midplane_calc'][itername]['weight'][1:ny+1]
+        else:
+            print('nete_midprof_cp is not there yet!')
+        
+        weight_B = np.ones(len(weight))- weight
+             
+        mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
+        mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
+        mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
+        
+        return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
+    
+    
+    
+    
     
     
     def plot_neteTSdat(self):
@@ -153,7 +228,8 @@ class NT_plot(radial_plot):
     
     
     
-    def neteTSplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, dat_size):
+    def neteTSplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, dat_size, 
+                          xcoord_type):
         
         TS_dic = self.plot_neteTSdat()
         
@@ -164,18 +240,47 @@ class NT_plot(radial_plot):
         te_er = TS_dic['errte']
         
         
+        midplane_psi = self.data['midplane_calc']['psi_solps_mid']
+        r_rsep = self.data['midplane_calc']['R_Rsep']
+        
+        
+        psi_to_dsa_func = interpolate.interp1d(midplane_psi, r_rsep, fill_value = 'extrapolate')
+        
+        rrsep_TS = psi_to_dsa_func(psi)
+        
+        
         fig, axs = plt.subplots(3, 1)
         
         anchored_text = AnchoredText('{}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
-        axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'black', label= '$n_e$ TS data')
+        
+        if xcoord_type == 'psi':
+            
+            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'black', label= '$n_e$ TS data')
+        
+        elif xcoord_type == 'rrsep':
+            
+            axs[0].errorbar(rrsep_TS, exp_ne, yerr= ne_er, fmt = 'o', color = 'black', label= '$n_e$ TS data')
+        
+            
         axs[0].add_artist(anchored_text)
         axs[0].legend(loc='lower left', fontsize=10)
         
         
         
-        anchored_text2 = AnchoredText('{}'.format('$t_e$ [eV]'), loc= 'upper right')
-        axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'black', label= '$t_e$ TS data')
-        axs[1].set_xlabel('$\psi_N$')
+        anchored_text2 = AnchoredText('{}'.format('$T_e$ [eV]'), loc= 'upper right')
+        
+        if xcoord_type == 'psi':
+            
+            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'black', label= '$T_e$ TS data')
+            axs[1].set_xlabel('$\psi_N$')
+        
+        elif xcoord_type == 'rrsep':
+            
+            axs[1].errorbar(rrsep_TS, exp_te, yerr= te_er, fmt = 'o', color = 'black', label= '$T_e$ TS data')
+            axs[1].set_xlabel('$R - R_{sep}$')
+            
+            
+        
         axs[1].add_artist(anchored_text2)
         axs[1].legend(loc='lower left', fontsize=10)
         
@@ -194,8 +299,8 @@ class NT_plot(radial_plot):
             dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
         
         
-        print('this is 201:')
-        print(dat_size)
+        # print('this is 201:')
+        # print(dat_size)
         
         for aa in iterlist:
             
@@ -203,6 +308,9 @@ class NT_plot(radial_plot):
                                                     data_struc = dat_struc)
             
             mid_pe_pro = np.multiply(mid_ne_pro, mid_te_pro)
+            
+            rrsep_solps = psi_to_dsa_func(psi_coord)
+            
             """
             label= 'core density {} $10^{19}$'.format(aa)
             
@@ -234,41 +342,258 @@ class NT_plot(radial_plot):
             if scan_style == 'denscan':
                 
                 title_ap = float(ap)*pow(10, 5)
+                label_ad = float(ad)*pow(10, 20)
                 
-                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad])
-                axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
-                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad])       
-                axs[2].plot(psi_coord, mid_pe_pro, color = cl_dic[ad], label= '{}'.format(ad))
-                axs[2].add_artist(anchored_text3)
-                axs[2].set_xlabel('$\psi_N$')
+                if xcoord_type == 'psi':
+                    
+                    axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad])
+                    axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad])       
+                    axs[2].plot(psi_coord, mid_pe_pro, color = cl_dic[ad], label= '{:.3} (1/s)'.format(label_ad))
+                    axs[2].set_xlabel('$\psi_N$')
+                
+                elif xcoord_type == 'rrsep':
+                    
+                    axs[0].plot(rrsep_solps, mid_ne_pro, color = cl_dic[ad])
+                    axs[1].plot(rrsep_solps, mid_te_pro, color = cl_dic[ad])       
+                    axs[2].plot(rrsep_solps, mid_pe_pro, color = cl_dic[ad], label= '{:.3} (1/s)'.format(label_ad))
+                    axs[2].set_xlabel('$R - R_{sep}$')
+                
+                
+                axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))         
+                axs[2].add_artist(anchored_text3)       
                 axs[2].legend(loc = 'lower left')
 
                             
             elif scan_style == 'tempscan':
                 
                 title_ap = float(ap)*pow(10, 20)
+                label_ad = float(ad)*pow(10, 5)
                 
-                axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad])
+                if xcoord_type == 'psi':
+                    
+                    axs[0].plot(psi_coord, mid_ne_pro, color = cl_dic[ad])
+                    axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad])
+                    axs[2].plot(psi_coord, mid_pe_pro, color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                    axs[2].set_xlabel('$\psi_N$')
+                
+                elif xcoord_type == 'rrsep':
+                    
+                    axs[0].plot(rrsep_solps, mid_ne_pro, color = cl_dic[ad])
+                    axs[1].plot(rrsep_solps, mid_te_pro, color = cl_dic[ad])
+                    axs[2].plot(rrsep_solps, mid_pe_pro, color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                    axs[2].set_xlabel('$R - R_{sep}$')
+                
+                
                 axs[0].set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
-                axs[1].plot(psi_coord, mid_te_pro, color = cl_dic[ad])
-                axs[2].plot(psi_coord, mid_pe_pro, color = cl_dic[ad], label= '{}'.format(ad))
                 axs[2].add_artist(anchored_text3)
-                axs[2].set_xlabel('$\psi_N$')
                 axs[2].legend(loc = 'lower left')
             
             else:
                 print('neteTSplot_structure, please check the scan parameter')
         
-        n_sym = self.data['radial_fit_data'][aa]['ne_symmetry_point']
-        dn = self.data['opacity_poloidal'][aa]['pedestal_width_psiN']
-        axs[0].axvline(x= n_sym + dn, color='gray',lw=3)
-        axs[0].axvline(x= n_sym - dn, color='gray',lw=3)
+        
+        if xcoord_type == 'psi':
+            
+            n_sym = self.data['radial_fit_data'][aa]['ne_symmetry_point']
+            dn = self.data['opacity_poloidal'][aa]['pedestal_width_psiN']
+            axs[0].axvline(x= n_sym + dn, color='gray',lw=3, label= '$\Delta n_e$')
+            axs[0].axvline(x= n_sym - dn, color='gray',lw=3)
+        
+        elif xcoord_type == 'rrsep':
+            
+            n_sym_psi = self.data['radial_fit_data'][aa]['ne_symmetry_point']
+            n_sym = psi_to_dsa_func(n_sym_psi)
+            dn = self.data['opacity_poloidal'][aa]['pedestal_width']
+            axs[0].axvline(x= n_sym + dn, color='gray',lw=3, label= '$\Delta n_e$')
+            axs[0].axvline(x= n_sym - dn, color='gray',lw=3)
+        
+        
+        
+        axs[0].legend(loc = 'lower left')
 
         
         # fig.savefig('profiles.pdf')
     
     
-    def neudenplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, dat_size):
+    
+    
+    def neteTSplot_shiftmethod(self, iterlist, cl_dic, A_dic, dat_size, xcoord_type):
+        
+        TS_dic = self.plot_neteTSdat()
+        
+        psi = TS_dic['psi']
+        exp_ne = TS_dic['neTS']
+        ne_er = TS_dic['errne']
+        exp_te = TS_dic['teTS']
+        te_er = TS_dic['errte']
+        
+        
+        midplane_psi = self.data['midplane_calc']['org']['psi_solps_mid']
+        r_rsep = self.data['midplane_calc']['org']['R_Rsep']
+        
+        
+        psi_to_dsa_func = interpolate.interp1d(midplane_psi, r_rsep, fill_value = 'extrapolate')
+        
+        rrsep_TS = psi_to_dsa_func(psi)
+        
+        
+        fig, axs = plt.subplots(2, 1)
+        
+        anchored_text = AnchoredText('{}'.format('$n_e$ [$m^{-3}$]'), loc='upper right')
+        
+        if xcoord_type == 'psi':
+            
+            axs[0].errorbar(psi, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
+        
+        elif xcoord_type == 'rrsep':
+            
+            axs[0].errorbar(rrsep_TS, exp_ne, yerr= ne_er, fmt = 'o', color = 'purple', label= '$n_e$ TS data')
+        
+            
+        axs[0].add_artist(anchored_text)
+        axs[0].legend(loc='lower left', fontsize=10)
+        
+        
+        
+        anchored_text2 = AnchoredText('{}'.format('$T_e$ [eV]'), loc= 'upper right')
+        
+        if xcoord_type == 'psi':
+            
+            axs[1].errorbar(psi, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$T_e$ TS data')
+            axs[1].set_xlabel('$\psi_N$')
+        
+        elif xcoord_type == 'rrsep':
+            
+            axs[1].errorbar(rrsep_TS, exp_te, yerr= te_er, fmt = 'o', color = 'purple', label= '$T_e$ TS data')
+            axs[1].set_xlabel('$R - R_{sep}$')
+            
+            
+        
+        axs[1].add_artist(anchored_text2)
+        axs[1].legend(loc='lower left', fontsize=10)
+        
+        plt.subplots_adjust(hspace=.0)
+        
+        nx = self.data['b2fgeo']['org']['nx']
+        ny = self.data['b2fgeo']['org']['ny']
+        
+        
+        if dat_size == 'full':
+
+            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+        
+        elif dat_size == 'small':
+            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+        
+        
+        print('this is 201:')
+        print(dat_size)
+        
+        for aa in iterlist:
+            
+            
+            if self.series_compare == True:
+                
+                for kk in ['fixed', 'flux']:
+                    
+                    psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof_cp(itername = aa, 
+                                            data_struc = dat_struc, cptag = kk)
+                    
+                    rrsep_solps = psi_to_dsa_func(psi_coord)
+                    
+                    """
+                    label= 'core density {} $10^{19}$'.format(aa)
+                    
+                    """
+                    
+                    if xcoord_type == 'psi':
+                        
+                        if kk == 'fixed':
+                            
+                            axs[0].plot(psi_coord, mid_ne_pro, '-', color = cl_dic[aa], label = 'fix A = {}'.format(A_dic[aa]))
+                            axs[1].plot(psi_coord, mid_te_pro, '-', color = cl_dic[aa])
+                        
+                        elif kk == 'flux':
+                            
+                            axs[0].plot(psi_coord, mid_ne_pro, '-o', color = cl_dic[aa], label = 'flux A = {}'.format(A_dic[aa]))
+                            axs[1].plot(psi_coord, mid_te_pro, '-o', color = cl_dic[aa])
+                            
+                               
+                        axs[1].set_xlabel('$\psi_N$')
+                    
+                    elif xcoord_type == 'rrsep':
+                        
+                        if kk == 'fixed':
+                            
+                            axs[0].plot(psi_coord, mid_ne_pro, '-', color = cl_dic[aa], label = 'A = {}'.format(A_dic[aa]))
+                            axs[1].plot(psi_coord, mid_te_pro, '-', color = cl_dic[aa])
+                        
+                        elif kk == 'flux':
+                            
+                            axs[0].plot(psi_coord, mid_ne_pro, '-o', color = cl_dic[aa], label = 'flux A = {}'.format(A_dic[aa]))
+                            axs[1].plot(psi_coord, mid_te_pro, '-o', color = cl_dic[aa])
+                        
+                        
+                        axs[1].set_xlabel('$R - R_{sep}$')
+            
+            else:
+                
+                psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = aa, 
+                                                        data_struc = dat_struc)
+                
+                rrsep_solps = psi_to_dsa_func(psi_coord)
+                
+                """
+                label= 'core density {} $10^{19}$'.format(aa)
+                
+                """
+                
+                if xcoord_type == 'psi':
+                    
+                        
+                    axs[0].plot(psi_coord, mid_ne_pro, '-', color = cl_dic[aa], label = 'A = {}'.format(A_dic[aa]))
+                    axs[1].plot(psi_coord, mid_te_pro, '-', color = cl_dic[aa])
+                        
+                           
+                    axs[1].set_xlabel('$\psi_N$')
+                
+                elif xcoord_type == 'rrsep':
+                    
+                     
+                    axs[0].plot(psi_coord, mid_ne_pro, '-', color = cl_dic[aa], label = 'A = {}'.format(A_dic[aa]))
+                    axs[1].plot(psi_coord, mid_te_pro, '-', color = cl_dic[aa])
+                    
+                    
+                    axs[1].set_xlabel('$R - R_{sep}$')
+            
+            
+        
+        axs[0].legend(loc = 'lower left')
+        if self.series_compare == True:
+            plt.suptitle('$n_e$, $T_e$ comparison for fixed and flux boundary condition')
+        
+        else:
+            pass
+
+        
+        # fig.savefig('profiles.pdf')
+    
+    
+    
+    
+    
+    
+    
+    
+    def neudenplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, dat_size, 
+                          xcoord_type):
+        
+        
+        midplane_psi = self.data['midplane_calc']['psi_solps_mid']
+        r_rsep = self.data['midplane_calc']['R_Rsep']
+        
+        
+        psi_to_dsa_func = interpolate.interp1d(midplane_psi, r_rsep, fill_value = 'extrapolate')
         
        
         fig, axs = plt.subplots()
@@ -292,7 +617,7 @@ class NT_plot(radial_plot):
             psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = aa, 
                                                     data_struc = dat_struc)
             
-            
+            rrsep_solps = psi_to_dsa_func(psi_coord)
             """
             label= 'core density {} $10^{19}$'.format(aa)
             
@@ -320,15 +645,36 @@ class NT_plot(radial_plot):
 
             if scan_style == 'denscan':
                 
-                axs.plot(psi_coord, mid_neu_pro, color = cl_dic[ad], 
-                         label= '{}'.format(A_dic[ad]))
+                
+                if xcoord_type == 'psi':
+                    
+                    axs.plot(psi_coord, mid_neu_pro, color = cl_dic[ad], 
+                             label= '{}'.format(A_dic[ad]))
+                
+                elif xcoord_type == 'rrsep':
+                    
+                    axs.plot(rrsep_solps, mid_neu_pro, color = cl_dic[ad], 
+                             label= '{}'.format(A_dic[ad]))
+                    
+                    
                 axs.set_title('Density scan with Te = {} eV'.format(scandetail))
                 axs.legend()
             
             elif scan_style == 'tempscan':
                 
-                axs.plot(psi_coord, mid_neu_pro, color = cl_dic[ad], 
-                            label= '{}'.format(A_dic[ad]))
+                
+                if xcoord_type == 'psi':
+                    
+                    axs.plot(psi_coord, mid_neu_pro, color = cl_dic[ad], 
+                                label= '{}'.format(A_dic[ad]))
+                
+                elif xcoord_type == 'rrsep':
+                    
+                    axs.plot(rrsep_solps, mid_neu_pro, color = cl_dic[ad], 
+                                label= '{}'.format(A_dic[ad]))
+                    
+                    
+                    
                 axs.set_title('Temperature scan with Ne = {}'.format(scandetail))
                 axs.legend()
 
@@ -444,7 +790,7 @@ class NT_plot(radial_plot):
     
     
         
-    def neteTS_plot(self, scan_style, dat_size):
+    def neteTS_plot(self, scan_style, dat_size, xcoord_type):
         
         if self.withshift == True and self.withseries == False:
             
@@ -456,8 +802,8 @@ class NT_plot(radial_plot):
             
             asp_ch = self.data['dircomp']['multi_shift']
             
-            self.neteTSplot_method(iterlist = asp_ch, 
-                                      cl_dic = color_dic, A_dic = label_dic, scan = 'not')
+            self.neteTSplot_shiftmethod(iterlist = asp_ch, cl_dic = color_dic, A_dic = label_dic, 
+                                   dat_size = dat_size, xcoord_type = xcoord_type)
         
         elif self.withshift == False and self.withseries == True:
             
@@ -505,11 +851,11 @@ class NT_plot(radial_plot):
                     print(label_dic)
                     
                     self.neteTSplot_method(iterlist = iter_key, scandetail = scan_title,
-                            cl_dic = color_dic, A_dic = label_dic, 
+                            cl_dic = color_dic, A_dic = label_dic, xcoord_type= xcoord_type,
                             scan_style = scan_style, dat_size = dat_size)
                     
                     self.neudenplot_method(iterlist = iter_key, cl_dic = color_dic, 
-                                A_dic = label_dic, scan_style = scan_style, 
+                                A_dic = label_dic, scan_style = scan_style, xcoord_type= xcoord_type,
                                 scandetail = scan_title, dat_size = dat_size)
                     
              
