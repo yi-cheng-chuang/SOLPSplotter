@@ -51,16 +51,19 @@ xl.paper_fluxes(pol_list = poloidal_index_list)
 
 # xl.polNT(pol_list = poloidal_index_list)
 
-xl.polsource(pol_list = poloidal_index_list)
+# xl.polsource(pol_list = poloidal_index_list)
 
 # xl.sqrtg_change(pol_list = poloidal_index_list)
 
-xl.R_change(pol_list = poloidal_index_list)
+# xl.R_change(pol_list = poloidal_index_list)
 
-xl.hxhy(pol_list = poloidal_index_list)
+# xl.hxhy(pol_list = poloidal_index_list)
 
 
-xl.parallel_flow(pol_list = poloidal_index_list, side = 'outer target')
+# xl.parallel_flow(pol_list = poloidal_index_list, side = 'outer target')
+
+
+xl.pllflow_evolve(pol_list = poloidal_index_list, side = 'HFS')
 
 
 
