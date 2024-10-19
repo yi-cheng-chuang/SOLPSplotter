@@ -221,9 +221,9 @@ class Diff_R_calc(iout_process):
                 elif side == 'outer target':
                     
                     psiN = self.data['psi']['psival'][aa][1:37, -1]
-                    fnax_t = fnax[60, :]
-                    fnay_t = fnay[60, :]
-                    sterm_t = sterm[60, :]
+                    fnax_t = fnax[-1, :]
+                    fnay_t = fnay[-1, :]
+                    sterm_t = sterm[-1, :]
 
                 
                     
@@ -246,6 +246,124 @@ class Diff_R_calc(iout_process):
             plt.subplots_adjust(hspace=.0)
     
     
+    def pllflow_evolve(self, pol_list, side):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                          'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            fig, axs = plt.subplots(1, 4, sharey= True)
+            
+            pol_text = AnchoredText('{}'.format('(a) Poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                         loc='upper center')
+            
+            S_text = AnchoredText('{}'.format('(b) source [$m^{-3}*s^{-1}$]'), 
+                                         loc='upper center')
+            
+            neuden_text = AnchoredText('{}'.format('(c) neutral density [$m^{-3}$]'), 
+                                         loc='upper center')
+            
+            # side = ['inner target', 'outer target']
+            
+            # side = 'inner target'
+            # for kk in side:
+                      
+            for ii, aa in enumerate(self.data['dircomp']['multi_shift']):
+                
+                
+                fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+                vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+                hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                
+                
+                fnnx = np.divide(fnaxs, vol)
+                fnax = np.multiply(fnnx, hx)
+                
+                
+                
+                source = self.data['b2wdat'][aa]['b2npc_sna'][0][1:97, 1:37]
+                vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+                
+                sterm = np.divide(source, vol)
+                
+                
+                if side == 'HFS':
+                    psiN = self.data['psi']['psival'][aa][1:37, 1]
+                    fnax_t = fnax[0, :]
+                    fnax_s = fnax[5, :]
+                    fnax_m = fnax[15, :]
+                    fnax_px = fnax[23, :]
+                    fnax_p = fnax[25, :]
+                    
+                    axs[ii].plot(psiN, np.abs(fnax_t), '-', color = 'red', 
+                                  label = 'inner target')
+                    axs[ii].axhline(y= max(np.abs(fnax_t)), ls = '--', color = 'red')
+                    axs[ii].plot(psiN, np.abs(fnax_s), '-', color = 'orange', 
+                                  label = 'index 5')
+                    
+                    # axs[ii].axhline(y= max(fnax_s),ls = '--', color = 'orange')
+                    axs[ii].plot(psiN, np.abs(fnax_m), '-', color = 'green', 
+                                  label = 'index 15')
+                    
+                    # axs[ii].axhline(y= max(fnax_m), ls = '--', color = 'green')
+                    axs[ii].plot(psiN, np.abs(fnax_px), '-', color = 'blue', 
+                                  label = 'index 23, before left cut 24')
+                    
+                    # axs[ii].axhline(y= max(fnax_px), ls = '--', color = 'blue')
+                    
+                    axs[ii].plot(psiN, np.abs(fnax_p), '-', color = 'purple', 
+                                  label = 'poloidal angle 250, index 25')
+                    axs[ii].axhline(y= max(np.abs(fnax_p)), ls = '--', color = 'purple')
+                    axs[ii].set_xlabel('$\psi_N$')
+                    axs[ii].legend(loc= 'lower right')
+                    axs[ii].set_title('A = {} {} poloidal flux evolution'.format(A_dic[aa], side))
+                    axs[ii].set_yscale('log')
+                    
+                    
+                elif side == 'LFS':
+                    
+                    psiN = self.data['psi']['psival'][aa][18:37, -1]
+                    fnax_t = fnax[95, 17:]
+                    fnax_s = fnax[90, 17:]
+                    fnax_m = fnax[80, 17:]
+                    fnax_px = fnax[73, 17:]
+                    fnax_p = fnax[59, 17:]
+                    
+                    axs[ii].plot(psiN, fnax_t, '-', color = 'red', 
+                                  label = 'outer target')
+                    axs[ii].axhline(y= max(fnax_t), ls = '--', color = 'red')
+                    axs[ii].plot(psiN, fnax_s, '-', color = 'orange', 
+                                  label = 'index 90')
+                    
+                    # axs[ii].axhline(y= max(fnax_s), ls = '--', color = 'orange')
+                    
+                    axs[ii].plot(psiN, fnax_m, '-', color = 'green', 
+                                  label = 'index 80')
+                    
+                    # axs[ii].axhline(y= max(fnax_m), ls = '--', color = 'green')
+                    
+                    axs[ii].plot(psiN, fnax_px, '-', color = 'blue', 
+                                  label = 'index 73, after right cut 72')
+                    
+                    # axs[ii].axhline(y= max(fnax_px), ls = '--', color = 'blue')
+                    axs[ii].plot(psiN, fnax_p, '-', color = 'purple', 
+                                  label = 'inner midplane, index 59')
+                    
+                    axs[ii].axhline(y= max(fnax_p), ls = '--', color = 'purple')
+                    axs[ii].set_xlabel('$\psi_N$')
+                    axs[ii].legend(loc= 'lower right')
+                    axs[ii].set_title('A = {} {} poloidal flux evolution'.format(A_dic[aa], side))
+                    axs[ii].set_yscale('log')
+                
+                    
+            plt.suptitle('poloidal flux {} evolution'.format(side))
+            # axs[0].set_yscale('log')
+            # axs[1].set_yscale('log')
+            plt.subplots_adjust(wspace=.0)
     
     
 
