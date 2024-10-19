@@ -37,7 +37,7 @@ xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne
 xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_ne = False)
 
 
-xl.neteTS_plot(scan_style = 'tempscan', dat_size = 'small')
+xl.neteTS_plot(scan_style = 'denscan', dat_size = 'small', xcoord_type = 'psi')
 
 
 # xl.AtomNT_plot(AM_flag = 'atom', scan_style = 'denscan')
