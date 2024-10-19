@@ -535,7 +535,10 @@ def read_b2wdat(b2wdatLoc,nSpec):
     b2npc_fnaxs = []
     b2npc_fnays = []
     b2tfnb_dPat_mdf_gradnax = []
+    b2tfnb_dPat_mdf_gradnay = []
     b2trno_cdnax = []
+    b2trno_cdnay = []
+    b2tqna_dna0 = []
     crxs = []
     crys = []
     for i in range(4): crxs.append(read_b2wdat_field(b2wdatLoc+'output/'+'crx'+str(i)+'.dat'))
@@ -571,7 +574,11 @@ def read_b2wdat(b2wdatLoc,nSpec):
         b2stel_sna_ions.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_sna_ion00'+str(spIdx)+'.dat'))
         b2stel_sna_recs.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_sna_rec00'+str(spIdx)+'.dat'))
         b2tfnb_dPat_mdf_gradnax.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2tfnb_dPat_mdf_gradnax00'+str(spIdx)+'.dat'))
+        b2tfnb_dPat_mdf_gradnay.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2tfnb_dPat_mdf_gradnay00'+str(spIdx)+'.dat'))
         b2trno_cdnax.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2trno_cdnax00'+str(spIdx)+'.dat'))
+        b2trno_cdnay.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2trno_cdnay00'+str(spIdx)+'.dat'))
+        b2tqna_dna0.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2tqna_dna000'+str(spIdx)+'.dat'))
+        
         if spIdx==0 or spIdx==2: b2npc_fnaxs.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npco_fnax00'+str(spIdx)+'.dat'))
         else: b2npc_fnaxs.append(read_b2wdat_field(b2wdatLoc+'output/'+'b2npc11_fnax00'+str(spIdx)+'.dat'))
 
@@ -613,6 +620,11 @@ def read_b2wdat(b2wdatLoc,nSpec):
             self.b2stbr_shi_eir = read_b2wdat_field(b2wdatLoc+'output/'+'b2stbr_shi_eir.dat')
             self.b2stbr_she_eir = read_b2wdat_field(b2wdatLoc+'output/'+'b2stbr_she_eir.dat')
             self.b2stel_she_rad = read_b2wdat_field(b2wdatLoc+'output/'+'b2stel_she_rad.dat')
+            self.b2nph9_fhey = read_b2wdat_field(b2wdatLoc+'output/'+'b2nph9_fhey.dat')
+            self.b2nph9_fhex = read_b2wdat_field(b2wdatLoc+'output/'+'b2nph9_fhex.dat')
+            self.b2nph9_she = read_b2wdat_field(b2wdatLoc+'output/'+'b2nph9_she.dat')
+            self.b2nph9_fhix = read_b2wdat_field(b2wdatLoc+'output/'+'b2nph9_fhix.dat')
+            #b2sihs_shedu.dat
 
             #particle sources
             self.b2stbr_sna_eir = b2stbr_sna_eirs
@@ -621,6 +633,11 @@ def read_b2wdat(b2wdatLoc,nSpec):
             self.b2npc_sna = b2npc_snas
             self.b2npc_fnaxs = b2npc_fnaxs
             self.b2npc_fnays = b2npc_fnays
+            self.b2tfnb_dPat_mdf_gradnax = b2tfnb_dPat_mdf_gradnax
+            self.b2tfnb_dPat_mdf_gradnay = b2tfnb_dPat_mdf_gradnay
+            self.b2trno_cdnax = b2trno_cdnax
+            self.b2trno_cdnay = b2trno_cdnay
+            self.b2tqna_dna0 = b2tqna_dna0
 
             #geo info
             self.hx  = read_b2wdat_field(b2wdatLoc+'output/'+'hx.dat')
