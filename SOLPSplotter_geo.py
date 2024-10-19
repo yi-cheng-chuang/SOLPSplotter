@@ -121,7 +121,7 @@ class load_geometry(load_directory):
             shift = self.data['dircomp']['shift_value']
             
             b2mn, geo, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
-                            simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
+                    simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
             
             self.data['b2mn'] = b2mn
             self.data['b2fgeo'] = geo
@@ -133,7 +133,13 @@ class load_geometry(load_directory):
             gfilesum_dic = {}
             for shiftname in self.data['dircomp']['multi_shift']:
                 
-                simudir = self.data['dirdata']['simudir'][shiftname]
+                if self.series_compare == True:
+                    simudir = self.data['dirdata']['simudir'][shiftname]['fixed']
+                
+                else:
+                    simudir = self.data['dirdata']['simudir'][shiftname]
+                    
+                              
                 simutop = self.data['dirdata']['simutop'][shiftname]
                 shift = self.data['dircomp']['shift_dic'][shiftname]
                 b2mn, geo, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
