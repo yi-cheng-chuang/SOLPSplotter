@@ -35,7 +35,7 @@ xl.load_b2fstate()
 xl.load_b2fstate_fna()
 # xl.set_plot()
 xl.load_fluxes_iout()
-xl.twinscan_ioutplot(scan_style = 'tempscan')
+xl.twinscan_ioutplot(scan_style = 'tempscan', plot_option = 'radial flux poloidal plot', format_option = '2x2')
 # a = ('b2tfnb_fnbx001.dat', 'pol_flux_no_psch')
 # xl.load_iout(filename = a[0], simple_quant = a[1])
 
