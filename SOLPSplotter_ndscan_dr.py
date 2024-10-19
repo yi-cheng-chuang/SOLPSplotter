@@ -49,4 +49,11 @@ xl.load_fluxes_iout()
 # xl.multirad_data_fit(pol_list = pol_list, dat_size = 'small', check_ne = False)
 
 
-xl.twinscan_ndrad_plot(scan_style = 'tempscan', dat_size = 'small', log_flag = True, format_option= '1x1')
+xl.twinscan_ndrad_plot(scan_style = 'tempscan', dat_size = 'small', log_flag = True, 
+                       format_option= '1x1', xcoord_type = 'rrsep')
+
+
+
+
+
+
