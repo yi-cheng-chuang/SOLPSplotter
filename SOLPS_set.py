@@ -78,7 +78,7 @@ def mast_twocompare_dir():
 
 def mast_comp_dic_withshift():
     
-    bc = 'fixed_new'
+    bc = 'fixed'
     
     if bc == 'fixed':
         multi_shift = ['org', 'dot3', 'dot5', 'dot7']
