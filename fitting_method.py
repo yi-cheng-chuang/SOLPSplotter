@@ -74,13 +74,22 @@ def exp_fit(x_coord, neuden):
 def linear_fit(x_coord, neuden):
     
     NeuDen = np.log(neuden)
-    x_sh = x_coord - x_coord[0]
     
+    
+    
+    x_sh = x_coord - x_coord[0]
+    # print(x_coord[0])
+    
+    
+    # x_sh = x_coord - 1
     
     ln_exp_fitcoe = np.polyfit(x_sh, NeuDen, 1 , cov=True)
+    
+    # print('exp coe')
     # print(ln_exp_fitcoe[0])
     ln_exp_fitpoly = np.poly1d(ln_exp_fitcoe[0])
     
+    # print('exp poly')
     # print(ln_exp_fitpoly)
     exp_ln_fit = np.exp(ln_exp_fitpoly(x_sh))
     
