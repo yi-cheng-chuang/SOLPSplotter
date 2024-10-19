@@ -44,9 +44,9 @@ xl.load_vessel()
 xl.shift_vessel_in_one()
 
 
-dat_list = ['Neutral density', 'Poloidal flux', 'Source']
+dat_list = ['neutral density', 'Poloidal flux', 'Source', 'hx']
 
-xl.iout_paper_plot(plotstyle = 'paper', dataname = 'Poloidal flux')
+xl.iout_paper_plot(plotstyle = 'paper', dataname = 'Source', sideswitch = 'both')
 
 
 
