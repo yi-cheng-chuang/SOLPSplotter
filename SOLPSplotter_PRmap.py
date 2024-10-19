@@ -74,7 +74,7 @@ class RP_mapping(load_simu_data):
         # print(mag_axis_z)
         
         
-        "Calculate midplane R for Z=0"
+        "Calculate midplane R for Z at the magnetic axis"
         
         "Calculate weight"
         
@@ -197,7 +197,7 @@ class RP_mapping(load_simu_data):
             if plot_psi_dsa_align:
                 color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                              'dot7': 'blue', 'one': 'purple'}
-                plt.figure(figsize=(7,7))
+                plt.figure()
                 for in_sh in self.data['dircomp']['multi_shift']:
                     # plt.plot(midplane_dic[in_sh]['psi_solps_mid'], midplane_dic[in_sh]['R_Rsep'], 'o-', 
                     #   label= 'R-Rsep:[m] with modify {} m'.format(self.data['dircomp']['shift_dic'][in_sh]))
@@ -356,7 +356,7 @@ class RP_mapping(load_simu_data):
     
     #calculate the poloidal angle function    
             
-        def rad_polangle_method(self, RadLoc, VertLoc, gfile, shift, pol_list, plot_angle, rn):
+    def rad_polangle_method(self, RadLoc, VertLoc, gfile, shift, pol_list, plot_angle, rn):
             
             
             mag_axis_z = gfile['zmaxis']
@@ -401,7 +401,7 @@ class RP_mapping(load_simu_data):
         
         
         
-        def calc_polangle_rad(self, pol_list, plot_angle, input_rloc):
+    def calc_polangle_rad(self, pol_list, plot_angle, input_rloc):
             
             if self.withshift == False and self.withseries == False:
                 
@@ -577,8 +577,18 @@ class RP_mapping(load_simu_data):
             
             for aa in self.data['dircomp']['multi_shift']:
                 rad_grid = self.data['grid']['RadLoc'][aa]
-                vert_grid = self.data['grid']['VertLoc'][aa]     
-                dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+                vert_grid = self.data['grid']['VertLoc'][aa]
+                
+                if self.series_compare == True:
+                    
+                    dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa]['fixed'] + '/dsa')
+                
+                else:
+                    
+                    dsa = lcm.read_dsa(self.data['dirdata']['simudir'][aa] + '/dsa')
+                    
+                
+
                 jxa = self.data['b2mn'][aa]['jxa']
                 
                 dist, index = self.calc_sep_dsa_method(RadLoc = rad_grid, VertLoc = vert_grid, 
@@ -814,6 +824,79 @@ class RP_mapping(load_simu_data):
         
         else:
             print('calc_flux_expansion has a bug.')
+
+
+#---------------------------------------------------------------------------------------
+# Poloidally create weight for separatrix
+
+
+    def calc_polsep_method(self, pol_list, psiN):
+         
+        # pol_range = int(geo['nx'] + 2)
+        # rad_range = int(geo['ny'] + 2)
+        
+        RadLoc = self.data['grid']['RadLoc']
+ 
+        # psiN = self.data['psi']['psival'][aa][1:37, 1:97]
+        
+        "Calculate the weight for psiN = 1"
+        
+        "Calculate weight"
+        
+        st = int(pol_list[0])
+        ed = int(pol_list[-1]) + 1
+        
+        high_psi = psiN[20, st:ed]
+        low_psi = psiN[18, st:ed]
+        
+        list_len = len(high_psi)
+    
+        weight_mid = np.zeros(list_len)
+        for x in range(list_len):
+            weight_mid[x] = (1 - low_psi[x])/ (high_psi[x] - low_psi[x])
+        
+
+        return weight_mid
+    
+    
+    def calc_polsep(self, pol_list):
+        
+        if self.withshift == False and self.withseries == False:
+            print('calc_polsep function is not there yet!')
+        
+        
+        elif self.withshift == True and self.withseries == False:        
+            
+
+            weight_dic = {}
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                psiN = self.data['psi']['psival'][aa][1:37, 1:97]
+                
+                               
+                weight_mid = self.calc_polsep_method(pol_list = pol_list, psiN = psiN)
+                
+                weight_dic[aa] = weight_mid
+            
+            
+            self.data['polpsi_weight'] = weight_dic
+            
+           
+        elif self.withshift == False and self.withseries == True:
+            
+            print('calc_polsep function is not there yet!')
+            
+            
+        elif self.withshift == True and self.withseries == True:
+            print('calc_RRsep function is not there yet!')
+        
+        else:
+            print('calc_RRsep function has a bug')
+
+
+
+
+
 
 
 
