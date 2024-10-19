@@ -6,13 +6,12 @@ Created on Thu Sep 19 00:45:40 2024
 """
 
 
-
-
 from SOLPSplotter_NTplot import NT_plot
 from SOLPSplotter_ioutflux import iout_flux
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
+from scipy import interpolate
 
 
 class neuden_scan(NT_plot, iout_flux):
@@ -140,15 +139,20 @@ class neuden_scan(NT_plot, iout_flux):
 
     
 
-    def twinscan_ndrad_method(self, log_flag, cl_dic, A_dic
-                                   ,scandetail, iterlist, dat_size, scan_style, format_option):
+    def twinscan_ndrad_method(self, log_flag, cl_dic, A_dic, xcoord_type,
+                                   scandetail, iterlist, dat_size, scan_style, format_option):
         
         if format_option == '2x1':
             fig, axs = plt.subplots(2, 1)
         
         elif format_option == '1x1':
             fig, axs = plt.subplots()
+        
             
+        midplane_psi = self.data['midplane_calc']['psi_solps_mid']
+        r_rsep = self.data['midplane_calc']['R_Rsep']
+             
+        psi_to_dsa_func = interpolate.interp1d(midplane_psi, r_rsep, fill_value = 'extrapolate')
         
         
         nx = self.data['b2fgeo']['nx']
@@ -175,6 +179,8 @@ class neuden_scan(NT_plot, iout_flux):
             
             psi_list, S_list = self.twinscan_Smid(iter_index = aa, 
                                                             data_struc = dat_struc)
+            
+            rrsep_solps = psi_to_dsa_func(psi_list)
             
             """
             label= 'core density {} $10^{19}$'.format(aa)
@@ -205,7 +211,7 @@ class neuden_scan(NT_plot, iout_flux):
             if scan_style == 'denscan':
                 
                 title_ap = float(ap)*pow(10, 5)
-                
+                label_ad = float(ad)*pow(10, 20)
                 
                 if format_option == '2x1':
                     
@@ -214,14 +220,16 @@ class neuden_scan(NT_plot, iout_flux):
                     else:
                         pass
                     
-                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
-                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    
+                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                    axs[1].set_xlabel('$\psi_N$')
                     axs[0].axvline(x= 1, color='black', lw=3, ls='--')
                     axs[1].axvline(x= 1, color='black', lw=3, ls='--')
                     axs[0].add_artist(anchored_text)
                     axs[1].add_artist(anchored_text_2)
                     axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
-                    axs[1].set_xlabel('$\psi_N$')
+                    
                     axs[0].legend(loc= 'lower right')
                 
                 elif format_option == '1x1':
@@ -231,20 +239,26 @@ class neuden_scan(NT_plot, iout_flux):
                     else:
                         pass
                     
-                    axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    if xcoord_type == 'psi':
+                        
+                        axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                        axs.set_xlabel('$\psi_N$')
+                    
+                    elif xcoord_type == 'rrsep':
+                        
+                        axs.plot(rrsep_solps, nd_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                        axs.set_xlabel('$R - R_{sep}$')
+                    
+                    
+                    
                     axs.add_artist(anchored_text)
                     axs.set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
-                    axs.set_xlabel('$\psi_N$')
-                    axs.legend(loc= 'lower right')
                     
-                    
-                
-    
                             
             elif scan_style == 'tempscan':
                 
                 title_ap = float(ap)*pow(10, 20)
-                
+                label_ad = float(ad)*pow(10, 5)
                 # exp_an_fit = fit_dat['exp_fit']
                 # xcoord_cut = fit_dat['x_coord_cut']
                 if format_option == '2x1':
@@ -254,8 +268,8 @@ class neuden_scan(NT_plot, iout_flux):
                     else:
                         pass
                     
-                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
-                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
                     axs[0].axvline(x= 1, color='black', lw=3, ls='--')
                     axs[1].axvline(x= 1, color='black', lw=3, ls='--')
                     axs[0].add_artist(anchored_text)
@@ -272,27 +286,51 @@ class neuden_scan(NT_plot, iout_flux):
                     else:
                         pass
                     
-                    axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{}'.format(ad))
+                    if xcoord_type == 'psi':
+                        
+                        axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                        axs.set_xlabel('$\psi_N$')
+                    
+                    elif xcoord_type == 'rrsep':
+                        
+                        axs.plot(rrsep_solps, nd_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                        axs.set_xlabel('$R - R_{sep}$')
+                    
+                    
                     axs.add_artist(anchored_text)
                     axs.set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
-                    axs.set_xlabel('$\psi_N$')
-                    axs.legend(loc= 'lower right')
+                    
+                    
             else:
                 print('neteTSplot_structure, please check the scan parameter')
         
     
         if format_option == '1x1':
             
-            n_sym = self.data['radial_fit_data'][aa]['ne_symmetry_point']
-            dn = self.data['opacity_poloidal'][aa]['pedestal_width_psiN']
-            axs.axvline(x= n_sym + dn, color='gray',lw=3)
-            axs.axvline(x= n_sym - dn, color='gray',lw=3)
+            
+            if xcoord_type == 'psi':
+                
+                n_sym = self.data['radial_fit_data'][aa]['ne_symmetry_point']
+                dn = self.data['opacity_poloidal'][aa]['pedestal_width_psiN']
+                axs.axvline(x= n_sym + dn, color='gray',lw=3, label= '$\Delta n_e$')
+                axs.axvline(x= n_sym - dn, color='gray',lw=3)
+            
+            elif xcoord_type == 'rrsep':
+                
+                n_sym_psi = self.data['radial_fit_data'][aa]['ne_symmetry_point']
+                n_sym = psi_to_dsa_func(n_sym_psi)
+                dn = self.data['opacity_poloidal'][aa]['pedestal_width']
+                axs.axvline(x= n_sym + dn, color='gray',lw=3, label= '$\Delta n_e$')
+                axs.axvline(x= n_sym - dn, color='gray',lw=3)
+            
+            
+            axs.legend(loc= 'lower right')
             
     
     
     
     
-    def twinscan_ndrad_plot(self, scan_style, dat_size, log_flag, format_option):
+    def twinscan_ndrad_plot(self, scan_style, dat_size, log_flag, format_option, xcoord_type):
         
         
         
@@ -419,7 +457,7 @@ class neuden_scan(NT_plot, iout_flux):
                     label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
                     
                     
-                    self.twinscan_ndrad_method(iterlist = iter_key, cl_dic = color_dic, 
+                    self.twinscan_ndrad_method(iterlist = iter_key, cl_dic = color_dic, xcoord_type = xcoord_type,
                                 A_dic = label_dic, scan_style = scan_style, log_flag = log_flag,
                                 scandetail = scan_title, dat_size = dat_size,format_option = format_option)
             
