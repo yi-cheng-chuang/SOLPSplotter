@@ -22,8 +22,8 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': True,
-               'Parameters': P, 'series_flag': 'twin_scan',
+    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': True, 'withseries': False,
+               'Parameters': P, 'series_flag': 'shift', 'series_compare': False,
     'series_filename': 'org_new25scan_fast_save', 'series_tail': '_fast_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
     return set_dic
@@ -33,7 +33,7 @@ series_flag = ['eireneN','change_den','change_temp']
 
 def mast_comp_dic():
     a_shift = 'org'
-    shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
+    shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot55': 0.55, 'dot7': 0.7, 'one': 1}
     
     twinscan = False
     
@@ -47,13 +47,12 @@ def mast_comp_dic():
         
     
     
-    shift_file_dic = {'org': series_name,'dot3': 'dot3','dot5': 'dot5',
-                          'dot7': 'dot7','one': 'one_LS'}
+    shift_file_dic = {'org': series_name,'dot3': 'dot3','dot5': 'dot5', 'dot55': 'dot55',
+                          'dot7': 'dot7'}
     
     
     series_dic = {'org': file_name, 'dot3': '16_n900000_leakbtarnsol_dot3_a', 
-                  'dot5': '29_n9E5_tallies_dot5_a', 'dot7': '17_n9E5_tallies_dot7_a', 
-                  'one': '33_n100000_leakagebou_one_a'}
+        'dot5': '29_n9E5_tallies_dot5_a', 'dot55': '2_dot55_a', 'dot7': '17_n9E5_tallies_dot7_a'}
     
     outputlist = ['Output', 'Output2', 'EirOutput']
     mast_dir_dic = {'Shot': '027205', 'shift_dic': shift_dic, 
@@ -78,26 +77,53 @@ def mast_twocompare_dir():
 
 
 def mast_comp_dic_withshift():
-    multi_shift = ['org', 'dot3', 'dot5', 'dot7']
-    # multi_shift = ['org', 'dot3', 'dot5', 'dot7', 'one']
-    shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7, 'one': 1}
-    shift = ['org_cfluxb_std', 'dot3', 'dot5', 'dot7', 'one_LS']
-    tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
-            'one': 'one_a'}
     
+    bc = 'fixed_new'
     
-    series = ['76_n900000_leakbsol_nts5_a', '16_n900000_leakbtarnsol_dot3_a', '27_n900000_leakbtarnsol_dot5_a', 
-              '15_n900000_leakbtarnsol_dot7_a', '32_n100000_m12_one_a']
+    if bc == 'fixed':
+        multi_shift = ['org', 'dot3', 'dot5', 'dot7']
+        shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7}
+        shift = ['org_cfluxb_std', 'dot3', 'dot5', 'dot7']
+        tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
+                }
+        
+        series = ['76_n900000_leakbsol_nts5_a', '16_n900000_leakbtarnsol_dot3_a', '27_n900000_leakbtarnsol_dot5_a',
+                  '15_n900000_leakbtarnsol_dot7_a']
+        
     
-    # series = ['73_n100000_n5e3et1e2_nts5_a', '15_n100000_leakagebou_dot3_a', '26_n100000_leakagebou_dot5_a', 
-    #           '14_n100000_leakagebou_dot7_a', '33_n100000_leakagebou_one_a']
+    elif bc == 'fixed_new':
+        multi_shift = ['org', 'dot3', 'dot5', 'dot7']
+        shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7}
+        shift = ['org_cfluxb_std', 'dot3', 'dot5', 'dot7']
+        tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
+                }
+        
+        
+        series = ['78_n9E5_newtallies_a', '19_n9E5_newtallies_dot3_a', '30_n9E5_newtallies_dot5_a', 
+                  '18_n9E5_newtallies_dot7_a']
+            
     
-    # series = ['72_n100000_m12n8e3_nts5_a', '14_n100000_m12_dot3_a', '25_n100000_m12_dot5_a', 
-    #           '13_n100000_m12_dot7_a', '32_n100000_m12_one_a']
+    elif bc == 'flux':
+        multi_shift = ['org', 'dot3', 'dot5', 'dot7']
+        shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7}
+        shift = ['org_cfluxb_std', 'dot3', 'dot5', 'dot7']
+        tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a',
+                }
+        
+        series = ['78_n5E4_fluxtallies_a', '19_n5E4_fluxtallies_dot3_a', '30_n5E4_fluxtallies_dot5_a', 
+                  '18_n5E4_fluxtallies_dot7_a']
     
+    elif bc == 'try':
+        
+        multi_shift = ['org', 'dot3', 'dot5', 'dot55', 'dot7']
+        shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot55': 0.55, 'dot7': 0.7}
+        shift = ['org_cfluxb_std', 'dot3', 'dot5', 'dot55', 'dot7']
+        tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot55': 'dot55_a', 'dot7': 'dot7_a',
+                }
+        
+        series = ['78_n5E4_fluxtallies_a', '19_n5E4_fluxtallies_dot3_a', '30_n5E4_fluxtallies_dot5_a', 
+                  '1_dot55_a', '18_n5E4_fluxtallies_dot7_a']
 
-    # series = ['46_n100000_5c_nts5_a', '13_n100000_2_dot3_a', '24_n100000_2_dot5_a', 
-    #           '12_n100000_2_dot7_a', '31_n100000_2_one_a']
     
     
     outputlist = ['Output', 'Output2', 'EirOutput']
@@ -107,6 +133,37 @@ def mast_comp_dic_withshift():
                           'Output': outputlist}
     
     return mast_withshift_dic
+
+
+
+
+def mastcomp_withshift_compare():
+    
+
+    multi_shift = ['org', 'dot3', 'dot5', 'dot7']
+    shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot7': 0.7}
+    shift = ['org_cfluxb_std', 'dot3', 'dot5', 'dot7']
+    tail = {'org': 'nts_a', 'dot3': 'dot3_a', 'dot5': 'dot5_a', 'dot7': 'dot7_a'}
+    
+    series = [('78_n9E5_newtallies_a', '76_n900000_leakbsol_nts5_a'), ('19_n9E5_newtallies_dot3_a', '16_n900000_leakbtarnsol_dot3_a'),
+   ('30_n9E5_newtallies_dot5_a', '27_n900000_leakbtarnsol_dot5_a'), ('18_n9E5_newtallies_dot7_a', '15_n900000_leakbtarnsol_dot7_a')]
+    
+    
+    
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    
+    mast_withshift_dic = {'Shot': '027205', 'multi_shift': multi_shift, 'shift_dic': shift_dic, 
+                          'shift_filelist': shift, 'tail': tail, 'series': series,
+                          'Output': outputlist}
+    
+    return mast_withshift_dic
+
+
+
+
+
+
+
 
 
 def Ashift_dir_comp():
