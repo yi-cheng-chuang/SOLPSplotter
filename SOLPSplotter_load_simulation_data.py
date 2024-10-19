@@ -235,16 +235,43 @@ class load_simu_data(load_expdata):
     
     def one_dim_scan_b2fstate(self, iterlist):
         
-        state_dic = {}
-        dim_dic = {}
+        if self.series_compare == True:
+            
+            state_dic = {}
+            dim_dic = {}
+            
+            for aa in iterlist:
+                
+                state_cpdic = {'fixed': {}, 'flux': {}}
+                for kk in ['fixed', 'flux']:
+                    file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][kk], 'b2fstate')
+                    state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+                    state_cpdic[kk] = vars(state)
+                
+                
+                state_dic[aa] = state_cpdic
+                dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
         
-        for aa in iterlist:
-            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
-            state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
-            state_dic[aa] = vars(state)
-            dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+        else:
+            
+            state_dic = {}
+            dim_dic = {}
+            
+            for aa in iterlist:
+                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
+                state, dim = lbdm.read_b2fstate(b2fstateLoc = file_loc)
+                state_dic[aa] = vars(state)
+                dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+        
+        
+        
         
         return state_dic, dim_dic
+    
+    
+
+    
+    
     
     
     def two_dim_scan_b2fstate(self, iterlist, iterlist_a, iterlist_b):
@@ -499,13 +526,33 @@ class load_simu_data(load_expdata):
     
     def one_dim_scan_ft44(self, iterlist):
         
-        ft44_dic = {}
         
-        for aa in iterlist:
+        if self.series_compare == True:
             
-            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'fort.44.i')
-            ft44 = lEdm.read_ft44(fileName = file_loc)
-            ft44_dic[aa] = vars(ft44)
+            ft44_dic = {}
+            
+            for aa in iterlist:
+                
+                ft44_cp = {'fixed': {}, 'flux': {}}
+                for kk in ['fixed', 'flux']:
+                    file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][kk], 'fort.44.i')
+                    ft44 = lEdm.read_ft44(fileName = file_loc)
+                    ft44_cp[kk] = vars(ft44)
+                
+                ft44_dic[aa] = ft44_cp
+                
+        
+        else:
+            
+            ft44_dic = {}
+            
+            for aa in iterlist:
+                
+                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'fort.44.i')
+                ft44 = lEdm.read_ft44(fileName = file_loc)
+                ft44_dic[aa] = vars(ft44)
+        
+        
         
         return ft44_dic
     
