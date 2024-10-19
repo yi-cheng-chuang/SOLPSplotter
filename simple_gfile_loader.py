@@ -17,7 +17,7 @@ simu_case = 'gfile_lab'
 g_loc = '{}/{}/prac_g.00275_efitpp'.format(simu_loc, simu_case)
 
 
-shift_value = 0.55
+shift_value = 0.3
 
 with open(g_loc) as f:
      lines = f.readlines()
