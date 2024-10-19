@@ -150,8 +150,11 @@ class poloidal_plot(profile_fit):
             self.data['neuden_angle'] = cp_dat
         
         elif self.withshift == True and self.withseries == False:
+            
             cp_dat_dic = {}
             list_len = len(pol_list)
+            
+            
             for aa in self.data['dircomp']['multi_shift']:
                 
                 list_len = len(pol_list)
@@ -182,7 +185,7 @@ class poloidal_plot(profile_fit):
         
         # print(adj_list)
         for i in itemname:
-            plt.figure(figsize=(7,7))
+            plt.figure()
             if log_flag:
                 plt.yscale('log')
             else:
@@ -206,8 +209,6 @@ class poloidal_plot(profile_fit):
                 self.poloidal_label(angle_fix= pol_loc, item= i, xpoint_fix = xpoint)
                 
                 
-        
-            
             elif self.withshift == True and self.withseries == False:
                 
                 
@@ -268,53 +269,53 @@ class poloidal_plot(profile_fit):
                 print('poloidal_plot function has a bug.')
         
         
-        def opacity_poloidal_subplot_method(self, itemname):
+    def opacity_poloidal_subplot_method(self, itemname):
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8', 'one': '3.4'}
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue', 'one': 'purple'}
+        
+        
+        if self.withshift == False and self.withseries == False:
             
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                         'dot7': 'blue', 'one': 'purple'}
-            
-            
-            if self.withshift == False and self.withseries == False:
-                
-                result = self.data['opacity_poloidal']
+            result = self.data['opacity_poloidal']
 
+            
+            unit = self.opacity_study_unit()
+            pol_loc = self.data['angle']['angle_list']
+            xpoint = self.data['angle']['xpoint_angle']
+            a_shift = self.data['dircomp']['a_shift']
+            A_val = A_dic[a_shift]
+            color = color_dic[a_shift]
+            
+            self.opacity_poloidal_plot_method(item = itemname, pol_angle = pol_loc, 
+        result_dic = result, color_code = color, A_value = A_val, unit_dic = unit)
+            
+            self.poloidal_label(angle_fix= pol_loc, item= itemname, xpoint_fix = xpoint)
+            
+            
+    
+        
+        elif self.withshift == True and self.withseries == False:
+            
+            
+            for aa in self.data['dircomp']['multi_shift']:
                 
+                result = self.data['opacity_poloidal'][aa]
                 unit = self.opacity_study_unit()
-                pol_loc = self.data['angle']['angle_list']
-                xpoint = self.data['angle']['xpoint_angle']
-                a_shift = self.data['dircomp']['a_shift']
-                A_val = A_dic[a_shift]
-                color = color_dic[a_shift]
+                pol_loc = self.data['angle']['angle_list'][aa]
+                xpoint = self.data['angle']['xpoint_angle'][aa]
+                A_val = A_dic[aa]
+                color = color_dic[aa]
+                ang_fix = self.data['angle']['angle_list']['org']
+                xp_fix = self.data['angle']['xpoint_angle']['org']
                 
                 self.opacity_poloidal_plot_method(item = itemname, pol_angle = pol_loc, 
             result_dic = result, color_code = color, A_value = A_val, unit_dic = unit)
-                
-                self.poloidal_label(angle_fix= pol_loc, item= i, xpoint_fix = xpoint)
-                
-                
-        
             
-            elif self.withshift == True and self.withseries == False:
-                
-                
-                for aa in self.data['dircomp']['multi_shift']:
-                    
-                    result = self.data['opacity_poloidal'][aa]
-                    unit = self.opacity_study_unit()
-                    pol_loc = self.data['angle']['angle_list'][aa]
-                    xpoint = self.data['angle']['xpoint_angle'][aa]
-                    A_val = A_dic[aa]
-                    color = color_dic[aa]
-                    ang_fix = self.data['angle']['angle_list']['org']
-                    xp_fix = self.data['angle']['xpoint_angle']['org']
-                    
-                    self.opacity_poloidal_plot_method(item = itemname, pol_angle = pol_loc, 
-                result_dic = result, color_code = color, A_value = A_val, unit_dic = unit)
-                
-                
-                self.poloidal_label(angle_fix= ang_fix, item= i, xpoint_fix = xp_fix)
+            
+            self.poloidal_label(angle_fix= ang_fix, item= itemname, xpoint_fix = xp_fix)
         
         
         
