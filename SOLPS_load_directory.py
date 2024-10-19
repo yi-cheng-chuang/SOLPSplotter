@@ -21,6 +21,7 @@ class load_directory:
         self.series_filename = DefaultSettings['series_filename']
         self.series_tail = DefaultSettings['series_tail']
         self.series_flag = DefaultSettings['series_flag']
+        self.series_compare = DefaultSettings['series_compare']
                  
             
         "DefaultSettings"    
@@ -81,10 +82,29 @@ class load_directory:
         
                 
             elif self.withshift == True and self.withseries == False:
-                self.data['dircomp'] = sps.mast_comp_dic_withshift()
-                shift_dir, att_dic = lmem.mast_withshift_dir()
-                self.data['dirdata'] = shift_dir
-                self.data['dircomp']['Attempt'] = att_dic
+                
+                # print('series compare is:')
+                # print(self.series_compare)
+                
+                if self.series_compare == True:
+                    
+                    self.data['dircomp'] = sps.mastcomp_withshift_compare()
+                    shift_dir, att_dic = lmem.mast_withshift_cp_dir()
+                    self.data['dirdata'] = shift_dir
+                    self.data['dircomp']['Attempt'] = att_dic
+                
+                else:
+                    
+                    self.data['dircomp'] = sps.mast_comp_dic_withshift()
+                    shift_dir, att_dic = lmem.mast_withshift_dir()
+                    self.data['dirdata'] = shift_dir
+                    self.data['dircomp']['Attempt'] = att_dic
+                    
+                    
+                    
+                
+                
+                
             
             elif self.withshift == False and self.withseries == True:
                 
