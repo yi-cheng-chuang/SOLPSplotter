@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 
 simu_loc = 'C:/Users/ychuang/Documents/SOLPS_data/simulation_data/mast/027205'
-simu_case = 'AD3D'
+simu_case = 'dot7_mcenter_fast'
 file_dir = '{}/{}/baserun'.format(simu_loc, simu_case)
 geo_dir = '{}/b2fgmtry'.format(file_dir)
 
@@ -44,7 +44,7 @@ def load_b2fgmtry(file_name):
 
 geo_dic = {}
 
-geo_dic['dot3'] = load_b2fgmtry(file_name= geo_dir)
+geo_dic['dot55'] = load_b2fgmtry(file_name= geo_dir)
 geo_dic['MAST'] = load_b2fgmtry(file_name= geo_dir_2)
 
 topic = 'mag_pol'
@@ -93,8 +93,8 @@ if topic == 'mag_pol':
     
     fig, axs = plt.subplots(3, 1)
     
-    color_dic = {'MAST': 'red','dot3': 'purple'}
-    A_dic = {'MAST': '1.4', 'dot3': '2.0'}
+    color_dic = {'MAST': 'red','dot55': 'purple'}
+    A_dic = {'MAST': '1.4', 'dot55': '2.5'}
     
     B_text = AnchoredText('{}'.format('B: [T]'), 
                                  loc='upper center')
@@ -106,7 +106,7 @@ if topic == 'mag_pol':
                                  loc='lower center')
     
     text_list = [bx_text, B_text, bz_text]
-    case_list = ['MAST', 'dot3']
+    case_list = ['MAST', 'dot55']
     
     for ind, dat_name in enumerate(flux_list):
         
@@ -128,36 +128,63 @@ if topic == 'mag_pol':
     plt.subplots_adjust(hspace=.0)
 
 
+color_dic = {'MAST': 'red','dot55': 'purple'}
+A_dic = {'MAST': '1.4', 'dot55': '2.5'}
+
+
 fig, axs = plt.subplots()
 
-color_dic = {'MAST': 'red','dot3': 'purple'}
-A_dic = {'MAST': '1.4', 'dot3': '2.0'}
 
-B_text = AnchoredText('{}'.format('B: [T]'), 
+bc_text = AnchoredText('{}'.format('$B_{pol} constant$: [T]'), 
                              loc='upper center')
 
-bx_text = AnchoredText('{}'.format('$B_x$: [T]'), 
-                             loc='upper center')
 
-bz_text = AnchoredText('{}'.format('$B_z$: [T]'), 
-                             loc='lower center')
-
-text_list = [B_text, bx_text, bz_text]
-case_list = ['MAST', 'dot3']
+case_list = ['MAST', 'dot55']
 
     
 for aa in case_list:
     
-    mag_dat = geo_dic[aa]['bb'][:, :, -2]
+    mag_dat = geo_dic[aa]['bb'][1:97, 1:37, 0]
+    crx = geo_dic[aa]['crx'][1:97, 1:37, -2]
     
-    mag_geo_pol(itername = aa, pol_list = pol_list_a, 
-        data = mag_dat, art_text = text_list[ind], axs = axs, 
-        color_dic = color_dic, psi_dic = psi_dic, A_dic = A_dic, no_A_label = False)
-            
+    bc = np.multiply(mag_dat, crx)
+    
+    sk = int(pol_list_a[0])
+    sd = int(pol_list_a[-1]) + 1
+    
+    axs.plot(pol_list_a, bc[sk:sd, 18], color= color_dic[aa], label= 'A = {}'.format(A_dic[aa]))           
     
     axs.legend(loc= 'upper right')
 
 axs.set_xlabel('poloidal index')
-axs.set_title('magnetic strength at the separatrix')
+axs.set_title('poloidal magnetic constant')
+
+
+fig, axs = plt.subplots()
+
+
+bc_text = AnchoredText('{}'.format('b_ratio'), 
+                             loc='upper center')
+
+
+case_list = ['MAST', 'dot55']
+
+    
+for aa in case_list:
+    
+    org_bb = geo_dic['MAST']['bb'][1:97, 1:37, 2]
+    dot55_bb = geo_dic['dot55']['bb'][1:97, 1:37, 2]
+    
+    br = np.divide(org_bb, dot55_bb)
+    
+    sk = int(pol_list_a[0])
+    sd = int(pol_list_a[-1]) + 1
+    
+    axs.plot(pol_list_a, br[sk:sd, 18], color= color_dic[aa], label= 'A = {}'.format(A_dic[aa]))           
+    
+    axs.legend(loc= 'upper right')
+
+axs.set_xlabel('poloidal index')
+axs.set_title('toroidal magnetic ratio')
 
 
