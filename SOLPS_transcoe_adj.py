@@ -135,18 +135,15 @@ class transport_coefficient_adjustment(load_geometry):
                     if log_flag:
                         plt.yscale('log')
                     plt.figure(figsize=(7,7))
-                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                                 'dot7': 'blue', 'one': 'purple'}
-                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                              'dot7': '2.8', 'one': '3.4'}
+                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green', 'dot7': 'blue'}
+                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4', 'dot7': '2.8'}
                     for ab in self.data['dircomp']['multi_shift']: 
                         # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
                         #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
-                        plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
-                                 'o-', color= color_dic[ab], 
+                        plt.scatter(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], color= color_dic[ab], 
                                  label = 'aspect ratio = {}'.format(A_dic[ab]))
                         plt.xlabel('psiN')
-                        plt.title('radial {} coefficient'.format(coe_label_dic[k]))
+                        plt.title('radial {} coefficient at outer midplane'.format(coe_label_dic[k]))
                         plt.legend() 
                     
                     if save_eps:
@@ -171,10 +168,8 @@ class transport_coefficient_adjustment(load_geometry):
                 for i, k in enumerate(label_list):
                     if log_flag:
                         plt.yscale('log')
-                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                                 'dot7': 'blue', 'one': 'purple'}
-                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                              'dot7': '2.8', 'one': '3.4'}
+                    color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green', 'dot7': 'blue'}
+                    A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4', 'dot7': '2.8'}
                     
                     coe = coe_label_dic[k]
                     po = alphabat_list[i]
@@ -183,9 +178,6 @@ class transport_coefficient_adjustment(load_geometry):
                     for ab in self.data['dircomp']['multi_shift']:
                         
                         
-                        
-                        # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
-                        #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
                         axs[i].plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
                                  'o-', color= color_dic[ab], label = 'aspect ratio = {}'.format(A_dic[ab]))
                     
@@ -207,12 +199,13 @@ class transport_coefficient_adjustment(load_geometry):
                     plt.savefig('{}/{}.eps'.format(fig_dir, coe_label_dic[k]), format='eps')
                 
             
-            
-            
         else:
             print('transport_coe_align_plot is not there yet')
     
-    
+
+
+
+
     def transport_coe_compare_plot(self, file_loc_list, plot_compare):
         trans_dic = {}
         psi_1d_dic = {}
@@ -260,7 +253,7 @@ class transport_coefficient_adjustment(load_geometry):
                     plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', 
                              label= '{}'.format(ab))
                     plt.xlabel('psiN')
-                    plt.title('radial {} coefficient'.format(coe_label_dic[k]))
+                    plt.title('radial {} coefficient at outer midplane'.format(coe_label_dic[k]))
                     plt.legend() 
             plt.show()
             
