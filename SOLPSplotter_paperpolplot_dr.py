@@ -42,6 +42,12 @@ for i in range(44):
     poloidal_index_list.append('{}'.format(25 + i))
     
 xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
+
+
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 xl.paper_poloidal_subplot(log_flag = False)
+
+
+
+
