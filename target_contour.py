@@ -27,7 +27,7 @@ class target_contour(Diff_R_calc, PlotContour):
         
     
     
-    def iout_paper_plot(self, plotstyle, dataname):
+    def iout_paper_plot(self, plotstyle, dataname, sideswitch):
         
         if self.withshift == True and self.withseries == False:
             
@@ -79,7 +79,7 @@ class target_contour(Diff_R_calc, PlotContour):
 
                 for ii, aa in enumerate(comp_list):
                     
-                    if dataname == 'Neutral density':
+                    if dataname == 'neutral density':
                         neuden = self.data['ft44'][aa]['dab2'][:, :, 0]
                         input_dat = neuden
                     
@@ -88,8 +88,7 @@ class target_contour(Diff_R_calc, PlotContour):
                         fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
                         vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
                         hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
-                        
-                        
+                                               
                         fnnx = np.divide(fnaxs, vol)
                         fnax = np.multiply(fnnx, hx)
                         input_dat = fnax
@@ -101,6 +100,12 @@ class target_contour(Diff_R_calc, PlotContour):
                         
                         sterm = np.divide(source, vol)
                         input_dat = sterm
+                    
+                    elif dataname == 'hx':
+                        
+                        hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                                               
+                        input_dat = hx
                     
                     
                     
@@ -115,15 +120,76 @@ class target_contour(Diff_R_calc, PlotContour):
                         
                         if dataname == 'Poloidal flux':
                             
-                            plot_2dval = np.abs(input_dat)
+                            if sideswitch == 'negative':
+                                
+                                plot_2dval = ma.masked_where(input_dat >= 0, input_dat)
+                                
+                                datamap = np.abs(plot_2dval)
                             
-                            datamap = ma.masked_where(plot_2dval <= 0, plot_2dval)
-                        
+                            elif sideswitch == 'positive':
+                                
+                                plot_2dval = ma.masked_where(input_dat <= 0, input_dat)
+                                
+                                datamap = np.abs(plot_2dval)
+                            
+                            elif sideswitch == 'both':
+                                
+                                plot_2dval = np.abs(input_dat)
+                                
+                                datamap = ma.masked_where(plot_2dval <= 0, plot_2dval)
+                            
+                            else:
+                                print('check sideswitch for poloidal flux')
+                                
+                                
                         elif dataname == 'Source':
                             
-                            plot_2dval = np.abs(input_dat)
+                            if sideswitch == 'positive':
+                                
+                                plot_2dval = ma.masked_where(input_dat <= 0, input_dat)
+                                
+                                datamap = np.abs(plot_2dval)
                             
-                            datamap = plot_2dval
+                            elif sideswitch == 'negative':
+                                
+                                plot_2dval = ma.masked_where(input_dat >= 0, input_dat)
+                                
+                                datamap = np.abs(plot_2dval)
+                                
+                            elif sideswitch == 'both':
+                                
+                                plot_2dval = np.abs(input_dat)
+                                
+                                datamap = plot_2dval
+                            
+                            else:
+                                print('check sideswitch for source')
+                        
+                                
+                        elif dataname == 'hx':
+                            
+                            if sideswitch == 'negative':
+                                
+                                plot_2dval = ma.masked_where(input_dat >= 0, input_dat)
+                                
+                                datamap = np.abs(plot_2dval)
+                            
+                            elif sideswitch == 'positive':
+                                
+                                plot_2dval = ma.masked_where(input_dat <= 0, input_dat)
+                                
+                                datamap = np.abs(plot_2dval)
+                            
+                            elif sideswitch == 'both':
+                                
+                                plot_2dval = np.abs(input_dat)
+                                
+                                datamap = ma.masked_where(plot_2dval <= 0, plot_2dval)
+                            
+                            else:
+                                print('check sideswitch for hx')
+                        
+                        
                         
                         else:
                             plot_2dval = ma.masked_where(input_dat <= 0, input_dat)
@@ -201,7 +267,13 @@ class target_contour(Diff_R_calc, PlotContour):
                 fig.subplots_adjust(right=0.8)
                 cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
                 # fig.supxlabel('R [m]')
-                fig.suptitle('{} contour plot'.format(dataname))
+                if dataname == 'neutral density':
+                    fig.suptitle('Atomic{} contour plot'.format(dataname))
+                
+                else:
+                    fig.suptitle('{} {} part contour plot'.format(dataname, sideswitch))
+                    
+                    
                 smap = cm.ScalarMappable(Lnorm, CPB)    
                 fig.colorbar(smap, cax= cbar_ax)
                 # plt.tight_layout()
