@@ -26,6 +26,7 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
+xl.load_ft44()
 xl.load_b2fplasmf()
 xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
@@ -41,6 +42,11 @@ xl.shift_vessel_in_one()
 # poloidal_index_list = ['59']
 # xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
+xl.improve_paper_plot(plotstyle = 'paper')
+
+xl.rebuttal_NTplot(plotstyle = 'paper')
+
+xl.rebuttal_NTchpplot(plotstyle = 'paper')
 
 
 # xl.set_plot()
