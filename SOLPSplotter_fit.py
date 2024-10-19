@@ -19,7 +19,7 @@ class profile_fit(RP_mapping):
     def opacity_study_unit(self):
         unit = {'efold_length_psiN': 'Neutral penetration length ($\psi_N$)',
                 'pedestal_width_psiN': 'Pedestal width ($\psi_N$)',
-                  'dimensionless_opaqueness': 'Experimental opaqueness', 
+                  'dimensionless_opaqueness': 'Modeled opaqueness', 
                   'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
                   'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
                   'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
