@@ -57,7 +57,7 @@ A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
  'mag_contour', 'fluxes_no_psch', 'mag_pol', 'annual_review_mag', 'varify_vpara']
 
 
-topic = 'all_fluxes'
+topic = 'fluxes_no_geo'
 
 
 topic_label_dic = {'all_fluxes': '4', 'fluxes_geo': '2', 'fluxes_no_geo': '2', 
