@@ -70,10 +70,11 @@ def terminal_single_dir():
 
 
 
-
-mwd = sps.mast_comp_dic_withshift()
-
 def mast_withshift_dir():
+    
+    mwd = sps.mast_comp_dic_withshift()
+    # print(mwd)
+     
     basedrt, topdrt = sps.set_wdir()
     gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
     gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
@@ -89,6 +90,10 @@ def mast_withshift_dir():
             if aa == s:
                 i = shift_list.index(aa)
                 filename = mwd['series'][i]
+                
+                # print('look for series :')
+                # print(mwd['series'])
+                
                 newbase = '{}/{}/{}/{}/{}'.format(basedrt,od['DEV'], d['Shot'],
                                            mwd['shift_filelist'][i], filename)
                 tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], 
@@ -96,7 +101,9 @@ def mast_withshift_dir():
                 adir = {}
                 for i in d['Output']:
                     adir[i] = '{}/{}'.format(newbase, i)
-                 
+                
+                print(adir['Output'])
+                
                 att_dic[aa] = str(sps.s_number(adir['Output'], series_flag= None)[0])
                 
                 simudir_dic[aa] = newbase
@@ -110,6 +117,69 @@ def mast_withshift_dir():
     
     
     return mast_withshift_dir_dic, att_dic
+
+
+mwd = sps.mastcomp_withshift_compare()
+
+def mast_withshift_cp_dir():
+    basedrt, topdrt = sps.set_wdir()
+    gbase = '{}/{}/{}'.format(topdrt, od['DEV'], d['Shot'])
+    gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
+    shift_list = list(mwd['shift_dic'].keys())
+    # print(type(shift_list))
+    a_shift = mwd['multi_shift']
+    simudir_dic = {}
+    simutop_dic = {}
+    outputdir_dic = {}
+    att_dic = {}
+    for aa in a_shift:
+        for s in shift_list:
+            if aa == s:
+                i = shift_list.index(aa)
+                filename = mwd['series'][i]
+                newbase_cp = {'fixed': {}, 'flux': {}}
+                
+                
+                newbase_cp['fixed'] = '{}/{}/{}/{}/{}'.format(basedrt,od['DEV'], d['Shot'],
+                                                mwd['shift_filelist'][i], filename[0])
+                
+                newbase_cp['flux'] = '{}/{}/{}/{}/{}'.format(basedrt,od['DEV'], d['Shot'],
+                                                mwd['shift_filelist'][i], filename[1])
+                
+                
+                tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], 
+                                          d['Shot'], mwd['shift_filelist'][i])
+                    
+                
+                adir = {'fixed': {}, 'flux': {}}
+                for k in ['fixed', 'flux']:
+                    for i in d['Output']:
+                        adir[k][i] = '{}/{}'.format(newbase_cp[k], i)
+                    
+                    
+                 
+                att_dic[aa] = str(sps.s_number(adir['fixed']['Output'], series_flag= None)[0])
+                
+                simudir_dic[aa] = newbase_cp
+                simutop_dic[aa] = tbase
+                outputdir_dic[aa] = adir
+    
+    mast_withshift_dir_dic = {'basedrt': basedrt, 'topdrt': topdrt, 
+                              'gbase': gbase, 'gdir': gdir, 
+                              'simudir': simudir_dic, 'simutop': simutop_dic, 
+                              'outputdir': outputdir_dic}
+    
+    
+    return mast_withshift_dir_dic, att_dic
+
+
+
+
+
+
+
+
+
 
 
 mcds = sps.mast_comp_dir_series()
