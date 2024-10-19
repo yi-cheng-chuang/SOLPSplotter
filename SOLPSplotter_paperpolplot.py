@@ -48,10 +48,17 @@ class paper_poloidal_plot(profile_fit):
             
         
         
-        if item == 'pedestal_width' or item == 'efold_length':
+        if item == 'pedestal_width':
+            new_r = result_dic[item]*2000
+            ax.plot(pol_angle, new_r, '-', color= color_code, label= 'A= {}'.format(A_value))
+            # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
+        
+        elif item == 'efold_length':
             new_r = result_dic[item]*1000
             ax.plot(pol_angle, new_r, '-', color= color_code, label= 'A= {}'.format(A_value))
             # ax.legend(loc='upper right', bbox_to_anchor=(0.5, 0.5))
+        
+        
                     
         elif item == 'pedestal_width_psiN':
             ax.plot(pol_angle, np.round_(result_dic[item], 2), '-', 
@@ -143,6 +150,10 @@ class paper_poloidal_plot(profile_fit):
             ax.axvline(x= xpoint_fix + 360, color='black',lw=3, ls='--')
         else:
             pass
+    
+    
+    
+    
     
     def nolegend_pol_label(self, angle_fix, item, xpoint_fix, ax):
         
@@ -336,7 +347,7 @@ class paper_poloidal_plot(profile_fit):
     
     def paper_poloidal_subplot(self, log_flag):
             
-            itemname = ['pedestal_width', 'efold_length', 'flux_expansion', 'dimensionless_opaqueness']
+            itemname = ['pedestal_width', 'efold_length', 'dimensionless_opaqueness']
             # adj_list = list(result_dic.keys())
             
             A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
@@ -346,7 +357,7 @@ class paper_poloidal_plot(profile_fit):
             alphabat_list = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)']
             # print(adj_list)
             
-            fig_n = 4
+            fig_n = 3
             ax_n = 1
             i_n = 0
             
@@ -373,7 +384,7 @@ class paper_poloidal_plot(profile_fit):
 
             fig, axs = plt.subplots()
 
-            anchored_text = AnchoredText('{}'.format('neutral density $n_0^{sep}$ [$m^{-3}$]'), 
+            anchored_text = AnchoredText('{}'.format('neutral density at pedestal bottom [$m^{-3}$]'), 
                                          loc='upper center')
             
             axs.add_artist(anchored_text)
@@ -389,6 +400,105 @@ class paper_poloidal_plot(profile_fit):
             plt.ylim(ymin= 0, ymax = 6*10**16)
             
             plt.savefig('neu_den.pdf')
+            
+            
+            
+            neuden_change_percent = {}
+            result = self.data['opacity_poloidal']
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                org_std = result['org']['neutral_density']
+                aa_comp = result[aa]['neutral_density']
+                
+                ncp_list = []
+                
+                for kk in range(len(org_std)):
+                    
+                    ncp = (aa_comp[kk] - org_std[kk])*100/(org_std[kk])
+                    
+                    
+                    ncp_list.append(ncp)
+                
+                neuden_change_percent[aa] = ncp_list
+            
+            self.data['ncp'] = neuden_change_percent
+            
+            
+            "print the neutral density change percentage"
+            
+            
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                HFS_ncp = self.data['ncp'][aa][:13]
+                avg_ncp = sum(HFS_ncp) / len(HFS_ncp)
+                
+                print('the {} case HFS increase percentage is: {:.1f} '.format(aa, avg_ncp))
+            
+            
+            
+            
+            
+            fig, axs = plt.subplots()
+
+            anchored_text = AnchoredText('{}'.format('neutral density change percentage'), 
+                                         loc='upper center')
+            
+            axs.add_artist(anchored_text)
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                if aa == 'org':
+                    pass
+                
+                else:
+                    
+                    dat_set = self.data['ncp'][aa]
+                    
+                    pol_loc = self.data['angle']['angle_list'][aa]
+                    xpoint = self.data['angle']['xpoint_angle'][aa]
+
+                    A_val = A_dic[aa]
+                    color = color_dic[aa]
+                    
+                
+                    
+                    axs.plot(pol_loc, dat_set, '-', color= color, 
+                            label= 'A= {}'.format(A_val))
+            
+            
+            ang_fix = self.data['angle']['angle_list']['org']
+            xp_fix = self.data['angle']['xpoint_angle']['org']
+            self.neuden_poloidal_label(angle_fix= ang_fix, item= 'neuden_percentage', 
+                                       xpoint_fix = xp_fix)
+            
+            
+            axs.set_xlabel('poloidal angle')
+            plt.legend(loc= 'lower left', fontsize=10)
+            
+            
+                    
+                    
+                    
+                    
+                
+                
+                
+                
+            
+            
+            
+                
+                
+                    
+                    
+            
+            
+            
+            
+            
+            
             
             
             
