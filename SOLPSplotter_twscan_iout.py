@@ -29,11 +29,7 @@ class twinscan_ioutflux(iout_flux, NT_plot):
   
         else:
             print('Publish setting is incorrect or add another setting')
-    
 
-    
-    
-    
 
     def twinscaniout_method(self, iterlist, cl_dic, scan_style, ang_list, plot_option, format_option):
         
@@ -45,12 +41,10 @@ class twinscan_ioutflux(iout_flux, NT_plot):
             
             fig, axs = plt.subplots(2, 2)
         
-        
-        
+              
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
-        
-        
+                
         # if dat_size == 'full':
 
         #     dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
@@ -59,14 +53,26 @@ class twinscan_ioutflux(iout_flux, NT_plot):
         #     dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
         
         plt.subplots_adjust(hspace=.0)
-        anchored_text_1 = AnchoredText('{}'.format('(a) Core particle flux [$s^{-1}$]'), 
+        anchored_text_1 = AnchoredText('{}'.format('(a) Core particle flux [$s^{-1}*m^{-2}$]'), 
                                               loc='lower center')
-        anchored_text_2 = AnchoredText('{}'.format('(b) separatrix particle flux [$s^{-1}$]'), 
-                                              loc='upper right')
-        anchored_text_3 = AnchoredText('{}'.format('(a) Core heat flux [$s^{-1}$]'), 
-                                              loc='upper right')
-        anchored_text_4 = AnchoredText('{}'.format('(b) separatrix heat flux [$s^{-1}$]'), 
+        anchored_text_2 = AnchoredText('{}'.format('(b) Separatrix particle flux [$s^{-1}*m^{-2}$]'), 
                                               loc='lower center')
+        anchored_text_3 = AnchoredText('{}'.format('(a) Core heat flux [$s^{-1}*m^{-2}$]'), 
+                                              loc='upper right')
+        anchored_text_4 = AnchoredText('{}'.format('(b) Separatrix heat flux [$s^{-1}*m^{-2}$]'), 
+                                             loc='lower center')
+        
+        
+        if scan_style == 'denscan':
+            
+            if format_option == '4x1':
+                
+                axs[3].axvline(x= 0, color='black', lw=3, ls='-', label= 'LFS')
+                axs[3].axvline(x= 180, color='brown', lw=3, ls='-', label= 'HFS')
+                axs[3].legend(loc = 'upper right')
+        
+        
+                 
         
         for aa in iterlist:
             
@@ -77,11 +83,6 @@ class twinscan_ioutflux(iout_flux, NT_plot):
                 fna_core = self.data['iout_data']['flux_y_0'][aa[0]][aa[1]][0, 25:73]
                 fhe_sol = self.data['iout_data']['eheatflux_y_0'][aa[0]][aa[1]][19, 25:73]
                 fhe_core = self.data['iout_data']['eheatflux_y_0'][aa[0]][aa[1]][0, 25:73]
-                
-
-            
-            # elif plot_option == 'density':
-                
                 
 
             """
@@ -115,124 +116,158 @@ class twinscan_ioutflux(iout_flux, NT_plot):
             if scan_style == 'denscan':
                 
                 title_ap = float(ap)*pow(10, 5)
+                label_ad = float(ad)*pow(10, 20)
                 
                 if format_option == '4x1':
                     
                     axs[0].plot(ang_list, fna_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} (1/s)'.format(label_ad))
                     axs[1].plot(ang_list, fna_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} (1/s)'.format(label_ad))
                     axs[2].plot(ang_list, fhe_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} (1/s)'.format(label_ad))
                     axs[3].plot(ang_list, fhe_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
-                    axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
-                    axs[0].add_artist(anchored_text_1)
-                    axs[1].add_artist(anchored_text_2)
-                    axs[2].add_artist(anchored_text_3)
-                    axs[3].add_artist(anchored_text_4)
-                    axs[0].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[1].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[2].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[3].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[0].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[2].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[3].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[3].set_xlabel('poloidal angle')
-                    axs[0].legend(loc = 'best')
+                             label= '{:.3E} (1/s)'.format(label_ad))
+                    axs[2].legend(loc = 'lower left')
+
                 
                 elif format_option == '2x2':
                     
                     axs[0, 0].plot(ang_list, fna_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} (1/s)'.format(label_ad))
                     axs[1, 0].plot(ang_list, fna_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
-                    axs[1, 0].set_yscale('log')
+                             label= '{:.3E} (1/s)'.format(label_ad))
+                    # axs[1, 0].set_yscale('log')
                     axs[0, 1].plot(ang_list, fhe_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} (1/s)'.format(label_ad))
                     axs[1, 1].plot(ang_list, fhe_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
-                    fig.suptitle('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
-                    axs[0, 0].add_artist(anchored_text_1)
-                    axs[1, 0].add_artist(anchored_text_2)
-                    axs[0, 1].add_artist(anchored_text_3)
-                    axs[1, 1].add_artist(anchored_text_4)
-                    axs[0, 0].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[1, 0].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[0, 1].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[1, 1].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[0, 0].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1, 0].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[0, 1].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1, 1].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1, 0].set_xlabel('poloidal angle')
-                    axs[1, 1].set_xlabel('poloidal angle')
-                    axs[0, 0].legend(loc = 'best')
+                             label= '{:.3E} (1/s)'.format(label_ad))
                     
                 
-                
-                
-            
             elif scan_style == 'tempscan':
                 
                 title_ap = float(ap)*pow(10, 20)
+                label_ad = float(ad)*pow(10, 5)
                 
                 if format_option == '4x1':
                     axs[0].plot(ang_list, fna_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} W'.format(label_ad))
                     axs[1].plot(ang_list, fna_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} W'.format(label_ad))
                     axs[2].plot(ang_list, fhe_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} W'.format(label_ad))
                     axs[3].plot(ang_list, fhe_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
-                    axs[0].set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
-                    axs[0].add_artist(anchored_text_1)
-                    axs[1].add_artist(anchored_text_2)
-                    axs[2].add_artist(anchored_text_3)
-                    axs[3].add_artist(anchored_text_4)
-                    axs[0].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[1].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[2].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[3].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[0].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[2].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[3].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[3].set_xlabel('poloidal angle')
-                    axs[0].legend(loc = 'best')
+                             label= '{:.3E} W'.format(label_ad))
+
 
                 elif format_option == '2x2':
                     
                     axs[0, 0].plot(ang_list, fna_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
+                             label= '{:.3E} W'.format(label_ad))
                     axs[1, 0].plot(ang_list, fna_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
-                    axs[0, 1].plot(ang_list, fhe_core, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
-                    axs[1, 1].plot(ang_list, fhe_sol, color = cl_dic[ad], 
-                             label= '{}'.format(ad))
-                    fig.suptitle('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
-                    axs[0, 0].add_artist(anchored_text_1)
-                    axs[1, 0].add_artist(anchored_text_2)
-                    axs[0, 1].add_artist(anchored_text_3)
-                    axs[1, 1].add_artist(anchored_text_4)
+                             label= '{:.3E} W'.format(label_ad))
                     # axs[1, 0].set_yscale('log')
-                    axs[0, 0].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[1, 0].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[0, 1].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[1, 1].axvline(x= 0, color='black', lw=3, ls='-')
-                    axs[0, 0].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1, 0].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[0, 1].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1, 1].axvline(x= 180, color='brown', lw=3, ls='-')
-                    axs[1, 0].set_xlabel('poloidal angle')
-                    axs[1, 1].set_xlabel('poloidal angle')
-                    axs[0, 0].legend(loc = 'best')
+                    axs[0, 1].plot(ang_list, fhe_core, color = cl_dic[ad], 
+                             label= '{:.3E} W'.format(label_ad))
+                    axs[1, 1].plot(ang_list, fhe_sol, color = cl_dic[ad], 
+                             label= '{:.3E} W'.format(label_ad))
             
             else:
                 print('neudenplot_method, please check the scan parameter')
+
+                
+        if scan_style == 'denscan':
+            
+            title_ap = float(ap)*pow(10, 5)
+            label_ad = float(ad)*pow(10, 20)
+            
+            if format_option == '4x1':
+                
+                axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
+                axs[0].add_artist(anchored_text_1)
+                axs[1].add_artist(anchored_text_2)
+                axs[2].add_artist(anchored_text_3)
+                axs[3].add_artist(anchored_text_4)
+                axs[0].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[1].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[2].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[3].axvline(x= 0, color='black', lw=3, ls='-', label= 'LFS')
+                axs[0].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[1].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[2].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[3].axvline(x= 180, color='brown', lw=3, ls='-', label= 'HFS')
+                axs[3].set_xlabel('poloidal angle')
+                axs[2].legend(loc = 'lower left')
+                # axs[3].legend(loc = 'upper right')
+            
+            elif format_option == '2x2':
+                
+                fig.suptitle('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
+                axs[0, 0].add_artist(anchored_text_1)
+                axs[1, 0].add_artist(anchored_text_2)
+                axs[0, 1].add_artist(anchored_text_3)
+                axs[1, 1].add_artist(anchored_text_4)
+                axs[0, 0].axvline(x= 0, color='black', lw=3, ls='-', label= 'LFS')
+                axs[1, 0].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[0, 1].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[1, 1].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[0, 0].axvline(x= 180, color='brown', lw=3, ls='-', label= 'HFS')
+                axs[1, 0].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[0, 1].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[1, 1].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[1, 0].set_xlabel('poloidal angle')
+                axs[1, 1].set_xlabel('poloidal angle')
+                axs[0, 0].legend(loc = 'best')
+        
+        
+        elif scan_style == 'tempscan':
+            
+            title_ap = float(ap)*pow(10, 20)
+            label_ad = float(ad)*pow(10, 5)
+            
+            if format_option == '4x1':
+                                
+                axs[0].set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
+                axs[0].add_artist(anchored_text_1)
+                axs[1].add_artist(anchored_text_2)
+                axs[2].add_artist(anchored_text_3)
+                axs[3].add_artist(anchored_text_4)
+                axs[0].axvline(x= 0, color='black', lw=3, ls='-', label= 'LFS')
+                axs[1].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[2].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[3].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[0].axvline(x= 180, color='brown', lw=3, ls='-', label= 'HFS')
+                axs[1].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[2].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[3].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[3].set_xlabel('poloidal angle')
+                axs[0].legend(loc = 'best')
+
+            elif format_option == '2x2':
+                
+                fig.suptitle('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
+                axs[0, 0].add_artist(anchored_text_1)
+                axs[1, 0].add_artist(anchored_text_2)
+                axs[0, 1].add_artist(anchored_text_3)
+                axs[1, 1].add_artist(anchored_text_4)
+                axs[0, 0].axvline(x= 0, color='black', lw=3, ls='-', label= 'LFS')
+                axs[1, 0].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[0, 1].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[1, 1].axvline(x= 0, color='black', lw=3, ls='-')
+                axs[0, 0].axvline(x= 180, color='brown', lw=3, ls='-', label = 'HFS')
+                axs[1, 0].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[0, 1].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[1, 1].axvline(x= 180, color='brown', lw=3, ls='-')
+                axs[1, 0].set_xlabel('poloidal angle')
+                axs[1, 1].set_xlabel('poloidal angle')
+                axs[0, 0].legend(loc = 'best')
+       
+                
+                
+        
+
+       
+
 
     def iout_twinscan_prep(self, ta, keylist_b, scan_style):
      
@@ -271,7 +306,7 @@ class twinscan_ioutflux(iout_flux, NT_plot):
                  return iter_key, color_dic
 
 
-    def twinscan_ioutplot(self, scan_style):
+    def twinscan_ioutplot(self, scan_style, plot_option, format_option):
         
         if self.withshift == False and self.withseries == True:
             
@@ -326,7 +361,7 @@ class twinscan_ioutflux(iout_flux, NT_plot):
                     # print(label_dic)
                     self.twinscaniout_method(iterlist = iter_key, cl_dic = color_dic, 
                                 scan_style = scan_style, ang_list = ang_list, 
-                    plot_option = 'radial flux poloidal plot', format_option = '2x2')
+                    plot_option = plot_option, format_option = format_option)
                     
              
             else:
