@@ -45,13 +45,13 @@ xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_n
 xl.Opacity_study_radial_plot(pol_loc = poloidal_index_list, dat_size = 'small')
 # xl.plot_all_radial(separate = False)
 
-pol_list = []
-for i in range(10):
-    pol_list.append('{}'.format(52 + i))
+# pol_list = []
+# for i in range(10):
+#     pol_list.append('{}'.format(52 + i))
     
-xl.multirad_data_fit(pol_list = pol_list, dat_size = 'small', check_ne = False)
+# xl.multirad_data_fit(pol_list = pol_list, dat_size = 'small', check_ne = False)
 
-xl.paper_neuden_radial_plot(pol_loc = pol_list, dat_size = 'small')
+# xl.paper_neuden_radial_plot(pol_loc = pol_list, dat_size = 'small')
 
 # xl.ne_te_TS_plot()
 # xl.plot_tanh_fit(log_flag= False)
