@@ -30,6 +30,7 @@ xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_vessel()
 xl.load_ft44()
 xl.load_b2fstate()
+xl.load_b2wdat()
 
 
 poloidal_index_list = []
@@ -44,4 +45,6 @@ xl.polplotft44_leg()
 
 xl.neuden_tar(side = 'outer target')
 
-xl.neutemp_tar()
+xl.neutemp_tar(side = 'inner target')
+
+xl.totnd()
