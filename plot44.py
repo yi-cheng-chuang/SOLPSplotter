@@ -5,16 +5,16 @@ Created on Wed Oct  9 21:19:03 2024
 @author: ychuang
 """
 
-from SOLPSplotter_iout_dataprocess import iout_process
+from R_diff_calc import Diff_R_calc
 from matplotlib.offsetbox import AnchoredText
 import load_B2_data_method as lBdm
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class plot_ft44(iout_process):
+class plot_ft44(Diff_R_calc):
     def __init__(self, DefaultSettings, loadDS):
-        iout_process.__init__(self, DefaultSettings, loadDS)
+        Diff_R_calc.__init__(self, DefaultSettings, loadDS)
 
 
 
@@ -166,7 +166,7 @@ class plot_ft44(iout_process):
             axs.set_xlabel('$\psi_N$')
     
     
-    def neutemp_tar(self):
+    def neutemp_tar(self, side):
         
         if self.withshift == True and self.withseries == False:
             
@@ -176,7 +176,7 @@ class plot_ft44(iout_process):
             A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
                       'dot7': '2.8', 'one': '3.4'}
             
-            side = 'inner target'
+            # side = 'inner target'
             
             fig, axs = plt.subplots()
                       
@@ -206,10 +206,75 @@ class plot_ft44(iout_process):
                 
             
             axs.legend(loc= 'best')
-            axs.set_title('atomic temperature inner leg')
+            axs.set_title('atomic temperature {}'.format(side))
             
             
+    
+    def totnd(self):
+        
             
+        fig, axs = plt.subplots(2, 1)
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        HFS_text = AnchoredText('{}'.format('(a) Poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$] at HFS'), 
+                                     loc='upper center')
+        
+        LFS_text = AnchoredText('{}'.format('(b) Poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$] at LFS'), 
+                                     loc='upper center')
+        
+        for side in ['HFS', 'LFS']:
+        
+        
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+                
+                neuden = self.data['ft44'][aa]['dab2'][:, :, 0]
+                vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+                nd = np.multiply(neuden, vol)
+                       
+                if side == 'HFS':
+                    
+                    index_list = np.linspace(0, 23, 24)
+                    
+                    fx_list = []
+                    
+                    for ii in index_list:
+                        
+                        
+                        fx_list.append(abs(sum(nd[int(ii), 18:])))
+                    
+                    axs[0].plot(index_list, fx_list, color = color_dic[aa], 
+                                 label = 'A = {}'.format(A_dic[aa]))
+                    
+                    
+                elif side == 'LFS':
+                    
+                    index_list = np.linspace(72, 95, 24)
+                    
+                    fx_list = []
+                    
+                    for ii in index_list:
+                        
+                        fx_list.append(sum(nd[int(ii), 18:]))
+                    
+                    axs[1].plot(index_list, fx_list, color = color_dic[aa], 
+                                 label = 'A = {}'.format(A_dic[aa]))
+
+                
+
+            
+            axs[1].legend(loc= 'upper right')
+            axs[0].legend(loc = 'upper right')
+            axs[0].add_artist(HFS_text)
+            axs[1].add_artist(LFS_text)
+            axs[0].set_xlabel('poloidal index')
+            axs[1].set_xlabel('poloidal index')
     
     
     
