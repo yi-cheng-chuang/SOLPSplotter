@@ -79,7 +79,7 @@ xl.pllflow_evolve(pol_list = poloidal_index_list, side = 'HFS')
 # xl.continuity_terms(pol_list = poloidal_index_list)
 
 
-# xl.check_targetNT(pol_list = poloidal_index_list)
+xl.check_targetNT(pol_list = poloidal_index_list)
 
 # xl.check_source(pol_list = poloidal_index_list)
 
