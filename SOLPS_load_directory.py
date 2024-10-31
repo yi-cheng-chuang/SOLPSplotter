@@ -100,11 +100,6 @@ class load_directory:
                     self.data['dirdata'] = shift_dir
                     self.data['dircomp']['Attempt'] = att_dic
                     
-                    
-                    
-                
-                
-                
             
             elif self.withshift == False and self.withseries == True:
                 
