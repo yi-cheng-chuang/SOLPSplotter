@@ -6,8 +6,6 @@ Created on Sun Oct 20 01:49:17 2024
 """
 
 
-
-
 from R_diff_calc import Diff_R_calc
 from matplotlib.offsetbox import AnchoredText
 import load_B2_data_method as lBdm
@@ -232,11 +230,6 @@ class show_flow(Diff_R_calc):
         elif side == 'LFS':
             
             fig, axs = plt.subplots(3, 1)
-            
-            
-        
-            
-        
         
         color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                      'dot7': 'blue'}
