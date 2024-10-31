@@ -596,12 +596,12 @@ class PlotContour(profile_fit):
         
         if meter:
             axs.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, 
-        color = color_dic[itername], label= 'aspect ratio = {}'.format(A_dic[itername]))
+        color = color_dic[itername], label= 'A = {}'.format(A_dic[itername]))
             
             
         else:
             axs.plot(vessel_data[:,0], vessel_data[:,1], 
-    color = color_dic[itername], label= 'aspect ratio = {}'.format(A_dic[itername]))
+    color = color_dic[itername], label= 'A = {}'.format(A_dic[itername]))
             
     
             
