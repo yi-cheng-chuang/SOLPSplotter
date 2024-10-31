@@ -40,6 +40,8 @@ class neuden_scan(NT_plot, iout_flux):
                 neu_pro = self.data['outputdata']['NeuDen'][nf][tf]
                 weight = self.data['midplane_calc']['weight']
                 psi_coord = self.data['midplane_calc']['psi_solps_mid']
+                
+                              
             elif data_struc['size'] == 'small':
                 nx = data_struc['nx']
                 ny = data_struc['ny']
