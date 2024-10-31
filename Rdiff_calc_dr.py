@@ -47,7 +47,7 @@ xl.calc_polsep(pol_list = poloidal_index_list)
 
 xl.paper_fluxes(pol_list = poloidal_index_list)
 
-# xl.poloidal_transcoe(pol_list = poloidal_index_list)
+xl.poloidal_transcoe(pol_list = poloidal_index_list)
 
 # xl.polNT(pol_list = poloidal_index_list)
 
@@ -63,7 +63,7 @@ xl.paper_fluxes(pol_list = poloidal_index_list)
 # xl.parallel_flow(pol_list = poloidal_index_list, side = 'outer target')
 
 
-xl.pllflow_evolve(pol_list = poloidal_index_list, side = 'HFS')
+# xl.pllflow_evolve(pol_list = poloidal_index_list, side = 'HFS')
 
 
 
@@ -79,7 +79,7 @@ xl.pllflow_evolve(pol_list = poloidal_index_list, side = 'HFS')
 # xl.continuity_terms(pol_list = poloidal_index_list)
 
 
-xl.check_targetNT(pol_list = poloidal_index_list)
+# xl.check_targetNT(pol_list = poloidal_index_list)
 
 # xl.check_source(pol_list = poloidal_index_list)
 
