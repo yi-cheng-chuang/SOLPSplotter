@@ -174,14 +174,6 @@ def mast_withshift_cp_dir():
 
 
 
-
-
-
-
-
-
-
-
 mcds = sps.mast_comp_dir_series()
 
 def mast_series_dir(series_flag):
@@ -386,6 +378,8 @@ def series_terminal_dir(series_flag, dir_comp_dic):
     return mast_basedir, attempt_dic
 
 
+
+
 def twinscan_local_dir(series_flag, dir_comp_dic):
 
     mcds = dir_comp_dic
@@ -435,10 +429,6 @@ def twinscan_local_dir(series_flag, dir_comp_dic):
         
 
     return mast_basedir, attempt_dic
-
-
-
-
 
 
 
