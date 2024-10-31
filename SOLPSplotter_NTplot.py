@@ -179,8 +179,6 @@ class NT_plot(radial_plot):
     
     
     
-    
-    
     def plot_neteTSdat(self):
         
         
