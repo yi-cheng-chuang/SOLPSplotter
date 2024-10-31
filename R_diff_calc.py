@@ -1085,7 +1085,7 @@ class Diff_R_calc(iout_process):
                     
                     axs[0].plot(ang_list, fnax[st:ed, 18], color = color_dic[aa])
                     axs[1].plot(ang_list, fnay[st:ed, 18], color = color_dic[aa], 
-                                  label = '{}'.format(A_dic[aa]))
+                                  label = 'A = {}'.format(A_dic[aa]))
                     
                 
 
@@ -1572,7 +1572,7 @@ class Diff_R_calc(iout_process):
                 axs.plot(ang_list, Dcoe[st:ed, 17], color = color_dic[aa], 
                               label = 'A = {}'.format(A_dic[aa]))
             
-            axs.set_title('Particle diffusion coefficient at last cell before separatrix')
+            axs.set_title('Particle diffusion coefficient [$m^{2}/s$] at last cell before separatrix')
             axs.set_xlabel('poloidal angle')
             axs.legend(loc= 'best')
 
@@ -2167,6 +2167,16 @@ class Diff_R_calc(iout_process):
                 axs.set_title('{} temperature [eV]'.format(kk))
                 axs.set_xlabel('$\psi_N$')
                 axs.legend(loc= 'best')
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
