@@ -140,10 +140,10 @@ class transport_coefficient_adjustment(load_geometry):
                     for ab in self.data['dircomp']['multi_shift']: 
                         # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
                         #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
-                        plt.scatter(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], color= color_dic[ab], 
-                                 label = 'aspect ratio = {}'.format(A_dic[ab]))
-                        plt.xlabel('psiN')
-                        plt.title('radial {} coefficient at outer midplane'.format(coe_label_dic[k]))
+                        plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab], 
+                                 label = 'A = {}'.format(A_dic[ab]))
+                        plt.xlabel('$\Psi_N$')
+                        plt.title('Radial particle diffusion coefficient at [$m^{2}/s$] outer midplane')
                         plt.legend() 
                     
                     if save_eps:
