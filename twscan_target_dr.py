@@ -32,4 +32,4 @@ xl.load_b2wdat()
 
 
 
-xl.twinscan_targetNT(scan_style = 'denscan', dat_size = 'small', log_flag = True)
+xl.twinscan_targetNT(scan_style = 'denscan', dat_size = 'small', log_flag = True, match= True)
