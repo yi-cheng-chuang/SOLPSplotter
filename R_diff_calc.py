@@ -31,25 +31,7 @@ class Diff_R_calc(iout_process):
         else:
             print('Publish setting is incorrect or add another setting')
       
-    def load_b2wdat(self):
-        
-        if self.withshift == True and self.withseries == False:
-            
-            b2wdat_dic = {}
 
-            for aa in self.data['dircomp']['multi_shift']:
-                
-                file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa])
-                na_dat = self.data['b2fstate']['org']['na']
-                
-                
-                b2wdat = lBdm.read_b2wdat(b2wdatLoc = file_loc, 
-                                          nSpec = np.shape(na_dat)[2])
-                b2wdat_dic[aa] = vars(b2wdat)   
-
-            self.data['b2wdat'] = b2wdat_dic
-            
-    
     def diff_quant_y(self, iout_dat):
 
 
@@ -2167,20 +2149,8 @@ class Diff_R_calc(iout_process):
                 axs.set_title('{} temperature [eV]'.format(kk))
                 axs.set_xlabel('$\psi_N$')
                 axs.legend(loc= 'best')
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
     
     def check_source(self, pol_list):
         
@@ -2235,11 +2205,6 @@ class Diff_R_calc(iout_process):
                 axs.set_title('{} source'.format(kk))
                 
                 
-                
-                
-            
-            
-    
     
     
     
@@ -2273,6 +2238,25 @@ ed = int(pol_list[-1]) + 1
 # axs.plot(ang_list, dndx[st:ed, 1])
 axs.plot(ang_list, nadx[st:ed, 1])
 
+
+
+def load_b2wdat(self):
+    
+    if self.withshift == True and self.withseries == False:
+        
+        b2wdat_dic = {}
+
+        for aa in self.data['dircomp']['multi_shift']:
+            
+            file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa])
+            na_dat = self.data['b2fstate']['org']['na']
+            
+            
+            b2wdat = lBdm.read_b2wdat(b2wdatLoc = file_loc, 
+                                      nSpec = np.shape(na_dat)[2])
+            b2wdat_dic[aa] = vars(b2wdat)   
+
+        self.data['b2wdat'] = b2wdat_dic
 
 """
 
