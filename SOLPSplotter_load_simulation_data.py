@@ -269,10 +269,6 @@ class load_simu_data(load_expdata):
         return state_dic, dim_dic
     
     
-
-    
-    
-    
     
     def two_dim_scan_b2fstate(self, iterlist, iterlist_a, iterlist_b):
         
@@ -294,6 +290,7 @@ class load_simu_data(load_expdata):
         return state_dic, dim_dic
     
     
+       
     
     def load_b2fstate(self):
         if self.withshift == False and self.withseries == False:
@@ -350,6 +347,121 @@ class load_simu_data(load_expdata):
         
         else:
             print('load_b2fstate function is not there yet!')
+    
+    
+    
+    
+    def oneDscan_b2wdat(self, iterlist):
+        
+        if self.series_compare == True:
+            
+            print('we will improve this in the future!')
+        
+        else:
+            
+            b2wdat_dic = {}
+            
+            # dim_dic = {}
+            
+            for aa in iterlist:
+                               
+                file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa])
+                na_dat = self.data['b2fstate'][aa]['na']
+                b2wdat = lbdm.read_b2wdat(b2wdatLoc = file_loc, 
+                                          nSpec = np.shape(na_dat)[2])
+                b2wdat_dic[aa] = vars(b2wdat)
+                
+                
+                # dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+        
+        
+        return b2wdat_dic
+    
+    
+    
+    def twoDscan_b2wdat(self, iterlist, iterlist_a, iterlist_b):
+        
+
+
+        b2wdat_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        # print(state_dic)
+        # dim_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        
+        for tp in iterlist:
+            aa = tp[0]
+            ab = tp[1]
+            
+            file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa][ab])
+            na_dat = self.data['b2fstate'][aa][ab]['na']
+                       
+            b2wdat = lbdm.read_b2wdat(b2wdatLoc = file_loc, 
+                                      nSpec = np.shape(na_dat)[2])
+            b2wdat_dic[aa][ab] = vars(b2wdat)
+            # dim_dic[aa][ab] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+        
+        return b2wdat_dic
+    
+    
+    
+    
+    
+    def load_b2wdat(self):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            b2wdat_dic = {}
+
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa])
+                na_dat = self.data['b2fstate']['org']['na']
+                
+                
+                b2wdat = lbdm.read_b2wdat(b2wdatLoc = file_loc, 
+                                          nSpec = np.shape(na_dat)[2])
+                b2wdat_dic[aa] = vars(b2wdat)   
+
+            self.data['b2wdat'] = b2wdat_dic
+        
+        
+        
+        elif self.withshift == False and self.withseries == True:
+            
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            if self.series_flag == 'twin_scan':
+                
+                mcds = self.data['dircomp']
+                
+                ds_key = []
+                ts_key = []
+                
+                print('this is mcds')
+                print(type(mcds['denscan_list'][3]))
+                
+                for x in mcds['denscan_list']:
+                    ds_key.append('{:.3f}'.format(x))
+                    
+                print(ds_key)
+                for x in mcds['tempscan_list']:
+                    ts_key.append('{:.3f}'.format(x))
+                    
+
+                print(ts_key)
+                
+                b2wdat_dic = self.twoDscan_b2wdat(iterlist = scan, 
+                                    iterlist_a = ds_key, iterlist_b = ts_key)
+            else:
+                b2wdat_dic = self.oneDscan_b2wdat(iterlist = scan)
+                
+
+            self.data['b2wdat'] = b2wdat_dic
+            # self.data['DefaultSettings']['dims'] = dim_dic
+            
+        
+        else:
+            print('load_b2fstate function is not there yet!')
+        
     
     
     
