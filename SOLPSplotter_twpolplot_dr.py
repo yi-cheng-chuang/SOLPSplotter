@@ -29,6 +29,7 @@ xl.load_b2fstate()
 # xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
 xl.load_ft44()
+xl.load_b2wdat()
 
 poloidal_index_list = ['59']
 xl.calc_dsa(pol_loc= poloidal_index_list[0])
@@ -44,7 +45,11 @@ xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 
-xl.twpolplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', format_option = '1x1')
+# xl.twpolplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', format_option = '1x1')
+
+xl.twtripp(scan_style = 'denscan', pol_list = poloidal_index_list, log_flag = True)
+
+
 # xl.neuden_data_check(pol_list= poloidal_index_list)
 
 # xl.opacity_poloidal_plot(log_flag = False, save_pdf = False)
