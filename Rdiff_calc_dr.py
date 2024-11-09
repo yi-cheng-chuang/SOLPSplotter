@@ -66,9 +66,6 @@ xl.poloidal_transcoe(pol_list = poloidal_index_list)
 # xl.pllflow_evolve(pol_list = poloidal_index_list, side = 'HFS')
 
 
-
-
-
 # xl.term_three(pol_list = poloidal_index_list)
 
 # xl.term_one(pol_list = poloidal_index_list)
