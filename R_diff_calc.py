@@ -11,6 +11,7 @@ from SOLPSplotter_iout_dataprocess import iout_process
 from matplotlib.offsetbox import AnchoredText
 import load_B2_data_method as lBdm
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 
 
@@ -20,16 +21,14 @@ class Diff_R_calc(iout_process):
     
     
     def set_plot(self):
-        if self.Publish == 'b2plottersetting':
-            plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 3, markersize= 5)
-            plt.rcParams.update({'font.size': 10})
-            plt.rcParams.update({'figure.facecolor':'w'})
-            plt.rcParams.update({'mathtext.default': 'regular'})
-            # plt.rcParams["text.usetex"] = True
+        
+        plt.rcParams.update({'font.weight': 'normal'})
+        plt.rc('lines', linewidth= 5, markersize= 9)
+        plt.rcParams.update({'font.size': 16})
+        plt.rcParams.update({'figure.facecolor':'w'})
+        plt.rcParams.update({'mathtext.default': 'regular'})
   
-        else:
-            print('Publish setting is incorrect or add another setting')
+
       
 
     def diff_quant_y(self, iout_dat):
@@ -348,6 +347,122 @@ class Diff_R_calc(iout_process):
             plt.subplots_adjust(wspace=.0)
     
     
+    
+    def tarNT_evolve(self, pol_list, side):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                          'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            fig, axs = plt.subplots(1, 4, sharey= True)
+            
+            pol_text = AnchoredText('{}'.format('(a) Poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                         loc='upper center')
+            
+            S_text = AnchoredText('{}'.format('(b) source [$m^{-3}*s^{-1}$]'), 
+                                         loc='upper center')
+            
+            neuden_text = AnchoredText('{}'.format('(c) neutral density [$m^{-3}$]'), 
+                                         loc='upper center')
+            
+            # side = ['inner target', 'outer target']
+            
+            # side = 'inner target'
+            # for kk in side:
+                      
+            for ii, aa in enumerate(self.data['dircomp']['multi_shift']):
+                
+                
+                "I will use the data size as small version"
+                    
+                b2fstate = self.data['b2fstate'][aa]
+                
+                ne_pro = b2fstate['ne'][1:97, 1:37]
+                Te_J = b2fstate['te'][1:97, 1:37]
+                    
+                ev = 1.6021766339999999 * pow(10, -19)
+                tepro = Te_J / ev
+                
+                
+                if side == 'HFS':
+                    psiN = self.data['psi']['psival'][aa][1:37, 1]
+                    te_t = tepro[0, :]
+                    te_s = tepro[5, :]
+                    te_m = tepro[15, :]
+                    te_px = tepro[23, :]
+                    te_p = tepro[25, :]
+                    
+                    axs[ii].plot(psiN, np.abs(te_t), '-', color = 'red', 
+                                  label = 'inner target')
+                    axs[ii].axhline(y= max(np.abs(te_t)), ls = '--', color = 'red')
+                    axs[ii].plot(psiN, np.abs(te_s), '-', color = 'orange', 
+                                  label = 'index 5')
+                    
+                    # axs[ii].axhline(y= max(fnax_s),ls = '--', color = 'orange')
+                    axs[ii].plot(psiN, np.abs(te_m), '-', color = 'green', 
+                                  label = 'index 15')
+                    
+                    # axs[ii].axhline(y= max(fnax_m), ls = '--', color = 'green')
+                    axs[ii].plot(psiN, np.abs(te_px), '-', color = 'blue', 
+                                  label = 'index 23, before left cut 24')
+                    
+                    # axs[ii].axhline(y= max(fnax_px), ls = '--', color = 'blue')
+                    
+                    axs[ii].plot(psiN, np.abs(te_p), '-', color = 'purple', 
+                                  label = 'poloidal angle 250, index 25')
+                    axs[ii].axhline(y= max(np.abs(te_p)), ls = '--', color = 'purple')
+                    axs[ii].set_xlabel('$\psi_N$')
+                    axs[ii].legend(loc= 'lower right')
+                    axs[ii].set_title('A = {} {} poloidal flux evolution'.format(A_dic[aa], side))
+                    axs[ii].set_yscale('log')
+                    
+                    
+                elif side == 'LFS':
+                    
+                    psiN = self.data['psi']['psival'][aa][18:37, -1]
+                    te_t = tepro[95, 17:]
+                    te_s = tepro[90, 17:]
+                    te_m = tepro[80, 17:]
+                    te_px = tepro[73, 17:]
+                    te_p = tepro[59, 17:]
+                    
+                    axs[ii].plot(psiN, te_t, '-', color = 'red', 
+                                  label = 'outer target')
+                    axs[ii].axhline(y= max(te_t), ls = '--', color = 'red')
+                    axs[ii].plot(psiN, te_s, '-', color = 'orange', 
+                                  label = 'index 90')
+                    
+                    # axs[ii].axhline(y= max(te_s), ls = '--', color = 'orange')
+                    
+                    axs[ii].plot(psiN, te_m, '-', color = 'green', 
+                                  label = 'index 80')
+                    
+                    # axs[ii].axhline(y= max(te_m), ls = '--', color = 'green')
+                    
+                    axs[ii].plot(psiN, te_px, '-', color = 'blue', 
+                                  label = 'index 73, after right cut 72')
+                    
+                    # axs[ii].axhline(y= max(te_px), ls = '--', color = 'blue')
+                    axs[ii].plot(psiN, te_p, '-', color = 'purple', 
+                                  label = 'inner midplane, index 59')
+                    
+                    axs[ii].axhline(y= max(te_p), ls = '--', color = 'purple')
+                    axs[ii].set_xlabel('$\psi_N$')
+                    axs[ii].legend(loc= 'lower right')
+                    axs[ii].set_title('A = {} {} poloidal flux evolution'.format(A_dic[aa], side))
+                    axs[ii].set_yscale('log')
+                
+                    
+            plt.suptitle('poloidal flux {} evolution'.format(side))
+            # axs[0].set_yscale('log')
+            # axs[1].set_yscale('log')
+            plt.subplots_adjust(wspace=.0)
+    
+    
 
     
 
@@ -406,12 +521,6 @@ class Diff_R_calc(iout_process):
         
 
 
-
-
-
-
-                
-    
     def polsource(self, pol_list):
         
         if self.withshift == True and self.withseries == False:
@@ -903,7 +1012,10 @@ class Diff_R_calc(iout_process):
             axs.set_title('$B_{pol}* R$')
             axs.legend(loc= 'best')
 
-    
+
+
+
+  
     def pol_psiN(self, pol_list):
         
         if self.withshift == True and self.withseries == False:
@@ -1918,9 +2030,6 @@ class Diff_R_calc(iout_process):
             
             
             
-            
-            
-    
     def heatS_no_geo(self, pol_list):
         
         if self.withshift == True and self.withseries == False:
@@ -2149,7 +2258,223 @@ class Diff_R_calc(iout_process):
                 axs.set_title('{} temperature [eV]'.format(kk))
                 axs.set_xlabel('$\psi_N$')
                 axs.legend(loc= 'best')
+    
+    
+    
+    def rebu_targetNT(self, pol_list):
+        
+        if self.withshift == True and self.withseries == False:
+            
+                     
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+                       
+            inne_text = AnchoredText('{}'.format('(a) Inner target electron density [$m^{-3}$]'), 
+                                         loc= 'upper right')
+            
+            inte_text = AnchoredText('{}'.format('(b) Inner target electron temperature [eV]'), 
+                                         loc= 'lower right')
+            
+            infnax_text = AnchoredText('{}'.format('(c) Inner target poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                         loc= 'lower right')
+            
+            otne_text = AnchoredText('{}'.format('(d) Outer target electron density [$m^{-3}$]'), 
+                                         loc= 'upper right')
+            
+            otte_text = AnchoredText('{}'.format('(e) Outer target electron temperature [eV]'), 
+                                         loc= 'lower right')
+            
+            otfnax_text = AnchoredText('{}'.format('(f) Outer target poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                         loc= 'upper right')
+            
+            side = ['inner target', 'outer target']
+            
+            
+            fig, axs = plt.subplots(3, 2)
+            
+            
+            for kk in side:
+                               
+                for aa in self.data['dircomp']['multi_shift']:
+                    
+                    b2fstate = self.data['b2fstate'][aa]
+                    
+                    ne_pro = self.data['b2fstate'][aa]['ne'][1:97, 1:37]
+                    
+                    Te_J = self.data['b2fstate'][aa]['te'][1:97, 1:37]
+                    ev = 1.6021766339999999 * pow(10, -19)
+                    te_pro = Te_J / ev
+                    
+                    fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+                    vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+                    hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                    
+                    
+                    fnnx = np.divide(fnaxs, vol)
+                    fnax = np.multiply(fnnx, hx)
+                    
+                    data_list = [ne_pro, te_pro, fnax]
+                    
+                    intitle_list = [inne_text, inte_text, infnax_text]
+                    ottitle_list = [otne_text, otte_text, otfnax_text] 
+                    
+                    if kk == 'inner target':
+                        psiN = self.data['psi']['psival'][aa][1:37, 0]
+                        
+                        for ii, dl in enumerate(data_list):
+                            plot_data = dl[0, :]
+                            
+                            if ii == 0:
+                                axs[ii, 0].plot(psiN, plot_data, '-', color = color_dic[aa], 
+                                             label = 'A = {}'.format(A_dic[aa]))
+                            else:
+                                axs[ii, 0].plot(psiN, plot_data, '-', color = color_dic[aa])
+                                
+                            
+                            axs[ii, 0].add_artist(intitle_list[ii])
+                            axs[2, 0].set_xlabel('$\psi_N$')
+                            axs[0, 0].legend(loc= 'upper left')
+                            
+                            ii = ii + 1
+                            
+                    
+                    
+                    elif kk == 'outer target':
+                        
+                        psiN = self.data['psi']['psival'][aa][1:37, -1]
+                        
+                        for ii, dl in enumerate(data_list):
+                            plot_data = dl[-1, :]
+                            
+                            if ii == 0:
+                                axs[ii, 1].plot(psiN, plot_data, '-', color = color_dic[aa], 
+                                             label = 'A = {}'.format(A_dic[aa]))
+                            
+                            else:
+                                axs[ii, 1].plot(psiN, plot_data, '-', color = color_dic[aa])
+                                
 
+                            axs[ii, 1].add_artist(ottitle_list[ii])
+                            axs[2, 1].set_xlabel('$\psi_N$')
+                            axs[0, 1].legend(loc= 'upper left')
+                            
+                            ii = ii + 1
+
+                plt.subplots_adjust(hspace=.0)
+                plt.subplots_adjust(wspace=0.07)
+                # axs.set_title('{} density [1/(m^3)]'.format(kk))
+                
+    
+    def rebu_targetNTi(self):
+        
+        if self.withshift == True and self.withseries == False:
+            
+                     
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+                       
+            inne_text = AnchoredText('{}'.format('(a) Inner target electron density [$m^{-3}$]'), 
+                                         loc= 'upper right')
+            
+            inte_text = AnchoredText('{}'.format('(b) Inner target electron temperature [eV]'), 
+                                         loc= 'lower right')
+            
+            infnax_text = AnchoredText('{}'.format('(c) Inner target poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                         loc= 'lower right')
+            
+            otne_text = AnchoredText('{}'.format('(d) Outer target electron density [$m^{-3}$]'), 
+                                         loc= 'upper right')
+            
+            otte_text = AnchoredText('{}'.format('(e) Outer target electron temperature [eV]'), 
+                                         loc= 'lower right')
+            
+            otfnax_text = AnchoredText('{}'.format('(f) Outer target poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                         loc= 'upper right')
+            
+            side = ['inner target', 'outer target']
+            
+            
+            fig, axs = plt.subplots(3, 2)
+            
+            
+            for kk in side:
+                               
+                for aa in self.data['dircomp']['multi_shift']:
+                    
+                    b2fstate = self.data['b2fstate'][aa]
+                    
+                    ne_pro = self.data['b2fstate'][aa]['na'][1:97, 1:37, 1]
+                    
+                    Te_J = self.data['b2fstate'][aa]['ti'][1:97, 1:37]
+                    ev = 1.6021766339999999 * pow(10, -19)
+                    te_pro = Te_J / ev
+                    
+                    fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+                    vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+                    hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                    
+                    
+                    fnnx = np.divide(fnaxs, vol)
+                    fnax = np.multiply(fnnx, hx)
+                    
+                    data_list = [ne_pro, te_pro, fnax]
+                    
+                    intitle_list = [inne_text, inte_text, infnax_text]
+                    ottitle_list = [otne_text, otte_text, otfnax_text] 
+                    
+                    if kk == 'inner target':
+                        psiN = self.data['psi']['psival'][aa][1:37, 0]
+                        
+                        for ii, dl in enumerate(data_list):
+                            plot_data = dl[0, :]
+                            
+                            if ii == 0:
+                                axs[ii, 0].plot(psiN, plot_data, '-', color = color_dic[aa], 
+                                             label = 'A = {}'.format(A_dic[aa]))
+                            else:
+                                axs[ii, 0].plot(psiN, plot_data, '-', color = color_dic[aa])
+                                
+                            
+                            axs[ii, 0].add_artist(intitle_list[ii])
+                            axs[2, 0].set_xlabel('$\psi_N$')
+                            axs[0, 0].legend(loc= 'upper left')
+                            
+                            ii = ii + 1
+                            
+                    
+                    
+                    elif kk == 'outer target':
+                        
+                        psiN = self.data['psi']['psival'][aa][1:37, -1]
+                        
+                        for ii, dl in enumerate(data_list):
+                            plot_data = dl[-1, :]
+                            
+                            if ii == 0:
+                                axs[ii, 1].plot(psiN, plot_data, '-', color = color_dic[aa], 
+                                             label = 'A = {}'.format(A_dic[aa]))
+                            
+                            else:
+                                axs[ii, 1].plot(psiN, plot_data, '-', color = color_dic[aa])
+                                
+
+                            axs[ii, 1].add_artist(ottitle_list[ii])
+                            axs[2, 1].set_xlabel('$\psi_N$')
+                            axs[0, 1].legend(loc= 'upper left')
+                            
+                            ii = ii + 1
+
+                plt.subplots_adjust(hspace=.0)
+                plt.subplots_adjust(wspace=0.07)
+                # axs.set_title('{} density [1/(m^3)]'.format(kk))        
+    
+                
 
     
     def check_source(self, pol_list):
@@ -2205,6 +2530,196 @@ class Diff_R_calc(iout_process):
                 axs.set_title('{} source'.format(kk))
                 
                 
+    
+    
+    def check_heatsource(self):
+        
+        if self.withshift == True and self.withseries == False:
+            
+                     
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            side = ['inner target', 'outer target']
+            
+            
+            for kk in side:
+                
+                fig, axs = plt.subplots()
+                
+                
+                for aa in self.data['dircomp']['multi_shift']:
+                    
+                    ehs = self.data['b2wdat'][aa]['b2nph9_she'][1:97, 1:37]
+                    evp = self.data['b2wdat'][aa]['b2sihs_shedu'][1:97, 1:37]
+                    vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+                    ehsa = ehs + evp
+                    nehs = np.divide(ehsa, vol)
+                    
+                    
+                    
+                    if kk == 'inner target':
+                        psiN = self.data['psi']['psival'][aa][1:37, 0]
+                        plot_data = nehs[0, :]
+                        
+                    elif kk == 'outer target':
+                        
+                        psiN = self.data['psi']['psival'][aa][1:37, -1]
+                        plot_data = nehs[-1, :]
+
+                    
+                        
+                    axs.plot(psiN, plot_data, '-', color = color_dic[aa], 
+                                 label = '{}'.format(A_dic[aa]))
+                
+                axs.set_title('{} heat source'.format(kk))
+    
+    
+    def check_heatflux(self):
+        
+        if self.withshift == True and self.withseries == False:
+            
+                     
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            side = ['inner target', 'outer target']
+            
+            
+            for kk in side:
+                
+                fig, axs = plt.subplots()
+                
+                
+                for aa in self.data['dircomp']['multi_shift']:
+                    
+                    fhix = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+                    fhiy = self.data['b2wdat'][aa]['b2nph9_fhiy'][1:97, 1:37]
+                    fhex = self.data['b2wdat'][aa]['b2nph9_fhex'][1:97, 1:37]
+                    fhey = self.data['b2wdat'][aa]['b2nph9_fhey'][1:97, 1:37]
+                    hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+                    hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                    hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                    tor_area = np.multiply(hz, hy)
+                    pol_area = np.multiply(hz, hx)
+                    fhixn = np.divide(fhix, tor_area)
+                    fhiyn = np.divide(fhiy, pol_area)
+                    fhexn = np.divide(fhex, tor_area)
+                    fheyn = np.divide(fhey, pol_area)
+                    
+                    
+                    if kk == 'inner target':
+                        psiN = self.data['psi']['psival'][aa][1:37, 0]
+                        plot_data = fhexn[0, :]
+                        
+                    elif kk == 'outer target':
+                        
+                        psiN = self.data['psi']['psival'][aa][1:37, -1]
+                        plot_data = fhexn[-1, :]
+
+                    
+                        
+                    axs.plot(psiN, plot_data, '-', color = color_dic[aa], 
+                                 label = '{}'.format(A_dic[aa]))
+                
+                axs.set_title('Electron {} heat flux (W/m^2)'.format(kk))
+                # axs.set_yscale('log')
+        
+        
+    
+    
+    def rebu_tartri(self):
+        
+        if self.withshift == True and self.withseries == False:
+            
+                     
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8'}
+                       
+            inne_text = AnchoredText('{}'.format('(a) $n_e$ [$m^{-3}$]'), 
+                                         loc= 'upper right')
+            
+            inte_text = AnchoredText('{}'.format('(b) $\sqrt{T_e}$ [eV]'), 
+                                         loc= 'lower right')
+            
+            infnax_text = AnchoredText('{}'.format('(c) Poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                         loc= 'lower right')
+            
+            side = ['inner target']
+            
+            
+            fig, axs = plt.subplots(3, 1)
+            
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                b2fstate = self.data['b2fstate'][aa]
+                
+                ne_pro = self.data['b2fstate'][aa]['na'][1:97, 1:37, 1]
+                
+                Te_J = self.data['b2fstate'][aa]['te'][1:97, 1:37]
+                ev = 1.6021766339999999 * pow(10, -19)
+                te_pro = Te_J / ev
+                
+                
+                sqrt_te = np.sqrt(te_pro)
+                             
+                
+                fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+                vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+                hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                
+                
+                fnnx = np.divide(fnaxs, vol)
+                fnax = np.multiply(fnnx, hx)
+                
+                data_list = [ne_pro, sqrt_te, fnax]
+                
+                intitle_list = [inne_text, inte_text, infnax_text]
+                
+                psiN = self.data['psi']['psival'][aa][1:37, 0]
+                
+                for ii, dl in enumerate(data_list):
+                    plot_data = abs(dl[0, :])
+                    
+                    if ii == 0:
+                        axs[ii].plot(psiN, plot_data, '-', color = color_dic[aa], 
+                                     label = 'A = {}'.format(A_dic[aa]))
+                    else:
+                        axs[ii].plot(psiN, plot_data, '-', color = color_dic[aa])
+                        
+                    
+                    axs[ii].add_artist(intitle_list[ii])
+                    axs[2].set_xlabel('$\psi_N$')
+                    axs[0].legend(loc= 'upper left')
+                    axs[0].set_title('Inner target')
+                    axs[0].set_yscale('log')
+                    axs[1].set_yscale('log')
+                    axs[2].set_yscale('log')
+                    
+                    ii = ii + 1
+                
+            plt.subplots_adjust(hspace=.0)
+            plt.subplots_adjust(wspace=0.07)
+                               
+                
+
+    
+    
+    
+    
+    
+    
+    
     
     
     
