@@ -19,7 +19,18 @@ class transport_coefficient_adjustment(load_geometry):
     def __init__(self, DefaultSettings):
         load_geometry.__init__(self, DefaultSettings)
     
-       
+    
+    def set_plot(self):
+        
+        plt.rcParams.update({'font.weight': 'normal'})
+        plt.rc('lines', linewidth= 5, markersize= 9)
+        plt.rcParams.update({'font.size': 16})
+        plt.rcParams.update({'figure.facecolor':'w'})
+        plt.rcParams.update({'mathtext.default': 'regular'})
+  
+    
+    
+    
     def mod_transco_method(self,file_loc, withmod, de_SOL, ki_SOL, ke_SOL, log_flag):
         
         trans_list = tcam.load_transcoefile_method(file_loc, plot= False)
@@ -128,8 +139,11 @@ class transport_coefficient_adjustment(load_geometry):
     
    
             log_flag = False
-            coe_label_dic = {'1': 'particle diffusivity', '2': 'ion thermal diffusivity'
-                             ,'3': 'electron thermal diffusivity'}
+            coe_label_dic = {'1': 'particle transport coefficient', '2': 'ion thermal diffusivity'
+                             ,'3': 'electron heat transport coefficient'}
+            
+            
+            
             if plot_transcoe:
                 for k in coe_label_dic.keys():
                     if log_flag:
@@ -179,7 +193,7 @@ class transport_coefficient_adjustment(load_geometry):
                         
                         
                         axs[i].plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
-                                 'o-', color= color_dic[ab], label = 'aspect ratio = {}'.format(A_dic[ab]))
+                                 '-', color= color_dic[ab], label = 'A = {}'.format(A_dic[ab]))
                     
                     axs[i].add_artist(anchored_text)
                     
@@ -236,8 +250,8 @@ class transport_coefficient_adjustment(load_geometry):
     
    
         log_flag = False
-        coe_label_dic = {'1': 'particle diffusivity', '2': 'ion thermal diffusivity'
-                         ,'3': 'electron thermal diffusivity'}
+        coe_label_dic = {'1': 'particle transport coefficient', '2': 'ion thermal diffusivity'
+                         ,'3': 'electron heat transport coefficient'}
         
         note_list = ['leakage', 'decay length']
         
