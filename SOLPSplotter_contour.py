@@ -401,6 +401,96 @@ class PlotContour(profile_fit):
     
     
     
+    def rebuttal_NTplot(self, plotstyle):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                          'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+
+            if plotstyle == 'paper':
+                
+                
+                comp_list = ['org', 'dot3', 'dot5', 'dot7']
+                
+                fig, axs = plt.subplots(1, 4, sharey= True)
+                
+                org_text = AnchoredText('{}'.format('(a) A = 1.4'), 
+                                              loc='upper center')
+                
+                dot3_text = AnchoredText('{}'.format('(b) A = 2.0'), 
+                                              loc='upper center')
+                
+                dot5_text = AnchoredText('{}'.format('(c) A = 2.4'), 
+                                              loc='upper center')
+                
+                dot7_text = AnchoredText('{}'.format('(d) A = 2.8'), 
+                                              loc='upper center')
+                
+                
+                text_list = [org_text, dot3_text, dot5_text, dot7_text]
+                
+                
+
+                for ii, aa in enumerate(comp_list):
+                    
+                    
+                    
+                    
+                    Te_J = self.data['b2fstate'][aa]['te'][1:97, 1:37]
+                    
+                    ev = 1.6021766339999999 * pow(10, -19)
+                    neuden = Te_J / ev
+                    
+                    
+                    RadLoc = np.transpose(self.data['grid']['RadLoc'][aa])[1:97, 1:37]
+                    VertLoc = np.transpose(self.data['grid']['VertLoc'][aa])[1:97, 1:37]
+                    
+                    
+                    if np.all(neuden == 0):
+                        print('data_file is an zero matrix')
+                        
+                    elif np.any(neuden == 0):
+                        plot_2dval = ma.masked_where(neuden <= 0, neuden)
+                        
+                        datamap = np.abs(plot_2dval)
+                    
+                    else:
+                        
+                        datamap = neuden
+                    
+                    
+                    CPB = cm.viridis
+                    Lnorm = LogNorm(vmax = datamap.max(), vmin = datamap.min())
+                    
+                    
+                    self.paper_contour(plot_2dval = neuden, R_coord = RadLoc, Z_coord = VertLoc, 
+                            quantity = 'Electron density', itername = aa, 
+                log_bar = True, color_dic = color_dic, A_dic = A_dic, axs = axs[ii], 
+                cmap = CPB, norm = Lnorm, levels = 20)
+                    
+                    axs[ii].add_artist(text_list[ii])
+                    axs[ii].set_xlabel('R [m]')
+                    
+                
+                axs[0].set_ylabel('Z [m]')
+                fig.suptitle('Electron temperature $[eV]$ contour plot')
+                smap = cm.ScalarMappable(Lnorm, CPB)    
+                fig.colorbar(smap)
+                plt.tight_layout(w_pad = 0.05)
+    
+    
+    
+    
+    
+    
+    
+    
+    
     def paper_contour(self, plot_2dval, R_coord, Z_coord, quantity, itername, 
                      log_bar, color_dic, A_dic, axs, cmap, norm, levels):
         
