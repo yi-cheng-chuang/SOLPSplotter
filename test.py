@@ -8,6 +8,7 @@ Created on Fri Jul 14 22:34:31 2023
 import xarray as xr
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 
 startnum = 5.015
@@ -28,8 +29,80 @@ print(f"Mantissa: {mantissa}, Exponent: {exponent}")
 
 
 
+# Data
+categories = ['A', 'B', 'C', 'D']  # Categories
+group1 = [10, 15, 7, 12]           # Values for group 1
+group2 = [8, 12, 6, 10]            # Values for group 2
+group3 = [5, 18, 9, 14]            # Values for group 3
+
+# Number of categories
+x = np.arange(len(categories))  # Positions for the categories
+
+# Width of each bar
+bar_width = 0.25
+
+# Create the bars
+plt.bar(x - bar_width, group1, width=bar_width, label='Group 1', color='blue')
+plt.bar(x, group2, width=bar_width, label='Group 2', color='orange')
+plt.bar(x + bar_width, group3, width=bar_width, label='Group 3', color='green')
+
+# Add labels, title, and legend
+plt.xlabel('Categories')
+plt.ylabel('Values')
+plt.title('Grouped Bar Chart')
+plt.xticks(x, categories)  # Set the category labels at the center of the group
+plt.legend()
+
+# Show the plot
+plt.tight_layout()
+plt.show()
 
 
+
+
+# Data
+categories = ['A', 'B', 'C', 'D']  # Categories
+values = [
+    [10, 15, 7, 12],  # Group 1
+    [8, 12, 6, 10],   # Group 2
+    [5, 18, 9, 14]    # Group 3
+]
+group_labels = ['Group 1', 'Group 2', 'Group 3']
+colors = ['blue', 'orange', 'green']
+
+# Number of categories and groups
+n_categories = len(categories)
+n_groups = len(values)
+
+# X positions for the categories
+x = np.arange(n_categories)
+
+# Bar width
+bar_width = 0.2
+
+# Create the plot
+plt.figure(figsize=(10, 6))
+
+# Loop through each group to plot
+for i, group_values in enumerate(values):
+    plt.bar(
+        x + i * bar_width,  # Shift each group by bar_width
+        group_values,       # Heights of the bars
+        width=bar_width,    # Width of the bars
+        label=group_labels[i],  # Label for the group
+        color=colors[i]     # Color for the group
+    )
+
+# Add labels, title, and legend
+plt.xlabel('Categories')
+plt.ylabel('Values')
+plt.title('Grouped Bar Chart')
+plt.xticks(x + bar_width * (n_groups - 1) / 2, categories)  # Center the category labels
+plt.legend()
+
+# Show the plot
+plt.tight_layout()
+plt.show()
 
 
 
