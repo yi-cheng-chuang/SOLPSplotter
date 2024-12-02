@@ -36,8 +36,8 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 # xl.set_plot()
 
-# xl.eirene_contour_plot()
-xl.twcontourplot(scan_style = 'tempscan', plot_option = 'Neuden contour', format_option = '1x1')
+xl.eirene_contour_plot()
+# xl.twcontourplot(scan_style = 'tempscan', plot_option = 'Neuden contour', format_option = '1x1')
 
 # xl.calcpsi()
 # poloidal_index_list = []
