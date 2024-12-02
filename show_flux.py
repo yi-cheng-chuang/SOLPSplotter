@@ -572,7 +572,727 @@ class show_flow(Diff_R_calc):
             
         plt.subplots_adjust(hspace=.0)
         plt.suptitle('{}'.format(side))
+    
+     
+    
+    def allcover_fhix(self):
+        
+        
+        fig, axs = plt.subplots(4, 1)
+            
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        fhix_text = AnchoredText('{}'.format('(a) Ion poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        fhiy_text = AnchoredText('{}'.format('(b) Ion radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        fhex_text = AnchoredText('{}'.format('(c) Electron poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        fhey_text = AnchoredText('{}'.format('(d) Electron radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+    
+        for aa in self.data['dircomp']['multi_shift']:
+            
+            fhix = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+            fhiy = self.data['b2wdat'][aa]['b2nph9_fhiy'][1:97, 1:37]
+            fhex = self.data['b2wdat'][aa]['b2nph9_fhex'][1:97, 1:37]
+            fhey = self.data['b2wdat'][aa]['b2nph9_fhey'][1:97, 1:37]
+            hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+            hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+            hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+            tor_area = np.multiply(hz, hy)
+            pol_area = np.multiply(hz, hx)
+            fhixn = np.divide(fhix, tor_area)
+            fhiyn = np.divide(fhiy, pol_area)
+            fhexn = np.divide(fhex, tor_area)
+            fheyn = np.divide(fhey, pol_area)
+            
+            
+            kk = len(fhixn)
+            int_list = list(range(0, kk))
+                
+                
+            fx_list = fhixn[:, 18]
+            fy_list = fhiyn[:, -1]
+            fex_list = fhixn[:, 18]
+            fey_list = fhiyn[:, -1]
+            
+            
+            axs[0].plot(int_list, fx_list, color = color_dic[aa], 
+                         label = 'A = {}'.format(A_dic[aa]))
+            axs[1].plot(int_list, fy_list, color = color_dic[aa])
+            axs[2].plot(int_list, fex_list, color = color_dic[aa])
+            axs[3].plot(int_list, fey_list, color = color_dic[aa])
+                
+        axs[0].legend(loc= 'upper right')
+        axs[0].add_artist(fhix_text)
+        axs[1].add_artist(fhiy_text)
+        axs[2].add_artist(fhex_text)
+        axs[3].add_artist(fhey_text)
+        axs[1].set_xlabel('poloidal index')
+            
+            
+        plt.subplots_adjust(hspace=.0)
+    
+    def spac_fhix(self):
+        
+        
+        fig, axs = plt.subplots()
+            
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        # fhix_text = AnchoredText('{}'.format('(a) Ion poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        fhiy_text = AnchoredText('{}'.format('(a) Ion radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        # fhex_text = AnchoredText('{}'.format('(c) Electron poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        # fhey_text = AnchoredText('{}'.format('(d) Electron radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+    
+        for aa in self.data['dircomp']['multi_shift']:
+            
+            fhix = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+            fhiy = self.data['b2wdat'][aa]['b2nph9_fhiy'][1:97, 1:37]
+            fhex = self.data['b2wdat'][aa]['b2nph9_fhex'][1:97, 1:37]
+            fhey = self.data['b2wdat'][aa]['b2nph9_fhey'][1:97, 1:37]
+            hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+            hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+            hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+            tor_area = np.multiply(hz, hy)
+            pol_area = np.multiply(hz, hx)
+            fhixn = np.divide(fhix, tor_area)
+            fhiyn = np.divide(fhiy, pol_area)
+            fhexn = np.divide(fhex, tor_area)
+            fheyn = np.divide(fhey, pol_area)
+            
+            
+            kk = len(fhixn)
+            int_list = list(range(0, kk))
+                
+                
+            # fx_list = fhixn[:, 18]
+            fy_list = fhiyn[:, 0]
+            # fex_list = fhixn[:, 18]
+            # fey_list = fhiyn[:, -1]
+            
+            
+            # axs[0].plot(int_list, fx_list, color = color_dic[aa], 
+            #              label = 'A = {}'.format(A_dic[aa]))
+            axs.plot(int_list, fy_list, color = color_dic[aa], 
+                        label = 'A = {}'.format(A_dic[aa]))
+            # axs[2].plot(int_list, fex_list, color = color_dic[aa])
+            # axs[3].plot(int_list, fey_list, color = color_dic[aa])
+                
+        axs.legend(loc= 'upper right')
+        # axs[0].add_artist(fhix_text)
+        axs.add_artist(fhiy_text)
+        # axs[2].add_artist(fhex_text)
+        # axs[3].add_artist(fhey_text)
+        axs.set_xlabel('poloidal index')
+            
+            
+        plt.subplots_adjust(hspace=.0)
+    
+    
+    
+    
+    def hflux_bar(self):
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        # fhix_text = AnchoredText('{}'.format('(a) Ion poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        fhiy_text = AnchoredText('{}'.format('(a) Ion radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        # fhex_text = AnchoredText('{}'.format('(c) Electron poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        # fhey_text = AnchoredText('{}'.format('(d) Electron radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
 
+        def return_value():
+            vlist = []
+            gl_list = []
+            cl_list = []
+            for ii, aa in enumerate(self.data['dircomp']['multi_shift']):
+                
+                
+                fhix = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+                fhiy = self.data['b2wdat'][aa]['b2nph9_fhiy'][1:97, 1:37]
+                fhex = self.data['b2wdat'][aa]['b2nph9_fhex'][1:97, 1:37]
+                fhey = self.data['b2wdat'][aa]['b2nph9_fhey'][1:97, 1:37]
+                hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+                hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                tor_area = np.multiply(hz, hy)
+                pol_area = np.multiply(hz, hx)
+                fhixn = np.divide(fhix, tor_area)
+                fhiyn = np.divide(fhiy, pol_area)
+                fhexn = np.divide(fhex, tor_area)
+                fheyn = np.divide(fhey, pol_area)
+                
+                
+                kk = len(fhixn)
+                int_list = list(range(0, kk))
+                    
+                    
+                # fx_list = fhixn[:, 18]
+                if aa == 'org':
+                    fyi = sum(fhiy[24:72, 3])
+                elif aa == 'dot3':
+                    fyi = sum(fhiy[24:72, 0])
+                else:
+                    fyi = sum(fhiy[24:72, 2])
+                fyb = sum(fhiy[:, -1])
+                fxti = sum(abs(fhix[0, :]))
+                fxto = sum(fhix[-1, :])
+                fypfr1 = sum(fhiy[:24, 0])
+                fypfr2 = sum(fhiy[72:, 0])
+                fypfr = fypfr1 + fypfr2
+                fsum = fyb + fxti + fxto
+
+
+                vlist.append([fyb/fyi, fxti/fyi, fxto/fyi])
+                gl_list.append('A = {}'.format(A_dic[aa]))
+                cl_list.append('{}'.format(color_dic[aa]))
+            
+            return vlist, gl_list, cl_list
+            
+            
+            
+            
+        # Data
+        
+        vlist, gl_list, cl_list = return_value()
+        
+        categories = ['SOL boundary', 'inner target', 'outer target']  # Categories
+        values = vlist
+        group_labels = gl_list
+        colors = cl_list
+
+        # Number of categories and groups
+        n_categories = len(categories)
+        n_groups = len(values)
+
+        # X positions for the categories
+        x = np.arange(n_categories)
+
+        # Bar width
+        bar_width = 0.2
+
+        # Create the plot
+        plt.figure()
+
+        # Loop through each group to plot
+        for i, group_values in enumerate(values):
+            plt.bar(
+                x + i * bar_width,  # Shift each group by bar_width
+                group_values,       # Heights of the bars
+                width=bar_width,    # Width of the bars
+                label=group_labels[i],  # Label for the group
+                color=colors[i]     # Color for the group
+            )
+
+        # Add labels, title, and legend
+        plt.xlabel('Categories')
+        # plt.ylabel('Values')
+        plt.title('Ion Power (W) fraction Bar Chart')
+        plt.xticks(x + bar_width * (n_groups - 1) / 2, categories)  # Center the category labels
+        plt.legend()
+
+        # Show the plot
+        plt.tight_layout()
+        plt.show()
+        
+    
+        
+        
+    def hfluxe_bar(self):
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        # fhix_text = AnchoredText('{}'.format('(a) Ion poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        fhiy_text = AnchoredText('{}'.format('(a) Ion radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        # fhex_text = AnchoredText('{}'.format('(c) Electron poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        # fhey_text = AnchoredText('{}'.format('(d) Electron radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        def return_value():
+            vlist = []
+            gl_list = []
+            cl_list = []
+            for ii, aa in enumerate(self.data['dircomp']['multi_shift']):
+                
+                
+                fhix = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+                fhiy = self.data['b2wdat'][aa]['b2nph9_fhiy'][1:97, 1:37]
+                fhex = self.data['b2wdat'][aa]['b2nph9_fhex'][1:97, 1:37]
+                fhey = self.data['b2wdat'][aa]['b2nph9_fhey'][1:97, 1:37]
+                hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+                hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                tor_area = np.multiply(hz, hy)
+                pol_area = np.multiply(hz, hx)
+                fhixn = np.divide(fhix, tor_area)
+                fhiyn = np.divide(fhiy, pol_area)
+                fhexn = np.divide(fhex, tor_area)
+                fheyn = np.divide(fhey, pol_area)
+                
+                
+                kk = len(fhixn)
+                int_list = list(range(0, kk))
+                    
+                    
+                # fx_list = fhixn[:, 18]
+                if aa == 'org':
+                    fyi = sum(fhey[24:72, 3])
+                elif aa == 'dot3':
+                    fyi = sum(fhey[24:72, 0])
+                else:
+                    fyi = sum(fhey[24:72, 2])
+                fyb = sum(fhey[:, -1])
+                fxti = sum(abs(fhex[0, :]))
+                fxto = sum(fhex[-1, :])
+                fypfr1 = sum(fhey[:24, 0])
+                fypfr2 = sum(fhey[72:, 0])
+                fypfr = fypfr1 + fypfr2
+                
+                vlist.append([fyb/fyi, fxti/fyi, fxto/fyi])
+                gl_list.append('A = {}'.format(A_dic[aa]))
+                cl_list.append('{}'.format(color_dic[aa]))
+            
+            return vlist, gl_list, cl_list
+                
+                
+        # Data
+        
+        vlist, gl_list, cl_list = return_value()
+        
+        categories = ['SOL boundary', 'inner target', 'outer target']  # Categories
+        values = vlist
+        group_labels = gl_list
+        colors = cl_list
+
+        # Number of categories and groups
+        n_categories = len(categories)
+        n_groups = len(values)
+
+        # X positions for the categories
+        x = np.arange(n_categories)
+
+        # Bar width
+        bar_width = 0.2
+
+        # Create the plot
+        plt.figure()
+
+        # Loop through each group to plot
+        for i, group_values in enumerate(values):
+            plt.bar(
+                x + i * bar_width,  # Shift each group by bar_width
+                group_values,       # Heights of the bars
+                width=bar_width,    # Width of the bars
+                label=group_labels[i],  # Label for the group
+                color=colors[i]     # Color for the group
+            )
+
+        # Add labels, title, and legend
+        plt.xlabel('Categories')
+        # plt.ylabel('Values')
+        plt.title('Electron Power (W) fraction Bar Chart')
+        plt.xticks(x + bar_width * (n_groups - 1) / 2, categories)  # Center the category labels
+        plt.legend()
+
+        # Show the plot
+        plt.tight_layout()
+        plt.show()
+        
+    
+    
+    
+    
+    def hflux_tot_bar(self):
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        # fhix_text = AnchoredText('{}'.format('(a) Ion poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        fhiy_text = AnchoredText('{}'.format('(a) Ion radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        # fhex_text = AnchoredText('{}'.format('(c) Electron poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        # fhey_text = AnchoredText('{}'.format('(d) Electron radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        def return_value():
+            vlist = []
+            gl_list = []
+            cl_list = []
+            for ii, aa in enumerate(self.data['dircomp']['multi_shift']):
+                
+                
+                fhix = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+                fhiy = self.data['b2wdat'][aa]['b2nph9_fhiy'][1:97, 1:37]
+                fhex = self.data['b2wdat'][aa]['b2nph9_fhex'][1:97, 1:37]
+                fhey = self.data['b2wdat'][aa]['b2nph9_fhey'][1:97, 1:37]
+                hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+                hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                tor_area = np.multiply(hz, hy)
+                pol_area = np.multiply(hz, hx)
+                fhixn = np.divide(fhix, tor_area)
+                fhiyn = np.divide(fhiy, pol_area)
+                fhexn = np.divide(fhex, tor_area)
+                fheyn = np.divide(fhey, pol_area)
+                
+                
+                kk = len(fhixn)
+                int_list = list(range(0, kk))
+                    
+                    
+                # fx_list = fhixn[:, 18]
+                if aa == 'org':
+                    fyi = sum(fhey[24:72, 3])/sum(pol_area[24:72, 3])
+                elif aa == 'dot3':
+                    fyi = sum(fhey[24:72, 0])/sum(pol_area[24:72, 0])
+                else:
+                    fyi = sum(fhey[24:72, 2])/sum(pol_area[24:72, 2])
+                fyb = sum(fhey[:, -1])/sum(pol_area[:, -1])
+                fxti = sum(abs(fhex[0, 18:]))/sum(tor_area[0, 18:])
+                fxto = sum(fhex[-1, 18:])/sum(tor_area[-1, 18:])
+                fypfr1 = sum(fhiy[:24, 0])
+                fypfr2 = sum(fhiy[72:, 0])
+                fypfr = fypfr1 + fypfr2
+                
+                
+                vlist.append([fyi, fyb, fxti, fxto])
+                gl_list.append('A = {}'.format(A_dic[aa]))
+                cl_list.append('{}'.format(color_dic[aa]))
+            
+            return vlist, gl_list, cl_list
+
+        # Data
+        
+        vlist, gl_list, cl_list = return_value()
+        
+        categories = ['core input', 'SOL boundary', 'inner target', 'outer target']  # Categories
+        values = vlist
+        group_labels = gl_list
+        colors = cl_list
+
+        # Number of categories and groups
+        n_categories = len(categories)
+        n_groups = len(values)
+
+        # X positions for the categories
+        x = np.arange(n_categories)
+
+        # Bar width
+        bar_width = 0.2
+
+        # Create the plot
+        plt.figure()
+
+        # Loop through each group to plot
+        for i, group_values in enumerate(values):
+            plt.bar(
+                x + i * bar_width,  # Shift each group by bar_width
+                group_values,       # Heights of the bars
+                width=bar_width,    # Width of the bars
+                label=group_labels[i],  # Label for the group
+                color=colors[i]     # Color for the group
+            )
+
+        # Add labels, title, and legend
+        # plt.xlabel('Categories')
+        # plt.ylabel('Values')
+        plt.yscale('log')
+        plt.title('Average electron heat flux (W/$m^2$) value Bar Chart')
+        plt.xticks(x + bar_width * (n_groups - 1) / 2, categories)  # Center the category labels
+        plt.legend()
+
+        # Show the plot
+        plt.tight_layout()
+        plt.show()
+    
+    
+    
+    def hflux_value_bar(self):
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        # fhix_text = AnchoredText('{}'.format('(a) Ion poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        fhiy_text = AnchoredText('{}'.format('(a) Ion radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        # fhex_text = AnchoredText('{}'.format('(c) Electron poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        # fhey_text = AnchoredText('{}'.format('(d) Electron radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        def return_value():
+            vlist = []
+            gl_list = []
+            cl_list = []
+            for ii, aa in enumerate(self.data['dircomp']['multi_shift']):
+                
+                
+                fhix = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+                fhiy = self.data['b2wdat'][aa]['b2nph9_fhiy'][1:97, 1:37]
+                fhex = self.data['b2wdat'][aa]['b2nph9_fhex'][1:97, 1:37]
+                fhey = self.data['b2wdat'][aa]['b2nph9_fhey'][1:97, 1:37]
+                hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+                hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                tor_area = np.multiply(hz, hy)
+                pol_area = np.multiply(hz, hx)
+                fhixn = np.divide(fhix, tor_area)
+                fhiyn = np.divide(fhiy, pol_area)
+                fhexn = np.divide(fhex, tor_area)
+                fheyn = np.divide(fhey, pol_area)
+                
+                
+                kk = len(fhixn)
+                int_list = list(range(0, kk))
+                    
+                    
+                # fx_list = fhixn[:, 18]
+                if aa == 'org':
+                    fyi = sum(fhey[24:72, 3])
+                elif aa == 'dot3':
+                    fyi = sum(fhey[24:72, 0])
+                else:
+                    fyi = sum(fhey[24:72, 2])
+                fyb = sum(fhey[:, -1])
+                fxti = sum(abs(fhex[0, :]))
+                fxto = sum(fhex[-1, :])
+                fypfr1 = sum(fhiy[:24, 0])
+                fypfr2 = sum(fhiy[72:, 0])
+                fypfr = fypfr1 + fypfr2
+                
+                
+                vlist.append([fyi, fyb, fxti, fxto])
+                gl_list.append('A = {}'.format(A_dic[aa]))
+                cl_list.append('{}'.format(color_dic[aa]))
+            
+            return vlist, gl_list, cl_list
+
+        # Data
+        
+        vlist, gl_list, cl_list = return_value()
+        
+        categories = ['core input', 'north boundary', 'inner target', 'outer target']  # Categories
+        values = vlist
+        group_labels = gl_list
+        colors = cl_list
+
+        # Number of categories and groups
+        n_categories = len(categories)
+        n_groups = len(values)
+
+        # X positions for the categories
+        x = np.arange(n_categories)
+
+        # Bar width
+        bar_width = 0.2
+
+        # Create the plot
+        plt.figure()
+
+        # Loop through each group to plot
+        for i, group_values in enumerate(values):
+            plt.bar(
+                x + i * bar_width,  # Shift each group by bar_width
+                group_values,       # Heights of the bars
+                width=bar_width,    # Width of the bars
+                label=group_labels[i],  # Label for the group
+                color=colors[i]     # Color for the group
+            )
+
+        # Add labels, title, and legend
+        plt.xlabel('Categories')
+        plt.ylabel('Values')
+        plt.title('Electron Power (W) value Bar Chart')
+        plt.xticks(x + bar_width * (n_groups - 1) / 2, categories)  # Center the category labels
+        plt.legend()
+
+        # Show the plot
+        plt.tight_layout()
+        plt.show()
+    
+    
+    
+    def pflux_tot_bar(self):
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        # fhix_text = AnchoredText('{}'.format('(a) Ion poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        fhiy_text = AnchoredText('{}'.format('(a) Ion radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        # fhex_text = AnchoredText('{}'.format('(c) Electron poloidal heat flux $q_{i\Theta}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        # fhey_text = AnchoredText('{}'.format('(d) Electron radial heat flux $q_{ir}$ [$m^{-2} s^{-1}$]'), 
+        #                              loc='upper center')
+        
+        def return_value():
+            vlist = []
+            gl_list = []
+            cl_list = []
+            for ii, aa in enumerate(self.data['dircomp']['multi_shift']):
+                
+                fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+                fnays = self.data['b2wdat'][aa]['b2npc_fnays'][0][1:97, 1:37]
+                hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+                hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+                tor_area = np.multiply(hz, hy)
+                pol_area = np.multiply(hz, hx)
+                fnax = np.divide(fnaxs, tor_area)
+                fnay = np.divide(fnays, tor_area)
+
+                    
+                    
+                # fx_list = fhixn[:, 18]
+                if aa == 'org':
+                    fyi = sum(fnays[24:72, 3])/sum(pol_area[24:72, 3])
+                elif aa == 'dot3':
+                    fyi = sum(fnays[24:72, 0])/sum(pol_area[24:72, 0])
+                else:
+                    fyi = sum(fnays[24:72, 2])/sum(pol_area[24:72, 2])
+                fyb = sum(fnays[:, -1])/sum(pol_area[:, -1])
+                fxti = sum(abs(fnaxs[0, 18:]))/sum(tor_area[0, 18:])
+                fxto = sum(fnaxs[-1, 18:])/sum(tor_area[-1, 18:])
+                
+                
+                vlist.append([fyi, fyb, fxti, fxto])
+                gl_list.append('A = {}'.format(A_dic[aa]))
+                cl_list.append('{}'.format(color_dic[aa]))
+            
+            return vlist, gl_list, cl_list
+
+        # Data
+        
+        vlist, gl_list, cl_list = return_value()
+        
+        categories = ['core input', 'SOL boundary', 'inner target', 'outer target']  # Categories
+        values = vlist
+        group_labels = gl_list
+        colors = cl_list
+
+        # Number of categories and groups
+        n_categories = len(categories)
+        n_groups = len(values)
+
+        # X positions for the categories
+        x = np.arange(n_categories)
+
+        # Bar width
+        bar_width = 0.2
+
+        # Create the plot
+        plt.figure()
+
+        # Loop through each group to plot
+        for i, group_values in enumerate(values):
+            plt.bar(
+                x + i * bar_width,  # Shift each group by bar_width
+                group_values,       # Heights of the bars
+                width=bar_width,    # Width of the bars
+                label=group_labels[i],  # Label for the group
+                color=colors[i]     # Color for the group
+            )
+
+        # Add labels, title, and legend
+        plt.xlabel('Categories')
+        # plt.ylabel('Values')
+        plt.yscale('log')
+        plt.title('Averaged ion particle flux (W/$m^{2}$) value Bar Chart')
+        plt.xticks(x + bar_width * (n_groups - 1) / 2, categories)  # Center the category labels
+        plt.legend()
+
+        # Show the plot
+        plt.tight_layout()
+        plt.show()
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -592,8 +1312,6 @@ class show_flow(Diff_R_calc):
         
         cspf_text = AnchoredText('{}'.format('(a) Poloidal flux $\Gamma_{\Theta}$ [$m^{-2} s^{-1}$]'), 
                                       loc='upper center')
-        
-        
         
         ane_text = AnchoredText('{}'.format('(b) Electron density [$m^{-3}$]'), 
                                       loc='upper center')
@@ -763,12 +1481,62 @@ class show_flow(Diff_R_calc):
     
     
     
+    def rebu_fluxesNG(self, pol_list):
+        
+        if self.withshift == True and self.withseries == False:
+            
+            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                         'dot7': 'blue', 'one': 'purple'}
+            
+            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                      'dot7': '2.8', 'one': '3.4'}
+            
+            
+            fig, axs = plt.subplots()
+            
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                fnax = self.data['b2wdat'][aa]['b2nph9_fhix'][1:97, 1:37]
+                hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+                hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                tor_area = np.multiply(hz, hy)
+                fnaxs = np.divide(fnax, tor_area)
+                
+                
+                ang_list = self.data['angle']['angle_list'][aa]
+                # print(np.shape(nadiff))
+                st = int(pol_list[0])
+                ed = int(pol_list[-1]) + 1
+                
+                psiN = self.data['psi']['psival'][aa][1:37, 1:97]
+                std_psiN = psiN[18, st:ed]
+                h_psiN = max(std_psiN)
+                l_psiN = min(std_psiN)
+                
+                print('{} case first grid outside of separatrix psiN value max is: {}, and min is: {}'.format(aa, h_psiN, l_psiN))
+                
+                
+                fx_list = []
+                
+                for ii in pol_list:
+                    
+                    fx_list.append(fnaxs[int(ii), 18])
+                
+                
+                    
+                axs.plot(ang_list, fx_list, color = color_dic[aa], label = 'A = {}'.format(A_dic[aa]))
+                    
+            
+            # axs[0].set_xlabel('poloidal angle')
+            # axs[1].set_xlabel('poloidal angle')
+            axs.axvline(x= 0,ls = '--', color = 'black', label = 'LFS')
+            axs.axvline(x= 180,ls = '--', color = 'brown', label = 'HFS')
+            axs.axhline(y= 0, ls = '--', color = 'gray', label= '$q_{\Theta}$ = 0')
+            axs.legend(loc = 'upper right')
+            axs.set_xlabel('poloidal angle')
     
-    
-    
-    
-    
-    
+        
     
     def totfluxesNR(self, pol_list):
         
@@ -1200,14 +1968,3 @@ class show_flow(Diff_R_calc):
         
     
     
-    
-    
-    
-
-
-
-
-
-
-
-            
