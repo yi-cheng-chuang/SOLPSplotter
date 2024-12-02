@@ -60,6 +60,8 @@ xl.calc_polsep(pol_list = poloidal_index_list)
 
 xl.totfluxesNG(pol_list = poloidal_index_list)
 
+xl.rebu_fluxesNG(pol_list = poloidal_index_list)
+
 
 xl.avgfluxesNG(pol_list = poloidal_index_list)
 
@@ -72,6 +74,19 @@ xl.polneteNG(side = 'LFS')
 xl.triNG(side = 'HFS')
 xl.triNG(side = 'LFS')
 
+xl.allcover_fhix()
+
+xl.spac_fhix()
+
+xl.hflux_bar()
+
+xl.hfluxe_bar()
+
+xl.hflux_tot_bar()
+
+xl.hflux_value_bar()
+
+xl.pflux_tot_bar()
 
 
 
