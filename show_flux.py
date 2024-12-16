@@ -643,6 +643,143 @@ class show_flow(Diff_R_calc):
             
         plt.subplots_adjust(hspace=.0)
     
+    
+    
+    def allcover_tri(self):
+        
+        
+        fig, axs = plt.subplots(4, 1)
+            
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+        cspf_text = AnchoredText('{}'.format('(a) Poloidal flux $\Gamma_{\Theta}$ [$m^{-3} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        as_text = AnchoredText('{}'.format('(b) Source [$m^{-3} s^{-1}$]'), 
+                                     loc='upper center')
+        
+        and_text = AnchoredText('{}'.format('(c) Atomic neutral density $n_0$ [$m^{-3}$]'), 
+                                     loc='upper center')
+        
+        tpf_text = AnchoredText('{}'.format('(d) Poloidal particle flux $\Gamma_{\Theta}$ [$s^{-1}$]'), 
+                                     loc='upper center')
+        
+    
+        for aa in self.data['dircomp']['multi_shift']:
+            
+            
+            fnax = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+            hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+            hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+            tor_area = np.multiply(hz, hy)
+            fnaxs = np.divide(fnax, tor_area)
+            
+            
+            s_term = self.data['b2wdat'][aa]['b2npc_sna'][0][1:97, 1:37]
+            vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+            source = np.divide(s_term, vol)
+            
+            neuden = self.data['ft44'][aa]['dab2'][:, :, 0]
+            
+            
+                
+            fnaxs_list = fnaxs[:, 18]
+            source_list = source[:, 18]
+            neuden_list = neuden[:, 18]
+            fnax_list = fnax[:, 18]
+            
+            kk = len(fnax_list)
+            int_list = list(range(0, kk))
+            
+            
+            axs[0].plot(int_list, fnaxs_list, color = color_dic[aa], 
+                         label = 'A = {}'.format(A_dic[aa]))
+            axs[1].plot(int_list, source_list, color = color_dic[aa])
+            axs[2].plot(int_list, neuden_list, color = color_dic[aa])
+            axs[3].plot(int_list, fnax_list, color = color_dic[aa])
+                
+        axs[0].legend(loc= 'upper right')
+        axs[0].add_artist(cspf_text)
+        axs[1].add_artist(as_text)
+        axs[2].add_artist(and_text)
+        axs[3].add_artist(tpf_text)
+        axs[1].set_xlabel('poloidal index')
+            
+            
+        plt.subplots_adjust(hspace=.0)
+    
+    
+    
+    def allcover_neuden(self):
+        
+        
+        fig, axs = plt.subplots()
+            
+        
+        color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+                     'dot7': 'blue'}
+        
+        A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+                  'dot7': '2.8'}
+        
+
+        
+        tpf_text = AnchoredText('{}'.format('Poloidal particle flux $\Gamma_{\Theta}$ [$s^{-1}$]'), 
+                                     loc='upper center')
+        
+    
+        for aa in self.data['dircomp']['multi_shift']:
+            
+            
+            fnax = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+            hz = self.data['b2wdat'][aa]['hz'][1:97, 1:37]
+            hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+            tor_area = np.multiply(hz, hy)
+            fnaxs = np.divide(fnax, tor_area)
+            
+            
+            s_term = self.data['b2wdat'][aa]['b2npc_sna'][0][1:97, 1:37]
+            vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+            source = np.divide(s_term, vol)
+            
+            neuden = self.data['ft44'][aa]['dab2'][:, :, 0]
+            pn = np.multiply(neuden, vol)
+            
+            
+                
+            fnaxs_list = fnaxs[:, 18]
+            source_list = source[:, 18]
+            neuden_list = neuden[:, 18]
+            fnax_list = fnax[:, 18]
+            pn_list = pn[:, 18]
+            
+            kk = len(fnax_list)
+            int_list = list(range(0, kk))
+            
+            
+
+            axs.plot(int_list, pn_list, color = color_dic[aa])
+                
+        axs.legend(loc= 'upper right')
+        axs.add_artist(tpf_text)
+        axs.set_xlabel('poloidal index')
+        axs.set_yscale('log')
+            
+            
+        plt.subplots_adjust(hspace=.0)
+    
+    
+
+    
+    
+    
+    
+    
     def spac_fhix(self):
         
         
@@ -1272,27 +1409,7 @@ class show_flow(Diff_R_calc):
         plt.tight_layout()
         plt.show()
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     
     
     
