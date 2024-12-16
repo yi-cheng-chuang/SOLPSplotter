@@ -175,7 +175,7 @@ class transport_coefficient_adjustment(load_geometry):
                 
                 alphabat_list = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)']
                 
-                fig, axs = plt.subplots(2, 1)
+                fig, axs = plt.subplots()
                 
                 label_list = ['1', '3']
                 
@@ -189,20 +189,31 @@ class transport_coefficient_adjustment(load_geometry):
                     po = alphabat_list[i]
                     anchored_text = AnchoredText('{}{}'.format(po, coe), loc= 'upper left')
                     
-                    for ab in self.data['dircomp']['multi_shift']:
+                    if i == 0:
+                        for ab in self.data['dircomp']['multi_shift']:
+                            
+                            
+                            axs.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
+                                     '-', color= color_dic[ab], label = 'A = {}'.format(A_dic[ab]))
+                    else:
+                        for ab in self.data['dircomp']['multi_shift']:
+                            
+                            
+                            axs.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
+                                     '--', color= color_dic[ab])
                         
-                        
-                        axs[i].plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)],
-                                 '-', color= color_dic[ab], label = 'A = {}'.format(A_dic[ab]))
                     
-                    axs[i].add_artist(anchored_text)
                     
+                    
+                    # axs[i].add_artist(anchored_text)
                     
                     
                     
                     
-                axs[1].set_xlabel('$\psi_N$')
-                axs[1].legend(loc= 'center left')
+                    
+                axs.set_xlabel('$\psi_N$')
+                axs.legend(loc= 'lower left')
+                axs.set_yscale('log')
                 
                 # axs[2, 1].set_xlabel('poloidal angle')
                 
