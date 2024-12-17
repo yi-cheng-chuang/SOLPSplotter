@@ -24,7 +24,7 @@ class withparticles(show_flow):
     def allcover_three(self):
         
         
-        fig, axs = plt.subplots(3, 1)
+        fig, axs = plt.subplots(2, 1)
             
         
         color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
@@ -87,7 +87,7 @@ class withparticles(show_flow):
             axs[0].plot(arclength, fnaxs_list, color = color_dic[aa], 
                          label = 'A = {}'.format(A_dic[aa]))
             axs[1].plot(arclength, fnax_list, color = color_dic[aa])
-            axs[2].plot(arclength, pn_list, color = color_dic[aa])
+            # axs[2].plot(arclength, pn_list, color = color_dic[aa])
             
             
             
@@ -97,10 +97,10 @@ class withparticles(show_flow):
         axs[0].legend(loc= 'lower left')
         # axs[0].add_artist(tpf_text)
         # axs[1].add_artist(and_text)
-        axs[2].set_xlabel('outer to inner target arc length [m]')
+        axs[1].set_xlabel('outer to inner target arc length [m]')
         axs[0].set_yscale('log')
         axs[1].set_yscale('log')
-        axs[2].set_yscale('log')
+        # axs[2].set_yscale('log')
         axs[0].axvline(x= arclength[0], color='brown', linestyle='--')
         axs[0].axvline(x= arclength[-1], color='gray', linestyle='--')
         axs[0].axvline(x= arclength[23], color='black', linestyle='--')
@@ -114,10 +114,10 @@ class withparticles(show_flow):
         axs[1].axvline(x= arclength[71], color='black', linestyle='--')
         
         axs[1].legend(loc= 'lower left')
-        axs[2].axvline(x= arclength[0], color='brown', linestyle='--')
-        axs[2].axvline(x= arclength[-1], color='gray', linestyle='--')
-        axs[2].axvline(x= arclength[23], color='black', linestyle='--')
-        axs[2].axvline(x= arclength[71], color='black', linestyle='--')
+        # axs[2].axvline(x= arclength[0], color='brown', linestyle='--')
+        # axs[2].axvline(x= arclength[-1], color='gray', linestyle='--')
+        # axs[2].axvline(x= arclength[23], color='black', linestyle='--')
+        # axs[2].axvline(x= arclength[71], color='black', linestyle='--')
         
             
             
@@ -294,6 +294,59 @@ class withparticles(show_flow):
             sepl_dic[aa] = {'sepl': arclength, 'interp': interpolated_points}
         
         self.data['sepl'] = sepl_dic
+    
+    
+    # def term_one(self, pol_list):
+        
+    #     if self.withshift == True and self.withseries == False:
+            
+    #         color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
+    #                      'dot7': 'blue', 'one': 'purple'}
+            
+    #         A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
+    #                   'dot7': '2.8', 'one': '3.4'}
+            
+    #         fig, axs = plt.subplots()
+                      
+    #         for aa in self.data['dircomp']['multi_shift']:
+                
+                    
+                
+    #             fnaxs = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+    #             vol = self.data['b2wdat'][aa]['vol'][1:97, 1:37]
+    #             hx = self.data['b2wdat'][aa]['hx'][1:97, 1:37]
+    #             hy = self.data['b2wdat'][aa]['hy'][1:97, 1:37]
+                
+                
+    #             g_coe = np.divide(vol, hx)
+                
+    #             fnax = np.divide(fnaxs, g_coe)
+    #             cup_fnax_org = np.multiply(fnax, hy)
+                
+                
+    #             cpfnaxdiff_org = self.diff_quant_x(iout_dat = cup_fnax_org)
+    #             acp = np.divide(cpfnaxdiff_org, hx)
+    #             agcoe = np.multiply(hx_org, hy_org)
+    #             t1 = np.divide(acp, agcoe)
+                
+    #             del_t1 = t1 - t1_org
+                
+                
+    #             ang_list = self.data['angle']['angle_list'][aa]
+    #             # print(np.shape(nadiff))
+    #             st = int(pol_list[0])
+    #             ed = int(pol_list[-1]) + 1
+                
+                
+    #             # axs.plot(ang_list, dndx[st:ed, 1])
+    #             axs.plot(ang_list, del_t1[st:ed, 18], color = color_dic[aa], label = 'A = {}'.format(A_dic[aa]))
+                    
+                
+                
+            
+    #         axs.legend(loc= 'best')
+    #         axs.set_title('term 1')
+    #         axs.set_xlabel('poloidal angle')
         
         
         
