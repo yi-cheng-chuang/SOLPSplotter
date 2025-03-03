@@ -46,7 +46,84 @@ class load_geometry(load_directory):
     changing density cases
     
     """
+    
+    def sym_method(self, zdim, rdim, psi):
+        
+        iz = 0
+        zd = zdim
+        rd = rdim
 
+        while iz < zd/2:
+            iz = iz + 1
+            for ir in range(rd):
+                
+                # psisym = (psi[ir][iz] + psi[ir][zd - iz +1])/2.0
+                psi[iz][ir] = psi[- iz - 1][ir]
+                
+        return psi
+    
+    
+    
+    def loadsymgeo_method(self, attempt_loc, simufile_loc, g_data, shift_value):
+        
+        try:
+            b2mn = lcm.scrape_b2mn(attempt_loc + '/b2mn.dat')
+            
+        except:
+            print('can not generate b2mn')
+        
+            
+        try:
+            geo = lcm.read_b2fgmtry(simufile_loc + '/baserun/b2fgmtry')
+            # print(type(geo))
+        except:
+            print('can not generate geo')
+            
+        
+        
+        psiN = (g_data['psirz'] - g_data['simag']) / (g_data['sibry'] - g_data['simag'])
+
+        dR = g_data['rdim'] / (g_data['nw'] - 1)
+        dZ = g_data['zdim'] / (g_data['nh'] - 1)
+        
+        gZ = np.zeros(g_data['nh'])
+        for i in range(g_data['nh']):
+            gZ[i] = g_data['zmid'] - 0.5 * g_data['zdim'] + i * dZ
+                
+
+        gR = np.zeros(g_data['nw'])
+        for i in range(g_data['nw']):
+            gR[i] = g_data['rleft'] + i * dR + float(shift_value)
+            
+        rd = len(gR)
+        zd = len(gZ)
+        psi = g_data['psirz']
+        
+        
+        psi_sym = self.sym_method(zdim = zd, rdim = rd, psi = psi)
+        psiN = (g_data['psirz'] - g_data['simag']) / (g_data['sibry'] - g_data['simag'])
+        psiN_sym = (psi_sym - g_data['simag']) / (g_data['sibry'] - g_data['simag'])
+            
+
+        psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN_sym))
+        # psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
+        psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN_sym))
+        
+        interp_dic = {}
+        interp_dic['RBS'] = psiNinterp_RBS
+        # interp_dic['2d'] = psiNinterp_2d
+        interp_dic['RGI'] = psiNinterp_RGI
+        
+        
+        gfilesum = {'psiN': psiN, 'dR': dR, 'dZ': dZ, 'gR': gR, 'gZ': gZ,
+                    'check': 'yeah! shift is {} and series is {}'.format(self.withshift, self.withseries),
+                    'interp_dic': interp_dic, 'sym_psi': psi_sym, 'psiN_sym': psiN_sym}
+            
+        return b2mn, geo, gfilesum  
+    
+    
+    
+    
     def loadgeo_method(self, attempt_loc, simufile_loc, g_data, shift_value):
         
         try:
@@ -78,12 +155,12 @@ class load_geometry(load_directory):
             
 
         psiNinterp_RBS = interpolate.RectBivariateSpline(gR, gZ, np.transpose(psiN))
-        psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
+        # psiNinterp_2d = interpolate.interp2d(gR, gZ, psiN, kind = 'cubic')
         psiNinterp_RGI = interpolate.RegularGridInterpolator((gR, gZ), np.transpose(psiN))
         
         interp_dic = {}
         interp_dic['RBS'] = psiNinterp_RBS
-        interp_dic['2d'] = psiNinterp_2d
+        # interp_dic['2d'] = psiNinterp_2d
         interp_dic['RGI'] = psiNinterp_RGI
         
         
@@ -97,7 +174,39 @@ class load_geometry(load_directory):
     load_solpsgeo function is to load the geometric file for solps and is
     for single case, changing aspect ratio cases and changing density cases
        
-    """     
+    """
+    
+    def load_mastusolpsgeo(self):
+        
+        if self.terminal == True:
+            
+            print('check the g file dir')
+            print(self.data['dirdata']['gdir'])
+            g_loc = self.data['dirdata']['gdir'][0]
+            
+        elif self.terminal == False:
+            g_loc = self.data['dirdata']['gdir']
+            
+
+        gfile_data = lcm.loadg(g_loc)
+        self.data['gfile']['g'] = gfile_data
+        
+        
+        if self.withshift == False and self.withseries == False:
+            simudir = self.data['dirdata']['simudir']
+            simutop = self.data['dirdata']['simutop']
+            shift = self.data['dircomp']['shift']
+            
+            b2mn, geo, gfilesum = self.loadsymgeo_method(attempt_loc = simudir, 
+                    simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
+            
+            self.data['b2mn'] = b2mn
+            self.data['b2fgeo'] = geo
+            self.data['gfile']['gcomp'] = gfilesum
+    
+     
+    
+    
     def load_solpsgeo(self):
         
         if self.terminal == True:
@@ -714,100 +823,7 @@ class load_geometry(load_directory):
         
 
 
-'Way to generate align transport coefficient'
-    
-"""
-m = len(yd)
 
-one_trans = b2tp.InputfileParser(one_list[0], plot= False)
-ond = one_trans['1'].T
-onki = one_trans['3'].T
-onke = one_trans['4'].T
-onx= ond[:,0]  #the coordinate here is R-R_sep
-fd = ond[:,1]
-fki = onki[:,1]
-fke = onke[:,1]
-
-d_func = interpolate.interp1d(x, yd, fill_value = 'extrapolate')
-ond[:,1] = d_func(onx)
-ki_func = interpolate.interp1d(x, yki, fill_value = 'extrapolate')
-onki[:,1] = ki_func(onx)
-ke_func = interpolate.interp1d(x, yke, fill_value = 'extrapolate')
-onke[:,1] = ke_func(onx)
-
-
-b = b2tp.Generate(cod, CoeffID=1, SpeciesID=2, M=[1])
-c = b2tp.WriteInputfile(file='b2.transport.inputfile_align_{}_{}'.format(shift_a, n), points= one_trans ,M_1 = True, M=[1])
-"""
-            
-
-"""
-backup:
-
-try:
-    if self.withshift == False and self.withseries == False:
-        geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
-                               + '/baserun/b2fgmtry')
-    elif self.withshift == True and self.withseries == False:
-        geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'][itername] 
-                                   + '/baserun/b2fgmtry')
-    elif self.withshift == False and self.withseries == True:
-        geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
-                                   + '/baserun/b2fgmtry')
-    # print(type(geo))
-except:
-    print('can not generate geo')
-    
-    
-
-# g = lcm.loadg(self.data['dirdata']['gdir'][0])
-g = lcm.loadg(self.data['dirdata']['gbase'] 
-                       + '/MAST__RMP_results/g027205.00275_efitpp')
-        
-
-if self.withshift == False and self.withseries == False:
-    b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
-                          + '/b2mn.dat')
-elif self.withshift == True and self.withseries == False:
-    b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
-                              + '/b2mn.dat')
-elif self.withshift == False and self.withseries == True:
-    b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
-                          + '/b2mn.dat')
-
-            elif self.withshift == True and self.withseries == False:
-                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'][itername] 
-                                           + '/baserun/b2fgmtry')
-            elif self.withshift == False and self.withseries == True:
-                geo = lcm.read_b2fgmtry(self.data['dirdata']['simutop'] 
-                                           + '/baserun/b2fgmtry')
-            # print(type(geo))
-            
-            if self.withshift == False and self.withseries == False:
-                shift = self.data['dircomp']['shift_value']
-                # print(shift)
-            elif self.withshift == True and self.withseries == False:
-                shift = self.data['dircomp']['shift_dic'][itername]
-                # print(shift)
-            elif self.withshift == False and self.withseries == True:
-                shift = self.data['dircomp']['shift_value']
-                # print(shift)
-                
-            if self.withshift == False and self.withseries == False:
-                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir']
-                                      + '/b2mn.dat')
-            elif self.withshift == True and self.withseries == False:
-                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
-                                          + '/b2mn.dat')
-            elif self.withshift == False and self.withseries == True:
-                b2mn = lcm.scrape_b2mn(self.data['dirdata']['simudir'][itername]
-                                      + '/b2mn.dat')
-
-
-
-            ---- eliminated geometry input code ----
-        
-"""
 
 
         
