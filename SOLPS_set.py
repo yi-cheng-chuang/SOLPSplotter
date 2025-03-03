@@ -21,13 +21,29 @@ def Setting_dic():
     
     
     
-    set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': True, 'withseries': False,
+    set_dic = {'DEV': 'mastu', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
                'Parameters': P, 'series_flag': 'twin_scan', 'series_compare': False,
     'series_filename': 'org_new25scan_fast_save', 'series_tail': '_fast_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
     return set_dic
 
 series_flag = ['eireneN','change_den','change_temp']
+
+
+def mastu_comp_dic():
+    a_shift = 'org'
+    shift = 0
+
+    series = 'mastu39_CDN'
+    
+    filename = '49404_r1'
+    
+    outputlist = ['Output', 'Output2', 'EirOutput']
+    mastu_dircomp_dic = {'Shot': '49404', 'shift': shift, 
+                    'series': series, 'filename': filename, 
+                    'a_shift': a_shift}
+    
+    return mastu_dircomp_dic
 
 
 def mast_comp_dic():
@@ -420,12 +436,20 @@ def loadDS_dic(DEV):
     #          'EXP': False, 'fit': True, 'ROOTSHOT': ''}
     if DEV == 'mast':
         fndic = {'expfilename': 'yag_27205_275.dat', 'fitfname': 'fit_027205_275.dat'}
+        loadDS = {**bload, **fndic}
+        
+        
     else:
         print('please add the experimental file name')
-        
-    loadDS = {**bload, **fndic} 
+        loadDS = {'Notice': 'loadDS dic is empty, please add the experimental file name.'}
+    
+    
     
     return loadDS
+        
+    
+    
+    
     
 
 A = ['39']
