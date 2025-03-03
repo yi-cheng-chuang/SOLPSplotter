@@ -13,6 +13,38 @@ import SOLPS_set as sps
 d = sps.mast_comp_dic()
 od = sps.Setting_dic()
 # print(type(d))
+nd = sps.mastu_comp_dic()
+
+
+def mastu_base_dir():
+    basedrt, topdrt = sps.set_wdir()
+    gbase = '{}/{}/{}'.format(topdrt, od['DEV'], nd['Shot'])
+    gdir = glob.glob('{}/*'.format(gbase, nd['Shot']))[0]
+    
+    # all_list = glob.glob('{}/*'.format(gbase))
+    # print(all_list)
+    
+
+    series = nd['series']
+    filename = nd['filename']
+    newbase = '{}/{}/{}/{}/{}'.format(basedrt, od['DEV'], 
+                                    nd['Shot'], series, filename)
+    tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], nd['Shot'], series)
+
+     
+    attempt = '1'
+    shift_value = d['a_shift']
+    
+    mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
+                    'gdir': gdir, 'simudir': newbase, 'simutop': tbase}
+
+    return mast_basedir, attempt, shift_value
+
+
+
+
+
+
 
 def mast_base_dir():
     basedrt, topdrt = sps.set_wdir()
