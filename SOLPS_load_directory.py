@@ -57,7 +57,25 @@ class load_directory:
         
 #-------------load-device-simulation-directory---------------------
     
-
+    
+    
+    def load_mastu_dir(self):
+        if self.DEV == 'mastu':
+            if self.withshift == False and self.withseries == False:
+                
+                
+                if self.terminal == False:
+                    self.data['dircomp'] = sps.mastu_comp_dic()
+                    mast_basedir, Attempt_dic, shift_value = lmem.mastu_base_dir()
+                    self.data['dirdata'] = mast_basedir
+                    self.data['dircomp']['Attempt'] = Attempt_dic
+                    self.data['dircomp']['shift_value'] = shift_value
+                
+                elif self.terminal == True:
+                    
+                    print('load_mastu_dir function is not there yet!')
+    
+    
 
     def load_mast_dir(self):
         if self.DEV == 'mast':
@@ -170,4 +188,29 @@ class load_directory:
                 print('There is a bug')
 
         else:
+            
             print('DEV setting is not mast')
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
