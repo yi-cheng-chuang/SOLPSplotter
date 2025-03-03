@@ -6,6 +6,7 @@ Created on Tue Sep 26 17:27:01 2023
 """
 
 from SOLPSplotter_load_simulation_data import load_simu_data
+from SOLPSplotter_plotgeo import plot_geo
 import matplotlib.pyplot as plt
 import load_coord_method as lcm
 import fitting_method as fm 
@@ -13,7 +14,7 @@ from scipy.interpolate import interp1d
 import numpy as np
 
 
-class RP_mapping(load_simu_data):
+class RP_mapping(load_simu_data, plot_geo):
     def __init__(self, DefaultSettings, loadDS):
         load_simu_data.__init__(self, DefaultSettings, loadDS)
     
@@ -78,10 +79,10 @@ class RP_mapping(load_simu_data):
         
         "Calculate weight"
         
-        crup = RadLoc[:, 58]
-        crlow = RadLoc[:, 60]
-        czup = VertLoc[:, 58]
-        czlow = VertLoc[:, 60]
+        crup = RadLoc[:, 71]
+        crlow = RadLoc[:, 73]
+        czup = VertLoc[:, 71]
+        czlow = VertLoc[:, 73]
         
 
         weight_mid = np.zeros(rad_range)
@@ -121,19 +122,23 @@ class RP_mapping(load_simu_data):
         R_sep = (1 - weight_psi)*mid_R[sep_index_high] + weight_psi*mid_R[sep_index_high -1]
         R_Rsep = mid_R - R_sep
         
+        dsa_psi_func = interp1d(R_Rsep, psi_solps_mid, kind='quadratic', fill_value = 'extrapolate')
+        
         midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
                         'mid_R': mid_R, 'mid_Z': mid_Z, 
                         'psi_solps_mid': psi_solps_mid, 
-                        'weight_psi': weight_psi, 'R_Rsep': R_Rsep}
+                        'weight_psi': weight_psi, 'R_Rsep': R_Rsep,
+                        'dsa_psi_func': dsa_psi_func}
         
         psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
         
         psi_dsa_ratio = psi_dsa_dic['dsa_psi_fitcoe'][0]
         
         
-        pol_list = [57, 58, 59, 60]
+        
+        pol_list = [70, 71, 72, 73, 74]
         if plotRR:
-            plt.figure(figsize=(7,7))
+            plt.figure()
             for in_pol in pol_list:
                 crloc = RadLoc[:, int(in_pol)]
                 czloc = VertLoc[:, int(in_pol)]
