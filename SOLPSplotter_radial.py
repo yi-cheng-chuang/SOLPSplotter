@@ -286,11 +286,11 @@ class radial_plot(profile_fit):
             
             if dat_size == 'full':
                 
-                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 2]
+                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 1]
             
             elif dat_size == 'small':
                 
-                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 2][1:ny+1]
+                psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][:, 1][1:ny+1]
                 
             
             result_dic = self.data['radial_fit_data'] | self.data['opacity_poloidal']
@@ -379,7 +379,7 @@ class radial_plot(profile_fit):
                 Ne = self.data['radial_fit_data'][aa]['Ne']
                 Te = self.data['radial_fit_data'][aa]['Te']
                 SEP = int(self.data['DefaultSettings']['sep_index_dsa'])
-                psi = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 2]
+                psi = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 1]
                 
                 
                 result_dic = self.data['mix_dic'][aa]
