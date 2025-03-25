@@ -603,7 +603,7 @@ class load_geometry(load_directory):
         
         rad_range = int(geo['ny'] + 2)
         psiNinterp_RGI = psiNinterp_dic['RGI'] 
-        psiNinterp_2d = psiNinterp_dic['2d']
+        # psiNinterp_2d = psiNinterp_dic['2d']
         psiNinterp_RBS = psiNinterp_dic['RBS']
         
         
@@ -647,14 +647,14 @@ class load_geometry(load_directory):
             psi_solps[i] = np.mean([psi_solps_LL[i], psi_solps_UL[i], 
                                     psi_solps_LR[i], psi_solps_UR[i]])
         
-        psi_solps_2d = np.zeros(rad_range)
-        for i in range(rad_range):
-            psi_LL_2d = psiNinterp_2d(crLowerLeft[i], czLowerLeft[i])
-            psi_UL_2d = psiNinterp_2d(crUpperLeft[i], czUpperLeft[i])
-            psi_LR_2d = psiNinterp_2d(crLowerRight[i], czLowerRight[i])
-            psi_UR_2d = psiNinterp_2d(crUpperRight[i], czUpperRight[i])
-            psi_solps_2d[i] = np.mean([psi_LL_2d, psi_UL_2d, 
-                                       psi_LR_2d, psi_UR_2d])
+        # psi_solps_2d = np.zeros(rad_range)
+        # for i in range(rad_range):
+        #     psi_LL_2d = psiNinterp_2d(crLowerLeft[i], czLowerLeft[i])
+        #     psi_UL_2d = psiNinterp_2d(crUpperLeft[i], czUpperLeft[i])
+        #     psi_LR_2d = psiNinterp_2d(crLowerRight[i], czLowerRight[i])
+        #     psi_UR_2d = psiNinterp_2d(crUpperRight[i], czUpperRight[i])
+        #     psi_solps_2d[i] = np.mean([psi_LL_2d, psi_UL_2d, 
+        #                                psi_LR_2d, psi_UR_2d])
          
         
         psi_solps_RBS = np.zeros(rad_range)
@@ -696,16 +696,14 @@ class load_geometry(load_directory):
                 psi_solps_cp[i] = psi_CP
         
         
-            psival = np.zeros((int(rad_range), 4))
-            psival[:, 0] = psi_solps
-            psival[:, 1] = psi_solps_2d
-            psival[:, 2] = psi_solps_RBS
-            psival[:, 3] = psi_solps_cp
-        else:
             psival = np.zeros((int(rad_range), 3))
             psival[:, 0] = psi_solps
-            psival[:, 1] = psi_solps_2d
-            psival[:, 2] = psi_solps_RBS
+            psival[:, 1] = psi_solps_RBS
+            psival[:, 2] = psi_solps_cp
+        else:
+            psival = np.zeros((int(rad_range), 2))
+            psival[:, 0] = psi_solps
+            psival[:, 1] = psi_solps_RBS
         
         
         # index_dic = self.calc_sep_index(psi = psi_solps_RBS, rad_range = rad_range)        
