@@ -5,6 +5,16 @@ Created on Tue Sep 24 15:51:28 2024
 @author: ychuang
 """
 
+
+"""
+This code plot all the particle and heat flux scan for all 25 case across the core and separatrix
+
+"""
+
+
+
+
+
 import SOLPS_set as sps
 import SOLPSplotter_twscan_iout as spt
 
