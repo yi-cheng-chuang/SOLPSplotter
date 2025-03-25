@@ -261,12 +261,6 @@ class twinscan_ioutflux(iout_flux, NT_plot):
                 axs[1, 0].set_xlabel('poloidal angle')
                 axs[1, 1].set_xlabel('poloidal angle')
                 axs[0, 0].legend(loc = 'best')
-       
-                
-                
-        
-
-       
 
 
     def iout_twinscan_prep(self, ta, keylist_b, scan_style):
