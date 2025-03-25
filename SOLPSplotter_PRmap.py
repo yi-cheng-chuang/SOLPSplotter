@@ -71,7 +71,8 @@ class RP_mapping(load_simu_data, plot_geo):
         psiNinterp_RBS = psiNinterp_function
         
         
-        mag_axis_z = gfile_data['zmaxis']
+        # mag_axis_z = gfile_data['zmaxis']
+        # mag_axis_z = 0.15
         # print(mag_axis_z)
         
         
@@ -79,10 +80,27 @@ class RP_mapping(load_simu_data, plot_geo):
         
         "Calculate weight"
         
-        crup = RadLoc[:, 71]
-        crlow = RadLoc[:, 73]
-        czup = VertLoc[:, 71]
-        czlow = VertLoc[:, 73]
+        
+        if self.DEV == 'mast':
+            mag_axis_z = gfile_data['zmaxis']
+            
+            crup = RadLoc[:, 57]
+            crlow = RadLoc[:, 59]
+            czup = VertLoc[:, 57]
+            czlow = VertLoc[:, 59]
+        
+        elif self.DEV == 'mastu':
+            mag_axis_z = 0.15
+            
+            crup = RadLoc[:, 71]
+            crlow = RadLoc[:, 73]
+            czup = VertLoc[:, 71]
+            czlow = VertLoc[:, 73]
+        
+        else:
+            print("please check the device input")
+        
+    
         
 
         weight_mid = np.zeros(rad_range)
@@ -120,15 +138,28 @@ class RP_mapping(load_simu_data, plot_geo):
         weight_psi = (psi_solps_mid[sep_index_high] - 1)/(psi_solps_mid[sep_index_high] -psi_solps_mid[sep_index_high -1])
         
         R_sep = (1 - weight_psi)*mid_R[sep_index_high] + weight_psi*mid_R[sep_index_high -1]
+        
+        print('rsep is {:.2f}'.format(R_sep))
+        
         R_Rsep = mid_R - R_sep
         
         dsa_psi_func = interp1d(R_Rsep, psi_solps_mid, kind='quadratic', fill_value = 'extrapolate')
+        
+        
+        midR_psi_func = interp1d(mid_R, psi_solps_mid, kind='quadratic', fill_value = 'extrapolate')
+        
+        
+        rsep_fit = midR_psi_func(1.37)
+        
+        print('rsep_mid return psiN value: {:.2f}'.format(rsep_fit))
+        
         
         midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
                         'mid_R': mid_R, 'mid_Z': mid_Z, 
                         'psi_solps_mid': psi_solps_mid, 
                         'weight_psi': weight_psi, 'R_Rsep': R_Rsep,
-                        'dsa_psi_func': dsa_psi_func}
+                        'dsa_psi_func': dsa_psi_func, 
+                        'midR_psi_func': midR_psi_func}
         
         psi_dsa_dic = fm.dsa_psi_fit(dsa= R_Rsep, psi= psi_solps_mid)
         
@@ -136,7 +167,16 @@ class RP_mapping(load_simu_data, plot_geo):
         
         
         
-        pol_list = [70, 71, 72, 73, 74]
+        if self.DEV == 'mast':
+            pol_list = [57, 58, 59, 60, 61]
+            
+            
+        
+        elif self.DEV == 'mastu':
+            pol_list = [70, 71, 72, 73, 74]
+            
+            
+        
         if plotRR:
             plt.figure()
             for in_pol in pol_list:
