@@ -187,7 +187,7 @@ class load_expdata(load_geometry):
         te_sym_pt = popt_te[0]
         h = popt_ne[1]*pow(10, 20)
         
-        ro_popt_te = np.round_(popt_te, 2)
+        ro_popt_te = np.round(popt_te, 2)
         
         sep_pos = ro_popt_te[0] - 0.5*np.log(2 - np.sqrt(3))*ro_popt_te[2]
         
@@ -262,7 +262,7 @@ class load_expdata(load_geometry):
             
     
         try:
-            self.solpsgrid_data_store(x_coord = psi_solps[:, 2], ne_fit_coe = sh_popt_ne, 
+            self.solpsgrid_data_store(x_coord = psi_solps[:, 1], ne_fit_coe = sh_popt_ne, 
                                       te_fit_coe = sh_popt_te, plot_solps_fit = plot_solps_fit)
         except:
             print('solpsgrid_data_store function has a bug')
