@@ -632,11 +632,6 @@ class twinscan_showflow(Diff_R_calc, NT_plot):
                                         A_dic = label_dic, scan_style = scan_style, log_flag = log_flag,
                                         scandetail = scan_title, dat_size = dat_size, side = sk)
                         
-                        
-                    
-                    
-                    
-            
             
         else:
             print('Opacity_study_radial_plot has a bug')
