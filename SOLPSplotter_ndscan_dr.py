@@ -9,6 +9,14 @@ import SOLPS_set as sps
 import SOLPSplotter_ndscan as spn
 import SOLPS_transcoe_adj as sta
 
+
+
+"""
+This code plot all the radial neutral density and source for all 25 case.
+
+"""
+
+
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
 
@@ -37,7 +45,6 @@ poloidal_index_list = ['59']
 xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 
-
 xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
 xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_ne = False)
 
@@ -49,8 +56,11 @@ xl.load_fluxes_iout()
 # xl.multirad_data_fit(pol_list = pol_list, dat_size = 'small', check_ne = False)
 
 
+xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
+                       format_option= 'neuden', xcoord_type = 'psi')
+
 xl.twinscan_ndrad_plot(scan_style = 'tempscan', dat_size = 'small', log_flag = False, 
-                       format_option= '1x1', xcoord_type = 'rrsep')
+                       format_option= 'ionize', xcoord_type = 'psi')
 
 
 
