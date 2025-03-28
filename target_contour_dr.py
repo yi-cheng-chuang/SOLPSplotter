@@ -5,6 +5,14 @@ Created on Sat Oct 19 10:17:17 2024
 @author: ychuang
 """
 
+"""
+This code plot all the particle and heat flux scan for all 25 case across the core and separatrix
+
+"""
+
+
+
+
 import SOLPS_set as sps
 import matplotlib.pyplot as plt
 import target_contour as tc
