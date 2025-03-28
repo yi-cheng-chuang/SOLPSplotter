@@ -32,7 +32,11 @@ def mastu_base_dir():
     tbase = '{}/{}/{}/{}'.format(basedrt, od['DEV'], nd['Shot'], series)
 
      
-    attempt = '1'
+    attempt = str(sps.mastu_atp_number(newbase, usage = 'load_dir')[0])
+    
+    print('mastu attempt number is {}'.format(attempt))
+    
+    
     shift_value = d['a_shift']
     
     mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
