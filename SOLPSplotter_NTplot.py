@@ -108,10 +108,22 @@ class NT_plot(radial_plot):
             print('nete_TSplotmethod geo cut has a bug!')
         
         weight_B = np.ones(len(weight))- weight
-             
-        mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
-        mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
-        mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
+        
+        
+        if data_struc['size'] == 'full':
+            
+            pair = self.data['midplane_calc']['average_pair']
+            
+        
+        if data_struc['size'] == 'small':
+            
+            ap = self.data['midplane_calc']['average_pair']
+            pair = (ap[0]-1, ap[1]-1)
+        
+        
+        mid_ne_pro = np.multiply(ne_pro[:, pair[0]], weight) + np.multiply(ne_pro[:, pair[1]], weight_B)
+        mid_te_pro = np.multiply(te_pro[:, pair[0]], weight) + np.multiply(te_pro[:, pair[1]], weight_B)
+        mid_neu_pro = np.multiply(neu_pro[:, pair[0]], weight) + np.multiply(neu_pro[:, pair[1]], weight_B)
         
         return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
     
@@ -304,6 +316,13 @@ class NT_plot(radial_plot):
             
             psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = aa, 
                                                     data_struc = dat_struc)
+            
+            
+            
+            
+            
+            
+            
             
             mid_pe_pro = np.multiply(mid_ne_pro, mid_te_pro)
             
