@@ -18,7 +18,7 @@ xl = spn.NT_plot(DefaultSettings = d, loadDS = lex)
 xl.load_mast_dir()
 xl.load_solpsgeo()
 xl.calcpsi_avcr()
-xl.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
+xl.calc_RRsep(plotRR= True, plot_psi_dsa_align= False)
 fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
                           'plot_exp_and_fit': True, 'plot_shift_compare': False,
                           'data_print': True}
@@ -38,6 +38,10 @@ xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_n
 
 
 xl.neteTS_plot(scan_style = 'denscan', dat_size = 'small', xcoord_type = 'psi')
+
+
+
+
 
 
 # xl.AtomNT_plot(AM_flag = 'atom', scan_style = 'denscan')
