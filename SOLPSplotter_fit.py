@@ -43,6 +43,7 @@ class profile_fit(RP_mapping):
         opq = np.zeros(ln)
         neu_den = np.zeros(ln)
         ne_ped = np.zeros(ln)
+        ne_sep = np.zeros(ln)
         tdelta = np.zeros(ln)
         fluxexp = np.zeros(ln)
         
@@ -99,6 +100,7 @@ class profile_fit(RP_mapping):
             opq[i] = rd['dimensionless_opaqueness']
             neu_den[i] = rd['n_sep_fit']
             ne_ped[i] = rd['electron_pedestal_density']
+            ne_sep[i] = rd['electron_density_separatrix']
             tdelta[i] = rd['temperature_pedestal_width']
             fluxexp[i] = flux_expand
             efold_l[i] = rd['efold_length']*psi_dsa_ratio*flux_expand
@@ -112,6 +114,7 @@ class profile_fit(RP_mapping):
                   'dimensionless_opaqueness': opq, 
                   'neutral_density': neu_den, 
                   'electron_pedestal_density': ne_ped,
+                  'electron_density_separatrix': ne_sep,
                   'temperature_pedestal_width': tdelta,
                   'flux_expansion': fluxexp,
                   'efold_length': efold_l, 'pedestal_width': delta_l,                            
