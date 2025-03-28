@@ -154,21 +154,23 @@ class load_directory:
                     
                     if self.terminal == True:
                         
-                        self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
-                                            filename = self.series_filename)
+                        # self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                        #                     filename = self.series_filename)
                         
                         dir_comp = sps.terminal_series_comp_dir(tail = self.series_tail, 
                                             filename = self.series_filename)
                         
                         series_dir, att_dic = lmem.series_terminal_dir(series_flag = self.series_flag,
                                                                       dir_comp_dic = dir_comp)
+                        
+                        self.data['dircomp'] = dir_comp
                         self.data['dirdata'] = series_dir
                         self.data['dircomp']['Attempt'] = att_dic
                     
                     elif self.terminal == False:
                     
-                        self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
-                                            filename = self.series_filename)
+                        # self.data['dircomp'] = sps.terminal_series_comp_dir(tail = self.series_tail, 
+                        #                     filename = self.series_filename)
                         
                         dir_comp = sps.terminal_series_comp_dir(tail = self.series_tail, 
                                             filename = self.series_filename)
@@ -176,7 +178,9 @@ class load_directory:
                         print(dir_comp['denscan_list'])
                         
                         series_dir, att_dic = lmem.twinscan_local_dir(series_flag = self.series_flag,
-                                                                      dir_comp_dic = dir_comp)
+                                                                    dir_comp_dic = dir_comp)
+                        
+                        self.data['dircomp'] = dir_comp
                         self.data['dirdata'] = series_dir
                         self.data['dircomp']['Attempt'] = att_dic
                         
