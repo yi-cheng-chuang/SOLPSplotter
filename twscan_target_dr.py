@@ -5,6 +5,13 @@ Created on Thu Oct 31 12:54:22 2024
 @author: ychuang
 """
 
+"""
+This code plot all the target temperature, density, atomic density and source for all 25 case.
+
+"""
+
+
+
 import SOLPS_set as sps
 import twscan_target as tt
 import SOLPS_transcoe_adj as sta
