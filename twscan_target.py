@@ -635,3 +635,34 @@ class twinscan_showflow(Diff_R_calc, NT_plot):
             
         else:
             print('Opacity_study_radial_plot has a bug')
+        
+
+                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
