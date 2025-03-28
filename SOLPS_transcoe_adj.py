@@ -49,7 +49,7 @@ class transport_coefficient_adjustment(load_geometry):
                 if j<= de_SOL:
                     mod_y[j] = cod[j,1]
                 else:
-                    mod_y[j] = 12.0
+                    mod_y[j] = 20.0
             cod[:,1] = mod_y
 
             mod_yki = np.zeros(m)
@@ -57,7 +57,7 @@ class transport_coefficient_adjustment(load_geometry):
                 if j<= ki_SOL:
                     mod_yki[j] = coke[j,1]  
                 else:
-                    mod_yki[j] = 18.0
+                    mod_yki[j] = 20.0
             coki[:,1] = mod_yki
 
             mod_yke = np.zeros(m)
@@ -65,7 +65,7 @@ class transport_coefficient_adjustment(load_geometry):
                 if j<= ke_SOL:
                     mod_yke[j] = coke[j,1]  
                 else:
-                    mod_yke[j] = 18.0
+                    mod_yke[j] = 20.0
             coke[:,1] = mod_yke
         else:
             pass
@@ -74,7 +74,15 @@ class transport_coefficient_adjustment(load_geometry):
         tcam.Generate_transcoefile_method(cod, CoeffID=1, SpeciesID=2, M=[1])
         
         shift = 'org'
-        n = str(ss.s_number(file_loc, series_flag= None)[0])
+        
+        if self.DEV == 'mast':
+            n = str(ss.s_number(file_loc, series_flag= None)[0])
+        
+        elif self.DEV == 'mastu':
+            
+            n = str(ss.mastu_atp_number(file_loc, usage = 'transcoe')[0])
+            
+
         simu_dir = file_loc.rsplit("/",2)[0]
         # k = str(ss.s_number(file_loc, series_flag= None))
         print(simu_dir)
@@ -90,7 +98,7 @@ class transport_coefficient_adjustment(load_geometry):
                 plt.yscale('log')
             else:
                 pass
-            plt.figure(figsize=(7,7))
+            plt.figure()
             plt.plot(trans_list[k][0,:], trans_list[k][1,:], 'o-', color = 'orange')
             plt.xlabel('Radial coordinate: $R- R_{sep}$')
             # plt.ylabel(transcoe_unit[k][1])
