@@ -8,6 +8,14 @@ Created on Wed Sep 25 01:29:54 2024
 import SOLPS_set as sps
 import SOLPSplotter_twpolplot as spt
 
+
+"""
+This code plot all the  for all 25 case.
+
+"""
+
+
+
 d = sps.Setting_dic()
 lex = sps.loadDS_dic(d['DEV'])
 
@@ -47,7 +55,7 @@ xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 # xl.twpolplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', format_option = '1x1')
 
-xl.twtripp(scan_style = 'denscan', pol_list = poloidal_index_list, log_flag = True)
+xl.twtripp(scan_style = 'tempscan', pol_list = poloidal_index_list, log_flag = True)
 
 
 # xl.neuden_data_check(pol_list= poloidal_index_list)
