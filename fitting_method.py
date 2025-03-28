@@ -242,7 +242,8 @@ def Opacity_calculator(x_coord, ne, te, neuden, check_ne, minor_rad):
                       'efold_length': efold, 'dimensionless_opaqueness': opq,
                       'ne_symmetry_point': sym_pt, 'te_symmetry_point': sym_pt_te,
                       'n_sep_fit': n_sep_fit, 'sep_index': index_cut,
-                      'opaqueness_approximation': approxi_opq
+                      'opaqueness_approximation': approxi_opq,
+                      'electron_density_separatrix': ne_sep
                       }
         
         
