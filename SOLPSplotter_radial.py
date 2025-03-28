@@ -60,6 +60,8 @@ class radial_plot(profile_fit):
         yt = [tanh_te_fit[SEP], tanh_te_fit[SEP]]
         
         
+        
+        
         plt.figure()
         if log_flag:
             plt.yscale('log')
@@ -375,19 +377,50 @@ class radial_plot(profile_fit):
             for aa in self.data['dircomp']['Attempt'].keys():
             
                 pol_index = int(pol_loc[0])
-                Nd = self.data['radial_fit_data'][aa]['NeuDen']
-                Ne = self.data['radial_fit_data'][aa]['Ne']
-                Te = self.data['radial_fit_data'][aa]['Te']
-                SEP = int(self.data['DefaultSettings']['sep_index_dsa'])
-                psi = self.data['psi']['psi_{}_val'.format(pol_loc)][:, 1]
                 
                 
-                result_dic = self.data['mix_dic'][aa]
+                nx = self.data['b2fgeo'][aa]['nx']
+                ny = self.data['b2fgeo'][aa]['ny']
                 
+                
+                fstate = self.data['b2fstate'][aa]
+                
+                if dat_size == 'full':
+                    
+                    psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2]
+                    Nd = self.data['outputdata']['NeuDen'][aa]
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    Ne = fstate['ne'].transpose()
+                    Te_J = fstate['te'].transpose()
+                
+                elif dat_size == 'small':
+                    
+                    psi = self.data['psi']['psi_{}_val'.format(pol_loc[0])][aa][:, 2][1:ny+1]
+                    data = self.data['ft44'][aa]['dab2']
+                    Nd = np.transpose(data[:, :, 0])
+                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    Ne = fstate['ne'][1:nx+1, 1:ny+1].transpose()
+                    Te_J = fstate['te'][1:nx+1, 1:ny+1].transpose()
+                
+                
+                ev = 1.6021766339999999 * pow(10, -19)
+                Te = Te_J / ev
+                
+                Nd = Nd[:, pol_index]
+                Ne = Ne[:, pol_index]
+                Te = Te[:, pol_index]
+                SEP = int(self.data['DefaultSettings']['sep_index_dsa'][aa])
+                
+                
+                # result_dic = self.data['radial_fit_data'][aa] | self.data['opacity_poloidal'][aa]
+                # mix_dic[aa] = result_dic
                 
                 P = self.data['Parameter']
-                self.opacity_radial_method(result_dic = result_dic, SEP = SEP, 
-                x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, P = P, log_flag = True)
+                self.opacity_radial_method(result_dic = mix_dic[aa], SEP = SEP, 
+                x_coord = psi, Nd = Nd, Ne = Ne, Te = Te, P = P, log_flag = False)
+        
+
+        
         
         elif self.withshift == True and self.withseries == True:
             print('Opacity_study_radial_plot_psi is not there yet, to be continue...')    
