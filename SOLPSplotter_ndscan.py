@@ -147,7 +147,10 @@ class neuden_scan(NT_plot, iout_flux):
         if format_option == '2x1':
             fig, axs = plt.subplots(2, 1)
         
-        elif format_option == '1x1':
+        elif format_option == 'neuden':
+            fig, axs = plt.subplots()
+        
+        elif format_option == 'ionize':
             fig, axs = plt.subplots()
         
             
@@ -184,6 +187,43 @@ class neuden_scan(NT_plot, iout_flux):
             
             rrsep_solps = psi_to_dsa_func(psi_list)
             
+            
+            nd_array = np.array(nd_list)
+            S_array = np.array(S_list)
+            S_norm = max(S_list)
+            # print(f'the length of nd_array is: {len(nd_array)}')
+            
+            target = 1
+            
+            # Find the minimum distance to the target
+            min_diff = min(abs(x - target) for x in psi_list)
+            
+            # Find all values and indices that have this minimum difference
+            closest_elements = [(i, x) for i, x in enumerate(psi_list) if abs(x - target) == min_diff]
+            
+            # Print results
+            print(f"Closest values to {target:.4f} (within ±{min_diff:.4f}):")
+            for index, value in closest_elements:
+                print(f"Value: {value:.4f}, Index: {index}")
+            
+            if value < 1:
+                
+                nd_norm = 0.5*(nd_list[index] + nd_list[index + 1])
+                
+                
+            elif value > 1:
+                
+                nd_norm = 0.5*(nd_list[index] + nd_list[index - 1])
+            
+            else:
+                print('please check twinscan_ndrad_method function in SOLPSplotter_ndscan.py')
+                
+            
+
+            norm_nd_array = nd_array / nd_norm
+            norm_S_array = S_array / S_norm
+            
+            
             """
             label= 'core density {} $10^{19}$'.format(aa)
             
@@ -208,8 +248,7 @@ class neuden_scan(NT_plot, iout_flux):
             else:
                 ad = aa
                 
-            
-    
+                
             if scan_style == 'denscan':
                 
                 title_ap = float(ap)*pow(10, 5)
@@ -223,8 +262,8 @@ class neuden_scan(NT_plot, iout_flux):
                         pass
                     
                     
-                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
-                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                    axs[0].plot(psi_list, norm_nd_array,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                    axs[1].plot(psi_list, norm_S_array,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
                     axs[1].set_xlabel('$\psi_N$')
                     axs[0].axvline(x= 1, color='black', lw=3, ls='--')
                     axs[1].axvline(x= 1, color='black', lw=3, ls='--')
@@ -234,7 +273,7 @@ class neuden_scan(NT_plot, iout_flux):
                     
                     axs[0].legend(loc= 'lower right')
                 
-                elif format_option == '1x1':
+                elif format_option == 'neuden':
                     
                     if log_flag:
                         axs.set_yscale('log')
@@ -243,17 +282,40 @@ class neuden_scan(NT_plot, iout_flux):
                     
                     if xcoord_type == 'psi':
                         
-                        axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                        
+                        axs.plot(psi_list, norm_nd_array,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
                         axs.set_xlabel('$\psi_N$')
                     
                     elif xcoord_type == 'rrsep':
                         
-                        axs.plot(rrsep_solps, nd_list,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                        axs.plot(rrsep_solps, norm_nd_array,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
                         axs.set_xlabel('$R - R_{sep}$')
                     
                     
                     
                     axs.add_artist(anchored_text)
+                    axs.set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
+                
+                elif format_option == 'ionize':
+                    
+                    if log_flag:
+                        axs.set_yscale('log')
+                    else:
+                        pass
+                    
+                    if xcoord_type == 'psi':
+                        
+                        axs.plot(psi_list, norm_S_array,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                        axs.set_xlabel('$\psi_N$')
+                    
+                    elif xcoord_type == 'rrsep':
+                        
+                        axs.plot(rrsep_solps, norm_S_array,'-', color = cl_dic[ad], label= '{:.3E} (1/s)'.format(label_ad))
+                        axs.set_xlabel('$R - R_{sep}$')
+                    
+                    
+                    
+                    axs.add_artist(anchored_text_2)
                     axs.set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
                     
                             
@@ -270,8 +332,8 @@ class neuden_scan(NT_plot, iout_flux):
                     else:
                         pass
                     
-                    axs[0].plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
-                    axs[1].plot(psi_list, S_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                    axs[0].plot(psi_list, norm_nd_array,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                    axs[1].plot(psi_list, norm_S_array,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
                     axs[0].axvline(x= 1, color='black', lw=3, ls='--')
                     axs[1].axvline(x= 1, color='black', lw=3, ls='--')
                     axs[0].add_artist(anchored_text)
@@ -281,7 +343,7 @@ class neuden_scan(NT_plot, iout_flux):
                     axs[0].legend(loc= 'lower right')
                 
                 
-                elif format_option == '1x1':
+                elif format_option == 'neuden':
                     
                     if log_flag:
                         axs.set_yscale('log')
@@ -290,16 +352,37 @@ class neuden_scan(NT_plot, iout_flux):
                     
                     if xcoord_type == 'psi':
                         
-                        axs.plot(psi_list, nd_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                        axs.plot(psi_list, norm_nd_array,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
                         axs.set_xlabel('$\psi_N$')
                     
                     elif xcoord_type == 'rrsep':
                         
-                        axs.plot(rrsep_solps, nd_list,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                        axs.plot(rrsep_solps, norm_nd_array,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
                         axs.set_xlabel('$R - R_{sep}$')
                     
                     
                     axs.add_artist(anchored_text)
+                    axs.set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
+                
+                elif format_option == 'ionize':
+                    
+                    if log_flag:
+                        axs.set_yscale('log')
+                    else:
+                        pass
+                    
+                    if xcoord_type == 'psi':
+                        
+                        axs.plot(psi_list, norm_S_array,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                        axs.set_xlabel('$\psi_N$')
+                    
+                    elif xcoord_type == 'rrsep':
+                        
+                        axs.plot(rrsep_solps, norm_S_array,'-', color = cl_dic[ad], label= '{:.3E} W'.format(label_ad))
+                        axs.set_xlabel('$R - R_{sep}$')
+                    
+                    
+                    axs.add_artist(anchored_text_2)
                     axs.set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
                     
                     
@@ -307,7 +390,7 @@ class neuden_scan(NT_plot, iout_flux):
                 print('neteTSplot_structure, please check the scan parameter')
         
     
-        if format_option == '1x1':
+        if format_option == 'neuden':
             
             
             if xcoord_type == 'psi':
@@ -327,6 +410,9 @@ class neuden_scan(NT_plot, iout_flux):
             
             
             axs.legend(loc= 'lower right')
+        
+        else:
+            pass
             
     
     
@@ -466,3 +552,6 @@ class neuden_scan(NT_plot, iout_flux):
             
         else:
             print('Opacity_study_radial_plot has a bug')
+
+
+
