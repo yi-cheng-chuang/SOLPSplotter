@@ -36,7 +36,7 @@ def mastu_comp_dic():
 
     series = 'mastu39_CDN'
     
-    filename = '49404_r1'
+    filename = '4_49404_a'
     
     outputlist = ['Output', 'Output2', 'EirOutput']
     mastu_dircomp_dic = {'Shot': '49404', 'shift': shift, 
@@ -50,7 +50,7 @@ def mast_comp_dic():
     a_shift = 'org'
     shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot55': 0.55, 'dot7': 0.7, 'one': 1}
     
-    twinscan = False
+    twinscan = True
     
     if twinscan:
         series_name = 'org_cfluxb_std'
@@ -326,49 +326,109 @@ def set_figdir(): #Function to set correct Working Directory Path depending on w
 
 def s_number(text, series_flag):
     sd = Setting_dic()
-    if sd['withshift'] == False and sd['withseries'] == False:
-        name = text.split("/",-1)[-2]
-        nu = int(name.split('_')[0])
-    elif sd['withshift'] == False and sd['withseries'] == True:
-        if series_flag == 'change_den':
-            name = text.split("\\",-1)[-1]
-            nu = re.findall('\d+\.\d+', name)
-            nu.append(name.split('_')[0])
-            # print(nu)
-        elif series_flag == 'eireneN':
-            name = text.split("\\",-1)[-1]
-            nu = re.findall('\d+', name)
-            nu.append(name.split('_')[0])
-            # print(nu)
-        elif series_flag == 'change_temp':
-            name = text.split("\\",-1)[-1]
-            nu = re.findall('\d+\.\d+', name)
-            nu.append(name.split('_')[0])
+    
+    if sd['DEV'] == 'mast':
         
-        elif series_flag == 'two_compare':
-            name = text.split("\\",-1)[-1]
-            nu = re.findall('\d+', name)
-            nu.append(name.split('_')[0])
-            # print(nu)
-        
-        elif series_flag == 'twin_scan':
-            name = text.split("/",-1)[-1]
-            nu = re.findall('\d+\.\d+', name)
-            nu.append(name.split('_')[0])
-        
+        if sd['withshift'] == False and sd['withseries'] == False:
+            name = text.split("/",-1)[-2]
+            nu = int(name.split('_')[0])
+        elif sd['withshift'] == False and sd['withseries'] == True:
+            if series_flag == 'change_den':
+                name = text.split("\\",-1)[-1]
+                nu = re.findall('\d+\.\d+', name)
+                nu.append(name.split('_')[0])
+                # print(nu)
+            elif series_flag == 'eireneN':
+                name = text.split("\\",-1)[-1]
+                nu = re.findall('\d+', name)
+                nu.append(name.split('_')[0])
+                # print(nu)
+            elif series_flag == 'change_temp':
+                name = text.split("\\",-1)[-1]
+                nu = re.findall('\d+\.\d+', name)
+                nu.append(name.split('_')[0])
+            
+            elif series_flag == 'two_compare':
+                name = text.split("\\",-1)[-1]
+                nu = re.findall('\d+', name)
+                nu.append(name.split('_')[0])
+                # print(nu)
+            
+            elif series_flag == 'twin_scan':
+                name = text.split("/",-1)[-1]
+                nu = re.findall('\d+\.\d+', name)
+                nu.append(name.split('_')[0])
+            
+            else:
+                print('check the series flag')
+            
+        elif sd['withshift'] == True and sd['withseries'] == False:
+            name = text.split("/",-1)[-2]
+            nu = int(name.split('_')[0])
+            
+        elif sd['withshift'] == True and sd['withseries'] == True:
+            print('unexpected situation, please check the parameter setting')
         else:
-            print('check the series flag')
-        
-    elif sd['withshift'] == True and sd['withseries'] == False:
-        name = text.split("/",-1)[-2]
-        nu = int(name.split('_')[0])
-    elif sd['withshift'] == True and sd['withseries'] == True:
-        print('unexpected situation, please check the parameter setting')
+            print('There is a bug in s_number function')
+    
     else:
-        print('There is a bug in s_number function')
+        print('DEV setting is not MAST!')
+        
+    
+    
 
     return [nu, name]
         
+
+
+
+def mastu_atp_number(text, usage):
+    sd = Setting_dic()
+    
+    if sd['DEV'] == 'mastu':
+        
+        if sd['withshift'] == False and sd['withseries'] == False:
+            
+            if usage == 'load_dir':
+                
+                name = text.split("/",-1)[-1]
+                
+                # print(name)
+                
+                nu = int(name.split('_')[0])
+            
+            elif usage == 'transcoe':
+                
+                name = text.split("/",-1)[-2]
+                
+                # print(name)
+                
+                nu = int(name.split('_')[0])
+                
+                
+                
+                
+            
+            
+        else:
+            print('mastu_atp_number function is not there yet!')
+    
+    else:
+        print('DEV setting is not MAST!')
+        
+    
+    
+
+    return [nu, name]
+
+
+
+
+
+
+
+
+
 
 
 
