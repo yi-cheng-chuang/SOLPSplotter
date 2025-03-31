@@ -25,7 +25,7 @@ fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False,
                           'data_print': True}
 xl.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
 xl.load_b2fstate()
-xl.load_b2fplasmf()
+# xl.load_b2fplasmf()
 # xl.load_output_data(param= 'Te')
 xl.calc_sep_dsa()
 xl.load_ft44()
