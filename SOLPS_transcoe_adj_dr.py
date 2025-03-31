@@ -35,9 +35,6 @@ xt.align_transco(plot_align = True, log_flag = False)
 
 
 
-
-
-
 extra = False
 
 
