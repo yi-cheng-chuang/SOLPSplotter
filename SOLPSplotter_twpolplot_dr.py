@@ -46,16 +46,16 @@ xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 xl.set_plot()
 poloidal_index_list = []
-for i in range(35):
+for i in range(40):
     poloidal_index_list.append('{}'.format(28 + i))
     
 xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
 xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 
-# xl.twpolplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', format_option = '1x1')
+# xl.twpolplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', format_option = '3x1')
 
-xl.twtripp(scan_style = 'tempscan', pol_list = poloidal_index_list, log_flag = True)
+xl.twtripp(scan_style = 'denscan', pol_list = poloidal_index_list, log_flag = True)
 
 
 # xl.neuden_data_check(pol_list= poloidal_index_list)
