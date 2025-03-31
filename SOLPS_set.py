@@ -23,7 +23,7 @@ def Setting_dic():
     
     set_dic = {'DEV': 'mast', 'minor_rad': 0.5, 'withshift': False, 'withseries': True,
                'Parameters': P, 'series_flag': 'twin_scan', 'series_compare': False,
-    'series_filename': 'org_new25scan_fast_save', 'series_tail': '_fast_a',
+    'series_filename': 'org_new25scan_fast_a', 'series_tail': '_fast_a',
                'Publish': 'b2plottersetting', 'terminal': terminal}
     return set_dic
 
@@ -36,7 +36,7 @@ def mastu_comp_dic():
 
     series = 'mastu39_CDN'
     
-    filename = '4_49404_a'
+    filename = '5_49404_a'
     
     outputlist = ['Output', 'Output2', 'EirOutput']
     mastu_dircomp_dic = {'Shot': '49404', 'shift': shift, 
