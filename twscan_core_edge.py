@@ -113,6 +113,12 @@ class core_edge(neuden_scan):
         elif format_option == 'efold':
             fig, axs = plt.subplots(1, 2)
         
+        elif format_option == 'source_peak':
+            fig, axs = plt.subplots(1, 2)
+        
+        elif format_option == 'opaqueness':
+            fig, axs = plt.subplots(1, 2)
+        
         
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
@@ -185,6 +191,7 @@ class core_edge(neuden_scan):
                 multi_nesep_list = []
                 multi_neped_list = []
                 multi_ndsep_list = []
+                multi_spk_list = []
                 
                 
                 
@@ -211,6 +218,8 @@ class core_edge(neuden_scan):
                     ne_sep = self.data['opacity_poloidal'][aa]['electron_density_separatrix']
                     efold_length = self.data['opacity_poloidal'][aa]['efold_length']*pow(10, 3)
                     
+                    opq = self.data['opacity_poloidal'][aa]['dimensionless_opaqueness']
+                    
                     neuden_dat = self.data['ft44'][aa[0]][aa[1]]['dab2'][:, :, 0]
                     
                     st = int(pol_list[0])
@@ -218,6 +227,28 @@ class core_edge(neuden_scan):
                     
                     nd_sep = neuden_dat[st:ed, 18]
                     
+                    
+                    source = self.data['b2wdat'][aa[0]][aa[1]]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
+                    vol = self.data['b2wdat'][aa[0]][aa[1]]['vol'][1:nx+1, 1:ny+1]
+                    sx = np.divide(source, vol)
+                    
+                    psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
+                    
+
+                    int_pol_list = [int(x) for x in pol_list]
+                    
+                    s_peak_list = []
+                    
+                    for pol in int_pol_list:
+                        
+                        sx_list = list(sx[pol, :])
+                        psi_list = psi_coord[:, pol]
+                        
+                        
+                        sx_ind = sx_list.index(max(sx_list))
+                        s_peak_list.append(psi_list[sx_ind])
+                        
+                        
                     
                     if '59' in pol_list:
                         
@@ -296,6 +327,13 @@ class core_edge(neuden_scan):
                     for nds in nd_sep:
                         
                         multi_ndsep_list.append(nds)
+                    
+                    
+                    for spk in s_peak_list:
+                        
+                        multi_spk_list.append(spk)
+                    
+                    for 
                         
                     
                     
@@ -307,10 +345,10 @@ class core_edge(neuden_scan):
                     axs[1].scatter(multi_neped_list, multi_efold_list, color = color_dic[ap], label= '{:.3E} W'.format(label_ap))           
                     axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
                     axs[1].set_xlabel('$electron pedestal density at OMP$')
-                    axs[0].add_artist(anchored_text_1)
-                    axs[1].add_artist(anchored_text_2)
+                    # axs[0].add_artist(anchored_text_1)
+                    # axs[1].add_artist(anchored_text_2)
                     # axs[2].add_artist(anchored_text_3)
-                    axs[0].set_title('efold length')
+                    fig.suptitle('efold length')
                     
                     axs[0].legend(loc= 'lower right')
                 
@@ -321,12 +359,23 @@ class core_edge(neuden_scan):
                     axs[1].scatter(multi_neped_list, multi_ndsep_list, color = color_dic[ap], label= '{:.3E} W'.format(label_ap))           
                     axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
                     axs[1].set_xlabel('$electron pedestal density at OMP$')
-                    axs[0].add_artist(anchored_text_1)
-                    axs[1].add_artist(anchored_text_2)
+                    # axs[0].add_artist(anchored_text_1)
+                    # axs[1].add_artist(anchored_text_2)
                     # axs[2].add_artist(anchored_text_3)
-                    axs[0].set_title('neutral density at the separatrix')
+                    fig.suptitle('neutral density at the separatrix')
                     
                     axs[0].legend(loc= 'lower right')
+                
+                
+                elif format_option == 'source_peak':
+                    
+                    axs[0].scatter(multi_nesep_list, multi_spk_list, color = color_dic[ap], label= '{:.3E} W'.format(label_ap))
+                    axs[1].scatter(multi_neped_list, multi_spk_list, color = color_dic[ap], label= '{:.3E} W'.format(label_ap))           
+                    axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
+                    axs[1].set_xlabel('$electron pedestal density at OMP$')
+                    fig.suptitle('source peak location in psiN')
+                    
+                    axs[0].legend(loc= 'center right')
                     
                     
                     
@@ -341,10 +390,10 @@ class core_edge(neuden_scan):
                         axs[1].plot(ne_sep_list, te_outer_list,'-', color = color_dic[ap], label= 'LFS {:.3E} W'.format(label_ap))           
                         axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
                         axs[1].set_xlabel('$electron density at the separatrix on OMP$')
-                        axs[0].add_artist(anchored_text_1)
-                        axs[1].add_artist(anchored_text_2)
+                        # axs[0].add_artist(anchored_text_1)
+                        # axs[1].add_artist(anchored_text_2)
                         # axs[2].add_artist(anchored_text_3)
-                        axs[0].set_title('detachment cliff')
+                        fig.suptitle('detachment cliff')
                         
                         axs[0].legend(loc= 'lower right')
                     
@@ -352,12 +401,12 @@ class core_edge(neuden_scan):
                         
                         axs[0].plot(ne_ped_list, te_inner_list,'-', color = color_dic[ap], label= 'HFS {:.3E} W'.format(label_ap))
                         axs[1].plot(ne_ped_list, te_outer_list,'-', color = color_dic[ap], label= 'LFS {:.3E} W'.format(label_ap))           
-                        axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
-                        axs[1].set_xlabel('$electron density at the separatrix on OMP$')
+                        axs[0].set_xlabel('$electron pedestal density at OMP$')
+                        axs[1].set_xlabel('$electron pedestal density at OMP$')
                         axs[0].add_artist(anchored_text_1)
                         axs[1].add_artist(anchored_text_2)
                         # axs[2].add_artist(anchored_text_3)
-                        axs[0].set_title('detachment cliff')
+                        fig.suptitle('detachment cliff')
                         
                         axs[0].legend(loc= 'lower right')
                     
@@ -371,10 +420,10 @@ class core_edge(neuden_scan):
                         axs[1].plot(ne_sep_list, ndpeak_outer_list,'-', color = color_dic[ap], label= 'LFS {:.3E} W'.format(label_ap))           
                         axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
                         axs[1].set_xlabel('$electron_density at the separatrix on OMP$')
-                        axs[0].add_artist(anchored_text_1)
-                        axs[1].add_artist(anchored_text_2)
+                        # axs[0].add_artist(anchored_text_1)
+                        # axs[1].add_artist(anchored_text_2)
                         # axs[2].add_artist(anchored_text_3)
-                        axs[0].set_title('neuden peak')
+                        fig.suptitle('neuden peak')
                         
                         axs[0].legend(loc= 'lower right')
                     
@@ -382,12 +431,12 @@ class core_edge(neuden_scan):
                         
                         axs[0].plot(ne_ped_list, ndpeak_inner_list,'-', color = color_dic[ap], label= 'HFS {:.3E} W'.format(label_ap))
                         axs[1].plot(ne_ped_list, ndpeak_outer_list,'-', color = color_dic[ap], label= 'LFS {:.3E} W'.format(label_ap))           
-                        axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
-                        axs[1].set_xlabel('$electron density at the separatrix on OMP$')
+                        axs[0].set_xlabel('$electron pedestal density at OMP$')
+                        axs[1].set_xlabel('$electron pedestal density at OMP$')
                         axs[0].add_artist(anchored_text_1)
                         axs[1].add_artist(anchored_text_2)
                         # axs[2].add_artist(anchored_text_3)
-                        axs[0].set_title('neuden peak')
+                        fig.suptitle('neuden peak')
                         
                         axs[0].legend(loc= 'lower right')
                     
