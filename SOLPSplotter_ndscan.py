@@ -81,7 +81,7 @@ class neuden_scan(NT_plot, iout_flux):
         
         for ind, coord in enumerate(psi_coord):
             
-            if coord >= 0.95 and coord <= 1.05:
+            if coord >= 0.95 and coord <= 1.1:
                 psi_list.append(coord)
                 nd_list.append(mid_neu_pro[ind])
         
@@ -131,7 +131,7 @@ class neuden_scan(NT_plot, iout_flux):
         
         for ind, coord in enumerate(psi_coord):
             
-            if coord >= 0.95 and coord <= 1.05:
+            if coord >= 0.95 and coord <= 1.1:
                 psi_list.append(coord)
                 S_list.append(mid_S_pro[ind])
         
@@ -315,7 +315,7 @@ class neuden_scan(NT_plot, iout_flux):
                     
                     
                     
-                    axs.add_artist(anchored_text_2)
+                    # axs.add_artist(anchored_text_2)
                     axs.set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
                     
                             
@@ -382,7 +382,7 @@ class neuden_scan(NT_plot, iout_flux):
                         axs.set_xlabel('$R - R_{sep}$')
                     
                     
-                    axs.add_artist(anchored_text_2)
+                    # axs.add_artist(anchored_text_2)
                     axs.set_title('Heat flux scan with particle flux = {:.3E} (1/s)'.format(title_ap))
                     
                     
