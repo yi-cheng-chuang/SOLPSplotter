@@ -44,19 +44,22 @@ xl.set_plot()
 xl.calc_dsa(pol_loc= '59')
 
 poloidal_index_list = []
-for i in range(20):
-    poloidal_index_list.append('{}'.format(48 + i))
+for i in range(40):
+    poloidal_index_list.append('{}'.format(28 + i))
 
 xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
 # xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_ne = False)
+xl.calc_pol_angle(pol_list = poloidal_index_list, plot_angle= False)
 
 # xl.load_fluxes_iout()
 xl.load_b2wdat()
 
 
-xl.twscan_CE(dat_size = 'small', scan_var = 'ne_sep', format_option = 'nd_sep', pol_list = poloidal_index_list)
+xl.twscan_CE(dat_size = 'small', scan_var = 'ne_sep', format_option = 'Te', 
+             pol_list = poloidal_index_list, plot_case = 'all25')
 
+xl.bin_with_angle()
 
 
 # pol_list = []
