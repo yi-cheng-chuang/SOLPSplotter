@@ -44,7 +44,7 @@ class PlotContour(profile_fit):
         CMAP = cm.viridis
         NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
         
-        plt.figure(figsize=(6,12))
+        plt.figure()
         plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
         plt.title('{} contour plot'.format(quantity))
         
