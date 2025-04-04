@@ -41,7 +41,7 @@ xl.load_ft44()
 xl.calc_sep_dsa()
 xl.set_plot()
 
-poloidal_index_list = ['59']
+poloidal_index_list = ['40']
 xl.calc_dsa(pol_loc= poloidal_index_list[0])
 
 
@@ -59,7 +59,7 @@ xl.load_fluxes_iout()
 xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
                        format_option= 'neuden', xcoord_type = 'psi')
 
-xl.twinscan_ndrad_plot(scan_style = 'tempscan', dat_size = 'small', log_flag = False, 
+xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
                        format_option= 'ionize', xcoord_type = 'psi')
 
 
