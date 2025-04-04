@@ -24,7 +24,6 @@ class target_contour(Diff_R_calc, PlotContour):
         Diff_R_calc.__init__(self, DefaultSettings, loadDS)
         PlotContour.__init__(self, DefaultSettings, loadDS)
     
-        
     
     
     def iout_paper_plot(self, plotstyle, dataname, sideswitch):
