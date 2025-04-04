@@ -166,14 +166,19 @@ def Opacity_calculator(x_coord, ne, te, neuden, check_ne, minor_rad):
         tanh_te_fit = fit_tanh_dic['tanh_te_fit']
         dtn = fit_tanh_dic['popt_te'][2]  
         ne_ped = (fit_tanh_dic['popt_ne'][1] + fit_tanh_dic['popt_ne'][3])*pow(10, 19)
+        te_ped = (fit_tanh_dic['popt_te'][1] + fit_tanh_dic['popt_te'][3])*pow(10, 3)
         sym_pt_te = fit_tanh_dic['popt_te'][0]
         sym_pt_ne = fit_tanh_dic['popt_ne'][0]
         # print(sym_pt_te + dn)
         
         popt_ne = fit_tanh_dic['popt_ne']
+        popt_te = fit_tanh_dic['popt_te']
         
         ne_sep = tanh(1, popt_ne[0], popt_ne[1], 
                                popt_ne[2], popt_ne[3], popt_ne[4])*pow(10, 19)
+        
+        te_sep = tanh(1, popt_te[0], popt_te[1], 
+                               popt_te[2], popt_te[3], popt_te[4])*pow(10, 3)
         
         # print(ne_sep)
         avg_ne = 0.5*(ne_ped + ne_sep)
@@ -236,14 +241,17 @@ def Opacity_calculator(x_coord, ne, te, neuden, check_ne, minor_rad):
         
         
         result_dic = {'tanh_ne_fit': tanh_ne_fit, 'exp_fit': exp_an_fit,
-                      'electron_pedestal_density': ne_ped, 'x_coord_cut': xcoord_exp,
+                      'electron_pedestal_density': ne_ped,
+                      'electron_pedestal_temperature': te_ped,
+                      'x_coord_cut': xcoord_exp,
                       'tanh_te_fit': tanh_te_fit, 'pedestal_width': dn, 
                       'temperature_pedestal_width': dtn,
                       'efold_length': efold, 'dimensionless_opaqueness': opq,
                       'ne_symmetry_point': sym_pt, 'te_symmetry_point': sym_pt_te,
                       'n_sep_fit': n_sep_fit, 'sep_index': index_cut,
                       'opaqueness_approximation': approxi_opq,
-                      'electron_density_separatrix': ne_sep
+                      'electron_density_separatrix': ne_sep,
+                      'electron_temperature_separatrix': te_sep
                       }
         
         
