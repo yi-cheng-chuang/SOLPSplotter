@@ -5,15 +5,18 @@ Created on Thu Apr 10 04:04:50 2025
 @author: ychuang
 """
 
-import load_Eirene_data_method as lEdm
+
+from load_simulation_data.load_Eirene_data_method import read_ft46, read_ft44
+from load_directory.load_dirdata_method import load_dir_method
 
 
-class load_simu_data:
+class load_ftfiles_data:
     
-    def __init__(self, DF, data):
+    def __init__(self, DF, data, ldm: load_dir_method):
         
         self.DF = DF
         self.data = data
+        self.ldm = ldm
     
     
     
@@ -30,7 +33,7 @@ class load_simu_data:
         for aa in iterlist:
             
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'fort.46.i')
-            ft46 = lEdm.read_ft46(fileName = file_loc)
+            ft46 = read_ft46(fileName = file_loc)
             ft46_dic[aa] = vars(ft46)
             
             
@@ -41,14 +44,14 @@ class load_simu_data:
     def two_dim_scan_ft46(self, iterlist, iterlist_a, iterlist_b):
         
 
-        ft46_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        ft46_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
         
         for tp in iterlist:
             aa = tp[0]
             ab = tp[1]
             
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'fort.46.i')
-            ft46 = lEdm.read_ft46(fileName = file_loc)
+            ft46 = read_ft46(fileName = file_loc)
             ft46_dic[aa][ab] = vars(ft46)
         
         return ft46_dic
@@ -61,7 +64,7 @@ class load_simu_data:
         
         if self.withshift == False and self.withseries == False:
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], '{}'.format(ftname))
-            ft46 = lEdm.read_ft46(fileName = file_loc)
+            ft46 = read_ft46(fileName = file_loc)
             ft46_dic = vars(ft46)
             
             self.data['ft46'] = ft46_dic
@@ -74,7 +77,7 @@ class load_simu_data:
             for aa in self.data['dircomp']['multi_shift']:
                 
                 file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
-                ft46 = lEdm.read_ft46(fileName = file_loc)
+                ft46 = read_ft46(fileName = file_loc)
                 ft46_dic[aa] = vars(ft46)
                 
                 
@@ -86,7 +89,7 @@ class load_simu_data:
             # for aa in list(self.data['dircomp']['Attempt'].keys()):
                 
             #     file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
-            #     ft46 = lEdm.read_ft46(fileName = file_loc)
+            #     ft46 = read_ft46(fileName = file_loc)
             #     ft46_dic[aa] = vars(ft46)
                 
                 
@@ -147,7 +150,7 @@ class load_simu_data:
                 ft44_cp = {'fixed': {}, 'flux': {}}
                 for kk in ['fixed', 'flux']:
                     file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][kk], 'fort.44.i')
-                    ft44 = lEdm.read_ft44(fileName = file_loc)
+                    ft44 = read_ft44(fileName = file_loc)
                     ft44_cp[kk] = vars(ft44)
                 
                 ft44_dic[aa] = ft44_cp
@@ -160,7 +163,7 @@ class load_simu_data:
             for aa in iterlist:
                 
                 file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'fort.44.i')
-                ft44 = lEdm.read_ft44(fileName = file_loc)
+                ft44 = read_ft44(fileName = file_loc)
                 ft44_dic[aa] = vars(ft44)
         
         
@@ -172,14 +175,14 @@ class load_simu_data:
         
 
 
-        ft44_dic = lmem.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
+        ft44_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
         
         for tp in iterlist:
             aa = tp[0]
             ab = tp[1]
             
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'fort.44.i')
-            ft44 = lEdm.read_ft44(fileName = file_loc)
+            ft44 = read_ft44(fileName = file_loc)
             ft44_dic[aa][ab] = vars(ft44)
         
         return ft44_dic
@@ -189,17 +192,20 @@ class load_simu_data:
     def load_ft44(self):
         
         ftname = 'fort.44.i'
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
         
-        if self.withshift == False and self.withseries == False:
+        
+        if withshift == False and withseries == False:
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], '{}'.format(ftname))
-            ft44 = lEdm.read_ft44(fileName = file_loc)
+            ft44 = read_ft44(fileName = file_loc)
             ft44_dic = vars(ft44)
             
             self.data['ft44'] = ft44_dic
             # print('the next line is b2fplasmf')
             # print(type(k))
         
-        elif self.withshift == True and self.withseries == False:
+        elif withshift == True and withseries == False:
             
             
             scan = self.data['dircomp']['multi_shift']
@@ -208,11 +214,14 @@ class load_simu_data:
             
             self.data['ft44'] = ft44_dic
         
-        elif self.withshift == False and self.withseries == True:
+        elif withshift == False and withseries == True:
             
             scan = list(self.data['dircomp']['Attempt'].keys())
             
-            if self.series_flag == 'twin_scan':
+            series_flag = self.DF.series_flag
+            
+            
+            if series_flag == 'twin_scan':
                 
                 mcds = self.data['dircomp']
                 
