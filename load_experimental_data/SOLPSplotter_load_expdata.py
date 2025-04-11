@@ -93,7 +93,7 @@ class load_expdata:
         
         elif withshift == False and withseries == True:
             
-            self.check_b2mn(itername = itername)
+            self.lg.check_b2mn(itername = itername)
             jxa = self.data['b2mn']['jxa']
             self.lg.calcpsi_1D(pol_loc= str(jxa), no_coord_avg_check = False)
             psi_solps = self.data['psi']['psi_{}_val'.format(str(jxa))]
