@@ -223,8 +223,7 @@ class load_geometry:
         withshift = self.DF.withshift
         withseries = self.DF.withseries
         terminal = self.DF.terminal
-        compare = self.DF.series_compare
-        series_flag = self.DF.series_flag
+        
         
         if terminal == True:
             
@@ -259,6 +258,9 @@ class load_geometry:
             gfilesum_dic = {}
             for shiftname in self.data['dircomp']['multi_shift']:
                 
+                
+                compare = self.DF.series_compare
+                
                 if compare == True:
                     simudir = self.data['dirdata']['simudir'][shiftname]['fixed']
                 
@@ -281,6 +283,10 @@ class load_geometry:
         elif withshift == False and withseries == True:
             
             seriesname = list(self.data['dircomp']['Attempt'].keys())[0]
+            
+            
+            series_flag = self.DF.series_flag
+            
             
             if series_flag == 'twin_scan':
                 
