@@ -25,13 +25,20 @@ def Setting_dic():
             self.DEV = 'mast'
             self.a = 0.5
             self.withshift = False
-            self.withseries = False
+            self.withseries = True
             self.terminal = terminal
-            self.series_filename = 'org_new25scan_fast_save'
-            self.series_tail = 'fast_a'
-            self.series_flag = 'two_compare'
+            if self.withseries:
+                self.series_flag = 'twin_scan'
+                self.series_filename = 'org_new25scan_fast_save'
+                self.series_tail = 'fast_a'
+                
+            else:
+                print('withseries is false!')
+                
+            
             self.series_compare = False
             self.plot_setting = 'mod_transcoe'
+            self.data_size = 'small'
     
     DF = DefaultSettings()
     
