@@ -90,14 +90,12 @@ class load_directory:
 
     def load_mast_dir(self):
         
-        series_flag = self.DF.series_flag
+        
         terminal = self.DF.terminal
         
         if self.DF.DEV == 'mast':
             
             if self.DF.withshift == False and self.DF.withseries == False:
-                
-                
                 
                 
                 if terminal == False:
@@ -139,9 +137,7 @@ class load_directory:
             
             elif self.DF.withshift == False and self.DF.withseries == True:
                 
-                
-                
-                
+                series_flag = self.DF.series_flag
                 
                 if series_flag == 'change_den':
                     self.data['dircomp'] = self.di.mast_comp_dir_series()
