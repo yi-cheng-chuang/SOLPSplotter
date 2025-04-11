@@ -18,7 +18,10 @@ from fit_data.fitting_method import fit_method_collection
 from PRmap.SOLPSplotter_PRmap import RP_mapping
 from load_experimental_data.load_expdata_method import read_expdata_method
 from load_experimental_data.SOLPSplotter_load_expdata import load_expdata
-
+from load_simulation_data.read_B2simulation_data import load_B2simu_data
+from load_simulation_data.read_ft_files import load_ftfiles_data
+from fit_data.SOLPSplotter_fit import profile_fit
+from PRmap.midplane_profile_calculation import midplane_radial
 
 """
 This code plot all the radial neutral density and source for all 25 case.
@@ -27,7 +30,7 @@ This code plot all the radial neutral density and source for all 25 case.
 
 
 
-class twndscan_datapipline:
+class twscan_radial_datapipline:
     
     def __init__(self):
         # self.publish = 'b2plottersetting'
@@ -46,8 +49,8 @@ class twndscan_datapipline:
         
         xdi = directory_input(DF = self.DF, data = self.data)
         xga = grab_aptn_method(DF = self.DF, data = self.data)
-        xld = load_dir_method(DF = self.DF, data = self.data, di= xdi, gam = xga)
-        xld = load_directory(DF = self.DF, data = self.data, di= xdi, ldm= xld)
+        xldm = load_dir_method(DF = self.DF, data = self.data, di= xdi, gam = xga)
+        xld = load_directory(DF = self.DF, data = self.data, di= xdi, ldm= xldm)
         xlc = load_coordgeo_method(DF = self.DF, data = self.data)
         xlg = load_geometry(DF = self.DF, data = self.data, lcm = xlc)
         xps = plot_setting(DF = self.DF, data = self.data)
@@ -55,6 +58,10 @@ class twndscan_datapipline:
         xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
         xre = read_expdata_method(DF = self.DF, data = self.data)
         xle = load_expdata(DF = self.DF, data = self.data, fmc= xfm, rem = xre, lg= xlg)
+        xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
+        xlf = load_ftfiles_data(DF = self.DF, data = self.data, ldm= xldm)
+        xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
+        xmr = midplane_radial(DF = self.DF, data = self.data)
         
         
         
@@ -71,17 +78,18 @@ class twndscan_datapipline:
                                       'plot_exp_and_fit': True, 'plot_shift_compare': False,
                                       'data_print': True}
             xle.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
-            xl.load_b2fstate()
-            # xl.load_ft44()
-            # xl.calc_sep_dsa()
-            # xl.set_plot()
+            xlb.load_b2fstate()
+            xlf.load_ft44()
+            xrp.calc_sep_dsa()
 
-            # poloidal_index_list = ['40']
-            # xl.calc_dsa(pol_loc= poloidal_index_list[0])
+            poloidal_index_list = ['40']
+            xrp.calc_dsa(pol_loc= poloidal_index_list[0])
 
 
-            # xl.opacity_data_fit(pol_list = poloidal_index_list, dat_size = 'small', check_ne = False)
-            # xl.radial_data_fit(pol_loc = poloidal_index_list[0], dat_size = 'small', check_ne = False)
+            xpf.opacity_data_fit(pol_list = poloidal_index_list, check_ne = False)
+            xpf.radial_data_fit(pol_loc = poloidal_index_list[0], check_ne = False)
+            
+            xmr.calc_midplane_profile()
 
             # xl.load_fluxes_iout()
 
@@ -100,7 +108,7 @@ class twndscan_datapipline:
 
 
 if __name__ == "__main__":
-    dpl = twndscan_datapipline()
+    dpl = twscan_radial_datapipline()
     dpl.run_twndscan()
 
 
