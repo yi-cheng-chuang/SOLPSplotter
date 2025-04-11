@@ -21,6 +21,7 @@ class RP_mapping:
         self.DF = DF
         self.data = data
         self.fmc = fmc
+        self.lcm = lcm
     
   
 #-----------------------------------------------------------------------------
@@ -684,7 +685,11 @@ class RP_mapping:
             rad_grid = self.data['grid']['RadLoc']
             vert_grid = self.data['grid']['VertLoc']
             
-            if self.series_flag == 'twin_scan':
+            
+            series_flag = self.DF.series_flag
+            
+            
+            if series_flag == 'twin_scan':
                 
                 nf = aa[0]
                 tf = aa[1]
