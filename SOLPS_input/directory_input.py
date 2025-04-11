@@ -285,7 +285,7 @@ class directory_input:
         
         
         mast_eireneN_dir_dic = {'Shot': '027205', 'filename': self.DF.series_filename, 'shift_value': shift,
-                        'tail': self.DF.tail, 'a_shift': a_shift, 'Output': outputlist, 
+                        'tail': self.DF.series_tail, 'a_shift': a_shift, 'Output': outputlist, 
                 'denscan_list': ds_list, 'tempscan_list': ts_list}
         
         return mast_eireneN_dir_dic
