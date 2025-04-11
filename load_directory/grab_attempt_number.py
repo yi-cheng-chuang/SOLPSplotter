@@ -21,8 +21,6 @@ class grab_aptn_method:
     def s_number(self, text):
         # sd = ss.Setting_dic()
         
-        series_flag = self.DF.series_flag
-        
         
         
         if self.DF.DEV == 'mast':
@@ -30,7 +28,12 @@ class grab_aptn_method:
             if self.DF.withshift == False and self.DF.withseries == False:
                 name = text.split("/",-1)[-2]
                 nu = int(name.split('_')[0])
+                
+                
             elif self.DF.withshift == False and self.DF.withseries == True:
+                
+                series_flag = self.DF.series_flag
+                
                 if series_flag == 'change_den':
                     name = text.split("\\",-1)[-1]
                     nu = re.findall('\d+\.\d+', name)
