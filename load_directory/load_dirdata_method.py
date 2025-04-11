@@ -356,6 +356,9 @@ class load_dir_method:
         return twinscan_dic
 
 
+
+
+
     def series_terminal_dir(self, dir_comp_dic):
 
         mcds = dir_comp_dic
@@ -442,10 +445,10 @@ class load_dir_method:
 
 
     def twinscan_local_dir(self, dir_comp_dic):
-        d = self.di.mast_comp_dic(self)
+        d = self.di.mast_comp_dic()
         mcds = dir_comp_dic
            
-        basedrt, topdrt = self.gam.set_wdir()
+        basedrt, topdrt = self.di.set_wdir()
         gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, mcds['Shot']) 
         gdir = glob.glob('{}/g{}*'.format(gbase, mcds['Shot']))
         simbase = '{}/{}/{}'.format(basedrt, self.DF.DEV, d['Shot'])
@@ -459,27 +462,31 @@ class load_dir_method:
         ds_key = []
         ts_key = []
         
-        print('this is mcds')
-        print(type(mcds['denscan_list'][3]))
+        # print('this is mcds')
+        # print(type(mcds['denscan_list'][3]))
         
         for x in mcds['denscan_list']:
             ds_key.append('{:.3f}'.format(x))
             
-        print(ds_key)
+        # print(ds_key)
         for x in mcds['tempscan_list']:
             ts_key.append('{:.3f}'.format(x))
             
 
-        print(ts_key)
+        # print(ts_key)
         
         
         twinscan_dic = self.two_layer_dic(key_a = ds_key, key_b = ts_key)
-        print(twinscan_dic)
+        
+        # print(twinscan_dic)
+        
+        
+        
         
         for i in newbase:
-            attempt_dic[self.gam.atp_number(i, self.DF.series_flag)[0]] = self.gam.atp_number(i, self.DF.series_flag)[1]
+            attempt_dic[self.gam.atp_number(i)[0]] = self.gam.atp_number(i)[1]
             # print(sps.atp_number(i, series_flag))
-            st = self.gam.atp_number(i, self.DF.series_flag)[0]
+            st = self.gam.atp_number(i)[0]
             # print(st)
             # print(i)
             twinscan_dic[str(st[0])][str(st[1])] = i
