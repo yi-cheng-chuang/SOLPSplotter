@@ -58,16 +58,16 @@ class profile_fit:
         nx = data_struc['nx']
         ny = data_struc['ny']
         
-        if self.DF.data_size == 'full':
-            Ne_data = b2fstate['ne'].transpose()
-            Te_J = b2fstate['te'].transpose()
-            
-            
-        elif self.DF.data_size == 'small':
+        
+        if self.DF.data_size == 'small':
             Ne_data = b2fstate['ne'][1:nx+1, 1:ny+1].transpose()
             Te_J = b2fstate['te'][1:nx+1, 1:ny+1].transpose()
             # print(Ne_data.shape)
             # print(Te_J.shape)
+        
+        else:
+            
+            print('I do not use full data size for my study')
             
         # print(Neuden.shape)
         
@@ -154,21 +154,20 @@ class profile_fit:
             
             nx = self.data['b2fgeo']['nx']
             ny = self.data['b2fgeo']['ny']
+            dat_struc = {'nx': nx, 'ny': ny}
             
             for p in pol_list:
                 self.rp.calc_dsa(pol_loc= p)     
-            
-            if dat_size == 'full':
                 
-                self.load_output_data(param= 'NeuDen')
-                Neuden_data = self.data['outputdata']['NeuDen']
-                dat_struc = {'nx': nx, 'ny': ny}
-            
-            elif dat_size == 'small':
+                
+            if dat_size == 'small':
                 
                 data = self.data['ft44']['dab2']
                 Neuden_data = np.transpose(data[:, :, 0])
-                dat_struc = {'nx': nx, 'ny': ny}
+            
+            else:
+                
+                print('I do not use full data size for my study')
                 
             psiN_map = self.data['psi']['psival']
             fstate = self.data['b2fstate']         
@@ -194,18 +193,15 @@ class profile_fit:
                 
                 nx = self.data['b2fgeo'][aa]['nx']
                 ny = self.data['b2fgeo'][aa]['ny']
+                dat_struc = {'nx': nx, 'ny': ny}
                 
-                
-                
-                if dat_size == 'full':
-                    self.load_output_data(param= 'NeuDen')
-                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                    dat_struc = {'nx': nx, 'ny': ny}
-                
-                elif dat_size == 'small':
+                if dat_size == 'small':
                     data = self.data['ft44'][aa]['dab2']
                     Neuden_data = np.transpose(data[:, :, 0])
-                    dat_struc = {'nx': nx, 'ny': ny}
+                    
+                else:
+                    
+                    print('I do not use full data size for my study')
                 
                 
                 fstate = self.data['b2fstate'][aa]
@@ -241,16 +237,19 @@ class profile_fit:
                     
                     nx = self.data['b2fgeo']['nx']
                     ny = self.data['b2fgeo']['ny']
+                    dat_struc = {'nx': nx, 'ny': ny}
+
+
                     
-                    if dat_size == 'full':
-                        self.load_output_data(param= 'NeuDen')
-                        Neuden_data = self.data['outputdata']['NeuDen'][nf][tf]
-                        dat_struc = {'nx': nx, 'ny': ny}
-                    
-                    elif dat_size == 'small':
+                    if dat_size == 'small':
                         data = self.data['ft44'][nf][tf]['dab2']
                         Neuden_data = np.transpose(data[:, :, 0])
-                        dat_struc = {'nx': nx, 'ny': ny}
+                                           
+                    else:
+                        
+                        print('I do not use full data size for my study')
+                    
+
                         
                     fstate = self.data['b2fstate'][nf][tf]
                 
@@ -306,12 +305,14 @@ class profile_fit:
         nx = data_struc['nx']
         ny = data_struc['ny']
         
-        if self.DF.data_size == 'full':
-            Ne_data = b2fstate['ne'].transpose()
-            Te_J = b2fstate['te'].transpose()
-        elif self.DF.data_size == 'small':
+            
+        if self.DF.data_size == 'small':
             Ne_data = b2fstate['ne'][1:nx+1, 1:ny+1].transpose()
             Te_J = b2fstate['te'][1:nx+1, 1:ny+1].transpose()
+        
+        else:
+            
+            print('I do not use full data size for my study')
         
         
         
@@ -320,11 +321,12 @@ class profile_fit:
         pol_in = int(pol_loc)
         
         
-        if self.DF.data_size == 'full':
-            psi = psiN[:, pol_in]
-        
-        elif self.DF.data_size == 'small':
+        if self.DF.data_size == 'small':
             psi = psiN[1:ny+1, pol_in]
+        
+        else:
+            
+            print('I do not use full data size for my study')
             
             
         Nd = Neuden[:, pol_in]
@@ -356,18 +358,18 @@ class profile_fit:
             
             nx = self.data['b2fgeo']['nx']
             ny = self.data['b2fgeo']['ny']
+            dat_struc = {'nx': nx, 'ny': ny}
+
+
             
-            if dat_size == 'full':
-                
-                self.load_output_data(param= 'NeuDen')
-                Neuden_data = self.data['outputdata']['NeuDen']
-                dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-            
-            elif dat_size == 'small':
+            if dat_size == 'small':
                 
                 data = self.data['ft44']['dab2']
                 Neuden_data = np.transpose(data[:, :, 0])
-                dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+            
+            else:
+                
+                print('I do not use full data size for my study')
             
             
             fstate = self.data['b2fstate']
@@ -389,19 +391,17 @@ class profile_fit:
                 
                 nx = self.data['b2fgeo'][aa]['nx']
                 ny = self.data['b2fgeo'][aa]['ny']
+                dat_struc = {'nx': nx, 'ny': ny}
                 
                 
-                if dat_size == 'full':
-                    
-                    self.load_output_data(param= 'NeuDen')
-                    
-                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                
-                elif dat_size == 'small':
+                if dat_size == 'small':
                     data = self.data['ft44'][aa]['dab2']
                     Neuden_data = np.transpose(data[:, :, 0])
-                    dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                    
+                
+                else:
+                    
+                    print('I do not use full data size for my study')
                 
                     
                 # Neuden_data = self.data['outputdata']['NeuDen'][aa]
@@ -436,28 +436,27 @@ class profile_fit:
                     
                     nx = self.data['b2fgeo']['nx']
                     ny = self.data['b2fgeo']['ny']
+                    dat_struc = {'nx': nx, 'ny': ny}
                     
-                    if dat_size == 'full':
-                        
-                        self.load_output_data(param= 'NeuDen')
-                        
-                        Neuden_data = self.data['outputdata']['NeuDen'][nf][tf]
-                        dat_struc = {'nx': nx, 'ny': ny}
                     
-                    elif dat_size == 'small':
+                    
+                    if dat_size == 'small':
                         data = self.data['ft44'][nf][tf]['dab2']
                         Neuden_data = np.transpose(data[:, :, 0])
-                        dat_struc = {'nx': nx, 'ny': ny}
+                        
+                    
+                    else:
+                        
+                        print('I do not use full data size for my study')
                 
                     fstate = self.data['b2fstate'][nf][tf]
                 
                 
                 else:
-                    
-                    self.load_output_data(param= 'NeuDen')
-                    
-                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                                        
                     fstate = self.data['b2fstate'][aa]
+                    data = self.data['ft44'][aa]['dab2']
+                    Neuden_data = np.transpose(data[:, :, 0])
                     
                 
                 psiN_map = self.data['psi']['psival']
@@ -488,9 +487,6 @@ class profile_fit:
         dat_size = self.DF.data_size
         
         
-        self.load_ft44()
-        self.load_output_data(param= 'NeuDen')
-        
         if withshift == False and withseries == False:
             
             data = self.data['ft44']['dab2']
@@ -517,19 +513,17 @@ class profile_fit:
                     
                     nx = self.data['b2fgeo'][aa]['nx']
                     ny = self.data['b2fgeo'][aa]['ny']
+                    dat_struc = {'nx': nx, 'ny': ny}
                     
                     
-                    if dat_size == 'full':
-                        
-                        self.load_output_data(param= 'NeuDen')
-                        
-                        Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                        dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                    
-                    elif dat_size == 'small':
+                    if dat_size == 'small':
                         data = self.data['ft44'][aa]['dab2']
                         Neuden_data = np.transpose(data[:, :, 0])
-                        dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+                                            
+                    else:
+                        
+                        print('I do not use full data size for my study')
+                    
                     
                     
                     
@@ -558,7 +552,15 @@ class profile_fit:
                 for ind in pol_list:
                 
                 
-                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    if dat_size == 'small':
+                        data = self.data['ft44'][aa]['dab2']
+                        Neuden_data = np.transpose(data[:, :, 0])
+                                            
+                    else:
+                        
+                        print('I do not use full data size for my study')
+                    
+                    
                     fstate = self.data['b2fstate'][aa]
                     psiN_map = self.data['psi']['psival']
                     
@@ -581,9 +583,6 @@ class profile_fit:
             print('radial_data_fit has a bug')
     
     
-
-        
-        
             
 # ----------------------------------------------------------------------------           
     
