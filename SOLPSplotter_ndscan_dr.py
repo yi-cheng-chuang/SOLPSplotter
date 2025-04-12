@@ -89,7 +89,7 @@ class twscan_radial_datapipline:
             xpf.opacity_data_fit(pol_list = poloidal_index_list, check_ne = False)
             xpf.radial_data_fit(pol_loc = poloidal_index_list[0], check_ne = False)
             
-            xmr.calc_midplane_profile()
+            # xmr.calc_midplane_profile()
 
             # xl.load_fluxes_iout()
 
@@ -99,12 +99,6 @@ class twscan_radial_datapipline:
 
             # xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
             #                        format_option= 'ionize', xcoord_type = 'psi')
-        
-
-
-        
-            
-        
 
 
 if __name__ == "__main__":
