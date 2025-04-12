@@ -67,7 +67,7 @@ class transcoe_mod_datapipline:
         
         extra = False
         
-        if self.DF.series_flag == 'two_compare' and extra:
+        if self.DF.withseries and extra:
             
             basedrt, topdrt = xdi.set_wdir()
 
