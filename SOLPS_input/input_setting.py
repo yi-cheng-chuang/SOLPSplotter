@@ -53,6 +53,10 @@ def Setting_dic():
 series_flag = ['eireneN','change_den','change_temp', 'two_compare', 'twin_scan']
 plot_setting = ['mod_transcoe']
 
+
+self.data_size is always 'small', as 96*36 for the reminder
+
+
 """
 
 
