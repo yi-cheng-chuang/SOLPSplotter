@@ -52,7 +52,7 @@ class directory_input:
 
         series = 'mastu39_CDN'
         
-        filename = '13_49404bou1e4_a'
+        filename = '17_49404_a'
         
         outputlist = ['Output', 'Output2', 'EirOutput']
         mastu_dircomp_dic = {'Shot': '49404', 'shift': shift, 
