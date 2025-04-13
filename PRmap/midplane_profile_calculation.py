@@ -5,7 +5,8 @@ Created on Thu Apr 10 16:12:28 2025
 @author: ychuang
 """
 
- 
+from load_simulation_data.read_B2simulation_data import load_B2simu_data
+from load_directory.load_dirdata_method import load_dir_method
 import numpy as np
 
 
@@ -13,10 +14,12 @@ import numpy as np
 
 class midplane_radial:
     
-    def __init__(self, DF, data):
+    def __init__(self, DF, data, lbd: load_B2simu_data, ldm: load_dir_method):
         
         self.DF = DF
         self.data = data
+        self.lbd = lbd
+        self.ldm = ldm
     
     
     def calc_midplane_profile_method(self, itername, data_struc):
@@ -175,51 +178,85 @@ class midplane_radial:
         
         
         return midplane_profile_dic
+
     
-    
-    def oneDscan_midplan_profile(self):
+    def oneDscan_midplane(self, iterlist, dat_dic, dat_struc):
         
-        series_flag = self.DF.series_flag
-        nx = self.data['b2fgeo']['nx']
-        ny = self.data['b2fgeo']['ny']
-        dat_struc = {'nx': nx, 'ny': ny}
         
-        midprofiles = self.calc_midplane_profile_method(itername = aa, data_struc = dat_struc)
+        series_compare = self.DF.series_compare
         
-        midprofile_dic[aa] = midprofiles
+        if series_compare == True:
+            
+            print('we will improve this in the future!')
+        
+        else:
+            
+            
+            for aa in iterlist:
+
+                midprofiles = self.calc_midplane_profile_method(itername = aa, data_struc = dat_struc)
+                
+                dat_dic[aa] = midprofiles
+                
+                
+        return dat_dic
     
     
-    def twoDscan_b2wdat(self, iterlist, iterlist_a, iterlist_b, two_layer_dic):
+    def oneDscan_ndcut(self, iterlist, dat_dic, dat_struc, cut_range):
+        
+        
+        series_compare = self.DF.series_compare
+        
+        if series_compare == True:
+            
+            print('we will improve this in the future!')
+        
+        else:
+            
+            
+            for aa in iterlist:
+
+                ndcut = self.ndmid_withcut_method(itername = aa, data_struc = dat_struc, cut_range = cut_range)
+                
+                dat_dic[aa] = ndcut
+                
+                
+        return dat_dic
+    
+    
+    
+    def twoDscan_midplane(self, iterlist, iterlist_a, iterlist_b, dat_dic, dat_struc):
         
 
+            
+        for tp in iterlist:
+            aa = tp[0]
+            ab = tp[1]
+            
+            midprofiles = self.calc_midplane_profile_method(itername = tp, data_struc = dat_struc)
+            dat_dic[aa][ab] = midprofiles
+  
+        return dat_dic
+    
+    
+    
+    def twoDscan_ndcut(self, iterlist, iterlist_a, iterlist_b, dat_dic, dat_struc, cut_range):
 
-        b2wdat_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
-        # print(state_dic)
-        # dim_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
         
         for tp in iterlist:
             aa = tp[0]
             ab = tp[1]
             
-            file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa][ab])
-            na_dat = self.data['b2fstate'][aa][ab]['na']
-                       
-            b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
-                                      nSpec = np.shape(na_dat)[2])
-            b2wdat_dic[aa][ab] = vars(b2wdat)
-            # dim_dic[aa][ab] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+            ndcut = self.ndmid_withcut_method(itername = tp, data_struc = dat_struc, cut_range = cut_range)
+            dat_dic[aa][ab] = ndcut
+      
         
-        return b2wdat_dic
+        return dat_dic
     
-    
-    
-    
+  
     
     def calc_midplane_profile(self):
         
-        # self.load_ft44()
-        
-        dat_size = self.DF.data_size
         withshift = self.DF.withshift
         withseries = self.DF.withseries
         
@@ -259,61 +296,26 @@ class midplane_radial:
             
             midprofile_dic = {}
             
+            nx = self.data['b2fgeo']['nx']
+            ny = self.data['b2fgeo']['ny']
+            dat_struc = {'nx': nx, 'ny': ny}
             
-            for aa in list(self.data['dircomp']['Attempt'].keys()):
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            if self.DF.series_flag == 'twin_scan':
                 
+                ds_key, ts_key = self.lbd.twokeylists(printvalue= False)
                 
+                mid_dic = self.ldm.two_layer_dic(key_a = ds_key, key_b = ts_key)
                 
+                midprofile_dic = self.twoDscan_midplane(iterlist = scan, iterlist_a = ds_key, iterlist_b = ts_key, 
+                                                        dat_dic = mid_dic, dat_struc = dat_struc)
                 
+            
+            else:
                 
-                
-                scan = list(self.data['dircomp']['Attempt'].keys())
-                
-                if self.DF.series_flag == 'twin_scan':
-                    
-                    mcds = self.data['dircomp']
-                    
-                    ds_key = []
-                    ts_key = []
-                    
-                    print('this is mcds')
-                    print(type(mcds['denscan_list'][3]))
-                    
-                    for x in mcds['denscan_list']:
-                        ds_key.append('{:.3f}'.format(x))
-                        
-                    print(ds_key)
-                    for x in mcds['tempscan_list']:
-                        ts_key.append('{:.3f}'.format(x))
-                        
-
-                    print(ts_key)
-                    
-                    
-                    b2wdat_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
-                    # print(state_dic)
-                    # dim_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
-                    
-                    for tp in iterlist:
-                        aa = tp[0]
-                        ab = tp[1]
-                        
-                        file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa][ab])
-                        na_dat = self.data['b2fstate'][aa][ab]['na']
-                                   
-                        b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
-                                                  nSpec = np.shape(na_dat)[2])
-                        b2wdat_dic[aa][ab] = vars(b2wdat)
-                        # dim_dic[aa][ab] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
-
-                b2wdat_dic = self.twoDscan_b2wdat(iterlist = scan, 
-                                    iterlist_a = ds_key, iterlist_b = ts_key)
-                
-                
-                
-                else:
-                    b2wdat_dic = self.oneDscan_b2wdat(iterlist = scan)
-                
+                mid_dic = {}
+                midprofile_dic = self.oneDscan_midplane(iterlist = scan, dat_dic = mid_dic, dat_struc = dat_struc)
             
             self.data['midplane_profile'] = midprofile_dic
         
@@ -326,7 +328,7 @@ class midplane_radial:
     
     
     
-    def ndmid_withcut_method(self, itername, data_struc):
+    def ndmid_withcut_method(self, itername, data_struc, cut_range):
 
         dat_size = self.DF.data_size
         withshift = self.DF.withshift
@@ -348,7 +350,7 @@ class midplane_radial:
 
         elif withshift == True and withseries == False:
             
-            if data_struc['size'] == 'small':
+            if dat_size == 'small':
                 nx = data_struc['nx']
                 ny = data_struc['ny']
                 data = self.data['ft44'][itername]['dab2']
@@ -363,13 +365,13 @@ class midplane_radial:
         
         elif withshift == False and withseries == True:
             
-            if self.series_flag == 'twin_scan':
+            if self.DF.series_flag == 'twin_scan':
                 
                 nf = itername[0]
                 tf = itername[1]
                     
                                   
-                if data_struc['size'] == 'small':
+                if dat_size == 'small':
                     nx = data_struc['nx']
                     ny = data_struc['ny']
                     data = self.data['ft44'][nf][tf]['dab2']
@@ -383,7 +385,7 @@ class midplane_radial:
                 
             else:
                 
-                if data_struc['size'] == 'small':
+                if dat_size == 'small':
                     nx = data_struc['nx']
                     ny = data_struc['ny']
                     data = self.data['ft44'][itername]['dab2']
@@ -399,7 +401,7 @@ class midplane_radial:
         weight_B = np.ones(len(weight))- weight
             
         
-        if data_struc['size'] == 'small':
+        if dat_size == 'small':
             
             ap = self.data['midplane_calc']['average_pair']
             pair = (ap[0]-1, ap[1]-1)
@@ -412,20 +414,97 @@ class midplane_radial:
         
         psi_list = []
         nd_list = []
+        st = cut_range[0]
+        ed = cut_range[1]
         
         for ind, coord in enumerate(psi_coord):
             
-            if coord >= 0.95 and coord <= 1.1:
+            if coord >= st and coord <= ed:
                 psi_list.append(coord)
                 nd_list.append(mid_neu_pro[ind])
         
         
+        ndmid_cut_dic = {'psi_cut': psi_list, 'nd_cut': nd_list}
         
-        return psi_list, nd_list
+        
+        
+        return ndmid_cut_dic
         
     
     
-    
+    def calc_ndmid_cut(self):
+        
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
+        
+        
+        
+        if withshift == False and withseries == False:
+            
+            nx = self.data['b2fgeo']['nx']
+            ny = self.data['b2fgeo']['ny']
+            dat_struc = {'nx': nx, 'ny': ny}
+            cut_list = [0.95, 1.1]
+                
+            ndmidcut_dic = self.ndmid_withcut_method(itername = None, data_struc = dat_struc, cut_range = cut_list)
+            
+            self.data['ndmid_cutprofile'] = ndmidcut_dic
+        
+        elif withshift == True and withseries == False:
+            
+            
+            ndmidcut_dic = {}
+            
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                
+                nx = self.data['b2fgeo'][aa]['nx']
+                ny = self.data['b2fgeo'][aa]['ny']
+                dat_struc = {'nx': nx, 'ny': ny}
+                cut_list = [0.95, 1.1]
+                
+                
+                ndmidcut = self.ndmid_withcut_method(itername = aa, data_struc = dat_struc, cut_range = cut_list)
+                
+                ndmidcut_dic[aa] = ndmidcut
+            
+            self.data['ndmid_cutprofile'] = ndmidcut_dic
+        
+        elif withshift == False and withseries == True:
+            
+            midprofile_dic = {}
+            
+            nx = self.data['b2fgeo']['nx']
+            ny = self.data['b2fgeo']['ny']
+            dat_struc = {'nx': nx, 'ny': ny}
+            cut_list = [0.95, 1.1]
+            scan = list(self.data['dircomp']['Attempt'].keys())
+            
+            if self.DF.series_flag == 'twin_scan':
+                
+                ds_key, ts_key = self.lbd.twokeylists(printvalue= False)
+                
+                ndcut_dic = self.ldm.two_layer_dic(key_a = ds_key, key_b = ts_key)
+                
+                ndmidcut_dic = self.twoDscan_ndcut(iterlist = scan, iterlist_a = ds_key, 
+                                    iterlist_b = ts_key, dat_dic = ndcut_dic, dat_struc = dat_struc, 
+                                    cut_range = cut_list)
+                
+            else:
+                
+                ndc_dic = {}
+                ndmidcut_dic = self.oneDscan_ndcut(iterlist = scan, dat_dic = ndc_dic, 
+                                                   dat_struc = dat_struc, cut_range = cut_list)
+            
+            self.data['ndmid_cutprofile'] = ndmidcut_dic
+        
+        elif withshift == True and withseries == True:
+            print('calc_midplane_profile is not there yet!')
+        
+        
+        else:
+            print('calc_midplane_profile has a bug')
     
     
     
