@@ -22,6 +22,7 @@ from load_simulation_data.read_B2simulation_data import load_B2simu_data
 from load_simulation_data.read_ft_files import load_ftfiles_data
 from fit_data.SOLPSplotter_fit import profile_fit
 from PRmap.midplane_profile_calculation import midplane_radial
+from radial_plot.SOLPSplotter_NTplot import NT_plot
 
 """
 This code plot all the radial neutral density and source for all 25 case.
@@ -61,7 +62,8 @@ class twscan_radial_datapipline:
         xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
         xlf = load_ftfiles_data(DF = self.DF, data = self.data, ldm= xldm)
         xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
-        xmr = midplane_radial(DF = self.DF, data = self.data)
+        xmr = midplane_radial(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
+        xnt = NT_plot(DF = self.DF, data = self.data)
         
         
         
@@ -89,7 +91,10 @@ class twscan_radial_datapipline:
             xpf.opacity_data_fit(pol_list = poloidal_index_list, check_ne = False)
             xpf.radial_data_fit(pol_loc = poloidal_index_list[0], check_ne = False)
             
-            # xmr.calc_midplane_profile()
+            xmr.calc_midplane_profile()
+            xmr.calc_ndmid_cut()
+            
+            xnt.neteTS_plot(scan_style = 'denscan', xcoord_type = 'psi')
 
             # xl.load_fluxes_iout()
 
