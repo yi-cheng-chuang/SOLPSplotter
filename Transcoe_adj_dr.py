@@ -60,7 +60,7 @@ class transcoe_mod_datapipline:
         
         xlg.calcpsi_avcr()
         xps.set_plot()
-        xtca.mod_transco(withmod = False, de_SOL = 32, ki_SOL = 18, ke_SOL = 21, log_flag = False)
+        xtca.mod_transco(withmod = True, de_SOL = 32, ki_SOL = 18, ke_SOL = 21, log_flag = False)
         xtca.transport_coe_align_plot(plot_transcoe = True, paper_transcoe = True, save_eps = False)
         xtca.align_transco(plot_align = True, log_flag = False)
         
