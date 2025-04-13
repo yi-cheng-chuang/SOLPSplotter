@@ -80,11 +80,15 @@ class profile_fit:
             pol_in = int(k)
             i = pol_list.index(k)
             
-            if self.DF.data_size == 'full':
-                psi = psiN[:, pol_in]
+            # if self.DF.data_size == 'full':
+            #     psi = psiN[:, pol_in]
             
-            elif self.DF.data_size == 'small':
+            if self.DF.data_size == 'small':
                 psi = psiN[1:ny+1, pol_in]
+            
+            else:
+                
+                print('I do not use full data size for my study')
                 
                 
             Nd = Neuden[:, pol_in]
