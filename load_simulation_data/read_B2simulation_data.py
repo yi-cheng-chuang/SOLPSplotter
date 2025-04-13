@@ -21,67 +21,143 @@ class load_B2simu_data:
         self.ldm = ldm
   
     
-    def one_dim_scan_b2fstate(self, iterlist):
+    def twokeylists(self, printvalue):
+        
+        mcds = self.data['dircomp']
+        
+        ds_key = []
+        ts_key = []
+        
+        if printvalue:
+            print('this is mcds')
+            print(type(mcds['denscan_list'][3]))
+        else:
+            pass
+            
+        
+        for x in mcds['denscan_list']:
+            ds_key.append('{:.3f}'.format(x))
+        
+        if printvalue:
+            print(ds_key)
+        else:
+            pass
+            
+        
+        for x in mcds['tempscan_list']:
+            ts_key.append('{:.3f}'.format(x))
+            
+        if printvalue:
+            print(ts_key)
+        else:
+            pass
+        
+        return ds_key, ts_key
+        
+    
+    
+    def oneDscan_dat(self, iterlist, dat_type):
         
         
         series_compare = self.DF.series_compare
         
         if series_compare == True:
             
-            state_dic = {}
-            dim_dic = {}
+            if dat_type == 'b2fstate':
+                
+                state_dic = {}
+                dim_dic = {}
+                
+                for aa in iterlist:
+                    
+                    state_cpdic = {'fixed': {}, 'flux': {}}
+                    for kk in ['fixed', 'flux']:
+                        file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][kk], 'b2fstate')
+                        state, dim = read_b2fstate(b2fstateLoc = file_loc)
+                        state_cpdic[kk] = vars(state)
+                    
+                    
+                    state_dic[aa] = state_cpdic
+                    dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+                
+                return state_dic, dim_dic
             
-            for aa in iterlist:
+            
+            elif dat_type == 'b2wdat':
                 
-                state_cpdic = {'fixed': {}, 'flux': {}}
-                for kk in ['fixed', 'flux']:
-                    file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][kk], 'b2fstate')
-                    state, dim = read_b2fstate(b2fstateLoc = file_loc)
-                    state_cpdic[kk] = vars(state)
+                print('we will improve this in the future!')
                 
-                
-                state_dic[aa] = state_cpdic
-                dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
         
         else:
             
-            state_dic = {}
-            dim_dic = {}
+            if dat_type == 'b2fstate':
+                
+                dat_dic = {}
+                dim_dic = {}
+                
+                for aa in iterlist:
+                    file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
+                    state, dim = read_b2fstate(b2fstateLoc = file_loc)
+                    state_dic[aa] = vars(state)
+                    dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+                    
+                
+                return state_dic, dim_dic
             
-            for aa in iterlist:
-                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
+            
+            elif dat_type == 'b2wdat':
+                
+                b2wdat_dic = {}
+                
+                for aa in iterlist:
+                                   
+                    file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa])
+                    na_dat = self.data['b2fstate'][aa]['na']
+                    b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
+                                              nSpec = np.shape(na_dat)[2])
+                    b2wdat_dic[aa] = vars(b2wdat)
+
+
+                return b2wdat_dic
+                
+  
+    
+    def twoDscan_dat(self, iterlist, iterlist_a, iterlist_b, dat_type, dat_dic, dim_dic):
+        
+        
+        if dat_type == 'b2fstate':
+            
+            for tp in iterlist:
+                aa = tp[0]
+                ab = tp[1]
+                
+                file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'b2fstate')
                 state, dim = read_b2fstate(b2fstateLoc = file_loc)
-                state_dic[aa] = vars(state)
-                dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
-        
-        
-        
-        
-        return state_dic, dim_dic
-    
-    
-    
-    def two_dim_scan_b2fstate(self, iterlist, iterlist_a, iterlist_b):
-        
-
-
-        state_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
-        print(state_dic)
-        dim_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
-        
-        for tp in iterlist:
-            aa = tp[0]
-            ab = tp[1]
+                dat_dic[aa][ab] = vars(state)
+                dim_dic[aa][ab] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
             
-            file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa][ab], 'b2fstate')
-            state, dim = read_b2fstate(b2fstateLoc = file_loc)
-            state_dic[aa][ab] = vars(state)
-            dim_dic[aa][ab] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+            
+            return dat_dic, dim_dic
         
-        return state_dic, dim_dic
+        elif dat_type == 'b2wdat':
+            
+            
+            for tp in iterlist:
+            
+                aa = tp[0]
+                ab = tp[1]
+                
+                file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa][ab])
+                na_dat = self.data['b2fstate'][aa][ab]['na']
+                           
+                b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
+                                          nSpec = np.shape(na_dat)[2])
+                dat_dic[aa][ab] = vars(b2wdat)
+            
+            return dat_dic
+
+
     
-    
-       
     
     def load_b2fstate(self):
         
@@ -91,6 +167,7 @@ class load_B2simu_data:
         
         
         if withshift == False and withseries == False:
+            
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], 'b2fstate')
             state, dim = read_b2fstate(b2fstateLoc = file_loc)
             state_dic = vars(state)
@@ -103,7 +180,7 @@ class load_B2simu_data:
             
             scan = self.data['dircomp']['multi_shift']
             
-            state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
+            state_dic, dim_dic = self.oneDscan_dat(iterlist = scan, dat_type = 'b2fstate')
 
             self.data['b2fstate'] = state_dic
             self.data['DefaultSettings']['dims'] = dim_dic
@@ -117,28 +194,18 @@ class load_B2simu_data:
             
             if series_flag == 'twin_scan':
                 
-                mcds = self.data['dircomp']
                 
-                ds_key = []
-                ts_key = []
+                ds_key, ts_key = self.twokeylists(printvalue= False)
                 
-                print('this is mcds')
-                print(type(mcds['denscan_list'][3]))
+                state_dic = self.ldm.two_layer_dic(key_a = ds_key, key_b = ts_key)
+                # print(state_dic)
+                dim_dic = self.ldm.two_layer_dic(key_a = ds_key, key_b = ts_key)
                 
-                for x in mcds['denscan_list']:
-                    ds_key.append('{:.3f}'.format(x))
-                    
-                print(ds_key)
-                for x in mcds['tempscan_list']:
-                    ts_key.append('{:.3f}'.format(x))
-                    
-
-                print(ts_key)
-                
-                state_dic, dim_dic = self.two_dim_scan_b2fstate(iterlist = scan, 
-                                    iterlist_a = ds_key, iterlist_b = ts_key)
+                state_dic, dim_dic = self.twoDscan_dat(iterlist = scan, 
+                                    iterlist_a = ds_key, iterlist_b = ts_key, dat_type = 'b2fstate',
+                                    dat_dic = state_dic, dim_dic = dim_dic)
             else:
-                state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
+                state_dic, dim_dic = self.oneDscan_dat(iterlist = scan, dat_type = 'b2fstate')
                 
 
             self.data['b2fstate'] = state_dic
@@ -148,65 +215,8 @@ class load_B2simu_data:
         else:
             print('load_b2fstate function is not there yet!')
     
-    
-    
-    
-    def oneDscan_b2wdat(self, iterlist):
-        
-        
-        series_compare = self.DF.series_compare
-        
-        if series_compare == True:
-            
-            print('we will improve this in the future!')
-        
-        else:
-            
-            b2wdat_dic = {}
-            
-            # dim_dic = {}
-            
-            for aa in iterlist:
-                               
-                file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa])
-                na_dat = self.data['b2fstate'][aa]['na']
-                b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
-                                          nSpec = np.shape(na_dat)[2])
-                b2wdat_dic[aa] = vars(b2wdat)
-                
-                
-                # dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
-        
-        
-        return b2wdat_dic
-    
-    
-    
-    def twoDscan_b2wdat(self, iterlist, iterlist_a, iterlist_b):
-        
 
-
-        b2wdat_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
-        # print(state_dic)
-        # dim_dic = self.ldm.two_layer_dic(key_a = iterlist_a, key_b = iterlist_b)
-        
-        for tp in iterlist:
-            aa = tp[0]
-            ab = tp[1]
-            
-            file_loc = '{}/'.format(self.data['dirdata']['simudir'][aa][ab])
-            na_dat = self.data['b2fstate'][aa][ab]['na']
-                       
-            b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
-                                      nSpec = np.shape(na_dat)[2])
-            b2wdat_dic[aa][ab] = vars(b2wdat)
-            # dim_dic[aa][ab] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
-        
-        return b2wdat_dic
-    
-    
-    
-    
+       
     
     def load_b2wdat(self):
         
@@ -240,28 +250,16 @@ class load_B2simu_data:
             
             if self.series_flag == 'twin_scan':
                 
-                mcds = self.data['dircomp']
+                ds_key, ts_key = self.twokeylists(printvalue= False)
                 
-                ds_key = []
-                ts_key = []
+                wdat_dic = self.ldm.two_layer_dic(key_a = ds_key, key_b = ts_key)
+                dim_dic = self.ldm.two_layer_dic(key_a = ds_key, key_b = ts_key)
                 
-                print('this is mcds')
-                print(type(mcds['denscan_list'][3]))
-                
-                for x in mcds['denscan_list']:
-                    ds_key.append('{:.3f}'.format(x))
-                    
-                print(ds_key)
-                for x in mcds['tempscan_list']:
-                    ts_key.append('{:.3f}'.format(x))
-                    
-
-                print(ts_key)
-                
-                b2wdat_dic = self.twoDscan_b2wdat(iterlist = scan, 
-                                    iterlist_a = ds_key, iterlist_b = ts_key)
+                b2wdat_dic = self.twoDscan_dat(iterlist = scan, 
+                                    iterlist_a = ds_key, iterlist_b = ts_key, dat_type = 'b2wdat',
+                                    dat_dic = wdat_dic, dim_dic = dim_dic)
             else:
-                b2wdat_dic = self.oneDscan_b2wdat(iterlist = scan)
+                b2wdat_dic = self.oneDscan_dat(iterlist = scan, dat_type = 'b2wdat')
                 
 
             self.data['b2wdat'] = b2wdat_dic
@@ -355,6 +353,8 @@ class load_B2simu_data:
             iout_dic[aa][ab] = iout
         return iout_dic
     
+    
+    
     def load_iout(self, filename, simple_quant):
         filename_list = filename.split('.')
         quant = simple_quant
@@ -403,23 +403,9 @@ class load_B2simu_data:
             
             if series_flag == 'twin_scan':
                 
-                mcds = self.data['dircomp']
+                ds_key, ts_key = self.twokeylists(printvalue= False)
                 
-                ds_key = []
-                ts_key = []
                 
-                print('this is mcds')
-                print(type(mcds['denscan_list'][3]))
-                
-                for x in mcds['denscan_list']:
-                    ds_key.append('{:.3f}'.format(x))
-                    
-                print(ds_key)
-                for x in mcds['tempscan_list']:
-                    ts_key.append('{:.3f}'.format(x))
-                    
-
-                print(ts_key)
                 iout_dic = self.twinscan_iout(iterlist = scan, iterlist_a = ds_key, 
                               iterlist_b = ts_key, filename = filename)
             else:
