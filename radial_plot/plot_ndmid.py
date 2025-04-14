@@ -5,19 +5,21 @@ Created on Sun Apr 13 16:45:24 2025
 @author: ychuang
 """
 
-
+import matplotlib.pyplot as plt
+from scipy import interpolate
+from twscan_module.twinscan_prepare import twscan_assist
 
 
 class midnd_plot:
     
-    def __init__(self, DF, data):
+    def __init__(self, DF, data, twa: twscan_assist):
         
         self.DF = DF
         self.data = data
+        self.twa = twa
     
     
-    def neudenplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, dat_size, 
-                          xcoord_type):
+    def neudenplot_method(self, iterlist, cl_dic, A_dic, scan_style, scandetail, xcoord_type):
         
         
         midplane_psi = self.data['midplane_calc']['psi_solps_mid']
@@ -45,7 +47,7 @@ class midnd_plot:
             
             axs.legend(loc= 'lower left', fontsize=10)
             
-            if self.series_flag == 'twin_scan':
+            if self.DF.series_flag == 'twin_scan':
                 
                 if scan_style == 'tempscan':
                     
@@ -114,9 +116,14 @@ class midnd_plot:
     
     
     
-    def midnd_plot(self, scan_style, dat_size, xcoord_type):
+    def midnd_plot(self, scan_style, xcoord_type):
         
-        if self.withshift == True and self.withseries == False:
+        
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
+        
+        
+        if withshift == True and withseries == False:
             
             color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                          'dot7': 'blue', 'one': 'purple'}
@@ -128,12 +135,12 @@ class midnd_plot:
             
             print('I am still working on it')
         
-        elif self.withshift == False and self.withseries == True:
+        elif withshift == False and withseries == True:
             
             # series_flag = self.DefaultSettings['series_flag']
             
             
-            if self.series_flag == 'twin_scan':
+            if self.DF.series_flag == 'twin_scan':
                 
                 dircomp = self.data['dircomp']
                 
@@ -164,8 +171,8 @@ class midnd_plot:
                         keylist_b.append('{:.3f}'.format(x))
                     
                     
-                    iter_key, color_dic, scan_title, label_dic = self.twinscan_prep(ta = ta, 
-                    keylist_b = keylist_b, scan_style = scan_style, dat_size = dat_size)
+                    iter_key, color_dic, scan_title, label_dic = self.twa.twinscan_prep(ta = ta, 
+                    keylist_b = keylist_b, scan_style = scan_style)
                     
                     
                     print('check:')
@@ -175,7 +182,7 @@ class midnd_plot:
                     
                     self.neudenplot_method(iterlist = iter_key, cl_dic = color_dic, 
                                 A_dic = label_dic, scan_style = scan_style, xcoord_type= xcoord_type,
-                                scandetail = scan_title, dat_size = dat_size)
+                                scandetail = scan_title)
                     
              
             else:
