@@ -27,6 +27,9 @@ class midplane_radial:
         withshift = self.DF.withshift
         withseries = self.DF.withseries
         
+        nx = data_struc['nx']
+        ny = data_struc['ny']
+        
         if withshift == False and withseries == False:
             
             b2fstate = self.data['b2fstate']
@@ -35,6 +38,10 @@ class midplane_radial:
                 
                 data = self.data['ft44']['dab2']
                 neu_pro = np.transpose(data[:, :, 0])
+                
+                source = self.data['b2wdat']['b2npc_sna'][0][1:nx+1, 1:ny+1]                
+                vol = self.data['b2wdat']['vol'][1:nx+1, 1:ny+1]
+                sx = np.divide(source, vol)
             
             else:
                 
@@ -51,6 +58,10 @@ class midplane_radial:
                 
                 data = self.data['ft44'][itername]['dab2']
                 neu_pro = np.transpose(data[:, :, 0])
+                
+                source = self.data['b2wdat'][itername]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
+                vol = self.data['b2wdat'][itername]['vol'][1:nx+1, 1:ny+1]
+                sx = np.divide(source, vol)
             
             else:
                 
@@ -72,6 +83,10 @@ class midplane_radial:
                     
                     data = self.data['ft44'][nf][tf]['dab2']
                     neu_pro = np.transpose(data[:, :, 0])
+                    
+                    source = self.data['b2wdat'][nf][tf]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
+                    vol = self.data['b2wdat'][nf][tf]['vol'][1:nx+1, 1:ny+1]
+                    sx = np.divide(source, vol)
                 
                 else:
                     
@@ -85,6 +100,10 @@ class midplane_radial:
                     
                     data = self.data['ft44'][itername]['dab2']
                     neu_pro = np.transpose(data[:, :, 0])
+                    
+                    source = self.data['b2wdat'][itername]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
+                    vol = self.data['b2wdat'][itername]['vol'][1:nx+1, 1:ny+1]
+                    sx = np.divide(source, vol)
                 
                 else:
                     
@@ -92,8 +111,7 @@ class midplane_radial:
                 
                 
         
-        nx = data_struc['nx']
-        ny = data_struc['ny']
+
         
             
         if self.DF.data_size == 'small':
@@ -171,10 +189,11 @@ class midplane_radial:
         mid_ne_pro = np.multiply(ne_pro[:, pair[0]], weight) + np.multiply(ne_pro[:, pair[1]], weight_B)
         mid_te_pro = np.multiply(te_pro[:, pair[0]], weight) + np.multiply(te_pro[:, pair[1]], weight_B)
         mid_neu_pro = np.multiply(neu_pro[:, pair[0]], weight) + np.multiply(neu_pro[:, pair[1]], weight_B)
+        mid_S_pro = np.multiply(sx[:, pair[0]], weight) + np.multiply(sx[:, pair[1]], weight_B)
         
         
         midplane_profile_dic = {'psiN': psi_coord, 'mid_ne': mid_ne_pro, 'mid_te': mid_te_pro,
-                                'mid_nd': mid_neu_pro}
+                                'mid_nd': mid_neu_pro, 'mid_S': mid_S_pro}
         
         
         return midplane_profile_dic
@@ -201,30 +220,7 @@ class midplane_radial:
                 
         return dat_dic
     
-    
-    def oneDscan_ndcut(self, iterlist, dat_dic, dat_struc, cut_range):
         
-        
-        series_compare = self.DF.series_compare
-        
-        if series_compare == True:
-            
-            print('we will improve this in the future!')
-        
-        else:
-            
-            
-            for aa in iterlist:
-
-                ndcut = self.ndmid_withcut_method(itername = aa, data_struc = dat_struc, cut_range = cut_range)
-                
-                dat_dic[aa] = ndcut
-                
-                
-        return dat_dic
-    
-    
-    
     def twoDscan_midplane(self, iterlist, iterlist_a, iterlist_b, dat_dic, dat_struc):
         
 
@@ -239,22 +235,7 @@ class midplane_radial:
         return dat_dic
     
     
-    
-    def twoDscan_ndcut(self, iterlist, iterlist_a, iterlist_b, dat_dic, dat_struc, cut_range):
-
-        
-        for tp in iterlist:
-            aa = tp[0]
-            ab = tp[1]
-            
-            ndcut = self.ndmid_withcut_method(itername = tp, data_struc = dat_struc, cut_range = cut_range)
-            dat_dic[aa][ab] = ndcut
-      
-        
-        return dat_dic
-    
-  
-    
+       
     def calc_midplane_profile(self):
         
         withshift = self.DF.withshift
@@ -328,6 +309,83 @@ class midplane_radial:
     
     
     
+
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+"""
+backup
+
+def nete_midprof_cp(self, itername, cptag, data_struc):
+    
+    withshift = self.DF.withshift
+    withseries = self.DF.withseries
+    
+
+    if withshift == True and withseries == False:
+        
+        
+        
+        b2fstate = self.data['b2fstate'][itername][cptag]
+        
+        if data_struc['size'] == 'full':
+            neu_pro = self.data['outputdata']['NeuDen'][itername]
+        elif data_struc['size'] == 'small':
+            data = self.data['ft44'][itername][cptag]['dab2']
+            neu_pro = np.transpose(data[:, :, 0])
+    
+    
+    
+    nx = data_struc['nx']
+    ny = data_struc['ny']
+    
+    if data_struc['size'] == 'full':
+        ne_pro = b2fstate['ne'].transpose()
+        Te_J = b2fstate['te'].transpose()
+        
+    elif data_struc['size'] == 'small':
+        ne_pro = b2fstate['ne'][1:nx+1, 1:ny+1].transpose()
+        Te_J = b2fstate['te'][1:nx+1, 1:ny+1].transpose()
+        
+    
+    
+    ev = 1.6021766339999999 * pow(10, -19)
+    te_pro = Te_J / ev
+    
+    # neu_pro = np.transpose(data[:, :, 0])
+    
+    if withshift == True and withseries == False:
+        
+        if data_struc['size'] == 'full':
+            psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
+            weight = self.data['midplane_calc'][itername]['weight']
+            
+        elif data_struc['size'] == 'small':
+            psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid'][1:ny+1]
+            weight = self.data['midplane_calc'][itername]['weight'][1:ny+1]
+    else:
+        print('nete_midprof_cp is not there yet!')
+    
+    weight_B = np.ones(len(weight))- weight
+         
+    mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
+    mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
+    mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
+    
+    return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
+
+
+
+
     def ndmid_withcut_method(self, itername, data_struc, cut_range):
 
         dat_size = self.DF.data_size
@@ -505,115 +563,5 @@ class midplane_radial:
         
         else:
             print('calc_midplane_profile has a bug')
-    
-    
-    
-    
-    
-    
-    def twinscan_Smid(self, iter_index, data_struc):
-        
-        result_dic = self.data['radial_fit_data'][iter_index]
-        
-        
-        if self.series_flag == 'twin_scan':
-            
-            nf = iter_index[0]
-            tf = iter_index[1]
-            
-            nx = data_struc['nx']
-            ny = data_struc['ny']
-            source = self.data['iout_data']['source'][nf][tf][:, :]
-            weight = self.data['midplane_calc']['weight'][1:ny+1]
-            psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:ny+1]
-
-            
-        else:
-            
-            print('twinscan_Smid is not there yet!')
-            
-
-        weight_B = np.ones(len(weight))- weight
-               
-        mid_S_pro = np.multiply(source[:, 58], weight) + np.multiply(source[:, 60], weight_B)
-        
-        psi_list = []
-        S_list = []
-        
-        for ind, coord in enumerate(psi_coord):
-            
-            if coord >= 0.95 and coord <= 1.1:
-                psi_list.append(coord)
-                S_list.append(mid_S_pro[ind])
-        
-        
-        
-        return psi_list, S_list
-
-
-
-
-
-"""
-backup
-
-def nete_midprof_cp(self, itername, cptag, data_struc):
-    
-    withshift = self.DF.withshift
-    withseries = self.DF.withseries
-    
-
-    if withshift == True and withseries == False:
-        
-        
-        
-        b2fstate = self.data['b2fstate'][itername][cptag]
-        
-        if data_struc['size'] == 'full':
-            neu_pro = self.data['outputdata']['NeuDen'][itername]
-        elif data_struc['size'] == 'small':
-            data = self.data['ft44'][itername][cptag]['dab2']
-            neu_pro = np.transpose(data[:, :, 0])
-    
-    
-    
-    nx = data_struc['nx']
-    ny = data_struc['ny']
-    
-    if data_struc['size'] == 'full':
-        ne_pro = b2fstate['ne'].transpose()
-        Te_J = b2fstate['te'].transpose()
-        
-    elif data_struc['size'] == 'small':
-        ne_pro = b2fstate['ne'][1:nx+1, 1:ny+1].transpose()
-        Te_J = b2fstate['te'][1:nx+1, 1:ny+1].transpose()
-        
-    
-    
-    ev = 1.6021766339999999 * pow(10, -19)
-    te_pro = Te_J / ev
-    
-    # neu_pro = np.transpose(data[:, :, 0])
-    
-    if withshift == True and withseries == False:
-        
-        if data_struc['size'] == 'full':
-            psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
-            weight = self.data['midplane_calc'][itername]['weight']
-            
-        elif data_struc['size'] == 'small':
-            psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid'][1:ny+1]
-            weight = self.data['midplane_calc'][itername]['weight'][1:ny+1]
-    else:
-        print('nete_midprof_cp is not there yet!')
-    
-    weight_B = np.ones(len(weight))- weight
-         
-    mid_ne_pro = np.multiply(ne_pro[:, 58], weight) + np.multiply(ne_pro[:, 60], weight_B)
-    mid_te_pro = np.multiply(te_pro[:, 58], weight) + np.multiply(te_pro[:, 60], weight_B)
-    mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
-    
-    return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
-
 
 """
