@@ -8,15 +8,17 @@ Created on Thu Aug  1 14:02:21 2024
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
+from twscan_module.twinscan_prepare import twscan_assist
 from scipy import interpolate
 
 
 class NT_plot:
     
-    def __init__(self, DF, data):
+    def __init__(self, DF, data, twa: twscan_assist):
         
         self.DF = DF
         self.data = data
+        self.twa = twa
         
         
     def plot_neteTSdat(self):
@@ -413,100 +415,7 @@ class NT_plot:
         # fig.savefig('profiles.pdf')
 
     
-    def pair_dic(self, keys, values):
-        
-        # Use zip() to pair the keys with the values
-        zipped_pairs = zip(keys, values)
-        
-        # Convert the zipped pairs into a dictionary
-        result_dic = dict(zipped_pairs)
-        
-        return result_dic
-    
-    
-    def twinscan_prep(self, ta, keylist_b, scan_style):
-        
-        
-        withshift = self.DF.withshift
-        withseries = self.DF.withseries
-        
-        
-        if withshift == False and withseries == True:
-            
-            if self.DF.series_flag == 'twin_scan':
-                
-                color_list = ['red', 'orange', 'green', 'blue', 'purple']
-                
-                color_dic = self.pair_dic(keys = keylist_b, values = color_list)
-                
-                # print('check color dic:')
-                # print(color_dic)
-                
-                scan_list = []
-                iter_key = []
-                
-                
-                for tb in keylist_b:
-                    
-                    if scan_style == 'tempscan':
-                        
-                        it_in = (ta, tb)
-                    
-                    elif scan_style == 'denscan':
-                        
-                        it_in = (tb, ta)
-                    
-                    else:
-                        print('twinscan_plot_method, please check the scan_style!')
-                    
-                    
-                    nx = self.data['b2fgeo']['nx']
-                    ny = self.data['b2fgeo']['ny']
-                    dat_struc = {'nx': nx, 'ny': ny}
 
-                    
-                    mid_ne_pro = self.data['midplane_profile'][it_in[0]][it_in[1]]['mid_ne']
-                    mid_te_pro = self.data['midplane_profile'][it_in[0]][it_in[1]]['mid_te']
-                        
-                    
-                    if scan_style == 'tempscan':
-                        
-                        scan_add = '{:.1f} eV'.format(mid_te_pro[0])
-                    
-                    elif scan_style == 'denscan':
-                        
-                        scan_add = '{:.2E} '.format(mid_ne_pro[0])
-                    
-                    else:
-                        print('twinscan_plot_method, please check the scan_style!')
-                    
-                    scan_list.append(scan_add)
-                    iter_key.append(it_in)
-                
-                
-                # print('NT scan list: {}'.format(ta))
-                # print(scan_list)
-                
-                
-                if scan_style == 'tempscan':
-                    
-                    midne = self.data['midplane_profile'][ta]['4.115']['mid_ne']
-
-                    scan_title = '{:.2E}'.format(midne[0])
-                
-                elif scan_style == 'denscan':
-                    
-                    midte = self.data['midplane_profile']['5.512'][ta]['mid_te']
-
-                    scan_title = '{:.1f}'.format(midte[0])
-                
-                else:
-                    print('twinscan_plot_method, please check the scan_style!')
-                
-                label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
-            
-            
-                return iter_key, color_dic, scan_title, label_dic
     
     
         
@@ -566,7 +475,7 @@ class NT_plot:
                         keylist_b.append('{:.3f}'.format(x))
                     
                     
-                    iter_key, color_dic, scan_title, label_dic = self.twinscan_prep(ta = ta, 
+                    iter_key, color_dic, scan_title, label_dic = self.twa.twinscan_prep(ta = ta, 
                     keylist_b = keylist_b, scan_style = scan_style)
                     
                     
@@ -583,272 +492,6 @@ class NT_plot:
             else:
                 print('neteTS_plot, please check the series flag')
                 
-    
-    
-
-    
-        
-    def AM_NT_midprof(self, itername, AM_flag):
-        
-        if AM_flag == 'atom':
-            
-            den = 'dab2'
-            temp = 'tab2'
-            
-        elif AM_flag == 'mol':
-            
-            den = 'dmb2'
-            temp = 'tmb2'
-        
-        ev = 1.6021766339999999 * pow(10, -19)
-        
-        
-        
-        
-        if self.withshift == True and self.withseries == False:
-            
-            neu_data = self.data['ft44'][itername][den]
-            neu_pro = np.transpose(neu_data[:, :, 0])
-            atom_temp_data = self.data['ft44'][itername][temp]
-            
-            atom_temp = np.transpose(atom_temp_data[:, :, 0])
-            atom_temp_pro = atom_temp / ev
-        
-        elif self.withshift == False and self.withseries == True:
-            
-            if self.series_flag == 'twin_scan':
-                
-                nf = itername[0]
-                tf = itername[1]
-                
-                neu_data = self.data['ft44'][nf][tf][den]
-                neu_pro = np.transpose(neu_data[:, :, 0])
-                atom_temp_data = self.data['ft44'][nf][tf][temp]
-                atom_temp = np.transpose(atom_temp_data[:, :, 0])
-                atom_temp_pro = atom_temp / ev
-                              
-            else:
-                
-                neu_data = self.data['ft44'][itername][den]
-                neu_pro = np.transpose(neu_data[:, :, 0])
-                atom_temp_data = self.data['ft44'][itername][temp]
-                atom_temp = np.transpose(atom_temp_data[:, :, 0])
-                atom_temp_pro = atom_temp / ev
-        
-        if self.withshift == True and self.withseries == False:
-        
-            leftcut = self.data['b2fgeo'][itername]['leftcut'][0]
-            rightcut = self.data['b2fgeo'][itername]['rightcut'][0]
-            weight = self.data['midplane_calc'][itername]['weight']
-            psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid']
-        
-        elif self.withshift == False and self.withseries == True:
-        
-            leftcut = self.data['b2fgeo']['leftcut'][0]
-            rightcut = self.data['b2fgeo']['rightcut'][0]
-            weight = self.data['midplane_calc']['weight'][1:37]
-            psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:37]
-        
-        else:
-            print('NeuDen_plotmethod, please check withshift and withseries flag')
-        
-        weight_B = np.ones(len(weight))- weight
-        
-        mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
-        mid_atom_temp_pro = np.multiply(atom_temp_pro[:, 58], weight) + np.multiply(atom_temp_pro[:, 60], weight_B)
-        
-        return psi_coord, mid_neu_pro, mid_atom_temp_pro
-    
-    
-    
-    def AM_NTplot_method(self, iterlist, cl_dic, A_dic, AM_flag, scandetail, scan_style):
-        
-        
-        fig, axs = plt.subplots(2, 1)
-        
-        for aa in iterlist:
-            
-            psi_coord, mid_neu_pro, mid_atom_temp_pro = self.AM_NT_midprof(itername = aa, 
-                                                                AM_flag= AM_flag)
-            
-            if AM_flag == 'atom':
-                
-                anchored_text = AnchoredText('(a){}'.format('atomic density [$m^{-3}$]'), loc='upper center')
-                anchored_text2 = AnchoredText('(b){}'.format('atomic temperature [eV]'), loc= 'upper center')
-            
-            elif AM_flag == 'mol':
-                
-                anchored_text = AnchoredText('(a){}'.format('molecular density [$m^{-3}$]'), loc= 'upper center')
-                anchored_text2 = AnchoredText('(b){}'.format('molecular temperature [eV]'), loc= 'upper center')
-                
-
-            
-            if self.series_flag == 'twin_scan':
-                
-                if scan_style == 'tempscan':
-                    
-                    ad = aa[1]
-                
-                elif scan_style == 'denscan':
-                    
-                    ad = aa[0]
-                
-                else:
-                    print('AM_NTplot_method, please check scan_style')
-                
-                
-            
-            else:
-                ad = aa
-
-            if scan_style == 'denscan':
-                
-                axs[0].set_title('Density scan with Te = {} eV'.format(scandetail))
-                axs[0].plot(psi_coord, mid_neu_pro, color = cl_dic[ad], 
-                            label= '{}'.format(A_dic[ad]))
-                axs[1].plot(psi_coord, mid_atom_temp_pro, color = cl_dic[ad])
-                axs[0].add_artist(anchored_text)
-                axs[1].add_artist(anchored_text2)
-                axs[1].set_xlabel('$\psi_N$')
-                axs[0].legend()
-
-                            
-            elif scan_style == 'tempscan':
-                
-                
-                axs[0].set_title('Temperature scan with Ne = {}'.format(scandetail))
-                axs[0].plot(psi_coord, mid_neu_pro, color = cl_dic[ad])
-                axs[1].plot(psi_coord, mid_atom_temp_pro, color = cl_dic[ad], 
-                            label= '{}'.format(A_dic[ad]))
-                axs[0].add_artist(anchored_text)
-                axs[1].add_artist(anchored_text2)
-                axs[1].set_xlabel('$\psi_N$')
-                axs[1].legend()
-            
-            else:
-                print('AM_NTplot_method, please check the scan parameter')
-    
-            plt.subplots_adjust(hspace=.0)
-    
-    
-    def twinscan_plot_method(self, dircomp, scan_style, AM_flag):
-        
-        
-        if scan_style == 'tempscan':
-            
-            key_a = 'denscan_list'
-            key_b = 'tempscan_list'
-        
-        elif scan_style == 'denscan':
-            
-            key_a = 'tempscan_list'
-            key_b = 'denscan_list'
-        
-        else:
-            print('twinscan_plot_method, please check the scan_style!')
-        
-        keylist_a = [str(x) for x in dircomp[key_a]]
-        
-        for ta in keylist_a:
-            
-            keylist_b = [str(x) for x in dircomp[key_b]]
-            color_list = ['red', 'orange', 'green', 'blue', 'purple']
-            
-            color_dic = self.pair_dic(keys = keylist_b, values = color_list)
-            
-            scan_list = []
-            iter_key = []
-            
-            for tb in keylist_b:
-                
-                
-                if scan_style == 'tempscan':
-                    
-                    it_in = (ta, tb)
-                
-                elif scan_style == 'denscan':
-                    
-                    it_in = (tb, ta)
-                
-                else:
-                    print('twinscan_plot_method, please check the scan_style!')
-                    
-                    
-                psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = it_in)
-                
-                if scan_style == 'tempscan':
-                    
-                    scan_add = '{:.1f} eV'.format(mid_te_pro[0])
-                
-                elif scan_style == 'denscan':
-                    
-                    scan_add = '{:.2E}'.format(mid_ne_pro[0])
-                
-                else:
-                    print('twinscan_plot_method, please check the scan_style!')
-                    
-                
-                
-                scan_list.append(scan_add)
-                iter_key.append(it_in)
-            
-            
-            if scan_style == 'tempscan':
-                psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = (ta, '3.73'))
-                scan_title = '{:.2E}'.format(mid_ne_pro[0])
-            
-            elif scan_style == 'denscan':
-                psi_coord, mid_ne_pro, mid_te_pro = self.nete_midprof(itername = ('5.02', ta))
-                scan_title = '{:.1f}'.format(mid_te_pro[0])
-            
-            else:
-                print('twinscan_plot_method, please check the scan_style!')
-            
-            label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
-            
-            self.AM_NTplot_method(iterlist = iter_key, AM_flag = AM_flag,
-                    cl_dic = color_dic, A_dic = label_dic,
-                    scandetail = scan_title, scan_style = scan_style)
-                
-            print(scan_list)
-    
-    
-    
-    
-    def AtomNT_plot(self, AM_flag, scan_style):
-        
-        if self.withshift == True and self.withseries == False:
-            
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                         'dot7': 'blue', 'one': 'purple'}
-            
-            label_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
-            
-            asp_ch = self.data['dircomp']['multi_shift']
-            
-            self.AtomNTplot_method(iterlist = asp_ch, 
-                                      cl_dic = color_dic, A_dic = label_dic, scan = 'not')
-        
-        elif self.withshift == False and self.withseries == True:
-            
-            
-            if self.series_flag == 'twin_scan':
-                
-                dircomp = self.data['dircomp']
-                
-                self.twinscan_plot_method(dircomp = dircomp, scan_style = scan_style, 
-                                    AM_flag = AM_flag)
-            
-             
-            else:
-                print('AtomNT_plot, please check the series flag')
-    
-
-
-
-
-
 
 
 
