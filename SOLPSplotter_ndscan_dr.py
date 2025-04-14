@@ -23,6 +23,8 @@ from load_simulation_data.read_ft_files import load_ftfiles_data
 from fit_data.SOLPSplotter_fit import profile_fit
 from PRmap.midplane_profile_calculation import midplane_radial
 from radial_plot.SOLPSplotter_NTplot import NT_plot
+from radial_plot.plot_ndmid import midnd_plot
+from twscan_module.twinscan_prepare import twscan_assist
 
 """
 This code plot all the radial neutral density and source for all 25 case.
@@ -62,8 +64,11 @@ class twscan_radial_datapipline:
         xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
         xlf = load_ftfiles_data(DF = self.DF, data = self.data, ldm= xldm)
         xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
+        xta = twscan_assist(DF = self.DF, data = self.data)
         xmr = midplane_radial(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
-        xnt = NT_plot(DF = self.DF, data = self.data)
+        xnt = NT_plot(DF = self.DF, data = self.data, twa = xta)
+        xmp = midnd_plot(DF = self.DF, data = self.data, twa = xta)
+        
         
         
         
@@ -94,16 +99,38 @@ class twscan_radial_datapipline:
             xmr.calc_midplane_profile()
             xmr.calc_ndmid_cut()
             
-            xnt.neteTS_plot(scan_style = 'denscan', xcoord_type = 'psi')
-
-            # xl.load_fluxes_iout()
-
-
+            
+            "midplane scans"
+            
+            midprof = 'NT'
+            
+            if midprof == 'NT':
+                
+                xnt.neteTS_plot(scan_style = 'denscan', xcoord_type = 'psi')
+            
+            elif midprof == 'nd':
+                
+                xmp.midnd_plot(scan_style = 'denscan', xcoord_type = 'psi')
+            
+            
             # xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
             #                        format_option= 'neuden', xcoord_type = 'psi')
 
             # xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
             #                        format_option= 'ionize', xcoord_type = 'psi')
+                
+                
+                
+                
+            
+            
+            
+            
+
+            # xl.load_fluxes_iout()
+
+
+            
 
 
 if __name__ == "__main__":
