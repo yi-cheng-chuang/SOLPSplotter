@@ -108,11 +108,7 @@ class midplane_radial:
                 else:
                     
                     print('I do not use full data size for my study')
-                
-                
-        
-
-        
+      
             
         if self.DF.data_size == 'small':
             ne_pro = b2fstate['ne'][1:nx+1, 1:ny+1].transpose()
@@ -189,7 +185,7 @@ class midplane_radial:
         mid_ne_pro = np.multiply(ne_pro[:, pair[0]], weight) + np.multiply(ne_pro[:, pair[1]], weight_B)
         mid_te_pro = np.multiply(te_pro[:, pair[0]], weight) + np.multiply(te_pro[:, pair[1]], weight_B)
         mid_neu_pro = np.multiply(neu_pro[:, pair[0]], weight) + np.multiply(neu_pro[:, pair[1]], weight_B)
-        mid_S_pro = np.multiply(sx[:, pair[0]], weight) + np.multiply(sx[:, pair[1]], weight_B)
+        mid_S_pro = np.multiply(sx[pair[0], :], weight) + np.multiply(sx[pair[1], :], weight_B)
         
         
         midplane_profile_dic = {'psiN': psi_coord, 'mid_ne': mid_ne_pro, 'mid_te': mid_te_pro,
@@ -307,18 +303,6 @@ class midplane_radial:
         else:
             print('calc_midplane_profile has a bug')
     
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-
 
 
 
@@ -382,186 +366,5 @@ def nete_midprof_cp(self, itername, cptag, data_struc):
     mid_neu_pro = np.multiply(neu_pro[:, 58], weight) + np.multiply(neu_pro[:, 60], weight_B)
     
     return psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro
-
-
-
-
-    def ndmid_withcut_method(self, itername, data_struc, cut_range):
-
-        dat_size = self.DF.data_size
-        withshift = self.DF.withshift
-        withseries = self.DF.withseries
-        
-        if withshift == False and withseries == False:
-            
-            if dat_size == 'small':
-                nx = data_struc['nx']
-                ny = data_struc['ny']
-                data = self.data['ft44']['dab2']
-                neu_pro = np.transpose(data[:, :, 0])
-                weight = self.data['midplane_calc']['weight'][1:ny+1]
-                psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:ny+1]
-            
-            else:
-                
-                print('I do not use full data size for my study')
-
-        elif withshift == True and withseries == False:
-            
-            if dat_size == 'small':
-                nx = data_struc['nx']
-                ny = data_struc['ny']
-                data = self.data['ft44'][itername]['dab2']
-                neu_pro = np.transpose(data[:, :, 0])
-                weight = self.data['midplane_calc'][itername]['weight'][1:ny+1]
-                psi_coord = self.data['midplane_calc'][itername]['psi_solps_mid'][1:ny+1]
-            
-            else:
-                
-                print('I do not use full data size for my study')
-            
-        
-        elif withshift == False and withseries == True:
-            
-            if self.DF.series_flag == 'twin_scan':
-                
-                nf = itername[0]
-                tf = itername[1]
-                    
-                                  
-                if dat_size == 'small':
-                    nx = data_struc['nx']
-                    ny = data_struc['ny']
-                    data = self.data['ft44'][nf][tf]['dab2']
-                    neu_pro = np.transpose(data[:, :, 0])
-                    weight = self.data['midplane_calc']['weight'][1:ny+1]
-                    psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:ny+1]
-                
-                else:
-                    
-                    print('I do not use full data size for my study')
-                
-            else:
-                
-                if dat_size == 'small':
-                    nx = data_struc['nx']
-                    ny = data_struc['ny']
-                    data = self.data['ft44'][itername]['dab2']
-                    neu_pro = np.transpose(data[:, :, 0])
-                    weight = self.data['midplane_calc']['weight'][1:ny+1]
-                    psi_coord = self.data['midplane_calc']['psi_solps_mid'][1:ny+1]
-                
-                else:
-                    
-                    print('I do not use full data size for my study')
-            
-
-        weight_B = np.ones(len(weight))- weight
-            
-        
-        if dat_size == 'small':
-            
-            ap = self.data['midplane_calc']['average_pair']
-            pair = (ap[0]-1, ap[1]-1)
-        
-        else:
-            
-            print('I do not use full data size for my study')
-        
-        mid_neu_pro = np.multiply(neu_pro[:, pair[0]], weight) + np.multiply(neu_pro[:, pair[1]], weight_B)
-        
-        psi_list = []
-        nd_list = []
-        st = cut_range[0]
-        ed = cut_range[1]
-        
-        for ind, coord in enumerate(psi_coord):
-            
-            if coord >= st and coord <= ed:
-                psi_list.append(coord)
-                nd_list.append(mid_neu_pro[ind])
-        
-        
-        ndmid_cut_dic = {'psi_cut': psi_list, 'nd_cut': nd_list}
-        
-        
-        
-        return ndmid_cut_dic
-        
-    
-    
-    def calc_ndmid_cut(self):
-        
-        withshift = self.DF.withshift
-        withseries = self.DF.withseries
-        
-        
-        
-        if withshift == False and withseries == False:
-            
-            nx = self.data['b2fgeo']['nx']
-            ny = self.data['b2fgeo']['ny']
-            dat_struc = {'nx': nx, 'ny': ny}
-            cut_list = [0.95, 1.1]
-                
-            ndmidcut_dic = self.ndmid_withcut_method(itername = None, data_struc = dat_struc, cut_range = cut_list)
-            
-            self.data['ndmid_cutprofile'] = ndmidcut_dic
-        
-        elif withshift == True and withseries == False:
-            
-            
-            ndmidcut_dic = {}
-            
-            
-            for aa in self.data['dircomp']['multi_shift']:
-                
-                
-                nx = self.data['b2fgeo'][aa]['nx']
-                ny = self.data['b2fgeo'][aa]['ny']
-                dat_struc = {'nx': nx, 'ny': ny}
-                cut_list = [0.95, 1.1]
-                
-                
-                ndmidcut = self.ndmid_withcut_method(itername = aa, data_struc = dat_struc, cut_range = cut_list)
-                
-                ndmidcut_dic[aa] = ndmidcut
-            
-            self.data['ndmid_cutprofile'] = ndmidcut_dic
-        
-        elif withshift == False and withseries == True:
-            
-            midprofile_dic = {}
-            
-            nx = self.data['b2fgeo']['nx']
-            ny = self.data['b2fgeo']['ny']
-            dat_struc = {'nx': nx, 'ny': ny}
-            cut_list = [0.95, 1.1]
-            scan = list(self.data['dircomp']['Attempt'].keys())
-            
-            if self.DF.series_flag == 'twin_scan':
-                
-                ds_key, ts_key = self.lbd.twokeylists(printvalue= False)
-                
-                ndcut_dic = self.ldm.two_layer_dic(key_a = ds_key, key_b = ts_key)
-                
-                ndmidcut_dic = self.twoDscan_ndcut(iterlist = scan, iterlist_a = ds_key, 
-                                    iterlist_b = ts_key, dat_dic = ndcut_dic, dat_struc = dat_struc, 
-                                    cut_range = cut_list)
-                
-            else:
-                
-                ndc_dic = {}
-                ndmidcut_dic = self.oneDscan_ndcut(iterlist = scan, dat_dic = ndc_dic, 
-                                                   dat_struc = dat_struc, cut_range = cut_list)
-            
-            self.data['ndmid_cutprofile'] = ndmidcut_dic
-        
-        elif withshift == True and withseries == True:
-            print('calc_midplane_profile is not there yet!')
-        
-        
-        else:
-            print('calc_midplane_profile has a bug')
 
 """
