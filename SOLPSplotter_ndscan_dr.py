@@ -5,7 +5,6 @@ Created on Thu Sep 19 01:14:04 2024
 @author: ychuang
 """
 
-
 from SOLPS_input.input_setting import Setting_dic, loadDS_dic
 from SOLPS_input.directory_input import directory_input
 from load_directory.SOLPS_load_directory import load_directory
@@ -22,9 +21,11 @@ from load_simulation_data.read_B2simulation_data import load_B2simu_data
 from load_simulation_data.read_ft_files import load_ftfiles_data
 from fit_data.SOLPSplotter_fit import profile_fit
 from PRmap.midplane_profile_calculation import midplane_radial
-from radial_plot.SOLPSplotter_NTplot import NT_plot
-from radial_plot.plot_ndmid import midnd_plot
+from PRmap.midplane_AMS import midplane_ndsource_withcut
 from twscan_module.twinscan_prepare import twscan_assist
+from radial_plot.SOLPSplotter_NTplot import NT_plot
+from radial_plot.SOLPSplotter_ndscan import neuden_scan
+from radial_plot.plot_ndmid import midnd_plot
 
 """
 This code plot all the radial neutral density and source for all 25 case.
@@ -33,8 +34,9 @@ This code plot all the radial neutral density and source for all 25 case.
 
 
 
-class twscan_radial_datapipline:
+class radial_datapipline:
     
+       
     def __init__(self):
         # self.publish = 'b2plottersetting'
         
@@ -48,7 +50,7 @@ class twscan_radial_datapipline:
                      'gfile':{}, 'gridsettings': {}, 'psi':{}, 'DefaultSettings': {}, 
                      'outputdata':{}, 'iout_data':{}}
 
-    def run_twndscan(self):
+    def run_radial_plot(self):
         
         xdi = directory_input(DF = self.DF, data = self.data)
         xga = grab_aptn_method(DF = self.DF, data = self.data)
@@ -66,8 +68,10 @@ class twscan_radial_datapipline:
         xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
         xta = twscan_assist(DF = self.DF, data = self.data)
         xmr = midplane_radial(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
+        xmc = midplane_ndsource_withcut(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
         xnt = NT_plot(DF = self.DF, data = self.data, twa = xta)
         xmp = midnd_plot(DF = self.DF, data = self.data, twa = xta)
+        xns = neuden_scan(DF = self.DF, data = self.data, twa = xta)
         
         
         
@@ -86,23 +90,28 @@ class twscan_radial_datapipline:
                                       'data_print': True}
             xle.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
             xlb.load_b2fstate()
+            xlb.load_b2wdat()
             xlf.load_ft44()
             xrp.calc_sep_dsa()
 
-            poloidal_index_list = ['40']
+            poloidal_index_list = ['59']
             xrp.calc_dsa(pol_loc= poloidal_index_list[0])
+
+            poloidal_index_list = []
+            for i in range(40):
+                poloidal_index_list.append('{}'.format(28 + i))
 
 
             xpf.opacity_data_fit(pol_list = poloidal_index_list, check_ne = False)
             xpf.radial_data_fit(pol_loc = poloidal_index_list[0], check_ne = False)
             
             xmr.calc_midplane_profile()
-            xmr.calc_ndmid_cut()
+            xmc.calc_ndSmid_cut()
             
             
             "midplane scans"
             
-            midprof = 'NT'
+            midprof = 'norm_S'
             
             if midprof == 'NT':
                 
@@ -112,30 +121,21 @@ class twscan_radial_datapipline:
                 
                 xmp.midnd_plot(scan_style = 'denscan', xcoord_type = 'psi')
             
-            
-            # xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
-            #                        format_option= 'neuden', xcoord_type = 'psi')
-
-            # xl.twinscan_ndrad_plot(scan_style = 'denscan', dat_size = 'small', log_flag = False, 
-            #                        format_option= 'ionize', xcoord_type = 'psi')
+            elif midprof == 'norm_nd':
                 
+                xns.twinscan_ndrad_plot(scan_style = 'denscan', log_flag = True, 
+                                        format_option= 'neuden', xcoord_type = 'psi', withcut = False)
+            
+            elif midprof == 'norm_S':
                 
-                
-                
-            
-            
-            
-            
-
-            # xl.load_fluxes_iout()
-
-
+                xns.twinscan_ndrad_plot(scan_style = 'tempscan', log_flag = True, 
+                                        format_option= 'ionize', xcoord_type = 'psi', withcut = True)
             
 
 
 if __name__ == "__main__":
-    dpl = twscan_radial_datapipline()
-    dpl.run_twndscan()
+    dpl = radial_datapipline()
+    dpl.run_radial_plot()
 
 
 
