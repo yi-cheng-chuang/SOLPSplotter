@@ -7,5 +7,3 @@ Created on Tue Apr  8 20:37:59 2025
 
 
 # my_functions/__init__.py
-
-import numpy as np
