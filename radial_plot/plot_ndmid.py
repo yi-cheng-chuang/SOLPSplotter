@@ -68,8 +68,8 @@ class midnd_plot:
             else:
                 ad = aa
                 
-                psi_coord = self.data['midplane_profile'][aa[0]][aa[1]]['psiN']
-                mid_neu_pro = self.data['midplane_profile'][aa[0]][aa[1]]['mid_nd']
+                psi_coord = self.data['midplane_profile'][aa]['psiN']
+                mid_neu_pro = self.data['midplane_profile'][aa]['mid_nd']
                 rrsep_solps = psi_to_dsa_func(psi_coord)
                 
             
