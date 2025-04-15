@@ -248,7 +248,7 @@ class load_B2simu_data:
             
             scan = list(self.data['dircomp']['Attempt'].keys())
             
-            if self.series_flag == 'twin_scan':
+            if self.DF.series_flag == 'twin_scan':
                 
                 ds_key, ts_key = self.twokeylists(printvalue= False)
                 
