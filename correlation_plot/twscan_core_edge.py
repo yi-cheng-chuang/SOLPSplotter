@@ -17,126 +17,8 @@ class core_edge(neuden_scan):
     
     def __init__(self, DefaultSettings, loadDS):
         neuden_scan.__init__(self, DefaultSettings, loadDS)
-    
-    
-    
-    
-    def twscan_tarNTdata(self, iter_index, data_struc):
-        
-            
-        if self.series_flag == 'twin_scan':
-            
-            
-            nf = iter_index[0]
-            tf = iter_index[1]
-            
-            # b2fstate = self.data['b2fstate'][nf][tf]
-            
-            # nx = data_struc['nx']
-            # ny = data_struc['ny']
-            
-            if data_struc['size'] == 'full':
-                ne_dat = self.data['outputdata']['Ne'][nf][tf]
-                te_dat = self.data['outputdata']['Te'][nf][tf]
-                psi_coord = self.data['psi']['psival']
-                
-                              
-            elif data_struc['size'] == 'small':
-                nx = data_struc['nx']
-                ny = data_struc['ny']
-                b2fstate = self.data['b2fstate'][nf][tf]
-                ne_dat = b2fstate['ne'][1:nx+1, 1:ny+1]
-                Te_J = b2fstate['te'][1:nx+1, 1:ny+1]
-                
-                ev = 1.6021766339999999 * pow(10, -19)
-                te_dat = Te_J / ev
-                                
-                psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
-                
-                source = self.data['b2wdat'][nf][tf]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
-                vol = self.data['b2wdat'][nf][tf]['vol'][1:nx+1, 1:ny+1]
-                sx = np.divide(source, vol)
-                
-                neuden_dat = self.data['ft44'][nf][tf]['dab2'][:, :, 0]
-                # neuden_dat = np.transpose(data[:, :, 0])
-            
-        else:
-            
-            if data_struc['size'] == 'full':
-                ne_dat = self.data['outputdata']['Ne'][iter_index]
-                te_dat = self.data['outputdata']['Te'][iter_index]
-                psi_coord = self.data['psi']['psival']
-                
-            elif data_struc['size'] == 'small':
-                nx = data_struc['nx']
-                ny = data_struc['ny']
-                b2fstate = self.data['b2fstate'][iter_index]
-                ne_dat = b2fstate['ne'][1:nx+1, 1:ny+1]
-                Te_J = b2fstate['te'][1:nx+1, 1:ny+1]
-                
-                ev = 1.6021766339999999 * pow(10, -19)
-                te_dat = Te_J / ev
-                
-                source = self.data['b2wdat'][iter_index]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
-                vol = self.data['b2wdat'][iter_index]['vol'][1:nx+1, 1:ny+1]
-                sx = np.divide(source, vol)
-                
-                neuden_dat = self.data['ft44'][iter_index]['dab2'][:, :, 0]
-                # neuden_dat = np.transpose(data[:, :, 0])
-                              
-                psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
-            
-            
-        psi_dic = {'inner target': psi_coord[:, 0], 'outer target': psi_coord[:, nx-1]}
-        ne_dic = {'inner target': ne_dat[0, :], 'outer target': ne_dat[nx-1, :]}
-        te_dic = {'inner target': te_dat[0, :], 'outer target': te_dat[nx-1, :]}
-        sx_dic = {'inner target': sx[0, :], 'outer target': sx[nx-1, :]}
-        neuden_dic = {'inner target': neuden_dat[0, :], 'outer target': neuden_dat[nx-1, :]}
-        
-        
-        
-        return psi_dic, ne_dic, te_dic, sx_dic, neuden_dic
-    
-    
-    def bin_with_angle(self):
-        
-        test_list = np.linspace(250, -100, 8)
-        # print(test_list)
-        
-        angle_list = self.data['angle']['angle_list']
-        
-        angle_flist = [round(an, 2) for an in angle_list]
-        # print(angle_flist)
-        
-        
-        twlayer_list = []
-        twind_list = []
-        for em in range(len(test_list)-1):
-            twlayer_list.append([])
-            twind_list.append([])
-        
-        # print(twlayer_list)
-        
-        
-        
-        for in_an, an in enumerate(angle_flist):
-            
-            
-            for i in range(len(test_list)-1):
-                
-                if an >= test_list[i + 1] and an<= test_list[i]:
-                    
-                    twlayer_list[i].append(an)
-                    twind_list[i].append(in_an)
-        
-        # print(twind_list)
-        
-        return twind_list
-        
-                
-    
-    
-    
+
+
     
     
     def twscan_CE(self, dat_size, scan_var, format_option, pol_list, plot_case):
@@ -609,11 +491,6 @@ class core_edge(neuden_scan):
                                 
                                 axs[0].scatter(nesep_ar, tesep_ar, marker = marker_list[i], color = color_dic[ap], label= '{:.3E} W'.format(label_ap))
                                 axs[1].scatter(neped_ar, teped_ar, marker = marker_list[i], color = color_dic[ap], label= '{:.3E} W'.format(label_ap))
-                                
-                                
-                                
-                                
-                            
 
                             
                         axs[0].set_xlabel('$electron_density at the separatrix on OMP$')
@@ -622,14 +499,7 @@ class core_edge(neuden_scan):
                         axs[1].set_title('$electron pedestal temperature at OMP$')
                         
                         # fig.suptitle('Te')
-                    
-                        
-                    
-                
-                    
-                    
-                    
-                
+              
                 # print(color_dic)
                 
                 if format_option == 'detachment':
