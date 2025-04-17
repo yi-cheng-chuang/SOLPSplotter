@@ -6,29 +6,35 @@ Created on Sat Oct 19 10:02:30 2024
 """
 
 
-
-from R_diff_calc import Diff_R_calc
-from SOLPSplotter_contour import PlotContour
 from matplotlib.offsetbox import AnchoredText
-import load_B2_data_method as lBdm
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm, ticker
+from matplotlib import cm
 import matplotlib.tri as tri
 from matplotlib.colors import LogNorm
 from numpy import ma
 
 
-class target_contour(Diff_R_calc, PlotContour):
-    def __init__(self, DefaultSettings, loadDS):
-        Diff_R_calc.__init__(self, DefaultSettings, loadDS)
-        PlotContour.__init__(self, DefaultSettings, loadDS)
+class target_contour_plot:
+    
+    
+    
+    def __init__(self, DF, data):
+        
+        self.DF = DF
+        self.data = data
+
     
     
     
     def iout_paper_plot(self, plotstyle, dataname, sideswitch):
         
-        if self.withshift == True and self.withseries == False:
+        
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
+        
+        
+        if withshift == True and withseries == False:
             
             color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
                          'dot7': 'blue', 'one': 'purple'}
