@@ -15,8 +15,6 @@ from poloidal_plot.twscan_opacity_poloidal import twscan_opacity_polplot
 
 
 
-
-
 class poloidal_datapipline:
     
        
@@ -43,6 +41,7 @@ class poloidal_datapipline:
         xto = twscan_opacity_polplot(DF = self.DF, data = self.data, twa = xta)
         
         
+        
         if self.DF.DEV == 'mast':
             
             
@@ -55,24 +54,30 @@ class poloidal_datapipline:
             
             """
             
+            withshift = self.DF.withshift
+            withseries = self.DF.withseries
             
             
-            polplot_theme = 'opacity_study'
+            if withshift == False and withseries == True:
+                
+                
+                polplot_theme = 'opacity_study'
+                
+                if polplot_theme == 'polfluxndS':
+                    
+                    xtp.twpolfluxndS_plot(scan_style = 'denscan', pol_list = poloidal_loc_list, log_flag = True)
+                
+                elif polplot_theme == 'opacity_study':
+                    
+                    xto.twscan_opacity_polplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', 
+                                               format_option = '3x1')
+                
+                
             
-            if polplot_theme == 'polfluxndS':
-                
-                xtp.twpolfluxndS_plot(scan_style = 'denscan', pol_list = poloidal_loc_list, log_flag = True)
             
-            elif polplot_theme == 'opacity_study':
+            elif withshift == True and withseries == False:
                 
-                xto.twscan_opacity_polplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', 
-                                           format_option = '3x1')
-                
-                
-                
-                
-            
-            
+                pass
             
             
             
