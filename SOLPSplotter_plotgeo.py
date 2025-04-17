@@ -15,8 +15,11 @@ from matplotlib import colors, cm, ticker
 
 class plot_geo(load_geometry):
     
+    
     def __init__(self, DefaultSettings):
         load_geometry.__init__(self, DefaultSettings)
+        
+    
         
     
     def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity):
