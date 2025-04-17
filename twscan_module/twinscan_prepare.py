@@ -110,3 +110,105 @@ class twscan_assist:
                 
 
                 return iter_key, color_dic, scan_title, label_dic
+        
+        
+        
+    
+    
+    def twscan_plot_prep(self, ta, keylist_b, scan_style):
+        
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
+        
+        
+        
+        if withshift == False and withseries == True:
+            
+            if self.DF.series_flag == 'twin_scan':
+                
+                color_list = ['red', 'orange', 'green', 'blue', 'purple']
+                
+                color_dic = self.pair_dic(keys = keylist_b, values = color_list)
+                
+                iter_key = []
+                
+                
+                for tb in keylist_b:
+                    
+                    if scan_style == 'tempscan':
+                        
+                        it_in = (ta, tb)
+                    
+                    elif scan_style == 'denscan':
+                        
+                        it_in = (tb, ta)
+                    
+                    else:
+                        print('twinscan_plot_method, please check the scan_style!')
+                    
+                    
+                    nx = self.data['b2fgeo']['nx']
+                    ny = self.data['b2fgeo']['ny']
+                    
+                    iter_key.append(it_in)
+            
+            
+                return iter_key, color_dic
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+"""
+     
+        def twcontourplot_prep(self, ta, keylist_b, scan_style):
+         
+             if self.withshift == False and self.withseries == True:
+                 
+                 if self.series_flag == 'twin_scan':
+                     
+                     color_list = ['red', 'orange', 'green', 'blue', 'purple']
+                     
+                     color_dic = self.pair_dic(keys = keylist_b, values = color_list)
+                     
+                     iter_key = []
+                     
+                     
+                     for tb in keylist_b:
+                         
+                         if scan_style == 'tempscan':
+                             
+                             it_in = (ta, tb)
+                         
+                         elif scan_style == 'denscan':
+                             
+                             it_in = (tb, ta)
+                         
+                         else:
+                             print('twinscan_plot_method, please check the scan_style!')
+                         
+                         
+                         nx = self.data['b2fgeo']['nx']
+                         ny = self.data['b2fgeo']['ny']
+                         
+                         iter_key.append(it_in)
+                 
+                 
+                     return iter_key, color_dic
+
+"""
+        
+        
+        
+        
