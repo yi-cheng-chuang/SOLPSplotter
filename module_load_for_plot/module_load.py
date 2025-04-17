@@ -14,14 +14,17 @@ from load_coordinate.load_coord_method import load_coordgeo_method
 from load_coordinate.SOLPSplotter_geo import load_geometry
 from set_plot.plot_format import plot_setting
 from fit_data.fitting_method import fit_method_collection
-from PRmap.SOLPSplotter_PRmap import RP_mapping
+from midplane_data.SOLPSplotter_PRmap import RP_mapping
 from load_experimental_data.load_expdata_method import read_expdata_method
 from load_experimental_data.SOLPSplotter_load_expdata import load_expdata
 from load_simulation_data.read_B2simulation_data import load_B2simu_data
 from load_simulation_data.read_ft_files import load_ftfiles_data
 from fit_data.SOLPSplotter_fit import profile_fit
-from PRmap.midplane_profile_calculation import midplane_radial
-from PRmap.midplane_AMS import midplane_ndsource_withcut
+from midplane_data.midplane_netendS import midplane_radial
+from midplane_data.midplane_ndS_cut import midplane_ndsource_withcut
+from targets_data.target_fileload import target_dataload
+from data_organize_tool.loadfiles_tools import series_loadfiles
+from targets_data.target_savedata import target_radial
 
 
 
@@ -49,9 +52,12 @@ class load_prepare_module:
         xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
         xlf = load_ftfiles_data(DF = self.DF, data = self.data, ldm= xldm)
         xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
-
         xmr = midplane_radial(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
         xmc = midplane_ndsource_withcut(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
+        xtd = target_dataload(DF = self.DF, data = self.data)
+        xsl = series_loadfiles(DF = self.DF, data = self.data, td = xtd, mr = xmr)
+        xtr = target_radial(DF = self.DF, data = self.data, td = xtd, sl = xsl, lbd = xlb, ldm = xldm)
+        
         
         
         
@@ -61,6 +67,7 @@ class load_prepare_module:
             xld.load_mast_dir()
             xlg.load_solpsgeo()
             xlg.calcpsi_avcr()
+            xlg.load_vessel()
             xps.set_plot()
             
             
@@ -85,6 +92,9 @@ class load_prepare_module:
                 
                 xmr.calc_midplane_profile()
                 xmc.calc_ndSmid_cut()
+                xtr.load_target_profile()
+                
+                return poloidal_index_list
             
             
             elif plot_type == 'poloidal':
@@ -95,9 +105,18 @@ class load_prepare_module:
                 
                 xpf.opacity_data_fit(pol_list = poloidal_loc_list, check_ne = False)
                 xrp.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
+                xtr.load_target_profile()
             
             
-            return poloidal_loc_list
+                return poloidal_loc_list
+            
+            
+            elif plot_type == 'contour':
+                
+                xlf.load_ft46()
+                
+                
+                return poloidal_index_list
                 
                 
 
