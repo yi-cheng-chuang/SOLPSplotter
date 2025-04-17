@@ -20,23 +20,17 @@ from matplotlib.offsetbox import AnchoredText
 
 
 class PlotContour(profile_fit):
-    def __init__(self, DefaultSettings, loadDS):
-        profile_fit.__init__(self, DefaultSettings, loadDS)
+    
+    
+    
+    
+    def __init__(self, DF, data):
         
-        self.Publish = DefaultSettings['Publish']
-        self.data['DefaultSettings']['Publish'] = self.Publish
+        self.DF = DF
+        self.data = data
     
     
-    def set_plot(self):
-        if self.Publish == 'b2plottersetting':
-            plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 3, markersize= 6)
-            plt.rcParams.update({'font.size': 10})
-            plt.rcParams.update({'figure.facecolor':'w'})
-            plt.rcParams.update({'mathtext.default': 'regular'})
-  
-        else:
-            print('Publish setting is incorrect or add another setting')
+
     
     
     
@@ -401,93 +395,7 @@ class PlotContour(profile_fit):
     
     
     
-    def rebuttal_NTplot(self, plotstyle):
-        
-        if self.withshift == True and self.withseries == False:
-            
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                          'dot7': 'blue', 'one': 'purple'}
-            
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
-            
 
-            if plotstyle == 'paper':
-                
-                
-                comp_list = ['org', 'dot3', 'dot5', 'dot7']
-                
-                fig, axs = plt.subplots(1, 4, sharey= True)
-                
-                org_text = AnchoredText('{}'.format('(a) A = 1.4'), 
-                                              loc='upper center')
-                
-                dot3_text = AnchoredText('{}'.format('(b) A = 2.0'), 
-                                              loc='upper center')
-                
-                dot5_text = AnchoredText('{}'.format('(c) A = 2.4'), 
-                                              loc='upper center')
-                
-                dot7_text = AnchoredText('{}'.format('(d) A = 2.8'), 
-                                              loc='upper center')
-                
-                
-                text_list = [org_text, dot3_text, dot5_text, dot7_text]
-                
-                
-
-                for ii, aa in enumerate(comp_list):
-                    
-                    
-                    
-                    
-                    Te_J = self.data['b2fstate'][aa]['te'][1:97, 1:37]
-                    
-                    ev = 1.6021766339999999 * pow(10, -19)
-                    neuden = Te_J / ev
-                    
-                    
-                    RadLoc = np.transpose(self.data['grid']['RadLoc'][aa])[1:97, 1:37]
-                    VertLoc = np.transpose(self.data['grid']['VertLoc'][aa])[1:97, 1:37]
-                    
-                    
-                    if np.all(neuden == 0):
-                        print('data_file is an zero matrix')
-                        
-                    elif np.any(neuden == 0):
-                        plot_2dval = ma.masked_where(neuden <= 0, neuden)
-                        
-                        datamap = np.abs(plot_2dval)
-                    
-                    else:
-                        
-                        datamap = neuden
-                    
-                    
-                    CPB = cm.viridis
-                    Lnorm = LogNorm(vmax = datamap.max(), vmin = datamap.min())
-                    
-                    
-                    self.paper_contour(plot_2dval = neuden, R_coord = RadLoc, Z_coord = VertLoc, 
-                            quantity = 'Electron density', itername = aa, 
-                log_bar = True, color_dic = color_dic, A_dic = A_dic, axs = axs[ii], 
-                cmap = CPB, norm = Lnorm, levels = 20)
-                    
-                    axs[ii].add_artist(text_list[ii])
-                    axs[ii].set_xlabel('R [m]')
-                    
-                
-                axs[0].set_ylabel('Z [m]')
-                fig.suptitle('Electron temperature $[eV]$ contour plot')
-                smap = cm.ScalarMappable(Lnorm, CPB)    
-                fig.colorbar(smap)
-                plt.tight_layout(w_pad = 0.05)
-    
-    
-    
-    
-    
-    
     
     
     
@@ -538,109 +446,7 @@ class PlotContour(profile_fit):
         # axs.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = color_dic[itername])
                 
         
-    
-    def flux_expansion_contour_plot_method(self, RR_sep, flux_expand_map, itername):
-        
-        for pol_loc in range(self.data['b2fgeo']['nx']):
-            
-            if itername == None:
-                arcR = self.data['dsa']['dsa_{}'.format(pol_loc)]['dsa_{}_val'.format(pol_loc)]
-
-            else:
-                arcR = self.data['dsa']['dsa_{}'.format(pol_loc)][itername]['dsa_{}_val'.format(pol_loc)]
-            
-            
-            flux_fit_dic = fm.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
-            
-            flux_expand = flux_fit_dic['flux_fitcoe'][0]
-            a_flux_exp = flux_expand*np.ones(self.data['b2fgeo']['ny'])
-            
-            flux_expand_map[:, pol_loc] = a_flux_exp
-        
-        
-        RadLoc = self.data['grid']['RadLoc']
-        VertLoc = self.data['grid']['VertLoc']
-        
-        R_con = RadLoc[1:37, 1:97]
-        Z_con = VertLoc[1:37, 1:97]
-        
-        # contour_dic = {'R_coord': R_con, 'Z_coord': Z_con, 
-        #                'flux_map': flux_expand_map}
-        
-        contour_dic = {'flux_map': flux_expand_map}
-        
-        # map_flat = flux_expand_map.flatten()
-        
-        
-        self.contour_plot(plot_2dval = flux_expand_map, R_coord = R_con, 
-                         Z_coord = Z_con, quantity = 'flux expansion')
-        
-        
-        # self.plot_vessel(itername = itername, independent = False, meter = True)
-        # plt.show()
-        
-        return contour_dic
-        
        
-    def flux_expansion_contour_plot(self):
-        
-        if self.withshift == False and self.withseries == False:
-            
-            for pol_loc in range(self.data['b2fgeo']['nx']):
-                self.calc_dsa(pol_loc)
-            
-                        
-            RR_sep = self.data['midplane_calc']['R_Rsep']
-            flux_expand_map = np.zeros([self.data['b2fgeo']['ny'], self.data['b2fgeo']['nx']])
-            
-            contour_dic = self.flux_expansion_contour_plot_method(RR_sep = RR_sep, 
-                            flux_expand_map = flux_expand_map, itername = None)
-            
-            self.data['flux_contour'] = contour_dic
-            
-            
-        
-        elif self.withshift == True and self.withseries == False:
-            
-            contour_dic = {}
-            
-            for pol_loc in range(self.data['b2fgeo']['nx']):
-                self.calc_dsa(pol_loc)
-            
-            for aa in self.data['dircomp']['multi_shift']:
-            
-                RR_sep = self.data['midplane_calc'][aa]['R_Rsep']
-                flux_expand_map = np.zeros([self.data['b2fgeo']['ny'], self.data['b2fgeo']['nx']])
-            
-            
-                contour_dic[aa] = self.flux_expansion_contour_plot_method(RR_sep = RR_sep, 
-                                flux_expand_map = flux_expand_map, itername = aa)
-                
-            
-            self.data['flux_contour'] = contour_dic
-            
-        
-        elif self.withshift == False and self.withseries == True:
-            
-            for pol_loc in range(self.data['b2fgeo']['nx']):
-                self.calc_dsa(pol_loc)
-                                    
-            RR_sep = self.data['midplane_calc']['R_Rsep']
-            flux_expand_map = np.zeros([self.data['b2fgeo']['ny'], self.data['b2fgeo']['nx']])
-            
-            contour_dic = self.flux_expansion_contour_plot_method(RR_sep = RR_sep, 
-                            flux_expand_map = flux_expand_map, itername = None)
-            
-            self.data['flux_contour'] = contour_dic
-        
-        elif self.withshift == True and self.withseries == True:
-            print('calc_flux_expansion is not there yet, to be continue...')
-            
-        else:
-            print('There is a bug')
-
-
-    
     
     def plot_vessel_method(self, vessel_data, shift_value, independent, meter, color_dic, itername):
         
