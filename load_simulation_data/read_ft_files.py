@@ -61,17 +61,17 @@ class load_ftfiles_data:
     def load_ft46(self):
         
         ftname = 'fort.46.i'
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
         
-        if self.withshift == False and self.withseries == False:
+        if withshift == False and withseries == False:
             file_loc = '{}/{}'.format(self.data['dirdata']['simudir'], '{}'.format(ftname))
             ft46 = read_ft46(fileName = file_loc)
             ft46_dic = vars(ft46)
             
             self.data['ft46'] = ft46_dic
-            # print('the next line is b2fplasmf')
-            # print(type(k))
         
-        elif self.withshift == True and self.withseries == False:
+        elif withshift == True and withseries == False:
             ft46_dic = {}
             
             for aa in self.data['dircomp']['multi_shift']:
@@ -83,22 +83,12 @@ class load_ftfiles_data:
                 
             self.data['ft46'] = ft46_dic
         
-        elif self.withshift == False and self.withseries == True:
-            # ft46_dic = {}
-            
-            # for aa in list(self.data['dircomp']['Attempt'].keys()):
-                
-            #     file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], '{}'.format(ftname))
-            #     ft46 = read_ft46(fileName = file_loc)
-            #     ft46_dic[aa] = vars(ft46)
-                
-                
-            # self.data['ft46'] = ft46_dic
+        elif withshift == False and withseries == True:
             
             
             scan = list(self.data['dircomp']['Attempt'].keys())
             
-            if self.series_flag == 'twin_scan':
+            if self.DF.series_flag == 'twin_scan':
                 
                 mcds = self.data['dircomp']
                 
@@ -121,13 +111,9 @@ class load_ftfiles_data:
                 ft46_dic = self.two_dim_scan_ft46(iterlist = scan, iterlist_a = ds_key, 
                                        iterlist_b = ts_key)
                 
-                # state_dic, dim_dic = self.two_dim_scan_b2fstate(iterlist = scan, 
-                #                     iterlist_a = ds_key, iterlist_b = ts_key)
-                
             else:
                 
                 ft46_dic = self.one_dim_scan_ft46(iterlist = scan)
-                # state_dic, dim_dic = self.one_dim_scan_b2fstate(iterlist = scan)
             
             
             self.data['ft46'] = ft46_dic
@@ -141,7 +127,9 @@ class load_ftfiles_data:
     def one_dim_scan_ft44(self, iterlist):
         
         
-        if self.series_compare == True:
+        series_compare = self.DF.series_compare
+        
+        if series_compare == True:
             
             ft44_dic = {}
             
