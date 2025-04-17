@@ -6,21 +6,26 @@ Created on Tue Apr  1 19:49:55 2025
 """
 
 
-from twscan_core_edge import core_edge
+
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
-from scipy import interpolate
 import matplotlib.lines as mlines
+from twscan_module.twinscan_prepare import twscan_assist
+from correlation_plot.twscan_bin_plot import bin_plot
 
 
-class twcorrelate(core_edge):
+class twcorrelate:
     
-    def __init__(self, DefaultSettings, loadDS):
-        core_edge.__init__(self, DefaultSettings, loadDS)
+    def __init__(self, DF, data, twa: twscan_assist, bp: bin_plot):
+        
+        self.DF = DF
+        self.data = data
+        self.twa = twa
+        self.bp = bp
     
     
-    def twscan_corr(self, dat_size, scan_var, format_option, pol_list, plot_case, scan_style):
+    def twscan_corr(self, format_option, pol_list, plot_case, scan_style):
         
         if plot_case == 'all25':
             
@@ -50,24 +55,18 @@ class twcorrelate(core_edge):
         
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
+        dat_struc = {'nx': nx, 'ny': ny}
         
-        
-        if dat_size == 'full':
 
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-        
-        elif dat_size == 'small':
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
         
         plt.subplots_adjust(hspace=.0)
         anchored_text_1 = AnchoredText('{}'.format('Electron temperature at inner target [eV]'), loc='upper left')
         anchored_text_2 = AnchoredText('{}'.format('Electron temperature at outer target [eV]'), loc='upper left')
         # print('this is 201:')
-        # print(dat_size)
     
         
         
-        if self.series_flag == 'twin_scan':
+        if self.DF.series_flag == 'twin_scan':
             
             dircomp = self.data['dircomp']
             
@@ -95,7 +94,7 @@ class twcorrelate(core_edge):
                 
                 color_list = ['red', 'orange', 'green', 'blue', 'purple']
                 
-                color_dic = self.pair_dic(keys = keylist_a, values = color_list)
+                color_dic = self.twa.pair_dic(keys = keylist_a, values = color_list)
             
             else:
                 pass
@@ -112,7 +111,7 @@ class twcorrelate(core_edge):
                     
                     color_list = ['red', 'orange', 'green', 'blue', 'purple']
                     
-                    color_dic = self.pair_dic(keys = keylist_b, values = color_list)
+                    color_dic = self.twa.pair_dic(keys = keylist_b, values = color_list)
                 
                 else:
                     pass
@@ -208,9 +207,7 @@ class twcorrelate(core_edge):
                     
                     nf = aa[0]
                     tf = aa[1]
-                    
-                    psi_dic, ne_dic, te_dic, sx_dic, neuden_dic = self.twscan_tarNTdata(iter_index = aa, 
-                                                            data_struc = dat_struc)
+
                     
                     ne_ped = self.data['opacity_poloidal'][aa]['electron_pedestal_density']
                     ne_sep = self.data['opacity_poloidal'][aa]['electron_density_separatrix']
@@ -379,7 +376,7 @@ class twcorrelate(core_edge):
                     
                     
                     
-                    k_list = self.bin_with_angle()
+                    k_list = self.bp.bin_with_angle()
                     
                     kp = len(k_list)
                     
@@ -506,15 +503,7 @@ class twcorrelate(core_edge):
                             color_set = mlines.Line2D([0], [0], color= cl, marker='o', label=f'{val} $10^5$ W')
                         
                         color_handles.append(color_set)
-                            
-                        
-                        
-
-
-
-                    
-                    
-                    
+  
                         
                     if format_option == 'efold':
                         
