@@ -8,11 +8,7 @@ Created on Tue Apr  1 21:10:06 2025
 
 
 
-
-from target_contour import target_contour
-from SOLPSplotter_contour import PlotContour
 from matplotlib.offsetbox import AnchoredText
-import load_B2_data_method as lBdm
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm, ticker
@@ -21,9 +17,14 @@ from matplotlib.colors import LogNorm
 from numpy import ma
 
 
-class twscan_contour(target_contour):
-    def __init__(self, DefaultSettings, loadDS):
-        target_contour.__init__(self, DefaultSettings, loadDS)
+class twscan_contour:
+    
+    
+    
+    def __init__(self, DF, data):
+        
+        self.DF = DF
+        self.data = data
 
     
 
@@ -35,9 +36,6 @@ class twscan_contour(target_contour):
         elif norm == 'lnorm':
             
             NORM = LogNorm(vmin = plot_2dval.min(), vmax = plot_2dval.max())
-            
-            
-        
 
 
         axs.contourf(R_coord, Z_coord, plot_2dval, levels= lv, cmap=CMAP,norm=NORM)
@@ -55,19 +53,10 @@ class twscan_contour(target_contour):
 
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
+        dat_struc = {'nx': nx, 'ny': ny}
         
-        
-        if dat_size == 'full':
-    
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-            RadLoc = np.transpose(self.data['grid']['RadLoc'])
-            VertLoc = np.transpose(self.data['grid']['VertLoc'])
-        
-        elif dat_size == 'small':
-            
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-            RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:nx + 1, 1:ny + 1]
-            VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:nx + 1, 1:ny + 1]
+        RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:nx + 1, 1:ny + 1]
+        VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:nx + 1, 1:ny + 1]
             
             
         
@@ -164,33 +153,22 @@ class twscan_contour(target_contour):
                         nf = aa[0]
                         tf = aa[1]
                         
-                        # b2fstate = self.data['b2fstate'][nf][tf]
                         
-                        # nx = data_struc['nx']
-                        # ny = data_struc['ny']
-                        
-                        if dat_struc['size'] == 'full':
-                            ne_dat = self.data['outputdata']['Ne'][nf][tf]
-                            te_dat = self.data['outputdata']['Te'][nf][tf]
-                            psi_coord = self.data['psi']['psival']
-                            
-                                          
-                        elif dat_struc['size'] == 'small':
 
-                            b2fstate = self.data['b2fstate'][nf][tf]
-                            ne_dat = b2fstate['ne'][1:nx+1, 1:ny+1]
-                            Te_J = b2fstate['te'][1:nx+1, 1:ny+1]
-                            
-                            ev = 1.6021766339999999 * pow(10, -19)
-                            te_dat = Te_J / ev
-                                            
-                            psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
-                            
-                            source = self.data['b2wdat'][nf][tf]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
-                            vol = self.data['b2wdat'][nf][tf]['vol'][1:nx+1, 1:ny+1]
-                            sx = np.divide(source, vol)
-                            
-                            neuden_dat = self.data['ft44'][nf][tf]['dab2'][:, :, 0]
+                        b2fstate = self.data['b2fstate'][nf][tf]
+                        ne_dat = b2fstate['ne'][1:nx+1, 1:ny+1]
+                        Te_J = b2fstate['te'][1:nx+1, 1:ny+1]
+                        
+                        ev = 1.6021766339999999 * pow(10, -19)
+                        te_dat = Te_J / ev
+                                        
+                        psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
+                        
+                        source = self.data['b2wdat'][nf][tf]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
+                        vol = self.data['b2wdat'][nf][tf]['vol'][1:nx+1, 1:ny+1]
+                        sx = np.divide(source, vol)
+                        
+                        neuden_dat = self.data['ft44'][nf][tf]['dab2'][:, :, 0]
                         
                         vessel = self.data['vessel']
                         self.twcontourp(plot_2dval = te_dat, R_coord = RadLoc, Z_coord = VertLoc, 
@@ -219,33 +197,23 @@ class twscan_contour(target_contour):
                         nf = aa[0]
                         tf = aa[1]
                         
-                        # b2fstate = self.data['b2fstate'][nf][tf]
-                        
-                        # nx = data_struc['nx']
-                        # ny = data_struc['ny']
-                        
-                        if dat_struc['size'] == 'full':
-                            ne_dat = self.data['outputdata']['Ne'][nf][tf]
-                            te_dat = self.data['outputdata']['Te'][nf][tf]
-                            psi_coord = self.data['psi']['psival']
-                            
-                                          
-                        elif dat_struc['size'] == 'small':
 
-                            b2fstate = self.data['b2fstate'][nf][tf]
-                            ne_dat = b2fstate['ne'][1:nx+1, 1:ny+1]
-                            Te_J = b2fstate['te'][1:nx+1, 1:ny+1]
-                            
-                            ev = 1.6021766339999999 * pow(10, -19)
-                            te_dat = Te_J / ev
-                                            
-                            psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
-                            
-                            source = self.data['b2wdat'][nf][tf]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
-                            vol = self.data['b2wdat'][nf][tf]['vol'][1:nx+1, 1:ny+1]
-                            sx = np.divide(source, vol)
-                            
-                            neuden_dat = self.data['ft44'][nf][tf]['dab2'][:, :, 0]
+
+                        b2fstate = self.data['b2fstate'][nf][tf]
+                        ne_dat = b2fstate['ne'][1:nx+1, 1:ny+1]
+                        Te_J = b2fstate['te'][1:nx+1, 1:ny+1]
+                        
+                        ev = 1.6021766339999999 * pow(10, -19)
+                        te_dat = Te_J / ev
+                                        
+                        psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
+                        
+                        source = self.data['b2wdat'][nf][tf]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
+                        vol = self.data['b2wdat'][nf][tf]['vol'][1:nx+1, 1:ny+1]
+                        sx = np.divide(source, vol)
+                        
+                        neuden_dat = self.data['ft44'][nf][tf]['dab2'][:, :, 0]
+                        
                         
                         self.contour_plot(plot_2dval = te_dat, R_coord = RadLoc, Z_coord = VertLoc, 
                                           quantity = f'{aa[0]:.2f/aa[1]:.2f} Electron temperature')
