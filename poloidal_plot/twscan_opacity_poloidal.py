@@ -58,12 +58,7 @@ class twscan_opacity_polplot:
         
         for aa in iterlist:
             
-        
-            
-            # psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = aa, 
-            #                                         data_struc = dat_struc)
-                
-                
+
 
             """
             label= 'core density {} $10^{19}$'.format(aa)
@@ -87,22 +82,17 @@ class twscan_opacity_polplot:
                 
                 else:
                     print('neteTSplot_method, please check scan_style')
-                
-                efold = self.data['opacity_poloidal'][aa]['efold_length']*pow(10, 3)
-                width = self.data['opacity_poloidal'][aa]['pedestal_width']*pow(10, 3)*2
-                opq = self.data['opacity_poloidal'][aa]['dimensionless_opaqueness']
-                nd_sep = self.data['opacity_poloidal'][aa]['neutral_density']
-                
+                    
             else:
                 ad = aa
-                
-                
-                efold = self.data['opacity_poloidal'][aa]['efold_length']*pow(10, 3)
-                width = self.data['opacity_poloidal'][aa]['pedestal_width']*pow(10, 3)*2
-                opq = self.data['opacity_poloidal'][aa]['dimensionless_opaqueness']
-                nd_sep = self.data['opacity_poloidal'][aa]['neutral_density']
-                
             
+            
+            efold = self.data['opacity_poloidal'][aa]['efold_length']*pow(10, 3)
+            width = self.data['opacity_poloidal'][aa]['pedestal_width']*pow(10, 3)*2
+            opq = self.data['opacity_poloidal'][aa]['dimensionless_opaqueness']
+            nd_sep = self.data['opacity_poloidal'][aa]['neutral_density']
+                
+       
 
             if scan_style == 'denscan':
                 
@@ -323,7 +313,7 @@ class twscan_opacity_polplot:
                         keylist_b.append('{:.3f}'.format(x))
                     
                     
-                    iter_key, color_dic= self.twa.twpolplot_prep(ta = ta, 
+                    iter_key, color_dic= self.twa.twscan_plot_prep(ta = ta, 
                     keylist_b = keylist_b, scan_style = scan_style)
                     
                     
