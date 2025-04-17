@@ -5,23 +5,27 @@ Created on Wed Mar 26 15:48:40 2025
 @author: ychuang
 """
 
-from SOLPSplotter_ndscan import neuden_scan
-from twscan_target import twinscan_showflow
+
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
-from scipy import interpolate
+from twscan_module.twinscan_prepare import twscan_assist
+from correlation_plot.twscan_bin_plot import bin_plot
 
 
-class core_edge(neuden_scan):
+class core_edge:
     
-    def __init__(self, DefaultSettings, loadDS):
-        neuden_scan.__init__(self, DefaultSettings, loadDS)
+    def __init__(self, DF, data, twa: twscan_assist, bp: bin_plot):
+        
+        self.DF = DF
+        self.data = data
+        self.twa = twa
+        self.bp = bp
 
 
     
     
-    def twscan_CE(self, dat_size, scan_var, format_option, pol_list, plot_case):
+    def twscan_CE(self, scan_var, format_option, pol_list, plot_case):
         
         if plot_case == 'all25':
             
@@ -55,20 +59,13 @@ class core_edge(neuden_scan):
         
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
-        
-        
-        if dat_size == 'full':
-    
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-        
-        elif dat_size == 'small':
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
+        dat_struc = {'nx': nx, 'ny': ny}
+            
         
         plt.subplots_adjust(hspace=.0)
         anchored_text_1 = AnchoredText('{}'.format('Electron temperature at inner target [eV]'), loc='upper left')
         anchored_text_2 = AnchoredText('{}'.format('Electron temperature at outer target [eV]'), loc='upper left')
         # print('this is 201:')
-        # print(dat_size)
         
         
         if self.series_flag == 'twin_scan':
@@ -111,6 +108,9 @@ class core_edge(neuden_scan):
                 
                 print('input key is:')
                 print(iter_key)
+                
+                
+                
                 
                 
                 if plot_case == 'fivescan':
@@ -173,8 +173,11 @@ class core_edge(neuden_scan):
                 for aa in iter_key:
                     
                     
-                    psi_dic, ne_dic, te_dic, sx_dic, neuden_dic = self.twscan_tarNTdata(iter_index = aa, 
-                                                            data_struc = dat_struc)
+                    psi_dic = self.data['target_profile'][aa[0]][aa[1]]['psiN']
+                    ne_dic = self.data['target_profile'][aa[0]][aa[1]]['ne']
+                    te_dic = self.data['target_profile'][aa[0]][aa[1]]['te']
+                    sx_dic = self.data['target_profile'][aa[0]][aa[1]]['source']
+                    neuden_dic = self.data['target_profile'][aa[0]][aa[1]]['neuden']
                     
                     ne_ped = self.data['opacity_poloidal'][aa]['electron_pedestal_density']
                     ne_sep = self.data['opacity_poloidal'][aa]['electron_density_separatrix']
