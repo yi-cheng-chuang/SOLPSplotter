@@ -7,7 +7,7 @@ Created on Tue Jan 30 23:11:05 2024
 
 
 from fit_data.fitting_method import fit_method_collection
-from PRmap.SOLPSplotter_PRmap import RP_mapping
+from midplane_data.SOLPSplotter_PRmap import RP_mapping
 import numpy as np
 
 
@@ -20,23 +20,7 @@ class profile_fit:
         self.fmc = fmc
         self.rp = rp
     
-    
-    def opacity_study_unit(self):
-        unit = {'efold_length_psiN': 'Neutral penetration length ($\psi_N$)',
-                'pedestal_width_psiN': 'Pedestal width ($\psi_N$)',
-                  'dimensionless_opaqueness': 'Modeled opaqueness', 
-                  'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
-                  'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
-                  'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
-                  'flux_expansion': 'Flux expansion',
-                  'efold_length': '$\lambda_{n_D}$ [mm]',
-                  'pedestal_width': '$\Delta n_e$ [mm]',
-                  
-                  }
-        return unit
-    
-    
-    
+        
     def opacity_data_fit_method(self, psiN, b2fstate, Neuden, check_ne,
                 psi_dsa_ratio, pol_list, data_struc, itername): 
         # i = 0
@@ -186,7 +170,7 @@ class profile_fit:
         
         elif withshift == True and withseries == False:
             
-            self.load_output_data(param= 'NeuDen')
+            
             fitresult_dic = {}
             
             for p in pol_list:
@@ -387,7 +371,6 @@ class profile_fit:
         
         elif withshift == True and withseries == False:
             
-            self.load_output_data(param= 'NeuDen')
             fitresult_dic = {}
             
             for aa in self.data['dircomp']['multi_shift']:
