@@ -6,24 +6,24 @@ Created on Thu Sep 19 00:45:40 2024
 """
 
 
-from SOLPSplotter_NTplot import NT_plot
-from SOLPSplotter_ioutflux import iout_flux
+from twscan_module.twinscan_prepare import twscan_assist
 import matplotlib.pyplot as plt 
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
 from scipy import interpolate
 
 
-class neuden_scan(NT_plot, iout_flux):
+class neuden_scan:
     
-    def __init__(self, DefaultSettings, loadDS):
-        NT_plot.__init__(self, DefaultSettings, loadDS)
-        iout_flux.__init__(self, DefaultSettings, loadDS)
-
+    def __init__(self, DF, data, twa: twscan_assist):
+        
+        self.DF = DF
+        self.data = data
+        self.twa = twa
     
 
-    def twinscan_ndrad_method(self, log_flag, cl_dic, A_dic, xcoord_type,
-                                   scandetail, iterlist, dat_size, scan_style, format_option):
+    def twinscan_ndrad_method(self, log_flag, cl_dic, A_dic, xcoord_type, withcut,
+                                   scandetail, iterlist, scan_style, format_option):
         
         if format_option == '2x1':
             fig, axs = plt.subplots(2, 1)
@@ -41,30 +41,60 @@ class neuden_scan(NT_plot, iout_flux):
         psi_to_dsa_func = interpolate.interp1d(midplane_psi, r_rsep, fill_value = 'extrapolate')
         
         
-        nx = self.data['b2fgeo']['nx']
-        ny = self.data['b2fgeo']['ny']
-        
-        
-        if dat_size == 'full':
-    
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-        
-        elif dat_size == 'small':
-            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-        
         plt.subplots_adjust(hspace=.0)
         anchored_text = AnchoredText('{}'.format('Neutral density [$m^{-3}$]'), loc='upper left')
         anchored_text_2 = AnchoredText('{}'.format('Source [$s^{-1}$]'), loc='upper left')
         # print('this is 201:')
-        # print(dat_size)
         
         for aa in iterlist:
             
-            psi_list, nd_list = self.twinscan_ndmid(iter_index = aa, 
-                                                            data_struc = dat_struc)
             
-            psi_list, S_list = self.twinscan_Smid(iter_index = aa, 
-                                                            data_struc = dat_struc)
+            
+            if self.DF.series_flag == 'twin_scan':
+                
+                if scan_style == 'tempscan':
+                    
+                    ad = aa[1]
+                    ap = aa[0]
+                    
+                    
+                
+                elif scan_style == 'denscan':
+                    
+                    ad = aa[0]
+                    ap = aa[1]
+                
+                else:
+                    print('neteTSplot_method, please check scan_style')
+                
+                if withcut:
+                    
+                    psi_list = self.data['ndSmid_cutprofile'][aa[0]][aa[1]]['psi_cut']
+                    nd_list = self.data['ndSmid_cutprofile'][aa[0]][aa[1]]['nd_cut']
+                    S_list = self.data['ndSmid_cutprofile'][aa[0]][aa[1]]['source_cut']
+                
+                else:
+                    
+                    psi_list = self.data['midplane_profile'][aa[0]][aa[1]]['psiN']
+                    nd_list = self.data['midplane_profile'][aa[0]][aa[1]]['mid_nd']
+                    S_list = self.data['midplane_profile'][aa[0]][aa[1]]['mid_S']
+                    
+
+            else:
+                ad = aa
+                
+                if withcut:
+                    
+                    psi_list = self.data['ndSmid_cutprofile'][aa]['psi_cut']
+                    nd_list = self.data['ndSmid_cutprofile'][aa]['nd_cut']
+                    S_list = self.data['ndSmid_cutprofile'][aa]['source_cut']
+                
+                else:
+                    
+                    psi_list = self.data['midplane_profile'][aa]['psiN']
+                    nd_list = self.data['midplane_profile'][aa]['mid_nd']
+                    S_list = self.data['midplane_profile'][aa]['mid_S']
+             
             
             rrsep_solps = psi_to_dsa_func(psi_list)
             
@@ -109,26 +139,7 @@ class neuden_scan(NT_plot, iout_flux):
             label= 'core density {} $10^{19}$'.format(aa)
             
             """
-            
-            
-            if self.series_flag == 'twin_scan':
-                
-                if scan_style == 'tempscan':
-                    
-                    ad = aa[1]
-                    ap = aa[0]
-                
-                elif scan_style == 'denscan':
-                    
-                    ad = aa[0]
-                    ap = aa[1]
-                
-                else:
-                    print('neteTSplot_method, please check scan_style')
-            
-            else:
-                ad = aa
-                
+    
                 
             if scan_style == 'denscan':
                 
@@ -299,11 +310,13 @@ class neuden_scan(NT_plot, iout_flux):
     
     
     
-    def twinscan_ndrad_plot(self, scan_style, dat_size, log_flag, format_option, xcoord_type):
+    def twinscan_ndrad_plot(self, scan_style, log_flag, format_option, xcoord_type, withcut):
+        
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
         
         
-        
-        if self.withshift == True and self.withseries == False:
+        if withshift == True and withseries == False:
             
             
             for aa in self.data['dircomp']['multi_shift']:
@@ -316,11 +329,11 @@ class neuden_scan(NT_plot, iout_flux):
                 
                 
         
-        elif self.withshift == False and self.withseries == True:
+        elif withshift == False and withseries == True:
             print('Opacity_study_radial_plot is not there yet, to be continue...')  
             
             
-            if self.series_flag == 'twin_scan':
+            if self.DF.series_flag == 'twin_scan':
                 
                 dircomp = self.data['dircomp']
                 
@@ -350,89 +363,94 @@ class neuden_scan(NT_plot, iout_flux):
                     for x in dircomp[key_b]:
                         keylist_b.append('{:.3f}'.format(x))
                     
-                    color_list = ['red', 'orange', 'green', 'blue', 'purple']
                     
-                    color_dic = self.pair_dic(keys = keylist_b, values = color_list)
-                    
-                    scan_list = []
-                    # print('scan_list after initial:')
-                    # print(scan_list)
-                    iter_key = []
-                    
-                    
-                    for tb in keylist_b:
-                        
-                        if scan_style == 'tempscan':
-                            
-                            it_in = (ta, tb)
-                        
-                        elif scan_style == 'denscan':
-                            
-                            it_in = (tb, ta)
-                        
-                        else:
-                            print('twinscan_plot_method, please check the scan_style!')
-                        
-                        
-                        nx = self.data['b2fgeo']['nx']
-                        ny = self.data['b2fgeo']['ny']
-                        
-                        
-                        if dat_size == 'full':
-            
-                            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                        
-                        elif dat_size == 'small':
-                            dat_struc = {'size': dat_size, 'nx': nx, 'ny': ny}
-                            
-                            
-                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = it_in, 
-                                                                data_struc = dat_struc)
-                        
-                        
-                        
-                        if scan_style == 'tempscan':
-                            
-                            scan_add = '{:.1f} eV'.format(mid_te_pro[0])
-                        
-                        elif scan_style == 'denscan':
-                            
-                            scan_add = '{:.2E} '.format(mid_ne_pro[0])
-                        
-                        else:
-                            print('twinscan_plot_method, please check the scan_style!')
-                        
-                        scan_list.append(scan_add)
-                        iter_key.append(it_in)
-                    
-                    
-                    print('NT scan list: {}'.format(ta))
-                    print(scan_list)
-                    
-                    
-                    if scan_style == 'tempscan':
-                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = (ta, '4.115'),
-                                                                   data_struc = dat_struc)
-                        scan_title = '{:.2E}'.format(mid_ne_pro[0])
-                    
-                    elif scan_style == 'denscan':
-                        psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = ('5.512', ta), 
-                                                            data_struc = dat_struc)
-                        scan_title = '{:.1f}'.format(mid_te_pro[0])
-                    
-                    else:
-                        print('twinscan_plot_method, please check the scan_style!')
-                    
-                    label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
-                    
+                    iter_key, color_dic, scan_title, label_dic = self.twa.twinscan_prep(ta = ta, 
+                    keylist_b = keylist_b, scan_style = scan_style)
                     
                     self.twinscan_ndrad_method(iterlist = iter_key, cl_dic = color_dic, xcoord_type = xcoord_type,
-                                A_dic = label_dic, scan_style = scan_style, log_flag = log_flag,
-                                scandetail = scan_title, dat_size = dat_size,format_option = format_option)
+                                A_dic = label_dic, scan_style = scan_style, log_flag = log_flag, withcut = withcut,
+                                scandetail = scan_title, format_option = format_option)
             
             
         else:
             print('Opacity_study_radial_plot has a bug')
 
+
+
+
+
+"""
+color_list = ['red', 'orange', 'green', 'blue', 'purple']
+
+color_dic = self.pair_dic(keys = keylist_b, values = color_list)
+
+scan_list = []
+# print('scan_list after initial:')
+# print(scan_list)
+iter_key = []
+
+
+for tb in keylist_b:
+    
+    if scan_style == 'tempscan':
+        
+        it_in = (ta, tb)
+    
+    elif scan_style == 'denscan':
+        
+        it_in = (tb, ta)
+    
+    else:
+        print('twinscan_plot_method, please check the scan_style!')
+    
+    
+    nx = self.data['b2fgeo']['nx']
+    ny = self.data['b2fgeo']['ny']
+    dat_struc = {'nx': nx, 'ny': ny}
+    
+
+        
+        
+    psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = it_in, 
+                                            data_struc = dat_struc)
+    
+    
+    
+    if scan_style == 'tempscan':
+        
+        scan_add = '{:.1f} eV'.format(mid_te_pro[0])
+    
+    elif scan_style == 'denscan':
+        
+        scan_add = '{:.2E} '.format(mid_ne_pro[0])
+    
+    else:
+        print('twinscan_plot_method, please check the scan_style!')
+    
+    scan_list.append(scan_add)
+    iter_key.append(it_in)
+
+
+print('NT scan list: {}'.format(ta))
+print(scan_list)
+
+
+if scan_style == 'tempscan':
+    psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = (ta, '4.115'),
+                                               data_struc = dat_struc)
+    scan_title = '{:.2E}'.format(mid_ne_pro[0])
+
+elif scan_style == 'denscan':
+    psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro= self.nete_midprof(itername = ('5.512', ta), 
+                                        data_struc = dat_struc)
+    scan_title = '{:.1f}'.format(mid_te_pro[0])
+
+else:
+    print('twinscan_plot_method, please check the scan_style!')
+
+label_dic = self.pair_dic(keys = keylist_b, values = scan_list)
+
+
+"""
 
 
