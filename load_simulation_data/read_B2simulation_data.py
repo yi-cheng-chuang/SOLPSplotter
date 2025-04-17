@@ -98,11 +98,11 @@ class load_B2simu_data:
                 for aa in iterlist:
                     file_loc = '{}/{}'.format(self.data['dirdata']['simudir'][aa], 'b2fstate')
                     state, dim = read_b2fstate(b2fstateLoc = file_loc)
-                    state_dic[aa] = vars(state)
+                    dat_dic[aa] = vars(state)
                     dim_dic[aa] = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
                     
                 
-                return state_dic, dim_dic
+                return dat_dic, dim_dic
             
             
             elif dat_type == 'b2wdat':
