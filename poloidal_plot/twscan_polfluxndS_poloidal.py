@@ -22,7 +22,7 @@ class twscan_polfluxndS_polplot:
         self.twa = twa
 
     
-    def twpolfluxndS_method(self, iterlist, cl_dic, scan_style, plot_option, ang_list, pol_list, log_flag):
+    def twpolfluxndS_method(self, iterlist, cl_dic, scan_style, plot_option, ang_list, pol_list, log_flag, rad_loc):
         
 
             
@@ -72,9 +72,9 @@ class twscan_polfluxndS_polplot:
                 
                 for ii in pol_list:
                     
-                    fx_list.append(fnaxs[int(ii), 18])
-                    s_list.append(source[int(ii), 18])
-                    nd_list.append(neuden[int(ii), 18])
+                    fx_list.append(fnaxs[int(ii), rad_loc])
+                    s_list.append(source[int(ii), rad_loc])
+                    nd_list.append(neuden[int(ii), rad_loc])
                 
                 
             elif plot_option == 'inner leg':
@@ -87,9 +87,9 @@ class twscan_polfluxndS_polplot:
                 
                 for ii in index_list:
                     
-                    fx_list.append(abs(fnaxs[int(ii), 18]))
-                    s_list.append(source[int(ii), 18])
-                    nd_list.append(neuden[int(ii), 18])
+                    fx_list.append(abs(fnaxs[int(ii), rad_loc]))
+                    s_list.append(source[int(ii), rad_loc])
+                    nd_list.append(neuden[int(ii), rad_loc])
                 
                 
             elif plot_option == 'outer leg':
@@ -102,9 +102,9 @@ class twscan_polfluxndS_polplot:
                 
                 for ii in index_list:
                     
-                    fx_list.append(fnaxs[int(ii), 18])
-                    s_list.append(source[int(ii), 18])
-                    nd_list.append(neuden[int(ii), 18])
+                    fx_list.append(fnaxs[int(ii), rad_loc])
+                    s_list.append(source[int(ii), rad_loc])
+                    nd_list.append(neuden[int(ii), rad_loc])
             
             
             
@@ -241,7 +241,7 @@ class twscan_polfluxndS_polplot:
 
 
     
-    def twpolfluxndS_plot(self, scan_style, pol_list, log_flag):
+    def twpolfluxndS_plot(self, scan_style, pol_list, log_flag, rad_loc):
         
         
         withshift = self.DF.withshift
@@ -292,7 +292,7 @@ class twscan_polfluxndS_polplot:
                         keylist_b.append('{:.3f}'.format(x))
                     
                     
-                    iter_key, color_dic= self.twa.twpolplot_prep(ta = ta, 
+                    iter_key, color_dic= self.twa.twscan_plot_prep(ta = ta, 
                     keylist_b = keylist_b, scan_style = scan_style)
                     
                     
@@ -301,15 +301,15 @@ class twscan_polfluxndS_polplot:
                     print(color_dic)
 
                     self.twpolfluxndS_method(iterlist = iter_key, cl_dic = color_dic, 
-                                scan_style = scan_style, ang_list = ang_list, 
+                                scan_style = scan_style, ang_list = ang_list, rad_loc = rad_loc,
                                 pol_list = pol_list, plot_option = 'core', log_flag = log_flag)
                     
                     self.twpolfluxndS_method(iterlist = iter_key, cl_dic = color_dic, 
-                                scan_style = scan_style, ang_list = ang_list, 
+                                scan_style = scan_style, ang_list = ang_list, rad_loc = rad_loc,
                                 pol_list = pol_list, plot_option = 'inner leg', log_flag = log_flag)
                     
                     self.twpolfluxndS_method(iterlist = iter_key, cl_dic = color_dic, 
-                                scan_style = scan_style, ang_list = ang_list, 
+                                scan_style = scan_style, ang_list = ang_list, rad_loc = rad_loc,
                                 pol_list = pol_list, plot_option = 'outer leg', log_flag = log_flag)
              
             else:
