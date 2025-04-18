@@ -23,7 +23,16 @@ class fluxexpansion_contour:
         self.cpmc = cpmc
         self.rp = rp
 
+    
 
+    def calc_flux_expansion_line_method(self, RR_sep, arcR):
+                   
+        flux_fit_dic = self.fmc.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
+        
+        flux_expand = flux_fit_dic['flux_fitcoe'][0]
+        a_flux_exp = flux_expand*np.ones(self.data['b2fgeo']['ny'])
+        
+        return a_flux_exp
 
 
     def flux_expansion_contour_plot_method(self, RR_sep, flux_expand_map, itername):
