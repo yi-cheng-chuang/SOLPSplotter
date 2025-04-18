@@ -13,6 +13,7 @@ from numpy import ma
 from matplotlib.offsetbox import AnchoredText
 from matplotlib import colors, cm
 from twscan_module.twinscan_prepare import twscan_assist
+from contour_plot.contourplot_toolbox import contour_plot_method_collect
 
 
 
@@ -21,54 +22,17 @@ class Eirene_contour:
 
 
     
-    def __init__(self, DF, data, twa: twscan_assist):
+    def __init__(self, DF, data, twa: twscan_assist, cpmc: contour_plot_method_collect):
         
         self.DF = DF
         self.data = data
         self.twa = twa
+        self.cpmc = cpmc
 
 
-
-    def eirene_contourplot_method(self, simu_direc, data, itername, axs):
-        
-        
-        Nodes=np.fromfile('{}/fort.33'.format(simu_direc),sep=' ') #Alternatively use fort.33
-        NN=int(Nodes[0])
-        XNodes=Nodes[1:NN+1]
-        YNodes=Nodes[NN+1:]
-        
-        
-        data_mask = ma.masked_where(data <= 0, data)
-        
-        datamap = np.abs(data_mask)
-        CMAP = cm.viridis
-        NORM_data = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
-        # Lnorm = LogNorm(vmax = datamap.max(), vmin = datamap.min())
     
-        Triangles = np.loadtxt('{}/fort.34'.format(simu_direc), 
-            skiprows=1, usecols=(1,2,3)) #Alternatively use fort.34
-        # print(Triangles -1)
-    
-        TP = tri.Triangulation(XNodes, YNodes, triangles= (Triangles -1))
-    
-        # CMAP = cm.viridis
+    def twscan_eirene_contourplot_method(self, iterlist, cl_dic, scan_style, plot_option, format_option, norm_type):
         
-               
-        axs.tripcolor(TP, data, shading = 'flat', cmap = CMAP, norm = NORM_data)
-        axs.set_title('Neutral density contour plot {}_{}'.format(itername[0], itername[1]))
-        # plt.title('Neutral density contour plot outerleg')
-    
-        SM_data= cm.ScalarMappable(NORM_data, CMAP)
-        
-        plt.colorbar(SM_data)
-        
-
-    
-    def twscan_eirene_contourplot_method(self, iterlist, cl_dic, scan_style, plot_option, format_option):
-        
-      
-        nx = self.data['b2fgeo']['nx']
-        ny = self.data['b2fgeo']['ny']
         
         
         plt.subplots_adjust(hspace=.0)
@@ -89,12 +53,42 @@ class Eirene_contour:
             
             # psi_coord, mid_ne_pro, mid_te_pro, mid_neu_pro = self.nete_midprof(itername = aa, 
             #                                         data_struc = dat_struc)
-            if plot_option == 'Neuden contour':
-                simu_dir = self.data['dirdata']['simudir'][aa[0]][aa[1]]
-                dat = self.data['ft46'][aa[0]][aa[1]]['pdena'][:, 0]
-                
-                
             
+            
+            simu_dir = self.data['dirdata']['simudir'][aa[0]][aa[1]]
+            
+            
+            if plot_option == 'Neuden':
+                
+                dat = self.data['ft46'][aa[0]][aa[1]]['pdena'][:, 0]
+                datname = 'Atomic neutral density'
+            
+            
+            elif plot_option == 'testparticleden':
+
+                dat = self.data['ft46'][aa[0]][aa[1]]['pdeni'][:, 0]
+                datname = 'test particle density'
+            
+            
+            elif plot_option == 'moleculeden':
+
+                dat = self.data['ft46'][aa[0]][aa[1]]['pdenm'][:, 0]
+                datname = 'Molecule neutral density'
+            
+            elif plot_option == 'ndvxden':
+                
+                dat = self.data['ft46'][aa[0]][aa[1]]['vxdena'][:, 0]
+                datname = 'Atomic neutral x momentum density'
+            
+            elif plot_option == 'atomic energyden':
+
+                dat = self.data['ft46'][aa[0]][aa[1]]['edena'][:, 0]
+                datname = 'Atomic neutral energy density'
+            
+            
+            
+            
+          
             if self.DF.series_flag == 'twin_scan':
                 
                 if scan_style == 'tempscan':
@@ -113,8 +107,6 @@ class Eirene_contour:
             
             else:
                 ad = aa
-                
-            plot_num = 0
 
             if scan_style == 'denscan':
                 
@@ -123,8 +115,8 @@ class Eirene_contour:
                 if format_option == '1x1':
                     
                     
-                    self.eirene_contourplot_method(simu_direc = simu_dir, data = dat, 
-                                                   itername = aa, axs = axs)
+                    self.cpmc.eirene_contourplot_method(simu_direc = simu_dir, data = dat, 
+                                                   itername = aa, axs = axs, datname = datname, norm_type = norm_type)
                    
             elif scan_style == 'tempscan':
                 
@@ -132,25 +124,25 @@ class Eirene_contour:
                 
                 if format_option == '1x1':
                     
-                    self.eirene_contourplot_method(simu_direc = simu_dir, data = dat, 
-                                                   itername = aa, axs = axs)
+                    self.cpmc.eirene_contourplot_method(simu_direc = simu_dir, data = dat, 
+                                                   itername = aa, axs = axs, datname = datname, norm_type = norm_type)
           
             else:
                 print('neudenplot_method, please check the scan parameter')
         
-            plot_num = plot_num + 1
-            plt.tight_layout()    
+            plt.tight_layout()
+            plt.xlabel('R: [cm]')
+            plt.ylabel('Z: [cm]')
 
 
 
-    def twscan_eirene_contourplot(self, scan_style, plot_option, format_option):
+    def twscan_eirene_contourplot(self, scan_style, plot_option, format_option, norm_type):
         
         
         withshift = self.DF.withshift
         withseries = self.DF.withseries
         
-        
-        
+               
         if withshift == False and withseries == True:
             
             # series_flag = self.DefaultSettings['series_flag']
@@ -197,8 +189,10 @@ class Eirene_contour:
                     
                     
                     self.twscan_eirene_contourplot_method(iterlist = iter_key, cl_dic = color_dic, 
-                                scan_style = scan_style, 
+                                scan_style = scan_style, norm_type = norm_type,
                     plot_option = plot_option, format_option = format_option)
+                    
+                    
                     
              
             else:
