@@ -21,43 +21,16 @@ from matplotlib.offsetbox import AnchoredText
 
 class PlotContour(profile_fit):
     
-    
-    
+       
     
     def __init__(self, DF, data):
         
         self.DF = DF
         self.data = data
     
-    
 
     
-    
-    
-    def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity):
-        CMAP = cm.viridis
-        NORM= plt.Normalize(plot_2dval.min(), plot_2dval.max())
-        
-        plt.figure()
-        plt.contourf(R_coord, Z_coord, plot_2dval, levels= 20, cmap=CMAP,norm=NORM)
-        plt.title('{} contour plot'.format(quantity))
-        
-        
-        SM= cm.ScalarMappable(NORM,CMAP)    
-        plt.colorbar(SM)
-        plt.show()
-
    
-    
-    def calc_flux_expansion_line_method(self, RR_sep, arcR):
-                   
-        flux_fit_dic = fm.flux_expand_fit(RRsep = RR_sep, arclength = arcR)
-        
-        flux_expand = flux_fit_dic['flux_fitcoe'][0]
-        a_flux_exp = flux_expand*np.ones(self.data['b2fgeo']['ny'])
-        
-        return a_flux_exp
-    
     
     def contour_plot(self, plot_2dval, R_coord, Z_coord, quantity, itername, 
                      log_bar, ma100, bounds, color_dic, A_dic):
@@ -393,60 +366,7 @@ class PlotContour(profile_fit):
                 fig.colorbar(smap)
                 plt.tight_layout(w_pad = 0.05)
     
-    
-    
-
-    
-    
-    
-    def paper_contour(self, plot_2dval, R_coord, Z_coord, quantity, itername, 
-                     log_bar, color_dic, A_dic, axs, cmap, norm, levels):
-        
-        
-        vessel = self.data['vessel'][itername]
-        
-        
-        if log_bar:
-            if np.all(plot_2dval == 0):
-                print('data_file is an zero matrix')
-                
-            elif np.any(plot_2dval == 0):
-                plot_2dval = ma.masked_where(plot_2dval <= 0, plot_2dval)
-                
-                datamap = np.abs(plot_2dval)
-                
-                
-                # CPB = cm.viridis
-                # Lnorm = LogNorm(vmax = datamap.max(), vmin = datamap.min())
-                axs.contourf(R_coord, Z_coord, datamap, levels= levels, 
-                             cmap = cmap, norm = norm)
-                
-                
-            else:
-                
-                datamap = np.abs(plot_2dval)
-                
-                # CPB = cm.viridis
-                # Lnorm = LogNorm(vmax = datamap.max(), vmin = datamap.min())
-                
-                axs.contourf(R_coord, Z_coord, datamap,levels= levels, 
-                             cmap = cmap, norm = norm)
-                
-        else:
-            
-
-            # NORM = axs.Normalize(plot_2dval.min(), plot_2dval.max())
-            
-            # CMAP = cm.viridis
-            
-            axs.contourf(R_coord, Z_coord, plot_2dval, levels= levels, cmap= cmap, norm = norm)
-            
-            
-        axs.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = 'black')
-        # axs.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = color_dic[itername])
-                
-        
-       
+ 
     
     def plot_vessel_method(self, vessel_data, shift_value, independent, meter, color_dic, itername):
         
@@ -487,108 +407,7 @@ class PlotContour(profile_fit):
             pass
     
             
-    def paper_vessel_method(self, vessel_data, shift_value, meter, 
-                           color_dic, A_dic, itername, axs):
-        
-        if meter:
-            axs.plot(vessel_data[:,0]/1000, vessel_data[:,1]/1000, 
-        color = color_dic[itername], label= 'A = {}'.format(A_dic[itername]))
-            
-            
-        else:
-            axs.plot(vessel_data[:,0], vessel_data[:,1], 
-    color = color_dic[itername], label= 'A = {}'.format(A_dic[itername]))
-            
-    
-            
-    def plot_vessel(self, itername, independent, meter):
-        
-        if self.withshift == False and self.withseries == False:
-            
-            vessel = self.data['vessel']
-            shift = self.data['dircomp']['shift_value']*1000
-            
-            self.plot_vessel_method(vessel_data = vessel, shift_value = shift, 
-                                    independent = independent, meter= meter)
-        
-        elif self.withshift == True and self.withseries == False:
-            
-            vessel = self.data['vessel'][itername]
-            shift = self.data['dircomp']['shift_dic'][itername]*1000
-            
-            self.plot_vessel_method(vessel_data = vessel, shift_value = shift, 
-                                    independent = independent, meter = meter)
-        
-        elif self.withshift == False and self.withseries == True:
-            
-            vessel = self.data['vessel']
-            shift = self.data['dircomp']['shift_value']
-            
-            self.plot_vessel_method(vessel_data = vessel, shift_value = shift, 
-                                    independent = independent, meter = meter)
-        
-        else:
-            
-            print('plot_vessel function is not there yet!')
-    
-    
-    
-    def shaded_area(self):
-        
-            
-        # CMAP = 'RdBu'
-        CMAP = cm.viridis
-        
-        R_coord = self.data['grid']['RadLoc']['org']
-        Z_coord = self.data['grid']['VertLoc']['org']
-    
-        shade = np.ones([38, 98])
-        
-        plt.contourf(R_coord, Z_coord, shade, levels= 1, cmap= 'Blues')
-        
-        
-        # cs = ax.contourf(X, Y, z, locator=ticker.LogLocator(), cmap=cm.PuBu_r)
-        # cbar = fig.colorbar(cs)
 
-      
-    
-    
-    def shift_vessel_in_one(self):
-        
-        if self.withshift == True and self.withseries == False:
-            
-            fig, axs = plt.subplots()
-            
-            color_dic = {'org': 'red', 'dot3': 'orange', 'dot5': 'green',
-                         'dot7': 'blue', 'one': 'purple'}
-            
-            A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
-                      'dot7': '2.8', 'one': '3.4'}
-            
-            anchored_text = AnchoredText('{}'.format('vessel cross section'), loc='upper right')
-            
-            self.shaded_area()
-            
-            # ylabel_text = AnchoredText('{}'.format('Z [m]'), loc='center left')
-            
-            for aa in self.data['dircomp']['multi_shift']:
-                
-                vessel = self.data['vessel'][aa]
-                shift = self.data['dircomp']['shift_dic'][aa]*1000
-                
-                self.paper_vessel_method(vessel_data = vessel, shift_value = shift,
-            meter = True, color_dic = color_dic, itername = aa, axs = axs, A_dic = A_dic)
-                
-                axs.add_artist(anchored_text)
-                # axs.add_artist(ylabel_text)
-                axs.set_xlabel('R [m]')
-                axs.set_ylabel('Z [m]')
-                axs.legend(loc= 'center right', fontsize=10)
-            
-            
-            axs.set_aspect('equal')
-            
-            fig.savefig('vessel.pdf')
         
         
         
