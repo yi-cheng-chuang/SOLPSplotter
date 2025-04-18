@@ -6,28 +6,36 @@ Created on Sat Oct 19 11:20:13 2024
 """
 
 
-from R_diff_calc import Diff_R_calc
-from SOLPSplotter_contour import PlotContour
+
 from matplotlib.offsetbox import AnchoredText
-import load_B2_data_method as lBdm
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm, ticker
+from matplotlib import cm
 import matplotlib.tri as tri
 from matplotlib.colors import LogNorm
 from numpy import ma
 
 
-class eirene_contour(PlotContour):
-    def __init__(self, DefaultSettings, loadDS):
-        PlotContour.__init__(self, DefaultSettings, loadDS)
+class eirene_contour:
+    
+    
+    
+    def __init__(self, DF, data):
+        
+        self.DF = DF
+        self.data = data
+
         
     
     
     def plot_eireneoutput(self):
-            
         
-        if self.withshift == True and self.withseries == False:
+        
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
+        
+        
+        if withshift == True and withseries == False:
             
             fig, axs = plt.subplots(2, 2, sharey= True)
             triangle_dic = {}
@@ -155,7 +163,11 @@ class eirene_contour(PlotContour):
     def eirene_contour(self):
             
         
-        if self.withshift == True and self.withseries == False:
+        withshift = self.DF.withshift
+        withseries = self.DF.withseries
+        
+        
+        if withshift == True and withseries == False:
             
             fig, axs = plt.subplots(1, 4, sharey= True)
             triangle_dic = {}
