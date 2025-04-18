@@ -71,8 +71,8 @@ class correlation_datapipline:
                 
                 if corrplot_theme == 'twscan_corr':
                     
-                    xtc.twscan_corr(format_option = 'opaqueness', pol_list = poloidal_loc_list, 
-                                    plot_case = 'fivescan', scan_style = 'density')
+                    xtc.twscan_corr(format_option = 'Te', pol_list = poloidal_loc_list, 
+                                    plot_case = 'single', scan_style = 'density')
 
 
                 
@@ -87,8 +87,8 @@ class correlation_datapipline:
                     
                     xbp.bin_with_angle()
 
-                    xce.twscan_CE(dat_size = 'small', scan_var = 'ne_sep', format_option = 'Te', 
-                                 pol_list = poloidal_loc_list, plot_case = 'all25')
+                    xce.twscan_CE(scan_var = 'ne_sep', format_option = 'Te', 
+                                 pol_list = poloidal_loc_list, plot_case = 'single')
                     
 
                     
