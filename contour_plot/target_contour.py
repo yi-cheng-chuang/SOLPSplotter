@@ -13,16 +13,18 @@ from matplotlib import cm
 import matplotlib.tri as tri
 from matplotlib.colors import LogNorm
 from numpy import ma
+from contour_plot.contourplot_toolbox import contour_plot_method_collect
 
 
 class target_contour_plot:
     
     
     
-    def __init__(self, DF, data):
+    def __init__(self, DF, data, cpmc: contour_plot_method_collect):
         
         self.DF = DF
         self.data = data
+        self.cpmc = cpmc
 
     
     
@@ -217,7 +219,7 @@ class target_contour_plot:
                     
                     if ii < 2:
                         
-                        self.paper_contour(plot_2dval = datamap, R_coord = RadLoc, Z_coord = VertLoc, 
+                        self.cpmc.paper_contour(plot_2dval = datamap, R_coord = RadLoc, Z_coord = VertLoc, 
                                 quantity = dataname, itername = aa, 
                     log_bar = True, color_dic = color_dic, A_dic = A_dic, axs = axs[ii, 0], 
                     cmap = CPB, norm = Lnorm, levels = 20)
@@ -225,7 +227,7 @@ class target_contour_plot:
                     else:
                         
                         ik = ii % 2
-                        self.paper_contour(plot_2dval = datamap, R_coord = RadLoc, Z_coord = VertLoc, 
+                        self.cpmc.paper_contour(plot_2dval = datamap, R_coord = RadLoc, Z_coord = VertLoc, 
                                 quantity = dataname, itername = aa, 
                     log_bar = True, color_dic = color_dic, A_dic = A_dic, axs = axs[ik, 1], 
                     cmap = CPB, norm = Lnorm, levels = 20)
