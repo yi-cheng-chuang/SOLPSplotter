@@ -14,6 +14,10 @@ from contour_plot.twscan_eirene_contour import Eirene_contour
 from contour_plot.geo_contour_plot import fluxexpansion_contour
 from contour_plot.contourplot_toolbox import contour_plot_method_collect
 from contour_plot.target_contour import target_contour_plot
+from contour_plot.twscan_contour_plot import twscan_contour
+from contour_plot.vesselshift_contour import shiftvessel_contour
+from contour_plot.twscan_binfocus_eirene_contour import eirene_binfocus_contour
+from contour_plot.Eirene_contour import eirene_contour
 
 
 
@@ -43,11 +47,15 @@ class contour_datapipline:
         xps = plot_setting(DF = self.DF, data = self.data)
         xfm = fit_method_collection(DF = self.DF, data = self.data)
         xlc = load_coordgeo_method(DF = self.DF, data = self.data)
-        xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
-        xec = Eirene_contour(DF = self.DF, data = self.data, twa = xta)
+        xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)       
         xcpm = contour_plot_method_collect(DF = self.DF, data = self.data)
+        xec = Eirene_contour(DF = self.DF, data = self.data, twa = xta, cpmc = xcpm)
         xfc = fluxexpansion_contour(DF = self.DF, data = self.data, fmc = xfm, cpmc = xcpm, rp = xrp)
-        xtc = target_contour_plot(DF = self.DF, data = self.data)
+        xtc = target_contour_plot(DF = self.DF, data = self.data, cpmc = xcpm)
+        xtwc = twscan_contour(DF = self.DF, data = self.data)
+        xsc = shiftvessel_contour(DF = self.DF, data = self.data)
+        xebc = eirene_binfocus_contour(DF = self.DF, data = self.data, twa = xta, cpmc = xcpm)
+        xec2 = eirene_contour(DF = self.DF, data = self.data)                         
         
         
         if self.DF.DEV == 'mast':
@@ -56,11 +64,24 @@ class contour_datapipline:
             poloidal_index_list = xlp.prepare_for_plots(plot_type = 'contour')
             
             
-            plotfluxexpansion = False
             
-            if plotfluxexpansion:
+            """
+            geo_contour_theme = ['fluxexpansion', 'shift_vessel']
+            
+            
+            """
+            
+            
+            geo_contour_theme = 'None'
+            
+            if geo_contour_theme == 'fluxexpansion':
                 
                 xfc.flux_expansion_contour_plot()
+            
+            elif geo_contour_theme == 'shift_vessel':
+                
+                xsc.shift_vessel_in_one()
+            
             
             else:
                 pass
@@ -73,12 +94,23 @@ class contour_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                contour_theme = 'twcontour'
+                contour_theme = 'twscan_contour'
                 
-                if contour_theme == 'twcontour':
+                if contour_theme == 'tw_eirene_contour':
                     
-                    xec.twscan_eirene_contourplot(scan_style = 'tempscan', plot_option = 'Neuden contour', 
-                                                  format_option = '1x1')
+                    xec.twscan_eirene_contourplot(scan_style = 'tempscan', plot_option = 'atomic energyden', 
+                                                  format_option = '1x1', norm_type = 'natural')
+                
+                elif contour_theme == 'twscan_contour':
+                    
+                    xtwc.twscan_contour_plot(scan_style = 'denscan')
+                
+                
+                elif contour_theme == 'twscan_binfocus_contour':
+                    
+                    xebc.twscan_binfocus_eirene_contourplot(scan_style = 'tempscan', plot_option = 'Neuden contour')
+                
+                              
                 
                 else:
                     pass
@@ -88,14 +120,32 @@ class contour_datapipline:
             elif withshift == True and withseries == False:
                 
                 
-                # xl.shift_vessel_in_one()
-
-
-                dat_list = ['neutral density', 'Poloidal flux', 'Source', 'hx']
-
-                xtc.iout_paper_plot(plotstyle = 'paper', dataname = 'Source', sideswitch = 'both')
+                geo_contour_theme = 'None'
                 
-                # xec.eirene_contour_plot()
+                if geo_contour_theme == 'shift_vessel':
+                    
+                    xsc.shift_vessel_in_one()
+                
+                
+                else:
+                    pass
+                
+                contour_theme = 'eirene_contour'
+                
+                if contour_theme == 'iout_paper':
+                    
+                    dat_list = ['neutral density', 'Poloidal flux', 'Source', 'hx']
+
+                    xtc.iout_paper_plot(plotstyle = 'paper', dataname = 'Source', sideswitch = 'both')
+                
+                elif contour_theme == 'eirene_contour':
+                    
+                    xec2.plot_eireneoutput()
+
+                    xec2.eirene_contour()
+                
+                
+                
                 
                 
             
