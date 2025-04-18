@@ -61,11 +61,12 @@ class poloidal_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                polplot_theme = 'opacity_study'
+                polplot_theme = 'polfluxndS'
                 
                 if polplot_theme == 'polfluxndS':
                     
-                    xtp.twpolfluxndS_plot(scan_style = 'denscan', pol_list = poloidal_loc_list, log_flag = True)
+                    xtp.twpolfluxndS_plot(scan_style = 'denscan', pol_list = poloidal_loc_list, 
+                                          log_flag = True, rad_loc= 18)
                 
                 elif polplot_theme == 'opacity_study':
                     
