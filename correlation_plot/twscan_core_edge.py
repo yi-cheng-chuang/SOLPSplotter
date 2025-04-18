@@ -68,7 +68,7 @@ class core_edge:
         # print('this is 201:')
         
         
-        if self.series_flag == 'twin_scan':
+        if self.DF.series_flag == 'twin_scan':
             
             dircomp = self.data['dircomp']
             
@@ -92,7 +92,7 @@ class core_edge:
                 
                 color_list = ['red', 'orange', 'green', 'blue', 'purple']
                 
-                color_dic = self.pair_dic(keys = keylist_a, values = color_list)
+                color_dic = self.twa.pair_dic(keys = keylist_a, values = color_list)
                 
                 scan_list = []
                 # print('scan_list after initial:')
@@ -254,7 +254,7 @@ class core_edge:
                         
                     
                     
-                    if self.series_flag == 'twin_scan':
+                    if self.DF.series_flag == 'twin_scan':
                         
                         if scan_style == 'tempscan':
                             
@@ -342,7 +342,7 @@ class core_edge:
                     
                     
                     
-                    k_list = self.bin_with_angle()
+                    k_list = self.bp.bin_with_angle()
                     
                     kp = len(k_list)
                     
