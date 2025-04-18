@@ -707,7 +707,7 @@ class twcorrelate:
                         
                         elif scan_style == 'density':
                             
-                            fig.suptitle(f'Electron temperature with heat flux {ad} $10^5$ W and particle flux {ap} $10^{{{20}}}$ 1/s')
+                            fig.suptitle(f'Electron temperature with heat flux {ap} $10^5$ W and particle flux {ad} $10^{{{20}}}$ 1/s')
                         
                         
             
