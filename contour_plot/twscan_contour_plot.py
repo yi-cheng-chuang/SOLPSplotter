@@ -9,7 +9,7 @@ Created on Tue Apr  1 21:10:06 2025
 from matplotlib.offsetbox import AnchoredText
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm, ticker
+from matplotlib import cm, ticker, colors
 import matplotlib.tri as tri
 from matplotlib.colors import LogNorm
 from numpy import ma
@@ -26,14 +26,37 @@ class twscan_contour:
 
     
 
-    def twcontourp(self, plot_2dval, R_coord, Z_coord, quantity, axs, norm, lv):
+    def twcontourp(self, plot_2dval, R_coord, Z_coord, quantity, axs, norm_type, lv):
         CMAP = cm.viridis
-        if norm == 'norm':
-            NORM = plt.Normalize(plot_2dval.min(), plot_2dval.max())
+
         
-        elif norm == 'lnorm':
+        if norm_type == 'masklog':
             
-            NORM = LogNorm(vmin = plot_2dval.min(), vmax = plot_2dval.max())
+            data_mask = ma.masked_where(plot_2dval <= 0, plot_2dval) 
+            datamap = np.abs(data_mask)       
+            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
+        
+        elif norm_type == 'allpositivelog':
+                        
+            data_mask = ma.masked_where(plot_2dval == 0, plot_2dval) 
+            datamap = np.abs(data_mask)      
+            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
+        
+        elif norm_type == 'std_normalize':
+                        
+            normalized_data = (plot_2dval - np.mean(plot_2dval)) / np.std(plot_2dval)
+            NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
+            
+        elif norm_type == 'max_normalize':
+            
+            data_mask = ma.masked_where(plot_2dval == 0, plot_2dval)
+            normalized_data = data_mask / np.max(data_mask)
+            NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
+        
+        
+        elif norm_type == 'natural':
+            
+            NORM = colors.Normalize(plot_2dval.min(), plot_2dval.max())
 
 
         axs.contourf(R_coord, Z_coord, plot_2dval, levels= lv, cmap=CMAP,norm=NORM)
@@ -46,12 +69,11 @@ class twscan_contour:
     
     
     
-    def twscan_contour_plot(self, scan_style):
+    def twscan_contour_plot(self, scan_style, plot_name, limit, norm_type):
         
 
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
-        dat_struc = {'nx': nx, 'ny': ny}
         
         RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:nx + 1, 1:ny + 1]
         VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:nx + 1, 1:ny + 1]
@@ -169,20 +191,55 @@ class twscan_contour:
                             neuden_dat = self.data['ft44'][nf][tf]['dab2'][:, :, 0]
                             
                             vessel = self.data['vessel']
-                            self.twcontourp(plot_2dval = te_dat, R_coord = RadLoc, Z_coord = VertLoc, 
-                                              quantity = f'{aa} Electron temperature', axs = axs, 
-                                              norm = 'lnorm', lv = 40)
+                            
+                            
+                            if plot_name == 'Te':
+                                
+                                datname = 'Te'
+                                title_name = '{0} $\Gamma_r ={1}$*$10^{{20}}$ 1/s, $q_r = {2}*10^5$ W'.format(datname, ad, ap)
+                                self.twcontourp(plot_2dval = te_dat, R_coord = RadLoc, Z_coord = VertLoc, 
+                                                  quantity = title_name, axs = axs, 
+                                                  norm_type = norm_type, lv = 40)
+                            
+                            
+                            elif plot_name == 'sx':
+                                
+                                datname = 'Source'
+                                title_name = '{0} $\Gamma_r ={1}$*$10^{{20}}$ 1/s, $q_r = {2}*10^5$ W'.format(datname, ad, ap)
+                                
+                                
+                                plot_range = 'limit'
+                                
+                                if plot_range == 'full':
+                                    
+                                    self.twcontourp(plot_2dval = sx, R_coord = RadLoc, Z_coord = VertLoc, 
+                                                      quantity = title_name, axs = axs, 
+                                                      norm_type = norm_type, lv = 40)
+                                
+                                elif plot_range == 'limit':
+                                    
+                                    sx_limit = sx[:, 18:]
+                                    Rad_limit = RadLoc[:, 18:]
+                                    Vert_limit = VertLoc[:, 18:]
+                                    
+                                    self.twcontourp(plot_2dval = sx_limit, R_coord = Rad_limit, 
+                                            Z_coord = Vert_limit, quantity = title_name, axs = axs, 
+                                                      norm_type = norm_type, lv = 40)
+                    
                             
                             axs.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = 'black')
-                            
+                            axs.set_xlabel('R: [m]')
+                            axs.set_ylabel('Z: [m]')
 
-                                    
-                            axs.set_xlim(0, 2)
-                            axs.set_ylim(-2, -1)
+
+                            if limit:
+                                
+                                axs.set_xlim(0, 2)
+                                axs.set_ylim(-2, -1)
                             
-                            
-                            
-                
+                            else:
+                                pass
+             
 
                         elif scan_style == 'tempscan':
                             
@@ -223,7 +280,18 @@ class twscan_contour:
         
         
                 
-                
+"""
+        if norm == 'norm':
+            NORM = plt.Normalize(plot_2dval.min(), plot_2dval.max())
+        
+        elif norm == 'lnorm':
+            
+            NORM = LogNorm(vmin = plot_2dval.min(), vmax = plot_2dval.max())
+
+
+
+
+"""
                 
 
         
