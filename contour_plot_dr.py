@@ -103,7 +103,7 @@ class contour_datapipline:
                 
                 elif contour_theme == 'twscan_contour':
                     
-                    xtwc.twscan_contour_plot(scan_style = 'denscan')
+                    xtwc.twscan_contour_plot(scan_style = 'denscan', plot_name = 'sx', limit = False, norm_type = 'allpositivelog')
                 
                 
                 elif contour_theme == 'twscan_binfocus_contour':
