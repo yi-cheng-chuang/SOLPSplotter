@@ -222,6 +222,49 @@ class contour_plot_method_collect:
     
     
     
+    def twcontourp(self, plot_2dval, R_coord, Z_coord, quantity, axs, norm_type, lv):
+        CMAP = cm.viridis
+
+        
+        if norm_type == 'masklog':
+            
+            data_mask = ma.masked_where(plot_2dval <= 0, plot_2dval) 
+            datamap = np.abs(data_mask)       
+            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
+        
+        elif norm_type == 'allpositivelog':
+                        
+            data_mask = ma.masked_where(plot_2dval == 0, plot_2dval) 
+            datamap = np.abs(data_mask)      
+            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
+        
+        elif norm_type == 'std_normalize':
+                        
+            normalized_data = (plot_2dval - np.mean(plot_2dval)) / np.std(plot_2dval)
+            NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
+            
+        elif norm_type == 'max_normalize':
+            
+            data_mask = ma.masked_where(plot_2dval == 0, plot_2dval)
+            normalized_data = data_mask / np.max(data_mask)
+            NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
+        
+        
+        elif norm_type == 'natural':
+            
+            NORM = colors.Normalize(plot_2dval.min(), plot_2dval.max())
+
+
+        axs.contourf(R_coord, Z_coord, plot_2dval, levels= lv, cmap=CMAP,norm=NORM)
+        axs.set_title('{} contour plot'.format(quantity))
+        
+        
+        SM= cm.ScalarMappable(NORM,CMAP)    
+        plt.colorbar(SM)
+        plt.show()
+    
+    
+    
     
     
     
