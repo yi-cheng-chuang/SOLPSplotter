@@ -130,9 +130,9 @@ class transport_coefficient_adjustment:
                 if j>= de_ped and j<= de_SOL:
                     mod_y[j] = cod[j,1]
                 elif j< de_ped:
-                    mod_y[j] = 7.0
+                    mod_y[j] = 5.0
                 elif j> de_SOL:
-                    mod_y[j] = 25.0
+                    mod_y[j] = 30.0
                 
                     
             cod[:,1] = mod_y
@@ -140,7 +140,7 @@ class transport_coefficient_adjustment:
             mod_yki = np.zeros(m)
             for j in range(m):
                 if j<= ki_SOL:
-                    mod_yki[j] = coke[j,1]  
+                    mod_yki[j] = coki[j,1]  
                 else:
                     mod_yki[j] = 20.0
             coki[:,1] = mod_yki
