@@ -13,11 +13,13 @@ import matplotlib.pyplot as plt
 from matplotlib import colors, cm, ticker
 
 
-class plot_geo(load_geometry):
+class plot_geo:
     
     
-    def __init__(self, DefaultSettings):
-        load_geometry.__init__(self, DefaultSettings)
+    def __init__(self, DF, data):
+        
+        self.DF = DF
+        self.data = data
         
     
         
