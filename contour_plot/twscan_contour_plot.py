@@ -13,60 +13,19 @@ from matplotlib import cm, ticker, colors
 import matplotlib.tri as tri
 from matplotlib.colors import LogNorm
 from numpy import ma
+from contour_plot.contourplot_toolbox import contour_plot_method_collect
 
 
 class twscan_contour:
     
     
     
-    def __init__(self, DF, data):
+    def __init__(self, DF, data, cpmc: contour_plot_method_collect):
         
         self.DF = DF
         self.data = data
+        self.cpmc = cpmc
 
-    
-
-    def twcontourp(self, plot_2dval, R_coord, Z_coord, quantity, axs, norm_type, lv):
-        CMAP = cm.viridis
-
-        
-        if norm_type == 'masklog':
-            
-            data_mask = ma.masked_where(plot_2dval <= 0, plot_2dval) 
-            datamap = np.abs(data_mask)       
-            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
-        
-        elif norm_type == 'allpositivelog':
-                        
-            data_mask = ma.masked_where(plot_2dval == 0, plot_2dval) 
-            datamap = np.abs(data_mask)      
-            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
-        
-        elif norm_type == 'std_normalize':
-                        
-            normalized_data = (plot_2dval - np.mean(plot_2dval)) / np.std(plot_2dval)
-            NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
-            
-        elif norm_type == 'max_normalize':
-            
-            data_mask = ma.masked_where(plot_2dval == 0, plot_2dval)
-            normalized_data = data_mask / np.max(data_mask)
-            NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
-        
-        
-        elif norm_type == 'natural':
-            
-            NORM = colors.Normalize(plot_2dval.min(), plot_2dval.max())
-
-
-        axs.contourf(R_coord, Z_coord, plot_2dval, levels= lv, cmap=CMAP,norm=NORM)
-        axs.set_title('{} contour plot'.format(quantity))
-        
-        
-        SM= cm.ScalarMappable(NORM,CMAP)    
-        plt.colorbar(SM)
-        plt.show()
-    
     
     
     def twscan_contour_plot(self, scan_style, plot_name, limit, norm_type):
@@ -75,8 +34,8 @@ class twscan_contour:
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
         
-        RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:nx + 1, 1:ny + 1]
-        VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:nx + 1, 1:ny + 1]
+        RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:ny + 1, 1:nx + 1]
+        VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:ny + 1, 1:nx + 1]
             
         
         withshift = self.DF.withshift
@@ -197,7 +156,7 @@ class twscan_contour:
                                 
                                 datname = 'Te'
                                 title_name = '{0} $\Gamma_r ={1}$*$10^{{20}}$ 1/s, $q_r = {2}*10^5$ W'.format(datname, ad, ap)
-                                self.twcontourp(plot_2dval = te_dat, R_coord = RadLoc, Z_coord = VertLoc, 
+                                self.cpmc.twcontourp(plot_2dval = te_dat, R_coord = RadLoc, Z_coord = VertLoc, 
                                                   quantity = title_name, axs = axs, 
                                                   norm_type = norm_type, lv = 40)
                             
@@ -212,7 +171,7 @@ class twscan_contour:
                                 
                                 if plot_range == 'full':
                                     
-                                    self.twcontourp(plot_2dval = sx, R_coord = RadLoc, Z_coord = VertLoc, 
+                                    self.cpmc.twcontourp(plot_2dval = sx, R_coord = RadLoc, Z_coord = VertLoc, 
                                                       quantity = title_name, axs = axs, 
                                                       norm_type = norm_type, lv = 40)
                                 
@@ -222,7 +181,7 @@ class twscan_contour:
                                     Rad_limit = RadLoc[:, 18:]
                                     Vert_limit = VertLoc[:, 18:]
                                     
-                                    self.twcontourp(plot_2dval = sx_limit, R_coord = Rad_limit, 
+                                    self.cpmc.twcontourp(plot_2dval = sx_limit, R_coord = Rad_limit, 
                                             Z_coord = Vert_limit, quantity = title_name, axs = axs, 
                                                       norm_type = norm_type, lv = 40)
                     
