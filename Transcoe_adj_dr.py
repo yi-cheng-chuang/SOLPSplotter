@@ -15,6 +15,7 @@ from load_coordinate.SOLPSplotter_geo import load_geometry
 from set_plot.plot_format import plot_setting
 from modify_transport_coefficient.transport_coefficient_adjust_method import transcoe_method
 from modify_transport_coefficient.Transcoe_adj import transport_coefficient_adjustment
+from modify_transport_coefficient.transcoe_align import transport_coefficient_alignment
 
 
 
@@ -33,6 +34,8 @@ class transcoe_mod_datapipline:
                      'gfile':{}, 'gridsettings': {}, 'psi':{}, 'DefaultSettings': {}, 
                      'outputdata':{}, 'iout_data':{}}
 
+
+
     def transportcoe_modifier(self):
         
         xdi = directory_input(DF = self.DF, data = self.data)
@@ -43,7 +46,8 @@ class transcoe_mod_datapipline:
         xlg = load_geometry(DF = self.DF, data = self.data, lcm = xlc)
         xps = plot_setting(DF = self.DF, data = self.data)
         xtm = transcoe_method(DF = self.DF, data = self.data, lcm = xlc)
-        xtca = transport_coefficient_adjustment(DF = self.DF, data = self.data, gam = xga, geo = xlg, tm= xtm)
+        xtca = transport_coefficient_adjustment(DF = self.DF, data = self.data, gam = xga, tm= xtm)
+        xtcal = transport_coefficient_alignment(DF = self.DF, data = self.data, gam = xga, geo = xlg, tm= xtm)
         
         
         
@@ -60,9 +64,23 @@ class transcoe_mod_datapipline:
         
         xlg.calcpsi_avcr()
         xps.set_plot()
-        xtca.mod_transco(withmod = True, de_SOL = 32, ki_SOL = 18, ke_SOL = 21, log_flag = False)
-        xtca.transport_coe_align_plot(plot_transcoe = True, paper_transcoe = True, save_eps = False)
-        xtca.align_transco(plot_align = True, log_flag = False)
+        
+        mod_detail = True
+        
+        if mod_detail:
+            
+            xtca.transco_mod_detail(withmod = True, de_ped = 9, de_SOL = 30, 
+                                    ki_SOL = 18, ke_SOL = 21, log_flag = False)
+            
+        else:
+            
+            xtca.mod_transco(withmod = False, de_SOL = 32, ki_SOL = 18, 
+                             ke_SOL = 21, log_flag = False)
+        
+       
+
+        xtcal.transport_coe_align_plot(plot_transcoe = True, paper_transcoe = True, save_eps = False)
+        xtcal.align_transco(plot_align = True, log_flag = False)
         
         
         extra = False
