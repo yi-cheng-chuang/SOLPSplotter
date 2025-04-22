@@ -18,6 +18,7 @@ from contour_plot.twscan_contour_plot import twscan_contour
 from contour_plot.vesselshift_contour import shiftvessel_contour
 from contour_plot.twscan_binfocus_eirene_contour import eirene_binfocus_contour
 from contour_plot.Eirene_contour import eirene_contour
+from contour_plot.twscan_rectangular_countour_plot import Rectangular_contour
 
 
 
@@ -52,10 +53,11 @@ class contour_datapipline:
         xec = Eirene_contour(DF = self.DF, data = self.data, twa = xta, cpmc = xcpm)
         xfc = fluxexpansion_contour(DF = self.DF, data = self.data, fmc = xfm, cpmc = xcpm, rp = xrp)
         xtc = target_contour_plot(DF = self.DF, data = self.data, cpmc = xcpm)
-        xtwc = twscan_contour(DF = self.DF, data = self.data)
+        xtwc = twscan_contour(DF = self.DF, data = self.data, cpmc = xcpm)
         xsc = shiftvessel_contour(DF = self.DF, data = self.data)
         xebc = eirene_binfocus_contour(DF = self.DF, data = self.data, twa = xta, cpmc = xcpm)
-        xec2 = eirene_contour(DF = self.DF, data = self.data)                         
+        xec2 = eirene_contour(DF = self.DF, data = self.data)
+        xrc = Rectangular_contour(DF = self.DF, data = self.data, cpmc = xcpm)                    
         
         
         if self.DF.DEV == 'mast':
@@ -110,8 +112,13 @@ class contour_datapipline:
                     
                     xebc.twscan_binfocus_eirene_contourplot(scan_style = 'tempscan', plot_option = 'Neuden contour')
                 
-                              
                 
+                elif contour_theme == 'twscan_rectangular_contour':
+                    
+                    xrc.twrectangular_test()
+                    
+
+
                 else:
                     pass
                     
