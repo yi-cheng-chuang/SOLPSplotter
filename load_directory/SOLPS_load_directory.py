@@ -25,36 +25,7 @@ class load_directory:
         
         
         
-        # self.DEV = DefaultSettings['DEV']
-        # self.a = DefaultSettings['minor_rad']
-        # self.withshift = DefaultSettings['withshift']
-        # self.withseries = DefaultSettings['withseries']
-        # self.terminal = DefaultSettings['terminal']
-        # self.series_filename = DefaultSettings['series_filename']
-        # self.series_tail = DefaultSettings['series_tail']
-        # self.series_flag = DefaultSettings['series_flag']
-        # self.series_compare = DefaultSettings['series_compare']
-                 
-            
-        # "DefaultSettings"    
-        # if isinstance(DefaultSettings, dict):
-        #     self.DefaultSettings = DefaultSettings
-        # else:
-        #     print('parameter has to be a dictionary')
-        
-        # if DefaultSettings is None:
-        #     print('There is no input defaultsettings')
-        # else:
-        #     self.DefaultSettings = DefaultSettings
-         
-        # keylist = []
-        # for key, value in self.DefaultSettings.items():
-        #     keylist.append(key)
-        
-        # "Useful data"
-        # self.data = {'dircomp':{}, 'grid':{}, 'dirdata':{}, 'ExpDict': {}, 'dsa':{},
-        #              'gfile':{}, 'gridsettings': {}, 'psi':{}, 
-        #              'outputdata':{}, 'iout_data':{}}
+
 
         
     def _reset_object(self):
@@ -208,7 +179,41 @@ class load_directory:
         
         
         
-        
+
+"""
+
+# self.DEV = DefaultSettings['DEV']
+# self.a = DefaultSettings['minor_rad']
+# self.withshift = DefaultSettings['withshift']
+# self.withseries = DefaultSettings['withseries']
+# self.terminal = DefaultSettings['terminal']
+# self.series_filename = DefaultSettings['series_filename']
+# self.series_tail = DefaultSettings['series_tail']
+# self.series_flag = DefaultSettings['series_flag']
+# self.series_compare = DefaultSettings['series_compare']
+         
+    
+# "DefaultSettings"    
+# if isinstance(DefaultSettings, dict):
+#     self.DefaultSettings = DefaultSettings
+# else:
+#     print('parameter has to be a dictionary')
+
+# if DefaultSettings is None:
+#     print('There is no input defaultsettings')
+# else:
+#     self.DefaultSettings = DefaultSettings
+ 
+# keylist = []
+# for key, value in self.DefaultSettings.items():
+#     keylist.append(key)
+
+# "Useful data"
+# self.data = {'dircomp':{}, 'grid':{}, 'dirdata':{}, 'ExpDict': {}, 'dsa':{},
+#              'gfile':{}, 'gridsettings': {}, 'psi':{}, 
+#              'outputdata':{}, 'iout_data':{}}
+
+"""
         
         
         
