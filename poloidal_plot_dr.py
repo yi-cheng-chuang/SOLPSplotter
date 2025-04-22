@@ -11,6 +11,7 @@ from module_load_for_plot.module_load import *
 from twscan_module.twinscan_prepare import twscan_assist
 from poloidal_plot.twscan_polfluxndS_poloidal import twscan_polfluxndS_polplot
 from poloidal_plot.twscan_opacity_poloidal import twscan_opacity_polplot
+from poloidal_plot.twscan_boundarynendS_poloidal import twscan_boundary_nendS_polplot
 
 
 
@@ -39,6 +40,7 @@ class poloidal_datapipline:
         xta = twscan_assist(DF = self.DF, data = self.data)
         xtp = twscan_polfluxndS_polplot(DF = self.DF, data = self.data, twa = xta)
         xto = twscan_opacity_polplot(DF = self.DF, data = self.data, twa = xta)
+        xtbn = twscan_boundary_nendS_polplot(DF = self.DF, data = self.data, twa = xta)
         
         
         
@@ -61,7 +63,7 @@ class poloidal_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                polplot_theme = 'polfluxndS'
+                polplot_theme = 'nendS'
                 
                 if polplot_theme == 'polfluxndS':
                     
@@ -72,6 +74,11 @@ class poloidal_datapipline:
                     
                     xto.twscan_opacity_polplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', 
                                                format_option = '3x1')
+                
+                elif polplot_theme == 'nendS':
+                    
+                    xtbn.twpolfluxndS_plot(scan_style = 'denscan', pol_list = poloidal_loc_list, 
+                                          log_flag = True, rad_loc= -1)
                 
                 
             
