@@ -22,9 +22,9 @@ def Setting_dic():
         def __init__(self):
             
             
-            self.DEV = 'mastu'
+            self.DEV = 'mast'
             self.a = 0.5
-            self.withshift = False
+            self.withshift = True
             self.withseries = False
             self.terminal = terminal
             if self.withseries:
