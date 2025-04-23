@@ -10,14 +10,14 @@ Created on Wed Apr 16 18:27:05 2025
 from SOLPS_input.input_setting import Setting_dic, loadDS_dic
 from module_load_for_plot.module_load import *
 from twscan_module.twinscan_prepare import twscan_assist
-from contour_plot.twscan_eirene_contour import Eirene_contour
+from contour_plot.twscan_eirene_contour_plot import twscan_eirene_contour
 from contour_plot.geo_contour_plot import fluxexpansion_contour
 from contour_plot.contourplot_toolbox import contour_plot_method_collect
 from contour_plot.target_contour import target_contour_plot
 from contour_plot.twscan_contour_plot import twscan_contour
 from contour_plot.vesselshift_contour import shiftvessel_contour
 from contour_plot.twscan_binfocus_eirene_contour import eirene_binfocus_contour
-from contour_plot.Eirene_contour import eirene_contour
+from contour_plot.Ashift_eirene_contour_plot import Ashift_eirene_contour
 from contour_plot.twscan_rectangular_countour_plot import Rectangular_contour
 
 
@@ -50,13 +50,13 @@ class contour_datapipline:
         xlc = load_coordgeo_method(DF = self.DF, data = self.data)
         xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)       
         xcpm = contour_plot_method_collect(DF = self.DF, data = self.data)
-        xec = Eirene_contour(DF = self.DF, data = self.data, twa = xta, cpmc = xcpm)
+        xec = twscan_eirene_contour(DF = self.DF, data = self.data, twa = xta, cpmc = xcpm)
         xfc = fluxexpansion_contour(DF = self.DF, data = self.data, fmc = xfm, cpmc = xcpm, rp = xrp)
         xtc = target_contour_plot(DF = self.DF, data = self.data, cpmc = xcpm)
         xtwc = twscan_contour(DF = self.DF, data = self.data, cpmc = xcpm)
         xsc = shiftvessel_contour(DF = self.DF, data = self.data)
         xebc = eirene_binfocus_contour(DF = self.DF, data = self.data, twa = xta, cpmc = xcpm)
-        xec2 = eirene_contour(DF = self.DF, data = self.data)
+        xaec = Ashift_eirene_contour(DF = self.DF, data = self.data)
         xrc = Rectangular_contour(DF = self.DF, data = self.data, cpmc = xcpm)                    
         
         
@@ -96,7 +96,7 @@ class contour_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                contour_theme = 'twscan_contour'
+                contour_theme = 'twscan_binfocus_contour'
                 
                 if contour_theme == 'tw_eirene_contour':
                     
@@ -147,9 +147,9 @@ class contour_datapipline:
                 
                 elif contour_theme == 'eirene_contour':
                     
-                    xec2.plot_eireneoutput()
+                    xaec.Ashift_limit_eirene_contourplot()
 
-                    xec2.eirene_contour()
+                    xaec.Ashift_eirene_contourplot()
                 
                 
                 
