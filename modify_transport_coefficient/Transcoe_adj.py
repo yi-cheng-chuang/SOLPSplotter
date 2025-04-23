@@ -88,16 +88,18 @@ class transport_coefficient_adjustment:
         
         self.tm.Write_transcoefile_method(file = '{}/b2.transport.inputfile_mod_{}{}'.format(simu_dir, shift, n), points= trans_list ,M_1 = True, M=[1])
 
-        log_flag = False
+
         specieslist = ['1','3','4']
         transcoe_unit = self.tm.transport_coe_unit()
 
         for k in specieslist:
+            
+            plt.figure()
+            
             if log_flag:
                 plt.yscale('log')
             else:
                 pass
-            plt.figure()
             plt.plot(trans_list[k][0,:], trans_list[k][1,:], 'o-', color = 'orange')
             plt.xlabel('Radial coordinate: $R- R_{sep}$')
             # plt.ylabel(transcoe_unit[k][1])
@@ -132,7 +134,7 @@ class transport_coefficient_adjustment:
                 elif j< de_ped:
                     mod_y[j] = 5.0
                 elif j> de_SOL:
-                    mod_y[j] = 30.0
+                    mod_y[j] = 0.01
                 
                     
             cod[:,1] = mod_y
@@ -174,22 +176,26 @@ class transport_coefficient_adjustment:
         
         self.tm.Write_transcoefile_method(file = '{}/b2.transport.inputfile_mod_{}{}'.format(simu_dir, shift, n), points= trans_list ,M_1 = True, M=[1])
 
-        log_flag = False
         specieslist = ['1','3','4']
         transcoe_unit = self.tm.transport_coe_unit()
 
         for k in specieslist:
+            
+            plt.figure()
+            
             if log_flag:
                 plt.yscale('log')
             else:
                 pass
-            plt.figure()
+        
+            # plt.yscale('log')
             plt.plot(trans_list[k][0,:], trans_list[k][1,:], 'o-', color = 'orange')
             plt.xlabel('Radial coordinate: $R- R_{sep}$')
             # plt.ylabel(transcoe_unit[k][1])
             plt.title(transcoe_unit[k][0])
 
         plt.show()
+
 
 
 
