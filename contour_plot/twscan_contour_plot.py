@@ -34,8 +34,8 @@ class twscan_contour:
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
         
-        RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:ny + 1, 1:nx + 1]
-        VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:ny + 1, 1:nx + 1]
+        RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:nx + 1, 1:ny + 1]
+        VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:nx + 1, 1:ny + 1]
             
         
         withshift = self.DF.withshift
