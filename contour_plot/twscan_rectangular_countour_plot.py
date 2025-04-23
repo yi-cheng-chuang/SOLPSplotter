@@ -46,14 +46,6 @@ class Rectangular_contour:
 
 
 
-
-
-
-
-
-
-
-
     
     def twrectangular_contour_plot(self, scan_style, plot_name, limit, norm_type):
         
@@ -74,11 +66,7 @@ class Rectangular_contour:
         
         withshift = self.DF.withshift
         withseries = self.DF.withseries
-        
-        
 
-        
-        
         
         if withshift == False and withseries == True:
             
