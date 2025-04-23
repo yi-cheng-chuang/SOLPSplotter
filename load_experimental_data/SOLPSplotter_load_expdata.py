@@ -7,8 +7,7 @@ Created on Sun Oct 15 21:54:40 2023
 
 import matplotlib.pyplot as plt
 from SOLPS_input.input_setting import loadDS_dic
-from load_experimental_data.load_expdata_method import read_expdata_method
-# from load_simulation_data.load_B2_data_method import 
+from load_experimental_data.load_expdata_method import read_expdata_method 
 from fit_data.fitting_method import fit_method_collection
 from load_coordinate.SOLPSplotter_geo import load_geometry
 from scipy.optimize import curve_fit
