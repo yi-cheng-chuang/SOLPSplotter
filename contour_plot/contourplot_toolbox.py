@@ -120,7 +120,16 @@ class contour_plot_method_collect:
                         
             normalized_data = (data - np.mean(data)) / np.std(data)
             NORM_data = colors.Normalize(normalized_data.min(), normalized_data.max())
-            
+
+        
+        elif norm_type == 'std_lognorm':
+                        
+            normalized_data = (data - np.mean(data)) / np.std(data)
+            data_mask = ma.masked_where(normalized_data <= 0, normalized_data) 
+            datamap = np.abs(data_mask)
+            NORM_data = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
+        
+        
         elif norm_type == 'max_normalize':
             
             data_mask = ma.masked_where(data == 0, data)
@@ -132,9 +141,7 @@ class contour_plot_method_collect:
             
             NORM_data = colors.Normalize(data.min(), data.max())
             
-            
-            
-                        
+                      
         else:
             
             NORM_data = colors.Normalize(data.min(), data.max())
@@ -242,12 +249,26 @@ class contour_plot_method_collect:
                         
             normalized_data = (plot_2dval - np.mean(plot_2dval)) / np.std(plot_2dval)
             NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
+        
+        elif norm_type == 'std_lognorm':
+                        
+            normalized_data = (plot_2dval - np.mean(plot_2dval)) / np.std(plot_2dval)
+            data_mask = ma.masked_where(normalized_data <= 0, normalized_data) 
+            datamap = np.abs(data_mask)
+            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
             
         elif norm_type == 'max_normalize':
             
             data_mask = ma.masked_where(plot_2dval == 0, plot_2dval)
             normalized_data = data_mask / np.max(data_mask)
             NORM = colors.Normalize(normalized_data.min(), normalized_data.max())
+        
+        elif norm_type == 'max_lognorm':
+            
+            data_mask = ma.masked_where(plot_2dval == 0, plot_2dval)
+            normalized_data = data_mask / np.max(data_mask)
+            datamap = np.abs(normalized_data)
+            NORM = colors.LogNorm(np.nanmin(datamap), np.nanmax(datamap))
         
         
         elif norm_type == 'natural':
