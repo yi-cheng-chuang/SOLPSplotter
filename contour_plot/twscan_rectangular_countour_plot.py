@@ -34,34 +34,49 @@ class Rectangular_contour:
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
         
-        psi_map = self.data['psi']['psival'][1:ny+1, 1:nx+1]
+        psi_map = np.transpose(self.data['psi']['psival'])[1:nx+1, 1:ny+1]
 
-            
-        
-        
+
         Ra = np.arange(1, nx+1)
         extend_Ra = np.tile(Ra, (ny, 1))
+        Ra_map = np.transpose(extend_Ra)
         
-        self.data['save_rectangular'] = extend_Ra
+        self.data['save_rectangular'] = Ra_map
+        
+        # pol_list = self.DF.poloidal_loc_list
+        
+        # print(pol_list)
 
 
 
     
-    def twrectangular_contour_plot(self, scan_style, plot_name, limit, norm_type):
+    def twrectangular_contour_plot(self, scan_style, plot_name, norm_type, label_type, pol_loc_list):
         
 
         nx = self.data['b2fgeo']['nx']
         ny = self.data['b2fgeo']['ny']
         
-        psi_map = self.data['psi']['psival'][1:ny+1, 1:nx+1]
+        psi_map = np.transpose(self.data['psi']['psival'])[1:nx+1, 1:ny+1]
 
-            
+        
+
+
+        ang_label = self.data['angle']['angle_list']
+        extend_ang = np.tile(ang_label, (ny, 1))
+        ang_map = np.transpose(extend_ang)
         
         
         Ra = np.arange(1, nx+1)
         extend_Ra = np.tile(Ra, (ny, 1))
+        Ra_map = np.transpose(extend_Ra)
         
-        self.data['save_rectangular'] = extend_Ra
+        rec_dic = {'angle': ang_map, 'index': Ra_map}
+        
+        self.data['save_rectangular'] = rec_dic
+        
+        
+        RadLoc = np.transpose(self.data['grid']['RadLoc'])[1:nx + 1, 1:ny + 1]
+        VertLoc = np.transpose(self.data['grid']['VertLoc'])[1:nx + 1, 1:ny + 1]
             
         
         withshift = self.DF.withshift
@@ -165,8 +180,6 @@ class Rectangular_contour:
                             
                             ev = 1.6021766339999999 * pow(10, -19)
                             te_dat = Te_J / ev
-                                            
-                            psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
                             
                             source = self.data['b2wdat'][nf][tf]['b2npc_sna'][0][1:nx+1, 1:ny+1]                
                             vol = self.data['b2wdat'][nf][tf]['vol'][1:nx+1, 1:ny+1]
@@ -174,16 +187,94 @@ class Rectangular_contour:
                             
                             neuden_dat = self.data['ft44'][nf][tf]['dab2'][:, :, 0]
                             
-                            vessel = self.data['vessel']
                             
                             
                             if plot_name == 'Te':
                                 
                                 datname = 'Te'
                                 title_name = '{0} $\Gamma_r ={1}$*$10^{{20}}$ 1/s, $q_r = {2}*10^5$ W'.format(datname, ad, ap)
-                                self.cpmc.twcontourp(plot_2dval = te_dat, R_coord = psi_map, Z_coord = extend_Ra, 
-                                                  quantity = title_name, axs = axs, 
-                                                  norm_type = norm_type, lv = 40)
+                                
+                                
+                                if label_type == 'angle':
+                                    
+                                    st = int(pol_loc_list[0])
+                                    ed = int(pol_loc_list[-1]) + 1
+                                                                        
+                                    te_limit = te_dat[st:ed, 14:]
+                                    psi_limit = psi_map[st:ed, 14:]
+                                    Ra_limit = ang_map[:, 14:]
+                                    
+                                    self.cpmc.twcontourp(plot_2dval = te_limit, R_coord = Ra_limit, 
+                                            Z_coord = psi_limit, quantity = title_name, axs = axs, 
+                                                      norm_type = norm_type, lv = 40)
+                                    
+                                    axs.set_ylabel("$\psi_N$")
+                                    axs.set_xlabel("poloidal angle")
+                                
+                                elif label_type == 'index':
+                                    
+                                    te_limit = te_dat[:, 14:]
+                                    psi_limit = psi_map[:, 14:]
+                                    Ra_limit = Ra_map[:, 14:]
+                                    
+                                    
+                                    self.cpmc.twcontourp(plot_2dval = te_limit, R_coord = Ra_limit, 
+                                            Z_coord = psi_limit, quantity = title_name, axs = axs, 
+                                                      norm_type = norm_type, lv = 40)
+                                    
+                                    axs.set_ylabel("$\psi_N$")
+                                    axs.set_xlabel("poloidal index")
+
+                                
+                                
+                                
+                            
+                            
+                            elif plot_name == 'neuden':
+                                
+                                datname = 'Atomic neutral density'
+                                title_name = '{0} $\Gamma_r ={1}$*$10^{{20}}$ 1/s, $q_r = {2}*10^5$ W'.format(datname, ad, ap)
+                                
+                                
+                                if label_type == 'angle':
+                                    
+                                    st = int(pol_loc_list[0])
+                                    ed = int(pol_loc_list[-1]) + 1
+                                                                        
+                                    sx_limit = neuden_dat[st:ed, 14:]
+                                    psi_limit = psi_map[st:ed, 14:]
+                                    Ra_limit = ang_map[:, 14:]
+                                    
+                                    self.cpmc.twcontourp(plot_2dval = sx_limit, R_coord = Ra_limit, 
+                                            Z_coord = psi_limit, quantity = title_name, axs = axs, 
+                                                      norm_type = norm_type, lv = 40)
+                                    
+                                    axs.set_ylabel("$\psi_N$")
+                                    axs.set_xlabel("poloidal angle")
+                                    
+                                    
+                                    
+                                
+                                elif label_type == 'index':
+                                    
+                                    sx_limit = neuden_dat[:, 14:]
+                                    psi_limit = psi_map[:, 14:]
+                                    Ra_limit = Ra_map[:, 14:]
+                                    
+                                    
+                                    self.cpmc.twcontourp(plot_2dval = sx_limit, R_coord = Ra_limit, 
+                                            Z_coord = psi_limit, quantity = title_name, axs = axs, 
+                                                      norm_type = norm_type, lv = 40)
+                                    
+                                    axs.set_ylabel("$\psi_N$")
+                                    axs.set_xlabel("poloidal index")
+                                    
+                                    
+                                                                 
+                                
+                                
+                            
+                            
                             
                             
                             elif plot_name == 'sx':
@@ -192,40 +283,41 @@ class Rectangular_contour:
                                 title_name = '{0} $\Gamma_r ={1}$*$10^{{20}}$ 1/s, $q_r = {2}*10^5$ W'.format(datname, ad, ap)
                                 
                                 
-                                plot_range = 'limit'
-                                
-                                if plot_range == 'full':
+                                if label_type == 'angle':
                                     
-                                    self.cpmc.twcontourp(plot_2dval = sx, R_coord = psi_map, Z_coord = extend_Ra, 
-                                                      quantity = title_name, axs = axs, 
+                                    st = int(pol_loc_list[0])
+                                    ed = int(pol_loc_list[-1]) + 1
+                                                                        
+                                    sx_limit = sx[st:ed, 14:]
+                                    psi_limit = psi_map[st:ed, 14:]
+                                    Ra_limit = ang_map[:, 14:]
+                                    
+                                    self.cpmc.twcontourp(plot_2dval = sx_limit, R_coord = Ra_limit, 
+                                            Z_coord = psi_limit, quantity = title_name, axs = axs, 
                                                       norm_type = norm_type, lv = 40)
+                                    
+                                    axs.set_ylabel("$\psi_N$")
+                                    axs.set_xlabel("poloidal angle")
                                 
-                                elif plot_range == 'limit':
+                                elif label_type == 'index':
                                     
-                                    sx_limit = sx[:, 18:]
-                                    psi_limit = psi_map[:, 18:]
-                                    Ra_limit = extend_Ra[:, 18:]
+                                    sx_limit = sx[:, 14:]
+                                    psi_limit = psi_map[:, 14:]
+                                    Ra_limit = Ra_map[:, 14:]
                                     
-                                    
-                                    
-                                    
-                                    self.cpmc.twcontourp(plot_2dval = sx_limit, R_coord = Rad_limit, 
-                                            Z_coord = Vert_limit, quantity = title_name, axs = axs, 
+                                    self.cpmc.twcontourp(plot_2dval = sx_limit, R_coord = Ra_limit, 
+                                            Z_coord = psi_limit, quantity = title_name, axs = axs, 
                                                       norm_type = norm_type, lv = 40)
-                    
+                                    
+                                    axs.set_ylabel("$\psi_N$")
+                                    axs.set_xlabel("poloidal index")
+                                                                 
+                                
+                                
                             
-                            axs.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = 'black')
-                            axs.set_xlabel('R: [m]')
-                            axs.set_ylabel('Z: [m]')
 
 
-                            if limit:
-                                
-                                axs.set_xlim(0, 2)
-                                axs.set_ylim(-2, -1)
-                            
-                            else:
-                                pass
+
              
 
                         elif scan_style == 'tempscan':
