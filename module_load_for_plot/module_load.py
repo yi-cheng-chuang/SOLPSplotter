@@ -94,6 +94,8 @@ class load_prepare_module:
                 xmc.calc_ndSmid_cut()
                 xtr.load_target_profile()
                 
+                
+                
                 return poloidal_index_list
             
             
@@ -106,7 +108,8 @@ class load_prepare_module:
                 xpf.opacity_data_fit(pol_list = poloidal_loc_list, check_ne = False)
                 xrp.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
                 xtr.load_target_profile()
-            
+                
+
             
                 return poloidal_loc_list
             
@@ -115,8 +118,14 @@ class load_prepare_module:
                 
                 xlf.load_ft46()
                 
+                poloidal_loc_list = []
+                for i in range(40):
+                    poloidal_loc_list.append('{}'.format(28 + i))
                 
-                return poloidal_index_list
+                xrp.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
+                
+                
+                return poloidal_loc_list
                 
                 
 
