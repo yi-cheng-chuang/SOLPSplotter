@@ -22,9 +22,9 @@ def Setting_dic():
         def __init__(self):
             
             
-            self.DEV = 'mast'
+            self.DEV = 'mastu'
             self.a = 0.5
-            self.withshift = True
+            self.withshift = False
             self.withseries = False
             self.terminal = terminal
             if self.withseries:
@@ -39,6 +39,14 @@ def Setting_dic():
             self.series_compare = False
             self.plot_setting = 'mod_transcoe'
             self.data_size = 'small'
+        
+        
+        @classmethod
+        def add_class_attribute(cls, name, value):
+            
+            setattr(cls, name, value)
+            
+        
     
     DF = DefaultSettings()
     
