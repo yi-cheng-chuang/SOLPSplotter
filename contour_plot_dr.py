@@ -63,7 +63,7 @@ class contour_datapipline:
         if self.DF.DEV == 'mast':
             
             
-            poloidal_index_list = xlp.prepare_for_plots(plot_type = 'contour')
+            poloidal_loc_list = xlp.prepare_for_plots(plot_type = 'contour')
             
             
             
@@ -96,7 +96,7 @@ class contour_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                contour_theme = 'twscan_binfocus_contour'
+                contour_theme = 'twscan_rectangular_contour'
                 
                 if contour_theme == 'tw_eirene_contour':
                     
@@ -115,8 +115,19 @@ class contour_datapipline:
                 
                 elif contour_theme == 'twscan_rectangular_contour':
                     
-                    xrc.twrectangular_test()
+                    test = False
                     
+                    if test:
+                        
+                        xrc.twrectangular_test()
+                    
+                    else:
+                        
+                        xrc.twrectangular_contour_plot(scan_style = 'denscan', plot_name = 'neuden', 
+                                    norm_type = 'allpositivelog', pol_loc_list = poloidal_loc_list,
+                                    label_type = 'index')
+                        
+                   
 
 
                 else:
