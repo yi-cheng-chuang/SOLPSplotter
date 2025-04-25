@@ -66,7 +66,7 @@ class correlation_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                corrplot_theme = 'twscan_corr'
+                corrplot_theme = 'binplot'
                 
                 
                 if corrplot_theme == 'twscan_corr':
