@@ -166,10 +166,11 @@ class bin_plot:
         axs.plot(sep_R, sep_Z,'-', color = 'green', label = 'separatrix')
         axs.plot(outl_R, outl_Z,'--', color = 'black', label = 'plot limits')
         axs.plot(innl_R, innl_Z,'--', color = 'black')
-        
-        
-        axs.legend(loc= 'lower right')
-
+        axs.legend(loc= 'upper right')
 
         axs.plot(vessel[:,0]/1000, vessel[:,1]/1000, color = 'black')
+        axs.set_xlabel("R: [m]")
+        axs.set_ylabel("Z: [m]")
+        
+        plt.gca().set_aspect('equal')
 
