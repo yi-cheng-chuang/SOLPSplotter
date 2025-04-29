@@ -22,10 +22,10 @@ def Setting_dic():
         def __init__(self):
             
             
-            self.DEV = 'mastu'
+            self.DEV = 'mast'
             self.a = 0.5
             self.withshift = False
-            self.withseries = False
+            self.withseries = True
             self.terminal = terminal
             if self.withseries:
                 self.series_flag = 'twin_scan'
