@@ -48,6 +48,8 @@ class plot_geo:
         fig.colorbar(SM, ax=ax)
         plt.show()
     
+    
+    
     def plot_g(self):
         
         psi = self.data['gfile']['gcomp']['psiN']
