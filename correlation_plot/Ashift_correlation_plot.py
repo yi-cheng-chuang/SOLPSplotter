@@ -180,7 +180,7 @@ class aspect_ratio_correlate:
                 plt.scatter(x_cor, data_collect[:, p], color= color_list[p], label= 'A= {}'.format(A_list[p]))
             plt.axvline(x= 0.7/0.5, color='salmon',lw=3, ls='--', label= 'MAST')
             plt.axvline(x= 1.67/0.67, color='lime',lw=3, ls='--', label= 'D3D')
-            plt.axvline(x= 0.68/0.22, color='cyan',lw=3, ls='--', label= 'ITER')
+            plt.axvline(x= 6.2/2, color='cyan',lw=3, ls='--', label= 'ITER')
             # plt.axvline(x= 3.4, color='black',lw=3, ls='--', label= 'JT-60 aspect ratio')
             plt.xlabel('aspect ratio')
             # plt.ylabel('dimensionless opaqueness')
