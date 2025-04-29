@@ -15,6 +15,7 @@ from load_coordinate.SOLPSplotter_geo import load_geometry
 from set_plot.plot_format import plot_setting
 from fit_data.fitting_method import fit_method_collection
 from midplane_data.SOLPSplotter_PRmap import RP_mapping
+from separatrix_data.pol_sep_calculation import poloidal_separatrix_calc
 from load_experimental_data.load_expdata_method import read_expdata_method
 from load_experimental_data.SOLPSplotter_load_expdata import load_expdata
 from load_simulation_data.read_B2simulation_data import load_B2simu_data
@@ -47,6 +48,7 @@ class load_prepare_module:
         xps = plot_setting(DF = self.DF, data = self.data)
         xfm = fit_method_collection(DF = self.DF, data = self.data)
         xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
+        xpsc = poloidal_separatrix_calc(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
         xre = read_expdata_method(DF = self.DF, data = self.data)
         xle = load_expdata(DF = self.DF, data = self.data, fmc= xfm, rem = xre, lg= xlg)
         xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
@@ -71,7 +73,7 @@ class load_prepare_module:
             xps.set_plot()
             
             
-            xrp.calc_RRsep(plotRR= False, plot_psi_dsa_align= False)
+            xrp.calc_RRsep(plotRR= False, plot_psi_dsa_align= False, midplane_loc = 'maxis')
             fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
                                       'plot_exp_and_fit': True, 'plot_shift_compare': False,
                                       'data_print': True}
@@ -106,7 +108,7 @@ class load_prepare_module:
                     poloidal_loc_list.append('{}'.format(28 + i))
                 
                 xpf.opacity_data_fit(pol_list = poloidal_loc_list, check_ne = False)
-                xrp.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
+                xpsc.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
                 xtr.load_target_profile()
                 
 
@@ -122,7 +124,7 @@ class load_prepare_module:
                 for i in range(40):
                     poloidal_loc_list.append('{}'.format(28 + i))
                 
-                xrp.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
+                xpsc.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
                 
                 
                 return poloidal_loc_list
