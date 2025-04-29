@@ -48,7 +48,7 @@ class transport_coefficient_adjustment:
                 if j<= de_SOL:
                     mod_y[j] = cod[j,1]
                 else:
-                    mod_y[j] = 20.0
+                    mod_y[j] = 10.0
             cod[:,1] = mod_y
 
             mod_yki = np.zeros(m)
@@ -130,7 +130,7 @@ class transport_coefficient_adjustment:
                 
                 
                 if j>= de_ped1 and j<= de_ped2:
-                    mod_y[j] = 0.12
+                    mod_y[j] = 0.01
                 elif j< de_ped1:
                     mod_y[j] = cod[j,1]
                 elif j> de_ped2 and j<=de_SOL:
@@ -214,7 +214,7 @@ class transport_coefficient_adjustment:
         
         if withshift == False and withseries == False:
             simudir = self.data['dirdata']['simudir']
-            fileloc = '{}/b2.transport.inputfile_new'.format(simudir)
+            fileloc = '{}/b2.transport.inputfile'.format(simudir)
             self.mod_transco_method(file_loc = fileloc, withmod = withmod, de_SOL = de_SOL, 
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
         
