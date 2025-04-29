@@ -11,7 +11,6 @@ from load_directory.load_dirdata_method import load_dir_method
 from load_directory.grab_attempt_number import grab_aptn_method
 from load_coordinate.load_coord_method import load_coordgeo_method
 from load_coordinate.SOLPSplotter_geo import load_geometry
-from plot_geometry.SOLPSplotter_plotgeo import plot_geo
 from set_plot.plot_format import plot_setting
 from fit_data.fitting_method import fit_method_collection
 from midplane_data.SOLPSplotter_PRmap import RP_mapping
@@ -21,7 +20,7 @@ from load_experimental_data.SOLPSplotter_mastuTS import preprocess_mastuTS
 from load_simulation_data.read_B2simulation_data import load_B2simu_data
 from load_simulation_data.read_ft_files import load_ftfiles_data
 from fit_data.SOLPSplotter_fit import profile_fit
-
+from midplane_data.measure_minor_radius_plot import minor_radius_measurement
 # from midplane_data.midplane_netendS import midplane_radial
 # from midplane_data.midplane_ndS_cut import midplane_ndsource_withcut
 # from targets_data.target_fileload import target_dataload
@@ -47,7 +46,7 @@ class mastu_load_prepare_module:
         xld = load_directory(DF = self.DF, data = self.data, di= xdi, ldm= xldm)
         xlc = load_coordgeo_method(DF = self.DF, data = self.data)
         xlg = load_geometry(DF = self.DF, data = self.data, lcm = xlc)
-        xpg = plot_geo(DF = self.DF, data = self.data)
+        
         xps = plot_setting(DF = self.DF, data = self.data)
         xfm = fit_method_collection(DF = self.DF, data = self.data)
         xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
@@ -57,6 +56,7 @@ class mastu_load_prepare_module:
         xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
         xlf = load_ftfiles_data(DF = self.DF, data = self.data, ldm= xldm)
         xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
+        xmrm = minor_radius_measurement(DF = self.DF, data = self.data, rp= xrp)
         # xmr = midplane_radial(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
         # xmc = midplane_ndsource_withcut(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
         # xtd = target_dataload(DF = self.DF, data = self.data)
@@ -71,9 +71,10 @@ class mastu_load_prepare_module:
             
             xld.load_mastu_dir()
             xlg.load_mastusolpsgeo()
-
+            xlg.load_vessel()
             xlg.calcpsi_avcr()
-            xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False)
-            xpg.plot_g()
-            xpg.plot_sec()
-            xpm.load_mastu_TS(plot_OD = False, plot_P = True, writefile = True)
+            xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'TSmeasure')
+            xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'maxis')
+            xmrm.calc_minor_radius(plotRR= True)
+            # xpm.load_mastu_TS(plot_OD = False, plot_P = False, writefile = True)
+            
