@@ -66,7 +66,7 @@ class RP_mapping:
     
     
     
-    def calc_RRsep_method(self, geo, radgrid, vertgrid, gfile_data, psiNinterp_function, plotRR):
+    def calc_RRsep_method(self, geo, radgrid, vertgrid, gfile_data, psiNinterp_function, plotRR, midplane_loc):
                
         pol_range = int(geo['nx'] + 2)
         rad_range = int(geo['ny'] + 2)
@@ -98,14 +98,31 @@ class RP_mapping:
             average_pair = (58, 60)
         
         elif DEV == 'mastu':
-            mag_axis_z = 0.15
             
-            crup = RadLoc[:, 71]
-            crlow = RadLoc[:, 73]
-            czup = VertLoc[:, 71]
-            czlow = VertLoc[:, 73]
+                       
+            if midplane_loc == 'maxis':
+                
+                mag_axis_z = gfile_data['zmaxis']
+                
+                crup = RadLoc[:, 72]
+                crlow = RadLoc[:, 74]
+                czup = VertLoc[:, 72]
+                czlow = VertLoc[:, 74]
+                
+                average_pair = (72, 74)
             
-            average_pair = (71, 73)
+            elif midplane_loc == 'TSmeasure':
+                
+                mag_axis_z = 0.15
+                
+                crup = RadLoc[:, 71]
+                crlow = RadLoc[:, 73]
+                czup = VertLoc[:, 71]
+                czlow = VertLoc[:, 73]
+                
+                average_pair = (71, 73)
+                
+        
         
         else:
             print("please check the device input")
@@ -142,12 +159,13 @@ class RP_mapping:
         sep_index_dic = self.calc_sep_index(psi = psi_solps_mid, sep_value = 1)
         sep_index_high = int(sep_index_dic['index'][1])
         
+        print('index high number is {}'.format(sep_index_high))
         
         weight_psi = (psi_solps_mid[sep_index_high] -1)/(psi_solps_mid[sep_index_high] - psi_solps_mid[sep_index_high -1])
         
         R_sep = (1 - weight_psi)*mid_R[sep_index_high] + weight_psi*mid_R[sep_index_high -1]
         
-        print('rsep is {:.2f}'.format(R_sep))
+        print('rsep is {:.3f}'.format(R_sep))
         
         # psi_high = psi_solps_mid[sep_index_high]
         # psi_low = psi_solps_mid[sep_index_high -1]
@@ -163,9 +181,9 @@ class RP_mapping:
         midR_psi_func = interp1d(mid_R, psi_solps_mid, kind='quadratic', fill_value = 'extrapolate')
         
         
-        rsep_fit = midR_psi_func(1.37)
+        rsep_fit = midR_psi_func(R_sep)
         
-        print('rsep_mid return psiN value: {:.2f}'.format(rsep_fit))
+        print('rsep_mid return psiN value: {:.3f}'.format(rsep_fit))
         
         
         midplane_dic = {'weight': weight_mid, 'mid_choice': mid_choice, 
@@ -206,10 +224,11 @@ class RP_mapping:
     
     
     
-    def calc_RRsep(self, plotRR, plot_psi_dsa_align):
+    def calc_RRsep(self, plotRR, plot_psi_dsa_align, midplane_loc):
         
         withshift = self.DF.withshift
         withseries = self.DF.withseries
+        DEV = self.DF.DEV
         
         
         
@@ -223,13 +242,32 @@ class RP_mapping:
             
             midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(geo = b2fgeo, 
                         radgrid = radloc, vertgrid = vertloc, gfile_data = gfile, psiNinterp_function = psiNinterp_RBS, 
-                        plotRR = plotRR)
+                        plotRR = plotRR, midplane_loc = midplane_loc)
             
-            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
-            self.data['midplane_calc'] = midplane_dic
             
-            self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
-        
+            
+            if DEV == 'mast':
+                
+                self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
+                self.data['midplane_calc'] = midplane_dic            
+                self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
+            
+            elif DEV == 'mastu':
+                
+                if midplane_loc == 'maxis':
+                    
+                    self.data['DefaultSettings']['psi_dsa_maxis'] = psi_dsa_ratio
+                    self.data['midplane_calc_maxis'] = midplane_dic            
+                    self.data['DefaultSettings']['sep_index_RRsep_maxis'] = sep_index_high
+                    
+                    
+                elif midplane_loc == 'TSmeasure':
+                    
+                    self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
+                    self.data['midplane_calc'] = midplane_dic            
+                    self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
+                
+     
         
         elif withshift == True and withseries == False:        
             
@@ -247,15 +285,33 @@ class RP_mapping:
                                
                 midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(geo = b2fgeo, 
                             radgrid = radloc, vertgrid = vertloc, gfile_data = gfile, psiNinterp_function = psiNinterp_RBS, 
-                            plotRR = plotRR)
+                            plotRR = plotRR, midplane_loc = midplane_loc)
                 
                 midplane_series_dic[aa] = midplane_dic
                 psi_dsa_dic[aa] = psi_dsa_ratio
                 sep_index_dic[aa] = sep_index_high
+                
             
-            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
-            self.data['midplane_calc'] = midplane_series_dic
-            self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_dic
+            if DEV == 'mast':
+                
+                self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
+                self.data['midplane_calc'] = midplane_series_dic           
+                self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_dic
+            
+            elif DEV == 'mastu':
+                
+                if midplane_loc == 'maxis':
+                    
+                    self.data['DefaultSettings']['psi_dsa_maxis'] = psi_dsa_dic
+                    self.data['midplane_calc_maxis'] = midplane_series_dic            
+                    self.data['DefaultSettings']['sep_index_RRsep_maxis'] = sep_index_dic
+                    
+                    
+                elif midplane_loc == 'TSmeasure':
+                    
+                    self.data['DefaultSettings']['psi_dsa'] = psi_dsa_dic
+                    self.data['midplane_calc'] = midplane_series_dic           
+                    self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_dic
                 
                 
             if plot_psi_dsa_align:
@@ -284,11 +340,32 @@ class RP_mapping:
             
             midplane_dic, psi_dsa_ratio, sep_index_high = self.calc_RRsep_method(geo = b2fgeo, 
                         radgrid = radloc, vertgrid = vertloc, gfile_data = gfile, psiNinterp_function = psiNinterp_RBS, 
-                        plotRR = plotRR)
+                        plotRR = plotRR, midplane_loc = midplane_loc)
             
-            self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
-            self.data['midplane_calc'] = midplane_dic
-            self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
+            
+            
+            if DEV == 'mast':
+                
+                self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
+                self.data['midplane_calc'] = midplane_dic            
+                self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
+            
+            elif DEV == 'mastu':
+                
+                if midplane_loc == 'maxis':
+                    
+                    self.data['DefaultSettings']['psi_dsa_maxis'] = psi_dsa_ratio
+                    self.data['midplane_calc_maxis'] = midplane_dic            
+                    self.data['DefaultSettings']['sep_index_RRsep_maxis'] = sep_index_high
+                    
+                    
+                elif midplane_loc == 'TSmeasure':
+                    
+                    self.data['DefaultSettings']['psi_dsa'] = psi_dsa_ratio
+                    self.data['midplane_calc'] = midplane_dic            
+                    self.data['DefaultSettings']['sep_index_RRsep'] = sep_index_high
+            
+            
         
         elif self.withshift == True and self.withseries == True:
             print('calc_RRsep function is not there yet!')
