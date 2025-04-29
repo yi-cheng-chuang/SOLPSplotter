@@ -69,12 +69,12 @@ class transcoe_mod_datapipline:
         
         if mod_detail:
             
-            xtca.transco_mod_detail(withmod = True, de_ped1 = 16, de_ped2 = 30, de_SOL = 32, 
+            xtca.transco_mod_detail(withmod = True, de_ped1 = 16, de_ped2 = 28, de_SOL = 32, 
                                     ki_SOL = 18, ke_SOL = 21, log_flag = True)
             
         else:
             
-            xtca.mod_transco(withmod = True, de_SOL = 32, ki_SOL = 18, 
+            xtca.mod_transco(withmod = True, de_SOL = 18, ki_SOL = 18, 
                              ke_SOL = 21, log_flag = True)
         
        
