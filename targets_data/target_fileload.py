@@ -26,7 +26,7 @@ class target_dataload:
         dat_size = self.DF.data_size
         
         
-        if withshift == True and withseries == False:
+        if withshift == False and withseries == False:
             
             if dat_size == 'small':
                 nx = data_struc['nx']
@@ -72,7 +72,7 @@ class target_dataload:
                 neuden_dat = self.data['ft44'][itername]['dab2'][:, :, 0]
                 # neuden_dat = np.transpose(data[:, :, 0])
                               
-                psi_coord = self.data['psi']['psival'][1:ny+1, 1:nx+1]
+                psi_coord = self.data['psi']['psival'][itername][1:ny+1, 1:nx+1]
             
             else:
                 
