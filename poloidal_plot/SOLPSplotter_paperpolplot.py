@@ -5,32 +5,22 @@ Created on Wed Mar 27 14:25:17 2024
 @author: user
 """
 
-from SOLPSplotter_fit import profile_fit
+
 from matplotlib.offsetbox import AnchoredText
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class paper_poloidal_plot(profile_fit):
-    def __init__(self, DefaultSettings, loadDS):
-        profile_fit.__init__(self, DefaultSettings, loadDS)
+class paper_poloidal_plot:
     
     
-    def set_plot(self, plot_style):
-        if plot_style == 'pol_subplot':
-            plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 4, markersize= 7)
-            plt.rcParams.update({'font.size': 14})
-            plt.rcParams.update({'figure.facecolor':'w'})
-            plt.rcParams.update({'mathtext.default': 'regular'})
-            # plt.rcParams['figure.figsize'] = 40, 12
-            
-  
-        else:
-            print('Publish setting is incorrect or add another setting')
     
-
+    def __init__(self, DF, data):
+        
+        self.DF = DF
+        self.data = data
     
+   
      
     def paper_poloidal_method(self, item, pol_angle, result_dic, color_code, 
                                  A_value, unit_dic, ax, plot_order):
@@ -217,12 +207,12 @@ class paper_poloidal_plot(profile_fit):
             pass
         
         
-        if self.withshift == False and self.withseries == False:
+        if self.DF.withshift == False and self.DF.withseries == False:
             
             # result = self.data['nxny_sep_data']
 
             
-            unit = self.opacity_study_unit()
+            unit = self.data['opacity_study_unit']
             pol_loc = self.data['angle']['angle_list']
             xpoint = self.data['angle']['xpoint_angle']
             a_shift = self.data['dircomp']['a_shift']
@@ -237,7 +227,7 @@ class paper_poloidal_plot(profile_fit):
             self.nolegend_pol_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint,
                                 ax = ax)
         
-        elif self.withshift == True and self.withseries == False:
+        elif self.DF.withshift == True and self.DF.withseries == False:
             
             
             # result = self.data['nxny_sep_data']
@@ -262,7 +252,7 @@ class paper_poloidal_plot(profile_fit):
                 
                 dat_set = result[aa]
                 
-                unit = self.opacity_study_unit()
+                unit = self.data['opacity_study_unit']
                 pol_loc = self.data['angle']['angle_list'][aa]
                 xpoint = self.data['angle']['xpoint_angle'][aa]
 
@@ -292,12 +282,12 @@ class paper_poloidal_plot(profile_fit):
             pass
         
         
-        if self.withshift == False and self.withseries == False:
+        if self.DF.withshift == False and self.DF.withseries == False:
             
             # result = self.data['nxny_sep_data']
 
             
-            unit = self.opacity_study_unit()
+            unit = self.data['opacity_study_unit']
             pol_loc = self.data['angle']['angle_list']
             xpoint = self.data['angle']['xpoint_angle']
             a_shift = self.data['dircomp']['a_shift']
@@ -312,7 +302,7 @@ class paper_poloidal_plot(profile_fit):
             self.neuden_poloidal_label(angle_fix= pol_loc, item= i_name, xpoint_fix = xpoint)
         
         
-        elif self.withshift == True and self.withseries == False:
+        elif self.DF.withshift == True and self.DF.withseries == False:
             
             
             # result = self.data['nxny_sep_data']
@@ -321,7 +311,7 @@ class paper_poloidal_plot(profile_fit):
                 
                 dat_set = result[aa]
                 
-                unit = self.opacity_study_unit()
+                unit = self.data['opacity_study_unit']
                 pol_loc = self.data['angle']['angle_list'][aa]
                 xpoint = self.data['angle']['xpoint_angle'][aa]
 
