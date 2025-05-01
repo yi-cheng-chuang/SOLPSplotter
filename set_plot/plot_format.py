@@ -55,7 +55,17 @@ class plot_setting():
             plt.rcParams.update({'font.size': 10})
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
-  
+        
+        
+        elif self.DF.plot_setting == 'pol_subplot':
+            plt.rcParams.update({'font.weight': 'normal'})
+            plt.rc('lines', linewidth= 4, markersize= 7)
+            plt.rcParams.update({'font.size': 14})
+            plt.rcParams.update({'figure.facecolor':'w'})
+            plt.rcParams.update({'mathtext.default': 'regular'})
+            # plt.rcParams['figure.figsize'] = 40, 12
+            
+ 
         else:
             print('Publish setting is incorrect or add another setting')
 
