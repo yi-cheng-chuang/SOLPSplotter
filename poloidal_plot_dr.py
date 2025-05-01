@@ -12,6 +12,7 @@ from twscan_module.twinscan_prepare import twscan_assist
 from poloidal_plot.twscan_polfluxndS_poloidal import twscan_polfluxndS_polplot
 from poloidal_plot.twscan_opacity_poloidal import twscan_opacity_polplot
 from poloidal_plot.twscan_boundarynendS_poloidal import twscan_boundary_nendS_polplot
+from poloidal_plot.SOLPSplotter_paperpolplot import paper_poloidal_plot
 
 
 
@@ -41,6 +42,7 @@ class poloidal_datapipline:
         xtp = twscan_polfluxndS_polplot(DF = self.DF, data = self.data, twa = xta)
         xto = twscan_opacity_polplot(DF = self.DF, data = self.data, twa = xta)
         xtbn = twscan_boundary_nendS_polplot(DF = self.DF, data = self.data, twa = xta)
+        xppp = paper_poloidal_plot(DF = self.DF, data = self.data)
         
         
         
@@ -85,7 +87,13 @@ class poloidal_datapipline:
             
             elif withshift == True and withseries == False:
                 
-                pass
+                
+                polplot_theme = 'PSIpaper'
+                
+                if polplot_theme == 'PSIpaper':
+                    
+                    xppp.paper_poloidal_subplot(log_flag = False)
+                
             
             
             
