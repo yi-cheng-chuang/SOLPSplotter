@@ -71,6 +71,7 @@ class load_prepare_module:
             xlg.calcpsi_avcr()
             xlg.load_vessel()
             xps.set_plot()
+            xps.opacity_study_unit()
             
             
             xrp.calc_RRsep(plotRR= False, plot_psi_dsa_align= False, midplane_loc = 'maxis')
