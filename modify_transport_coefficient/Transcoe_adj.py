@@ -109,7 +109,7 @@ class transport_coefficient_adjustment:
         
 
         
-    def transcoe_detailmod_method(self,file_loc, withmod, de_ped1, de_ped2, de_SOL, ki_SOL, ke_SOL, log_flag):
+    def transcoe_detailmod_method(self,file_loc, withmod, de_ped, de_SOL, ki_SOL, ke_SOL, log_flag):
         
         
         DEV = self.DF.DEV
@@ -129,15 +129,13 @@ class transport_coefficient_adjustment:
             for j in range(m):
                 
                 
-                if j>= de_ped1 and j<= de_ped2:
-                    mod_y[j] = 0.01
-                elif j< de_ped1:
+                if j>= de_ped and j<= de_SOL:
                     mod_y[j] = cod[j,1]
-                elif j> de_ped2 and j<=de_SOL:
-                    mod_y[j] = cod[j,1]
+                if j< de_ped:
+                    mod_y[j] = 1.0
                     
                 elif j> de_SOL:
-                    mod_y[j] = 20.0
+                    mod_y[j] = 5.0
                 
                     
             cod[:,1] = mod_y
@@ -235,7 +233,7 @@ class transport_coefficient_adjustment:
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
     
     
-    def transco_mod_detail(self, withmod, de_ped1, de_ped2, de_SOL, ki_SOL, ke_SOL, log_flag, modnew):
+    def transco_mod_detail(self, withmod, de_ped, de_SOL, ki_SOL, ke_SOL, log_flag, modnew):
         
         
         withshift = self.DF.withshift
@@ -251,7 +249,7 @@ class transport_coefficient_adjustment:
             else:
                 fileloc = '{}/b2.transport.inputfile'.format(simudir)
             
-            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_ped1 = de_ped1, de_ped2 = de_ped2, de_SOL = de_SOL, 
+            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_ped = de_ped, de_SOL = de_SOL, 
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
         
         elif withshift == True and withseries == False:
@@ -262,7 +260,7 @@ class transport_coefficient_adjustment:
                 fileloc = '{}/b2.transport.inputfile_new'.format(simudir)
             else:
                 fileloc = '{}/b2.transport.inputfile'.format(simudir)
-            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_ped1 = de_ped1, de_ped2 = de_ped2, de_SOL = de_SOL, 
+            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_ped = de_ped, de_SOL = de_SOL, 
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
         
         
