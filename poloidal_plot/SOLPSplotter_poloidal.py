@@ -5,50 +5,20 @@ Created on Wed Jan 31 17:25:25 2024
 @author: ychuang
 """
 
-from SOLPSplotter_fit import profile_fit
+
 import matplotlib.pyplot as plt
-import SOLPS_set as ss
 import numpy as np
 
 
-class poloidal_plot(profile_fit):
-    def __init__(self, DefaultSettings, loadDS):
-        profile_fit.__init__(self, DefaultSettings, loadDS)
+class poloidal_plot:
+    
+    
+    def __init__(self, DF, data):
         
-        self.Publish = DefaultSettings['Publish']
-        self.data['DefaultSettings']['Publish'] = self.Publish
+        self.DF = DF
+        self.data = data
     
-    
-    def set_plot(self):
-        if self.Publish == 'b2plottersetting':
-            plt.rcParams.update({'font.weight': 'normal'})
-            plt.rc('lines', linewidth= 5, markersize= 9)
-            plt.rcParams.update({'font.size': 16})
-            plt.rcParams.update({'figure.facecolor':'w'})
-            plt.rcParams.update({'mathtext.default': 'regular'})
-  
-        else:
-            print('Publish setting is incorrect or add another setting')
-
-
-
-    
-    # def opacity_study_unit(self):
-    #     unit = {'efold_length_psiN': 'Neutral penetration length ($\psi_N$)',
-    #             'pedestal_width_psiN': 'Pedestal width ($\psi_N$)',
-    #               'dimensionless_opaqueness': 'Experimental opaqueness', 
-    #               'neutral_density': 'Neutral density ${n_D}$ (m$^{-3}$)', 
-    #               'electron_pedestal_density': 'Electron pedestal density: $n_{ped}$ (m$^{-3}$)',
-    #               'temperature_pedestal_width': 'Temperature pedestal width: $\Delta T$',
-    #               'flux_expansion': 'Flux expansion',
-    #               'efold_length': '$\lambda_{n_D}$ [mm]',
-    #               'pedestal_width': '$\Delta n_e$ [mm]',
-                  
-    #               }
-    #     return unit
-    
-    
-   
+         
     def opacity_poloidal_plot_method(self, item, pol_angle, result_dic, color_code, 
                                  A_value, unit_dic):
         
@@ -135,7 +105,7 @@ class poloidal_plot(profile_fit):
     def neuden_data_check(self, pol_list):
         
         
-        if self.withshift == False and self.withseries == False:
+        if self.DF.withshift == False and self.DF.withseries == False:
             
             list_len = len(pol_list)
             cp_dat = np.zeros([list_len, 3])
@@ -149,7 +119,7 @@ class poloidal_plot(profile_fit):
             
             self.data['neuden_angle'] = cp_dat
         
-        elif self.withshift == True and self.withseries == False:
+        elif self.DF.withshift == True and self.DF.withseries == False:
             
             cp_dat_dic = {}
             list_len = len(pol_list)
@@ -191,7 +161,7 @@ class poloidal_plot(profile_fit):
             else:
                 pass
             
-            if self.withshift == False and self.withseries == False:
+            if self.DF.withshift == False and self.DF.withseries == False:
                 
                 result = self.data['opacity_poloidal']
 
@@ -209,13 +179,13 @@ class poloidal_plot(profile_fit):
                 self.poloidal_label(angle_fix= pol_loc, item= i, xpoint_fix = xpoint)
                 
                 
-            elif self.withshift == True and self.withseries == False:
+            elif self.DF.withshift == True and self.DF.withseries == False:
                 
                 
                 for aa in self.data['dircomp']['multi_shift']:
                     
                     result = self.data['opacity_poloidal'][aa]
-                    unit = self.opacity_study_unit()
+                    unit = self.data['opacity_study_unit']
                     pol_loc = self.data['angle']['angle_list'][aa]
                     xpoint = self.data['angle']['xpoint_angle'][aa]
                     A_val = A_dic[aa]
@@ -229,13 +199,13 @@ class poloidal_plot(profile_fit):
                 
                 self.poloidal_label(angle_fix= ang_fix, item= i, xpoint_fix = xp_fix)
                 
-                if save_pdf:
+                # if save_pdf:
                     
-                    fig_dir  = ss.set_figdir()
-                    plt.savefig('{}/{}.pdf'.format(fig_dir, i), format='pdf')
+                #     fig_dir  = ss.set_figdir()
+                #     plt.savefig('{}/{}.pdf'.format(fig_dir, i), format='pdf')
             
             
-            elif self.withshift == True and self.withseries == False:
+            elif self.DF.withshift == True and self.DF.withseries == False:
                 
                 density_dic = {}
                 for k in self.data['dircomp']['Attempt'].keys():
@@ -261,7 +231,7 @@ class poloidal_plot(profile_fit):
                 self.poloidal_label(angle_fix= pol_loc, item= i, xpoint_fix = xpoint)
             
             
-            elif self.withshift == True and self.withseries == True:
+            elif self.DF.withshift == True and self.DF.withseries == True:
                 print('poloidal_plot function is not there yet!')
             
             
@@ -277,7 +247,7 @@ class poloidal_plot(profile_fit):
                      'dot7': 'blue', 'one': 'purple'}
         
         
-        if self.withshift == False and self.withseries == False:
+        if self.DF.withshift == False and self.DF.withseries == False:
             
             result = self.data['opacity_poloidal']
 
@@ -297,7 +267,7 @@ class poloidal_plot(profile_fit):
             
     
         
-        elif self.withshift == True and self.withseries == False:
+        elif self.DF.withshift == True and self.DF.withseries == False:
             
             
             for aa in self.data['dircomp']['multi_shift']:
@@ -360,6 +330,8 @@ class poloidal_plot(profile_fit):
                     x_cor = np.ones(len(iter_list))*A_list[p]
                     plt.scatter(x_cor, data_collect[:, p], color= color_list[p], 
                                 label= 'aspect ratio= {}'.format(str(A_list[p])))
+                    
+                    
                 plt.axvline(x= 0.7/0.5, color='salmon',lw=3, ls='--', 
                             label= 'MAST aspect ratio')
                 plt.axvline(x= 1.67/0.67, color='darkgreen',lw=3, ls='--', label= 'D3D aspect ratio')
