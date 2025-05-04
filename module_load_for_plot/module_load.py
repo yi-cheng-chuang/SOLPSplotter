@@ -23,6 +23,7 @@ from load_simulation_data.read_ft_files import load_ftfiles_data
 from fit_data.SOLPSplotter_fit import profile_fit
 from midplane_data.midplane_netendS import midplane_radial
 from midplane_data.midplane_ndS_cut import midplane_ndsource_withcut
+from midplane_data.cal_sep_length import seplength_calculator
 from targets_data.target_fileload import target_dataload
 from data_organize_tool.loadfiles_tools import series_loadfiles
 from targets_data.target_savedata import target_radial
@@ -49,6 +50,7 @@ class load_prepare_module:
         xfm = fit_method_collection(DF = self.DF, data = self.data)
         xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
         xpsc = poloidal_separatrix_calc(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
+        xsc = seplength_calculator(DF = self.DF, data = self.data)
         xre = read_expdata_method(DF = self.DF, data = self.data)
         xle = load_expdata(DF = self.DF, data = self.data, fmc= xfm, rem = xre, lg= xlg)
         xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
@@ -83,6 +85,7 @@ class load_prepare_module:
             xlb.load_b2wdat()
             xlf.load_ft44()
             xrp.calc_sep_dsa()
+            
 
             poloidal_index_list = ['59']
             xrp.calc_dsa(pol_loc= poloidal_index_list[0])
@@ -105,12 +108,13 @@ class load_prepare_module:
             elif plot_type == 'poloidal':
                 
                 poloidal_loc_list = []
-                for i in range(40):
-                    poloidal_loc_list.append('{}'.format(28 + i))
+                for i in range(44):
+                    poloidal_loc_list.append('{}'.format(25 + i))
                 
                 xpf.opacity_data_fit(pol_list = poloidal_loc_list, check_ne = False)
                 xpsc.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
                 xtr.load_target_profile()
+                xsc.sep_length(direct = 'out_to_in')
                 
 
             
