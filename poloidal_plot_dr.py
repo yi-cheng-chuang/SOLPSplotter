@@ -13,6 +13,13 @@ from poloidal_plot.twscan_polfluxndS_poloidal import twscan_polfluxndS_polplot
 from poloidal_plot.twscan_opacity_poloidal import twscan_opacity_polplot
 from poloidal_plot.twscan_boundarynendS_poloidal import twscan_boundary_nendS_polplot
 from poloidal_plot.SOLPSplotter_paperpolplot import paper_poloidal_plot
+from poloidal_plot.SOLPSplotter_poloidal import poloidal_plot
+from poloidal_plot.grant_proposal_plot import result_explain
+from poloidal_plot.integrate_flux_plot import integrate_flux
+from poloidal_plot.show_flux import show_flow
+
+
+
 
 
 
@@ -43,6 +50,10 @@ class poloidal_datapipline:
         xto = twscan_opacity_polplot(DF = self.DF, data = self.data, twa = xta)
         xtbn = twscan_boundary_nendS_polplot(DF = self.DF, data = self.data, twa = xta)
         xppp = paper_poloidal_plot(DF = self.DF, data = self.data)
+        xsf = show_flow(DF = self.DF, data = self.data)
+        xpp = poloidal_plot(DF = self.DF, data = self.data)
+        xre = result_explain(DF = self.DF, data = self.data)
+        # xif = integrate_flux(DF = self.DF, data = self.data, sc = xsc)
         
         
         
@@ -88,21 +99,97 @@ class poloidal_datapipline:
             elif withshift == True and withseries == False:
                 
                 
-                polplot_theme = 'PSIpaper'
+                polplot_theme = 'grant'
                 
                 if polplot_theme == 'PSIpaper':
                     
                     xppp.paper_poloidal_subplot(log_flag = False)
                 
+                
+                elif polplot_theme == 'poloidal':
+                    
+                    # xl.neuden_data_check(pol_list= poloidal_index_list)
+
+                    xpp.opacity_poloidal_plot(log_flag = False, save_pdf = False)
+                
+                
+                elif polplot_theme == 'integrate_flux':
+
+                    xif.allcover_three()
+
+                    # xl.allcover_twosum()
+                
+                elif polplot_theme == 'grant':
+
+                    xre.plot_addition_ndop()
+                    
+                    xre.plot_addition_ndflux()
+                    
+                    xre.shape_plot_addition(pol_list = poloidal_loc_list)
+                
+                
+                elif polplot_theme == 'showflux':
+                    
+                                       
+                    xsf.totpolflux()
+
+                    # xl.totpolfluxNR()
+
+
+                    # xl.totsource()
+                    # xl.totsourceNR()
+
+
+                    # xl.totnd()
+
+                    # xl.totndNR()
+
+
+                    xsf.totfluxes(pol_list = poloidal_loc_list)
+
+                    # xl.totfluxesNR(pol_list = poloidal_index_list)
+
+                    # xl.totfluxesNG(pol_list = poloidal_index_list)
+
+                    # xl.rebu_fluxesNG(pol_list = poloidal_index_list)
+
+
+                    # xl.avgfluxesNG(pol_list = poloidal_index_list)
+
+                    # xl.triNR_eq(side = 'HFS')polneteNR_HFS
+                    # xl.triNR_eq(side = 'LFS')
+
+                    # xl.polneteNG(side = 'HFS')
+                    # xl.polneteNG(side = 'LFS')
+
+                    # xl.triNG(side = 'HFS')
+                    # xl.triNG(side = 'LFS')
+
+                    # xl.allcover_fhix()
+
+                    # xl.spac_fhix()
+
+                    # xl.hflux_bar()
+
+                    # xl.hfluxe_bar()
+
+                    # xl.hflux_tot_bar()
+
+                    # xl.hflux_value_bar()
+
+                    # xl.pflux_tot_bar()
+                
+
+                    
+                    
+                
             
             
             
             
 
 
-            # xl.neuden_data_check(pol_list= poloidal_index_list)
-
-            # xl.opacity_poloidal_plot(log_flag = False, save_pdf = False)
+            
             
             
             
