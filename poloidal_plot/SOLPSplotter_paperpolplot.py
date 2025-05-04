@@ -35,9 +35,7 @@ class paper_poloidal_plot:
             
             anchored_text = AnchoredText('{}{}'.format(plot_order, unit_dic), 
                                          loc=2)
-            
-        
-        
+       
         if item == 'pedestal_width':
             new_r = result_dic[item]*2000
             ax.plot(pol_angle, new_r, '-', color= color_code, label= 'A= {}'.format(A_value))
@@ -81,11 +79,7 @@ class paper_poloidal_plot:
             
         else:
             pass
-        
-        
-        
-        
-        
+
         
         ax.add_artist(anchored_text)
                    
