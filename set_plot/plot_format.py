@@ -64,7 +64,18 @@ class plot_setting():
             plt.rcParams.update({'figure.facecolor':'w'})
             plt.rcParams.update({'mathtext.default': 'regular'})
             # plt.rcParams['figure.figsize'] = 40, 12
-            
+        
+        
+
+        elif self.Publish == 'b2plottersetting':
+            plt.rcParams.update({'font.weight': 'normal'})
+            plt.rc('lines', linewidth= 5, markersize= 9)
+            plt.rcParams.update({'font.size': 16})
+            plt.rcParams.update({'figure.facecolor':'w'})
+            plt.rcParams.update({'mathtext.default': 'regular'})
+  
+
+           
  
         else:
             print('Publish setting is incorrect or add another setting')
