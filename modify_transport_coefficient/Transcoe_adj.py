@@ -109,7 +109,7 @@ class transport_coefficient_adjustment:
         
 
         
-    def transcoe_detailmod_method(self,file_loc, withmod, de_ped, de_SOL, ki_SOL, ke_SOL, log_flag):
+    def transcoe_detailmod_method(self,file_loc, withmod, de_cut, ki_cut, ke_cut, log_flag, ped_adj):
         
         
         DEV = self.DF.DEV
@@ -122,39 +122,106 @@ class transport_coefficient_adjustment:
         yd= cod[:,1]
         yki = coki[:,1]
         yke = coke[:,1]
+        
+        
+        D_ped_adj = ped_adj[0]
+        ki_ped_adj = ped_adj[1]
+        ke_ped_adj = ped_adj[2]
+        
 
         m = len(yd)
         if withmod:
+            
+            de_ped = de_cut[0]
+            de_SOL = de_cut[1]
+            
             mod_y = np.zeros(m)
             for j in range(m):
                 
                 
                 if j>= de_ped and j<= de_SOL:
                     mod_y[j] = cod[j,1]
-                if j< de_ped:
-                    mod_y[j] = 1.0
+                    
+                elif j< de_ped:
+                    
+                    if D_ped_adj:
+                        mod_y[j] = 5.0
+                    
+                    else:
+                        mod_y[j] = cod[j,1]
+                        
+
                     
                 elif j> de_SOL:
-                    mod_y[j] = 5.0
+                    mod_y[j] = 20.0
                 
                     
             cod[:,1] = mod_y
-
+            
+            
+            ki_ped = ki_cut[0]
+            ki_SOL = ki_cut[1]
+            
+            
             mod_yki = np.zeros(m)
             for j in range(m):
-                if j<= ki_SOL:
-                    mod_yki[j] = coki[j,1]  
-                else:
+                
+                
+                if j>= ki_ped and j<= ki_SOL:
+                    mod_yki[j] = coki[j,1]
+                
+                elif j< ki_ped:
+                    
+                    if ki_ped_adj:
+                        mod_yki[j] = 14.0
+                    
+                    else:
+                        mod_yki[j] = coki[j,1]
+                
+                
+                elif j> ki_SOL:
+                    
                     mod_yki[j] = 20.0
+            
+            
             coki[:,1] = mod_yki
-
+            
+            
+            ke_ped = ke_cut[0]
+            ke_SOL = ke_cut[1]
+            
+            
+            
             mod_yke = np.zeros(m)
             for j in range(m):
-                if j<= ke_SOL:
-                    mod_yke[j] = coke[j,1]  
-                else:
+                
+                
+                if j>= ke_ped and j<= ke_SOL:
+                    
+                    mod_yke[j] = coke[j,1]
+                
+                elif j< ke_ped:
+                    
+                    if ke_ped_adj:
+                        mod_yke[j] = 20.0
+                    
+                    else:
+                        mod_yke[j] = coke[j,1]
+                
+                
+                elif j> ke_SOL:
+                    
                     mod_yke[j] = 20.0
+            
+            
+            
+            
+            
             coke[:,1] = mod_yke
+        
+        
+        
+        
         else:
             pass
 
@@ -233,7 +300,7 @@ class transport_coefficient_adjustment:
                                     ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
     
     
-    def transco_mod_detail(self, withmod, de_ped, de_SOL, ki_SOL, ke_SOL, log_flag, modnew):
+    def transco_mod_detail(self, withmod, de_cut, ki_cut, ke_cut, log_flag, modnew, ped_adj):
         
         
         withshift = self.DF.withshift
@@ -249,8 +316,8 @@ class transport_coefficient_adjustment:
             else:
                 fileloc = '{}/b2.transport.inputfile'.format(simudir)
             
-            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_ped = de_ped, de_SOL = de_SOL, 
-                                    ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
+            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_cut = de_cut,  
+                                    ki_cut = ki_cut, ke_cut = ke_cut, log_flag = log_flag, ped_adj = ped_adj)
         
         elif withshift == True and withseries == False:
             simudir = self.data['dirdata']['simudir']['org']
@@ -260,8 +327,10 @@ class transport_coefficient_adjustment:
                 fileloc = '{}/b2.transport.inputfile_new'.format(simudir)
             else:
                 fileloc = '{}/b2.transport.inputfile'.format(simudir)
-            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_ped = de_ped, de_SOL = de_SOL, 
-                                    ki_SOL = ki_SOL, ke_SOL = ke_SOL, log_flag = log_flag)
+            
+            
+            self.transcoe_detailmod_method(file_loc = fileloc, withmod = withmod, de_cut = de_cut,  
+                                    ki_cut = ki_cut, ke_cut = ke_cut, log_flag = log_flag, ped_adj = ped_adj)
         
         
         
