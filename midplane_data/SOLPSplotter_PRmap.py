@@ -113,14 +113,14 @@ class RP_mapping:
             
             elif midplane_loc == 'TSmeasure':
                 
-                mag_axis_z = 0.15
+                mag_axis_z = 0.015
                 
-                crup = RadLoc[:, 71]
-                crlow = RadLoc[:, 73]
-                czup = VertLoc[:, 71]
-                czlow = VertLoc[:, 73]
+                crup = RadLoc[:, 72]
+                crlow = RadLoc[:, 74]
+                czup = VertLoc[:, 72]
+                czlow = VertLoc[:, 74]
                 
-                average_pair = (71, 73)
+                average_pair = (72, 74)
                 
         
         
