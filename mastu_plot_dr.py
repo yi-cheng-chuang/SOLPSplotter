@@ -7,10 +7,9 @@ Created on Tue Apr 22 15:06:54 2025
 
 from SOLPS_input.input_setting import Setting_dic, loadDS_dic
 from module_load_for_plot.mastu_module_load import *
-from plot_geometry.SOLPSplotter_plotgeo import plot_geo
-from plot_geometry.plan_step import step_planning
-from contour_plot.B2_boundary_plot import B2_boundary_contour
-
+from vesselgeo_contour_plot.SOLPSplotter_plotgeo import plot_geo
+from vesselgeo_contour_plot.plan_step import step_planning
+from vesselgeo_contour_plot.B2_boundary_plot import B2_boundary_contour
 
 
 
