@@ -73,8 +73,10 @@ class mastu_load_prepare_module:
             xlg.load_mastusolpsgeo()
             xlg.load_vessel()
             xlg.calcpsi_avcr()
+            print('working on RRsep TSmeasure now...')
             xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'TSmeasure')
+            print('working on RRsep maxis now...')
             xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'maxis')
             xmrm.calc_minor_radius(plotRR= True)
-            # xpm.load_mastu_TS(plot_OD = False, plot_P = False, writefile = True)
+            xpm.load_mastu_TS(plot_OD = True, plot_P = True, writefile = True)
             
