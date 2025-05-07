@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from fit_data.fitting_method import fit_method_collection
 from scipy.optimize import curve_fit
 from lmfit import Model
+from scipy.interpolate import UnivariateSpline
 
 
 
@@ -95,6 +96,20 @@ class preprocess_mastuTS:
     
     
     
+    def merge_sorted_lists(self, x_lists, y_lists):
+        # Combine all x and y pairs
+        combined = []
+        for x_list, y_list in zip(x_lists, y_lists):
+            combined.extend(zip(x_list, y_list))
+        
+        # Sort the combined list based on x values
+        combined.sort(key=lambda pair: pair[0])
+        
+        # Unzip into final x and y lists
+        final_x, final_y = zip(*combined)
+        
+        return list(final_x), list(final_y)
+    
     
     
     
@@ -113,9 +128,7 @@ class preprocess_mastuTS:
         # print(data[49404].keys())
         # print(data[49404]['Te_arrays']['Pulse_0.820_0.840'].keys())
         # print(data[49404]['Te_arrays']['Pulse_0.820_0.840']['lasers']['0.82222'].keys())
-
         # target_dic = data[49404]['Te_arrays']['Pulse_0.820_0.840']['lasers']['0.82222']
-
         # print(target_dic['time'])
         
         
@@ -135,52 +148,6 @@ class preprocess_mastuTS:
         # te = target_dic['te']
         # ne = target_dic['ne']
         
-        # if plot_OD:
-            
-        #     # Create the plot
-        #     plt.figure()
-        #     plt.scatter(radius, ne, label='ne', color='b', linewidth=2)
-
-        #     # Add labels and title
-        #     plt.xlabel("radius (m)", fontsize=12)
-        #     plt.title("ne vs. radius", fontsize=14)
-
-
-        #     # Create the plot
-        #     plt.figure()
-        #     plt.scatter(dlcfs, ne, label='ne', color='b', linewidth=2)
-
-        #     # Add labels and title
-        #     plt.xlabel("dlcfs (m)", fontsize=12)
-        #     plt.title("ne vs. dlcfs", fontsize=14)
-
-
-        #     # Add legend
-        #     plt.legend()
-
-        #     # Show the plot
-        #     plt.show()
-        
-        
-        # dlcfs_list = []
-        # ne_list = []
-        # te_list = []
-        
-        # for kk, it in enumerate(dlcfs):
-            
-        #     if it >= -0.2 and np.isnan(ne[kk]) == False and np.isnan(te[kk]) == False:
-        #         dlcfs_list.append(it)
-        #         ne_list.append(ne[kk])
-        #         te_list.append(te[kk])
-        
-        # dlcfs_pro = np.array(dlcfs_list)
-        # ne_pro = np.array(ne_list)
-        # te_pro = np.array(te_list)
-        
-        # print(dlcfs_pro)
-        # print(ne_pro)
-        
-        
         
         alldata_dic = {}
 
@@ -199,32 +166,31 @@ class preprocess_mastuTS:
 
         "prepare for flatten"
 
-        ln = len(time_list)
 
-        an_list = []
-
-        for ti in time_list:
-            
-            an_list.append(len(alldata_dic[ti]['dlcfs']))
-            
-
-        an = max(an_list)
-
-        print(an)
-
+        
         dlcfs_flat = []
         ne_flat = []
         te_flat = []
+        len_log = []
 
         for tm in time_list:
+                         
+            dlcfs_flat.append(alldata_dic[tm]['dlcfs'])
+            ne_flat.append(alldata_dic[tm]['ne'])
+            te_flat.append(alldata_dic[tm]['te'])
+            len_log.append(len(alldata_dic[tm]['dlcfs']))
             
-            for kb, d in enumerate(alldata_dic[tm]['dlcfs']):
-                
-                dlcfs_flat.append(d)
-                ne_flat.append(alldata_dic[tm]['ne'][kb])
-                te_flat.append(alldata_dic[tm]['te'][kb])
-            
-            
+        
+        radius_sort, ne_sort = self.merge_sorted_lists(x_lists = dlcfs_flat, y_lists = ne_flat)
+        radius_sort, te_sort = self.merge_sorted_lists(x_lists = dlcfs_flat, y_lists = te_flat)
+        
+        # print(dlcfs_flat)
+        # print(radius_sort)
+        # print(ne_sort)
+        print(len_log)
+        
+      
+        
         "try to turn into array"
 
 
@@ -232,7 +198,7 @@ class preprocess_mastuTS:
 
         plt.figure()
 
-        plt.scatter(dlcfs_flat, ne_flat, label= 'ne_flatter')
+        plt.scatter(radius_sort, ne_sort, label= 'ne_flatter')
 
         # Add labels and title
         plt.xlabel("dlcfs (m)", fontsize=12)
@@ -250,37 +216,38 @@ class preprocess_mastuTS:
         RBS_func = self.data['gfile']['gcomp']['interp_dic']['RBS']
         
         
-        input_len = len(dlcfs_flat)
+        input_len = len(radius_sort)
         exp_psi = np.zeros(input_len)
-        z_flat = 0.15*np.ones(input_len)
+        z_flat = 0.015*np.ones(input_len)
         
         print('test np ones function')
+        print(input_len)
         # print(z_flat)
         
         for i in range(input_len):
             
-            exp_psi[i] = RBS_func(dlcfs_flat[i], z_flat[i])
+            exp_psi[i] = RBS_func(radius_sort[i], z_flat[i])
         
         
-        psi_mid = RBS_func(1.37, 0.15)
+        psi_mid = RBS_func(1.389, 0.015)
         # print(psi_mid)
         # print(exp_psi)
         # print('separatrix is {:.2f}'.format(psi_mid))
         # exp_psi = func(dlcfs_flat)
         
-        n_tot = 200
+        n_tot = 500
         psi_pro = np.linspace(exp_psi.min(), exp_psi.max(), num= n_tot, dtype= float)
         
-        shift_psi = -0.09
+        shift_psi = -0.03
         
         new_psi = exp_psi + shift_psi*np.ones(input_len)
         
-        print(new_psi)
+        # print(new_psi)
         
         
 
-        Ne = [x *pow(10, -19) for x in ne_flat]
-        Te = [x*pow(10, -3) for x in te_flat]
+        Ne = [x *pow(10, -19) for x in ne_sort]
+        Te = [x*pow(10, -3) for x in te_sort]
         
         p0 = [1, 0.6, 0.01, 0.01, 3/14]
         p1 = [1, 0.6, 0.01, 0.01, 3/14]
@@ -290,29 +257,13 @@ class preprocess_mastuTS:
         
         shift_psipro = np.linspace(new_psi.min(), new_psi.max(), num= n_tot, dtype= float)
         
-        # Create the model
-        model = Model(self.fmc.tanh)
         
-        # Provide initial parameter guesses
-        params = model.make_params(r0 = 1,h = 0.6,d = 0.01,b = 0.01,m = 3/14)
-        
-        # Fit to the data
-        result = model.fit(Te, params, r= exp_psi)
-        
-        # Show results
-        print(result.fit_report())
-        
-        # Plot
-        # plt.figure()
-        # plt.plot(exp_psi, Te, 'bo', label='data')
-        # plt.plot(exp_psi, result.best_fit, 'r-', label='fit')
-        # plt.legend()
         
         
         
         
         # Evaluate the fitted model at x_new
-        y_new = result.eval(r = psi_pro)
+        y_new = result_Te.eval(r = psi_pro)
         
         # Plot the new prediction
         plt.figure()
@@ -331,7 +282,7 @@ class preprocess_mastuTS:
         ne_dat = [x*pow(10, -20) for x in ne_fit]
         te_dat = [x*pow(10, -3) for x in te_fit]
         
-        exp_dic = {'exp_psi': exp_psi, 'exp_ne': ne_flat, 'exp_te': te_flat}
+        exp_dic = {'exp_psi': exp_psi, 'exp_ne': ne_sort, 'exp_te': te_sort}
         
         
         fitprofile = {'exp_psi': exp_psi, 'fit_ne': ne_fit, 
@@ -412,7 +363,7 @@ class preprocess_mastuTS:
 
             # Create the plot
             plt.figure()
-            plt.scatter(exp_psi, ne_flat, label='ne', color='b', linewidth=2)
+            plt.scatter(exp_psi, ne_sort, label='ne', color='b', linewidth=2)
             plt.plot(psi_pro, ne_fit, label='ne_fit', color='g', linewidth=2)
 
             # Add labels and title
@@ -433,7 +384,7 @@ class preprocess_mastuTS:
 
             # Create the plot
             plt.figure()
-            plt.scatter(exp_psi, te_flat, label='te', color='b', linewidth=2)
+            plt.scatter(exp_psi, te_sort, label='te', color='b', linewidth=2)
             plt.plot(psi_pro, te_fit, label='te_fit', color='g', linewidth=2)
 
             # Add labels and title
@@ -449,7 +400,97 @@ class preprocess_mastuTS:
             
         
         
-            
+"""
+
+
+ln = len(time_list)
+
+an_list = []
+
+for ti in time_list:
+    
+    an_list.append(len(alldata_dic[ti]['dlcfs']))
+    
+
+an = max(an_list)
+
+print(an)
+
+
+
+
+if plot_OD:
+   
+    # Create the plot
+    plt.figure()
+    plt.scatter(radius, ne, label='ne', color='b', linewidth=2)
+
+    # Add labels and title
+    plt.xlabel("radius (m)", fontsize=12)
+    plt.title("ne vs. radius", fontsize=14)
+
+
+    # Create the plot
+    plt.figure()
+    plt.scatter(dlcfs, ne, label='ne', color='b', linewidth=2)
+
+    # Add labels and title
+    plt.xlabel("dlcfs (m)", fontsize=12)
+    plt.title("ne vs. dlcfs", fontsize=14)
+
+
+    # Add legend
+    plt.legend()
+
+    # Show the plot
+    plt.show()
+ 
+ 
+dlcfs_list = []
+ne_list = []
+te_list = []
+ 
+for kk, it in enumerate(dlcfs):
+   
+    if it >= -0.2 and np.isnan(ne[kk]) == False and np.isnan(te[kk]) == False:
+        dlcfs_list.append(it)
+        ne_list.append(ne[kk])
+        te_list.append(te[kk])
+ 
+dlcfs_pro = np.array(dlcfs_list)
+ne_pro = np.array(ne_list)
+te_pro = np.array(te_list)
+ 
+print(dlcfs_pro)
+print(ne_pro)
+
+
+
+
+spline = UnivariateSpline(radius_sort, te_sort, s= 100)  # s controls smoothing
+y_smooth = spline(radius_sort)
+
+
+# 2. Create a dense x-axis for smooth plotting
+x_dense = np.linspace(min(radius_sort), max(radius_sort), 500)
+
+# 3. Evaluate the spline
+y_smooth = spline(x_dense)
+
+# 4. Plot original data and spline
+plt.figure()
+plt.plot(radius_sort, te_sort, 'o', label='Original data')
+plt.plot(x_dense, y_smooth, '-', label='Spline fit')
+plt.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Spline Fit to Data')
+plt.show()
+
+
+
+
+"""          
         
 
     
