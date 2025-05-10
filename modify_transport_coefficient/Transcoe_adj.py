@@ -145,7 +145,7 @@ class transport_coefficient_adjustment:
                 elif j< de_ped:
                     
                     if D_ped_adj:
-                        mod_y[j] = 5.0
+                        mod_y[j] = 0.02
                     
                     else:
                         mod_y[j] = cod[j,1]
@@ -173,7 +173,7 @@ class transport_coefficient_adjustment:
                 elif j< ki_ped:
                     
                     if ki_ped_adj:
-                        mod_yki[j] = 14.0
+                        mod_yki[j] = 12.0
                     
                     else:
                         mod_yki[j] = coki[j,1]
@@ -203,7 +203,7 @@ class transport_coefficient_adjustment:
                 elif j< ke_ped:
                     
                     if ke_ped_adj:
-                        mod_yke[j] = 20.0
+                        mod_yke[j] = 10.0
                     
                     else:
                         mod_yke[j] = coke[j,1]
