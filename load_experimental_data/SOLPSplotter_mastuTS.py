@@ -257,21 +257,6 @@ class preprocess_mastuTS:
         
         shift_psipro = np.linspace(new_psi.min(), new_psi.max(), num= n_tot, dtype= float)
         
-        
-        
-        
-        
-        
-        # Evaluate the fitted model at x_new
-        y_new = result_Te.eval(r = psi_pro)
-        
-        # Plot the new prediction
-        plt.figure()
-        plt.plot(psi_pro, y_new, 'g--', label='fit (extrapolated)')
-        plt.legend()
-        plt.show()
-        
-
           
         ne_fit = self.fmc.tanh(psi_pro, popt_ne[0], popt_ne[1], popt_ne[2], 
                          popt_ne[3], popt_ne[4])*pow(10, 19)
