@@ -13,7 +13,7 @@ from vesselgeo_contour_plot.B2_boundary_plot import B2_boundary_contour
 
 
 
-class mastu_datapipline:
+class test_mastu_datapipline:
     
        
     def __init__(self):
@@ -31,12 +31,10 @@ class mastu_datapipline:
 
 
 
-    def run_mastu_plot(self):
+    def test_mastu_plot(self):
         
         xml = mastu_load_prepare_module(DF = self.DF, data = self.data)
-        xpg = plot_geo(DF = self.DF, data = self.data)
-        xsp = step_planning(DF = self.DF, data = self.data)
-        xbbc = B2_boundary_contour(DF = self.DF, data = self.data)
+
 
         
         
@@ -47,27 +45,14 @@ class mastu_datapipline:
             xml.mastu_prepare_for_plots()
             
             
-            plot_theme = 'step_plan'
             
-            if plot_theme == 'geo':
-                
-                             
-                xpg.plot_g()
-                xpg.plot_sec()
-            
-            elif plot_theme == 'step_plan':
-                
-                xsp.mastu_Ra_measure()
-                xsp.vessel_change(plan_major_radius = 3.61, plan_minor_radius = 2)
-            
-            elif plot_theme == 'B2_boundary':
-                
-                
-                xbbc.plot_B2boundary()
                 
             
 
 
 if __name__ == "__main__":
-    dpl = mastu_datapipline()
-    dpl.run_mastu_plot()
+    dpl = test_mastu_datapipline()
+    dpl.test_mastu_plot()
+    
+    
+    
