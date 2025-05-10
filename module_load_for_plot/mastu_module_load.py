@@ -21,6 +21,7 @@ from load_simulation_data.read_B2simulation_data import load_B2simu_data
 from load_simulation_data.read_ft_files import load_ftfiles_data
 from fit_data.SOLPSplotter_fit import profile_fit
 from midplane_data.measure_minor_radius_plot import minor_radius_measurement
+from load_experimental_data.fitTS_usinglmfit import lmfit_TS
 # from midplane_data.midplane_netendS import midplane_radial
 # from midplane_data.midplane_ndS_cut import midplane_ndsource_withcut
 # from targets_data.target_fileload import target_dataload
@@ -57,6 +58,7 @@ class mastu_load_prepare_module:
         xlf = load_ftfiles_data(DF = self.DF, data = self.data, ldm= xldm)
         xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
         xmrm = minor_radius_measurement(DF = self.DF, data = self.data, rp= xrp)
+        xlt = lmfit_TS(DF = self.DF, data = self.data, fmc = xfm, pm = xpm)
         # xmr = midplane_radial(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
         # xmc = midplane_ndsource_withcut(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
         # xtd = target_dataload(DF = self.DF, data = self.data)
@@ -78,5 +80,6 @@ class mastu_load_prepare_module:
             print('working on RRsep maxis now...')
             xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'maxis')
             xmrm.calc_minor_radius(plotRR= True)
-            xpm.load_mastu_TS(plot_OD = True, plot_P = True, writefile = True)
+            xpm.load_mastu_TS(plot_OD = True, plot_P = False, writefile = False)
+            xlt.load_mastuTS_test(plot = True)
             
