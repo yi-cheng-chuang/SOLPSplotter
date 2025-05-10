@@ -70,7 +70,7 @@ class transcoe_mod_datapipline:
         if mod_detail:
             
             ped_adj = [False, False, False]
-            de_cut = [11, 32]
+            de_cut = [7, 32]
             ki_cut = [13, 18]
             ke_cut = [13, 21]
             
