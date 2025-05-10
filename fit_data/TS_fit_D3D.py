@@ -11,6 +11,7 @@ Created on Tue May  6 18:59:07 2025
 # Demonstration of the polyexp fitting in OMFITprofiles
 
 from pylab import random
+import numpy as np
 
 
 def mtanh(x, A, B, xsym, hwid, core, edge):
