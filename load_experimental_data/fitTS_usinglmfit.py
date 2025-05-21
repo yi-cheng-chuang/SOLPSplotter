@@ -122,6 +122,9 @@ class lmfit_TS:
             target_dic = data[49404]['Te_arrays']['Pulse_0.799_0.830']['lasers'][time]
             # radius = target_dic['radius']
             radius = target_dic['radius']
+            # dlcfs = target_dic['dlcfs']
+            # print('print dlcfs:')
+            # print(dlcfs)
             te = target_dic['te']
             ne = target_dic['ne']
             # print(type(ne))
