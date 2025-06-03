@@ -61,6 +61,23 @@ class directory_input:
         return mastu_dircomp_dic
 
 
+    
+    def mast_fluxstd_comp_dic(self):
+        a_shift = 'org'
+        shift = 0
+
+        series = 'org_cfluxb_std'
+        
+        filename = '80_newt15_a'
+        
+        mast_fluxstd_dircomp_dic = {'Shot': '27205', 'shift': shift, 
+                        'series': series, 'filename': filename, 
+                        'a_shift': a_shift}
+        
+        return mast_fluxstd_dircomp_dic
+
+
+
     def mast_comp_dic(self):
         a_shift = 'org'
         shift_dic = {'org': 0, 'dot3': 0.3, 'dot5': 0.5, 'dot55': 0.55, 'dot7': 0.7, 'one': 1}
