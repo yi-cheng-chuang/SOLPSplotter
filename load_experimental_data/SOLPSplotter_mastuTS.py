@@ -52,7 +52,7 @@ class preprocess_mastuTS:
         
         for kk, it in enumerate(dlcfs):
             
-            if it >= 1.25 and np.isnan(ne[kk]) == False and np.isnan(te[kk]) == False:
+            if it >= 1.33 and np.isnan(ne[kk]) == False and np.isnan(te[kk]) == False:
                 dlcfs_list.append(it)
                 ne_list.append(ne[kk])
                 te_list.append(te[kk])
