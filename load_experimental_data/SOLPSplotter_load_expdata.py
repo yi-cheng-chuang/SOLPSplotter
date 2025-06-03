@@ -19,7 +19,8 @@ import numpy as np
 class load_expdata:
     
     
-    def __init__(self, DF, data, fmc: fit_method_collection, rem: read_expdata_method, lg: load_geometry):
+    def __init__(self, DF, data, fmc: fit_method_collection, rem: read_expdata_method, 
+                                     lg: load_geometry):
         
         self.DF = DF
         self.data = data
@@ -155,42 +156,68 @@ class load_expdata:
         
         
         if withshift == False and withseries == False:
-            psi_solps = self.check_and_loadpsi1D(itername = None)
+            jxa = self.data['b2mn']['jxa']
+            psi_solps = self.data['psi']['psival'][:, jxa]
             
         elif withshift == True and withseries == False:
-            psi_solps = self.check_and_loadpsi1D(itername = 'org')
+            jxa = self.data['b2mn']['org']['jxa']
+            psi_solps = self.data['psi']['psival']['org'][:, jxa]
+            
+            core_psi = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                jxa = self.data['b2mn'][aa]['jxa']
+                psi_solps = self.data['psi']['psival'][aa][:, jxa]
+                core_psi[aa] = psi_solps[0]
         
         elif withshift == False and withseries == True:
             series_rap = list(self.data['dircomp']['Attempt'].keys())[0]
-            psi_solps = self.check_and_loadpsi1D(itername = series_rap)
+            jxa = self.data['b2mn'][series_rap]['jxa']
+            psi_solps = self.data['psi']['psival'][series_rap][:, jxa]
         
         else:
             print('fitmastexp function has a bug checking b2mn')
             
-                  
+        print('find psi_solps shape:')
+        print(psi_solps.shape)
+        
+        
         p0 = [0.97, 0.6, 0.01, 0.01, 3/14]
         p1 = [0.95, 0.2, 0.02, 0.01, 6/7]
         self.loadmastdata(EXP= True, fit= False)
         mast_dat_dict = self.data['ExpDict']
-        psi = mast_dat_dict['psi_normal']
-        ne = mast_dat_dict['electron_density(10^20/m^3)']
-        ne_er = mast_dat_dict['density error(10^20/m^3)']
-        te = mast_dat_dict['electron_temperature(KeV)']
-        te_er = mast_dat_dict['temperature error(10^20/m^3)']
+        psi_org = mast_dat_dict['psi_normal']
+        # Define your split point
+        split_point = 0.5
         
-        popt_ne, pcov_ne = curve_fit(self.fmc.tanh, psi, ne, p0)      
+        # Masks for the two regions
+        mask = psi_org >= split_point
+        
+        psi = mast_dat_dict['psi_normal'][mask]
+        ne = mast_dat_dict['electron_density(10^20/m^3)'][mask]
+        ne_er = mast_dat_dict['density error(10^20/m^3)'][mask]
+        te = mast_dat_dict['electron_temperature(KeV)'][mask]
+        te_er = mast_dat_dict['temperature error(10^20/m^3)'][mask]
+        
+
+        
+        popt_ne, pcov_ne = curve_fit(self.fmc.tanh, psi, ne, p0)
         popt_te, pcov_te = curve_fit(self.fmc.tanh, psi, te, p1)
 
-          
-        x_model = np.linspace(min(psi), 1.1, n_tot)
+        TS_dic = {'ne': ne, 'te': te}
+        
+        self.fmc.lmfit_tanh(TS_data = TS_dic, psi = psi, plot = True)
+            
+        x_model = np.linspace(min(psi), max(psi), n_tot)
         tanh_ne_fit = self.fmc.tanh(x_model, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         tanh_te_fit = self.fmc.tanh(x_model, popt_te[0], popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
         shift = 0
-                
+        
         sh_ne_fit = self.fmc.tanh(x_model, popt_ne[0] + shift, popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         sh_te_fit = self.fmc.tanh(x_model, popt_te[0] + shift, popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
+                    
         coe_len = len(popt_ne) 
         
         sh_popt_ne = np.zeros(coe_len)
@@ -202,24 +229,44 @@ class load_expdata:
             else:
                 sh_popt_ne[i] = popt_ne[i]
                 sh_popt_te[i] = popt_te[i]
-                
-                      
+            
+            
+
         gnexp = np.gradient(tanh_ne_fit)
         dn = popt_ne[2]
         sym_pt = popt_ne[0]
+        h = popt_ne[1]*pow(10, 20)
+            
+        
         dtn = popt_te[2]
         te_sym_pt = popt_te[0]
-        h = popt_ne[1]*pow(10, 20)
-        
-        ro_popt_te = np.round(popt_te, 2)
-        
+        ro_popt_te = np.round(popt_te, 2)        
         sep_pos = ro_popt_te[0] - 0.5*np.log(2 - np.sqrt(3))*ro_popt_te[2]
+        
+        if withshift:
+            core_ne = {}
+            core_te = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                core_ne[aa] = '{:.3e}'.format(self.fmc.tanh(core_psi[aa], *popt_ne)*pow(10, 20))
+                core_te[aa] = '{:.3e}'.format(self.fmc.tanh(core_psi[aa], *popt_te)*pow(10, 3))
+        
+        else:
+            pass
+            
+        
+        
+        
+        
         
         
         if plot_exp_and_fit:
             "experimental data and tanh fit"
             "electron density"
-            plt.figure(figsize=(7,7))
+            
+            plt.figure()
+                
             plt.plot(x_model, tanh_ne_fit, color='r', label= 'electron density fit')
             plt.errorbar(psi, ne, ne_er,fmt= "o", label= 'electron density experiment data')
             plt.axvline(x=dn + sym_pt, color= 'black',lw= 3, ls= '--', 
@@ -236,7 +283,7 @@ class load_expdata:
             
             "electron temperature"
             
-            plt.figure(figsize=(7,7))
+            plt.figure()
             plt.plot(x_model, tanh_te_fit, color='r', label= 'electron temperature fit')
             plt.errorbar(psi, te, te_er, fmt= "o", label= 'electron temperature experiment data')
             plt.axvline(x=dtn + te_sym_pt, color='black',lw=3, ls='--', 
@@ -258,7 +305,7 @@ class load_expdata:
             "fit profile and shift profile"
             "electron density"
             
-            plt.figure(figsize=(7,7))
+            plt.figure()
             plt.plot(x_model, sh_ne_fit,'-o', color='r', label= 'electron density fit with shift')
             plt.plot(x_model, tanh_ne_fit,'-o', color='b', label= 'electron density fit')
             
@@ -269,7 +316,7 @@ class load_expdata:
             
             "electron tempurature"
             
-            plt.figure(figsize=(7,7))
+            plt.figure()
             plt.plot(x_model, sh_te_fit,'-o', color='r', label= 'electron temperature fit with shift')
             plt.plot(x_model, tanh_te_fit,'-o', color='b', label= 'electron temperature fit')
             
@@ -281,12 +328,13 @@ class load_expdata:
             plt.show()
         elif plot_shift_compare == False:
             pass
+        
         else:
             print('plot_shift_compare has a bug')
             
     
         try:
-            self.solpsgrid_data_store(x_coord = psi_solps[:, 1], ne_fit_coe = sh_popt_ne, 
+            self.solpsgrid_data_store(x_coord = psi_solps, ne_fit_coe = sh_popt_ne, 
                                       te_fit_coe = sh_popt_te, plot_solps_fit = plot_solps_fit)
         except:
             print('solpsgrid_data_store function has a bug')
@@ -341,6 +389,13 @@ class load_expdata:
             print(round(sep_pos, 2))
             print('the next line is the temparature separatrix position calculation result')
             print(te_sym_pt + 0.5*np.log(2 + np.sqrt(3))*dtn + shift)
+            
+            if withshift:                
+                print('ne core fixed value:')
+                print(core_ne)
+                print('te core fixed value:')
+                print(core_te)
+                            
         elif data_print == False:
             pass
         else:
