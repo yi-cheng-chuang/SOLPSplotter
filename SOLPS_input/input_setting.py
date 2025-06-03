@@ -22,11 +22,10 @@ def Setting_dic():
         def __init__(self):
             
             
-            self.DEV = 'mastu'
-            self.a = 0.5
+            self.DEV = 'mast'
+            self.cross_series = False
             self.withshift = False
             self.withseries = False
-            self.terminal = terminal
             if self.withseries:
                 self.series_flag = 'twin_scan'
                 self.series_filename = 'org_new25scan_fast_save'
@@ -34,8 +33,37 @@ def Setting_dic():
                 
             else:
                 print('withseries is false!')
-                
             
+            if self.DEV == 'mast' or self.DEV == 'mastu':
+                
+                if self.withseries:
+                    
+                    if self.series_flag == 'minor_rad_scan':
+                        
+                        print('It will be define in each dir comp')
+                    
+                    else:
+                        self.a = 0.5
+                
+                else:
+                    
+                    self.a = 0.5
+
+            else:
+                print('we left other minor radius values to other contributors')
+                
+            if self.DEV == 'cross_machine':
+                
+                self.Dnames = 'mast_mastu'
+            
+            else:
+                
+                print('we left it for the future contributors')
+                
+
+            
+        
+            self.terminal = terminal
             self.series_compare = False
             self.plot_setting = 'mod_transcoe'
             self.data_size = 'small'
@@ -63,6 +91,8 @@ plot_setting = ['mod_transcoe']
 
 
 self.data_size is always 'small', as 96*36 for the reminder
+
+For now, the device type I have are: mast, mastu, cross_machine
 
 
 """
