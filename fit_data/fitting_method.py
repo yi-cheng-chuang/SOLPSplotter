@@ -8,6 +8,7 @@ Created on Sun Jul 30 13:28:56 2023
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
+from lmfit import Model
 
 
 
@@ -24,6 +25,9 @@ class fit_method_collection:
 
     def expfit(self, x,A,l):  #Removed vertical displacement variable B; seemed to cause 'overfitting'
         return A*np.exp(l*x)
+    
+    def tanh0(self, r,r0,h,d,b):
+        return b+(h/2)*(np.tanh((r0-r)/d)+1)
 
 
     def tanh_fit(self, x_coord, ne, te):
@@ -263,6 +267,75 @@ class fit_method_collection:
             
             
             return result_dic
+    
+    
+    def lmfit_tanh(self, TS_data, psi, plot):
+        
+        ne_sort = TS_data['ne']
+        te_sort = TS_data['te']
+        
+        
+        Ne = ne_sort
+        Te = te_sort
+        
+
+        # Create the model
+        model = Model(self.tanh)
+
+        # Provide initial parameter guesses
+        params = model.make_params(r0 = 1,h = 0.6,d = 0.01,b = 0.01,m = 3/14)
+        # params['b'].set(min=0.1, max=10)
+
+        # Fit to the data
+        result_Te = model.fit(Te, params, r= psi)
+        result_Ne = model.fit(Ne, params, r= psi)
+
+        "Show results"
+        print(result_Ne.fit_report())
+
+        #Plot
+        
+        if plot:
+            
+            plt.figure()
+            plt.plot(psi, Te, 'bo', label='data')
+            plt.plot(psi, result_Te.best_fit, 'r-', label='fit')
+            plt.title('check out Te lmfit')
+            plt.legend()
+
+
+            plt.figure()
+            plt.plot(psi, Ne, 'bo', label='data')
+            plt.plot(psi, result_Ne.best_fit, 'r-', label='fit')
+            plt.title('check out Ne lmfit')
+            plt.legend()
+            
+            
+            
+            n_tot = 200
+            psi_pro = np.linspace(psi.min(), psi.max(), num= n_tot, dtype= float)
+            
+            
+            
+            # Evaluate the fitted model at x_new
+            Te_new = result_Te.eval(r = psi_pro)
+            Ne_new = result_Ne.eval(r = psi_pro)
+            
+            # Plot the new prediction
+            plt.figure()
+            plt.plot(psi, Te, 'bo', label='data')
+            plt.plot(psi_pro, Te_new, 'g--', label='fit (extrapolated)')
+            plt.legend()
+            
+            
+            plt.figure()
+            plt.plot(psi, Ne, 'bo', label='data')
+            plt.plot(psi_pro, Ne_new, 'g--', label='fit (extrapolated)')
+            plt.legend()
+            plt.show()
+            
+            
+            plt.show()
 
 
 
