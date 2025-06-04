@@ -70,6 +70,10 @@ class load_piecewise_expdata:
     
         
     def solpsgrid_data_store(self, x_coord, ne_fit_coe, te_fit_coe, plot_solps_fit):
+        
+        
+        
+        
         ne_fit_solps = self.fmc.tanh(x_coord, ne_fit_coe[0], ne_fit_coe[1], ne_fit_coe[2], ne_fit_coe[3], ne_fit_coe[4])
         te_fit_solps = self.fmc.tanh(x_coord, te_fit_coe[0], te_fit_coe[1], te_fit_coe[2], te_fit_coe[3], te_fit_coe[4])
         
@@ -80,7 +84,7 @@ class load_piecewise_expdata:
         
         if plot_solps_fit:
             "fit electron density in 38 grids"
-            plt.figure(figsize=(7,7))
+            plt.figure()
             plt.plot(x_coord, ne_fit_solps,'-o', color='r', label= 'electron density fit with shift')
              
             plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
@@ -89,7 +93,7 @@ class load_piecewise_expdata:
             plt.legend()
             
             "fit electron temperature in 38 grids"
-            plt.figure(figsize=(7,7))
+            plt.figure()
             plt.plot(x_coord, te_fit_solps,'-o', color='r', label= 'electron temperature fit with shift')
              
             plt.xlabel('Magnetic flux coordinate: ${\psi_N}$')
@@ -127,8 +131,17 @@ class load_piecewise_expdata:
             psi_solps = self.data['psi']['psival'][:, jxa]
             
         elif withshift == True and withseries == False:
-            jxa = self.data['b2mn']['org']['jxa']
+            # jxa = self.data['b2mn']['org']['jxa']
+            jxa = 56
             psi_solps = self.data['psi']['psival']['org'][:, jxa]
+            
+            core_psi = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                # jxa = self.data['b2mn'][aa]['jxa']
+                jxa = 56
+                psi_solps = self.data['psi']['psival'][aa][:, jxa]
+                core_psi[aa] = round(psi_solps[0], 3)
         
         elif withshift == False and withseries == True:
             series_rap = list(self.data['dircomp']['Attempt'].keys())[0]
@@ -149,7 +162,7 @@ class load_piecewise_expdata:
         mast_dat_dict = self.data['ExpDict']
         psi_org = mast_dat_dict['psi_normal']
         # Define your split point
-        split_point = 0.5
+        split_point = 0.55
         
         # Masks for the two regions
         mask = psi_org >= split_point
@@ -195,7 +208,7 @@ class load_piecewise_expdata:
             mask4 = x_model >= split_point
             
             
-            tanh_ne_fit_ped = self.fmc.tanh(x_model[mask3], *popt_ne_ped)
+            tanh_ne_fit = self.fmc.tanh(x_model, *popt_ne_ped)
             tanh_ne_fit_SOL = self.fmc.tanh0(x_model[mask4], *popt_ne_SOL)
         
         else:
@@ -212,6 +225,11 @@ class load_piecewise_expdata:
         
         if piecewise:
             
+            # Define your split point
+            split_point = 1
+            
+            mask3 = x_model < split_point
+            mask4 = x_model >= split_point
             
             sh_ne_fit_ped = self.fmc.tanh(x_model[mask3], popt_ne_ped[0] + shift, 
                             popt_ne_ped[1], popt_ne_ped[2], popt_ne_ped[3], popt_ne_ped[4])
@@ -222,7 +240,9 @@ class load_piecewise_expdata:
             
             sh_ne_fit = self.fmc.tanh(x_model, popt_ne[0] + shift, popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
             
-            
+        
+        # print(type(sh_ne_fit_ped))
+        
             
 
         sh_te_fit = self.fmc.tanh(x_model, popt_te[0] + shift, popt_te[1], popt_te[2], popt_te[3], popt_te[4])
@@ -268,7 +288,25 @@ class load_piecewise_expdata:
         ro_popt_te = np.round(popt_te, 2)        
         sep_pos = ro_popt_te[0] - 0.5*np.log(2 - np.sqrt(3))*ro_popt_te[2]
         
+        if withshift:
+            core_ne = {}
+            core_te = {}
+            
+            for aa in self.data['dircomp']['multi_shift']:
+                
+                
+                if piecewise:
+                    core_ne[aa] = '{:.3e}'.format(self.fmc.tanh(core_psi[aa], *popt_ne_ped)*pow(10, 20))
+                
+                else:
+                    
+                    core_ne[aa] = '{:.3e}'.format(self.fmc.tanh(core_psi[aa], *popt_ne)*pow(10, 20))
+                    
+
+                core_te[aa] = '{:.3e}'.format(self.fmc.tanh(core_psi[aa], *popt_te)*pow(10, 3))
         
+        else:
+            pass
         
         
         if plot_exp_and_fit:
@@ -277,7 +315,16 @@ class load_piecewise_expdata:
             
             plt.figure()
             if piecewise:
-                plt.plot(x_model[mask3], tanh_ne_fit_ped, color='r', label= 'electron density ped fit')
+                
+                # Define your split point
+                split_point = 1
+                
+                mask3 = x_model < split_point
+                mask4 = x_model >= split_point
+                
+                
+                plt.plot(x_model[mask3], tanh_ne_fit[mask3], color='r', label= 'electron density ped fit')
+                plt.plot(x_model[mask4], tanh_ne_fit[mask4], color='green', linestyle= '--')
                 plt.plot(x_model[mask4], tanh_ne_fit_SOL, color='r', label= 'electron density SOL fit')
                 
             else:                
@@ -367,34 +414,103 @@ class load_piecewise_expdata:
                 fdir = '{}/{}'.format(self.data['dirdata']['topdrt'], self.loadDS['fitfname'])
                 
             elif terminal == False:
-                fdir = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
-                                        self.DF.DEV, self.loadDS['fitfname'])
+                
+                if piecewise:
+                    
+                    fdir = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
+                                            self.DF.DEV, 'pft_027205_275.dat')
+                
+                else:
+                    
+                    fdir = '{}/{}/{}'.format(self.data['dirdata']['basedrt'], 
+                                            self.DF.DEV, self.loadDS['fitfname'])
+                    
+                
+
             else:
                 print('exp fit file writing has a bug')
             
-            for j in range(n_tot):
-                w_list =[]
-                w_list.append("{: .6f}".format(x_model[j]))
-                w_list.append("{: .6f}".format(sh_ne_fit[j]))
-                w_list.append("{: .6f}".format(sh_te_fit[j]))
-                w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
-                w_datalist.append(w_writelist)
             
-            # for j in range(len(psi_solps[:, 2])):
-            #     w_list =[]
-            #     w_list.append("{: .6f}".format(psi_solps[:, 2][j]))
-            #     w_list.append("{: .6f}".format(ne_fit_solps[j]))
-            #     w_list.append("{: .6f}".format(te_fit_solps[j]))
-            #     w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
-            #     w_datalist.append(w_writelist)
-           
-            with open(fdir, 'w') as f:
-                for l,w_line in enumerate(w_datalist):   
-                    f.writelines(w_line + "\n")
+            
+            if piecewise:
+                
+                import pandas as pd
+
+                # # Full x array
+                # x = x_model
+                
+                # y1 and y2 are piecewise results
+                ne_ped = sh_ne_fit_ped  # corresponds to first 3 x values
+                ne_SOL = sh_ne_fit_SOL  # corresponds to last 3 x values
+                
+                # Split x to match y1 and y2
+                x1 = x_model[:len(ne_ped)]
+                x2 = x_model[len(ne_ped):]
+                
+                # Combine using np.concatenate
+                combined_x = np.concatenate([x1, x2])
+                combined_ne = np.concatenate([ne_ped, ne_SOL])
+                
+                
+                
+                # Stack columns together
+                data = np.column_stack((x_model, combined_ne, sh_te_fit))
+                
+                
+
+                # Save to text file
+                np.savetxt(fdir, data, fmt='%.6f', delimiter=' ')
+                
+                
+                """
+                
+                segments = np.array(['part1'] * len(x1) + ['part2'] * len(x2))
+                
+                # Save to CSV
+                df = pd.DataFrame({
+                    'x': combined_x,
+                    'y': combined_y,
+                    'segment': segments
+                })
+                df.to_csv('piecewise_combined.csv', index=False)
+                
+                """
+
+                
+                
+                
+            else:
+                
+                for j in range(n_tot):
+                    w_list =[]
+                    w_list.append("{: .6f}".format(x_model[j]))
+                    w_list.append("{: .6f}".format(sh_ne_fit[j]))
+                    w_list.append("{: .6f}".format(sh_te_fit[j]))
+                    w_writelist = ' '.join(str(y)+ "\t" for y in w_list)
+                    w_datalist.append(w_writelist)
+               
+                with open(fdir, 'w') as f:
+                    for l,w_line in enumerate(w_datalist):   
+                        f.writelines(w_line + "\n")
+            
+            
+
+            
+            
+            
+            
+            
         
         if data_print:
-            print('the next line is popt_ne')
-            print(popt_ne)
+            if piecewise:
+                
+                print('the next line is popt_ne')
+                print(popt_ne_ped)
+            else:
+                print('the next line is popt_ne')
+                print(popt_ne)
+                
+            
             print('the next line is popt_te')
             print(popt_te)
             print('the next line is rounded popt_te')
@@ -405,6 +521,19 @@ class load_piecewise_expdata:
             print(round(sep_pos, 2))
             print('the next line is the temparature separatrix position calculation result')
             print(te_sym_pt + 0.5*np.log(2 + np.sqrt(3))*dtn + shift)
+            
+            
+            if withshift:                
+                print('ne core fixed value:')
+                print(core_ne)
+                
+                print('te core fixed value:')
+                print(core_te)
+                
+                print('core psi_N')
+                print(core_psi)
+                
+           
         elif data_print == False:
             pass
         else:
