@@ -24,7 +24,7 @@ def Setting_dic():
             
             self.DEV = 'mast'
             self.cross_series = False
-            self.withshift = False
+            self.withshift = True
             self.withseries = False
             if self.withseries:
                 self.series_flag = 'twin_scan'
