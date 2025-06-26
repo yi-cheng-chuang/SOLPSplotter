@@ -331,7 +331,7 @@ class paper_poloidal_plot:
     
     def paper_poloidal_subplot(self, log_flag):
             
-            itemname = ['pedestal_width', 'efold_length', 'dimensionless_opaqueness']
+            itemname = ['flux_expansion', 'pedestal_width', 'efold_length', 'dimensionless_opaqueness']
             # adj_list = list(result_dic.keys())
             
             A_dic = {'org': '1.4', 'dot3': '2.0', 'dot5': '2.4',
@@ -341,7 +341,7 @@ class paper_poloidal_plot:
             alphabat_list = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)']
             # print(adj_list)
             
-            fig_n = 3
+            fig_n = 4
             ax_n = 1
             i_n = 0
             
