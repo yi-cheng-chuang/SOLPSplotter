@@ -171,9 +171,18 @@ class load_expdata:
                 core_psi[aa] = psi_solps[0]
         
         elif withshift == False and withseries == True:
-            series_rap = list(self.data['dircomp']['Attempt'].keys())[0]
-            jxa = self.data['b2mn'][series_rap]['jxa']
-            psi_solps = self.data['psi']['psival'][series_rap][:, jxa]
+            
+            if self.DF.series_flag == 'twin_scan':
+                jxa = self.data['b2mn']['jxa']
+                psi_solps = self.data['psi']['psival'][:, jxa]
+            
+            else:
+                series_rap = list(self.data['dircomp']['Attempt'].keys())[0]
+                jxa = self.data['b2mn'][series_rap]['jxa']
+                psi_solps = self.data['psi']['psival'][series_rap][:, jxa]
+                
+                
+
         
         else:
             print('fitmastexp function has a bug checking b2mn')
