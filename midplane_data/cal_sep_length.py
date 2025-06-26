@@ -67,44 +67,55 @@ class seplength_calculator:
 
     def sep_length(self, direct):
         
-        sepl_dic = {}
         
-        for aa in self.data['dircomp']['multi_shift']:
+        if self.DF.withshift:
             
+            sepl_dic = {}
             
-            nx = self.data['b2fgeo'][aa]['nx']
-            ny = self.data['b2fgeo'][aa]['ny']
-            
-            rad_grid = self.data['grid']['RadLoc'][aa]
-            vert_grid = self.data['grid']['VertLoc'][aa]
-            
-            
-            # R_loc = rad_grid[18, :][::-1]
-            
-            # print(R_loc)
-            # print(R_loc)
-            
-            
-            # Z_loc = vert_grid[18, :][::-1]
-            
-            if direct == 'in_to_out':
+            for aa in self.data['dircomp']['multi_shift']:
                 
-                R_loc = rad_grid[18, 1:nx+1]
-                Z_loc = vert_grid[18, 1:nx+1]
+                
+                nx = self.data['b2fgeo'][aa]['nx']
+                ny = self.data['b2fgeo'][aa]['ny']
+                
+                rad_grid = self.data['grid']['RadLoc'][aa]
+                vert_grid = self.data['grid']['VertLoc'][aa]
+                
+                
+                # R_loc = rad_grid[18, :][::-1]
+                
+                # print(R_loc)
+                # print(R_loc)
+                
+                
+                # Z_loc = vert_grid[18, :][::-1]
+                
+                if direct == 'in_to_out':
+                    
+                    R_loc = rad_grid[18, 1:nx+1]
+                    Z_loc = vert_grid[18, 1:nx+1]
+                
+                elif direct == 'out_to_in':
+                    
+                    R_loc = rad_grid[18, 1:nx+1][::-1]               
+                    Z_loc = vert_grid[18, 1:nx+1][::-1]
+                    
             
-            elif direct == 'out_to_in':
-                
-                R_loc = rad_grid[18, 1:nx+1][::-1]               
-                Z_loc = vert_grid[18, 1:nx+1][::-1]
-                
+                          
+                arclength, interpolated_points = self.calc_sepx_length(cr = R_loc, 
+                                                        cz = Z_loc, plot = False)
+            
+                sepl_dic[aa] = {'sepl': arclength, 'interp': interpolated_points}
+            
+            self.data['sepl'] = sepl_dic
         
-                      
-            arclength, interpolated_points = self.calc_sepx_length(cr = R_loc, 
-                                                    cz = Z_loc, plot = False)
+        else:
+            pass
+            
+            
         
-            sepl_dic[aa] = {'sepl': arclength, 'interp': interpolated_points}
         
-        self.data['sepl'] = sepl_dic
+        
 
 
 
