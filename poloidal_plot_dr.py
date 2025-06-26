@@ -76,7 +76,7 @@ class poloidal_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                polplot_theme = 'nendS'
+                polplot_theme = 'opacity_study'
                 
                 if polplot_theme == 'polfluxndS':
                     
@@ -85,8 +85,8 @@ class poloidal_datapipline:
                 
                 elif polplot_theme == 'opacity_study':
                     
-                    xto.twscan_opacity_polplot(scan_style = 'tempscan', plot_option = 'opacity study poloidal plot', 
-                                               format_option = '3x1')
+                    xto.twscan_opacity_polplot(scan_style = 'denscan', plot_option = 'opacity study poloidal plot', 
+                                               format_option = '3x1', space_option = 'psiN')
                 
                 elif polplot_theme == 'nendS':
                     
@@ -99,7 +99,7 @@ class poloidal_datapipline:
             elif withshift == True and withseries == False:
                 
                 
-                polplot_theme = 'grant'
+                polplot_theme = 'PSIpaper'
                 
                 if polplot_theme == 'PSIpaper':
                     
