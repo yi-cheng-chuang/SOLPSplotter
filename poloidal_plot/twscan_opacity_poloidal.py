@@ -26,7 +26,8 @@ class twscan_opacity_polplot:
     
     
     
-    def twscan_opacity_polplot_method(self, iterlist, cl_dic, scan_style, ang_list, plot_option, format_option):
+    def twscan_opacity_polplot_method(self, iterlist, cl_dic, scan_style, ang_list, 
+                                      plot_option, format_option, space_option):
         
         if format_option == '3x1':
             
@@ -91,6 +92,8 @@ class twscan_opacity_polplot:
             width = self.data['opacity_poloidal'][aa]['pedestal_width']*pow(10, 3)*2
             opq = self.data['opacity_poloidal'][aa]['dimensionless_opaqueness']
             nd_sep = self.data['opacity_poloidal'][aa]['neutral_density']
+            efold_psiN = self.data['opacity_poloidal'][aa]['efold_length_psiN']
+            width_psiN = self.data['opacity_poloidal'][aa]['pedestal_width_psiN']
                 
        
 
@@ -102,13 +105,23 @@ class twscan_opacity_polplot:
                 if format_option == '3x1':
                     
                     axs[0].set_title('Particle flux scan with heat flux = {:.3E} W'.format(title_ap))
-                    axs[0].plot(ang_list, width, color = cl_dic[ad], 
-                             label= '{:.3E} (1/s)'.format(label_ad))
-                    axs[1].plot(ang_list, efold, color = cl_dic[ad])
-                    axs[2].plot(ang_list, opq, color = cl_dic[ad])
-                    axs[0].set_ylim(0, 20)
-                    axs[1].set_ylim(0, 20)
-                    axs[2].set_ylim(0, 4)
+                    
+                    if space_option == 'psiN':
+                        axs[0].plot(ang_list, width_psiN, color = cl_dic[ad], 
+                                 label= '{:.3E} (1/s)'.format(label_ad))
+                        axs[1].plot(ang_list, efold_psiN, color = cl_dic[ad])
+                        
+                    elif space_option == 'real':
+                        
+                        axs[0].plot(ang_list, width, color = cl_dic[ad], 
+                                 label= '{:.3E} (1/s)'.format(label_ad))
+                        axs[1].plot(ang_list, efold, color = cl_dic[ad])
+                        axs[0].set_ylim(0, 20)
+                        axs[1].set_ylim(0, 20)
+                        axs[2].set_ylim(0, 4)
+                        
+                    
+                    axs[2].plot(ang_list, opq, color = cl_dic[ad])                    
                     axs[2].set_xlabel('poloidal angle')
                     axs[0].legend(loc = 'best')
                 
@@ -263,7 +276,7 @@ class twscan_opacity_polplot:
     
     
     
-    def twscan_opacity_polplot(self, scan_style, plot_option, format_option):
+    def twscan_opacity_polplot(self, scan_style, plot_option, format_option, space_option):
         
         
         withshift = self.DF.withshift
@@ -324,7 +337,7 @@ class twscan_opacity_polplot:
                     
                     self.twscan_opacity_polplot_method(iterlist = iter_key, cl_dic = color_dic, 
                                 scan_style = scan_style, ang_list = ang_list, 
-                    plot_option = plot_option, format_option = format_option)
+                    plot_option = plot_option, format_option = format_option, space_option = space_option)
                     
              
             else:
