@@ -224,9 +224,23 @@ class load_B2simu_data:
         withshift = self.DF.withshift
         withseries = self.DF.withseries
         
+        if withshift == False and withseries == False:
+            
+            file_loc = '{}/'.format(self.data['dirdata']['simudir'])
+            na_dat = self.data['b2fstate']['na']
+            
+            
+            b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
+                                      nSpec = np.shape(na_dat)[2])
+            b2wdat_dic = vars(b2wdat)
+                
+                   
+
+            self.data['b2wdat'] = b2wdat_dic
         
         
-        if withshift == True and withseries == False:
+        
+        elif withshift == True and withseries == False:
             
             b2wdat_dic = {}
 
