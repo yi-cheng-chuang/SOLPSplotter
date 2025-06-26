@@ -59,10 +59,16 @@ class radial_datapipline:
             withseries = self.DF.withseries
             
             
-            if withshift == False and withseries == True:
+            if withshift == False and withseries == False:
+                
+                print('we come back to single case!')
+            
+            
+            
+            elif withshift == False and withseries == True:
                 
                 
-                dat_type = 'radial'
+                dat_type = 'midplane scans'
                 
                 if dat_type == 'midplane scans':
                     
@@ -75,11 +81,11 @@ class radial_datapipline:
                     
                     
                     
-                    midprof = 'norm_S'
+                    midprof = 'norm_nd'
                     
                     if midprof == 'NT':
                         
-                        xnt.neteTS_plot(scan_style = 'denscan', xcoord_type = 'psi')
+                        xnt.neteTS_plot(scan_style = 'tempscan', xcoord_type = 'psi')
                     
                     elif midprof == 'nd':
                         
@@ -87,7 +93,7 @@ class radial_datapipline:
                     
                     elif midprof == 'norm_nd':
                         
-                        xns.twinscan_ndrad_plot(scan_style = 'denscan', log_flag = True, 
+                        xns.twinscan_ndrad_plot(scan_style = 'tempscan', log_flag = True, 
                                                 format_option= 'neuden', xcoord_type = 'psi', withcut = False)
                     
                     elif midprof == 'norm_S':
