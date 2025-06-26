@@ -96,11 +96,11 @@ class contour_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                contour_theme = 'twscan_rectangular_contour'
+                contour_theme = 'tw_eirene_contour'
                 
                 if contour_theme == 'tw_eirene_contour':
                     
-                    xec.twscan_eirene_contourplot(scan_style = 'tempscan', plot_option = 'atomic energyden', 
+                    xec.twscan_eirene_contourplot(scan_style = 'denscan', plot_option = 'Neuden', 
                                                   format_option = '1x1', norm_type = 'natural')
                 
                 elif contour_theme == 'twscan_contour':
