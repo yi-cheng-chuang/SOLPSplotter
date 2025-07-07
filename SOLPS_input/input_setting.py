@@ -22,8 +22,8 @@ def Setting_dic():
         def __init__(self):
             
             
-            self.DEV = 'mast'
-            self.cross_series = False
+            self.DEV = 'cross_machine'
+            # self.cross_series = False
             self.withshift = False
             self.withseries = False
             if self.withseries:
@@ -33,6 +33,17 @@ def Setting_dic():
                 
             else:
                 print('withseries is false!')
+            
+            
+            if self.DEV == 'cross_machine':
+                
+                self.Dnames = 'mastu_mast'
+            
+            else:
+                
+                print('we left it for the future contributors')
+            
+            
             
             if self.DEV == 'mast' or self.DEV == 'mastu':
                 
@@ -48,17 +59,16 @@ def Setting_dic():
                 else:
                     
                     self.a = 0.5
+            
+            elif self.DEV == 'cross_machine' and self.Dnames == 'mastu_mast':
+                
+                self.a = 0.5
+                
 
             else:
                 print('we left other minor radius values to other contributors')
                 
-            if self.DEV == 'cross_machine':
-                
-                self.Dnames = 'mast_mastu'
             
-            else:
-                
-                print('we left it for the future contributors')
                 
 
             
