@@ -8,6 +8,7 @@ Created on Thu Jul 13 21:05:04 2023
 import glob
 from SOLPS_input.directory_input import directory_input
 from load_directory.grab_attempt_number import grab_aptn_method
+from pathlib import Path
 
 
 
@@ -30,8 +31,20 @@ class load_dir_method:
         nd = self.di.mastu_comp_dic()
         d = self.di.mast_comp_dic()
         basedrt, topdrt = self.di.set_wdir()
-        gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, nd['Shot'])
-        gdir = glob.glob('{}/*'.format(gbase, nd['Shot']))[0]
+        
+        if self.DF.DEV == 'cross_machine':
+            
+            gbase = '{}/{}/{}'.format(topdrt, 'mastu', nd['Shot'])
+            g_path = glob.glob('{}/*'.format(gbase))[0]
+            gdir = Path(g_path).as_posix()
+        
+        else:
+            
+            gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, nd['Shot'])
+            g_path = glob.glob('{}/*'.format(gbase))[0]
+            gdir = Path(g_path).as_posix()
+            
+        
         
         # all_list = glob.glob('{}/*'.format(gbase))
         # print(all_list)
@@ -39,9 +52,19 @@ class load_dir_method:
 
         series = nd['series']
         filename = nd['filename']
-        newbase = '{}/{}/{}/{}/{}'.format(basedrt, self.DF.DEV, 
-                                        nd['Shot'], series, filename)
-        tbase = '{}/{}/{}/{}'.format(basedrt, self.DF.DEV, nd['Shot'], series)
+        
+        if self.DF.DEV == 'cross_machine':
+            
+            newbase = '{}/{}/{}/{}/{}'.format(basedrt, 'mastu', 
+                                            nd['Shot'], series, filename)
+            tbase = '{}/{}/{}/{}'.format(basedrt, 'mastu', nd['Shot'], series)
+        
+        else:
+            newbase = '{}/{}/{}/{}/{}'.format(basedrt, self.DF.DEV, 
+                                            nd['Shot'], series, filename)
+            tbase = '{}/{}/{}/{}'.format(basedrt, self.DF.DEV, nd['Shot'], series)
+            
+        
 
          
         attempt = str(self.gam.mastu_atp_number(newbase, usage = 'load_dir')[0])
@@ -49,20 +72,35 @@ class load_dir_method:
         print('mastu attempt number is {}'.format(attempt))
         
         
-        shift_value = d['a_shift']
         
         mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
                         'gdir': gdir, 'simudir': newbase, 'simutop': tbase}
 
-        return mast_basedir, attempt, shift_value
+        return mast_basedir, attempt
     
     
     
     def mast_base_dir(self):
         d = self.di.mast_comp_dic()
         basedrt, topdrt = self.di.set_wdir()
-        gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, d['Shot'])
-        gdir = glob.glob('{}/g{}*'.format(gbase, d['Shot']))
+        
+        
+        if self.DF.Dnames == 'mastu_mast':
+            
+            gbase = '{}/{}/{}'.format(topdrt, 'mast', d['Shot'])
+            g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
+            print(g_path)
+            gdir = Path(g_path).as_posix()
+        
+        else:
+            
+            gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, d['Shot'])
+            g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
+            print(g_path)
+            gdir = Path(g_path).as_posix()
+            
+        
+        print(gdir)
         
         shift_list = list(d['shift_dic'].keys())
         # print(type(shift_list))
@@ -71,9 +109,22 @@ class load_dir_method:
             if aa == a_shift:  
                 filename = d['series_dic'][aa]
                 shift = d['shift_file_dic'][aa]
-                newbase = '{}/{}/{}/{}/{}'.format(basedrt, self.DF.DEV, 
-                                                d['Shot'], shift, filename)
-                tbase = '{}/{}/{}/{}'.format(basedrt, self.DF.DEV, d['Shot'], shift)
+                
+                if self.DF.DEV == 'cross_machine':
+                    
+                    newbase = '{}/{}/{}/{}/{}'.format(basedrt, 'mast', 
+                                                    d['Shot'], shift, filename)
+                    tbase = '{}/{}/{}/{}'.format(basedrt, 'mast', d['Shot'], shift)
+                
+                else:
+                    
+                    newbase = '{}/{}/{}/{}/{}'.format(basedrt, self.DF.DEV, 
+                                                    d['Shot'], shift, filename)
+                    tbase = '{}/{}/{}/{}'.format(basedrt, self.DF.DEV, d['Shot'], shift)
+                
+                
+                
+                
                 adir = {}
                 for i in d['Output']:
                     adir[i] = '{}/{}'.format(newbase, i)
