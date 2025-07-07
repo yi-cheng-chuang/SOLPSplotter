@@ -25,9 +25,6 @@ class load_directory:
         
         
         
-
-
-        
     def _reset_object(self):
         # self.Shot=None
         # self.Attempts=None
@@ -43,10 +40,10 @@ class load_directory:
     
     
     
-    
     def load_cross_machine_dir(self):
-        if self.DF.DEV == 'cross_machine' and self.DF.cross_series == False:
-            if self.DF.Dnames == 'mast_mastu':
+        if self.DF.DEV == 'cross_machine':
+            
+            if self.DF.Dnames == 'mastu_mast':
                 
                 
                 
@@ -54,17 +51,16 @@ class load_directory:
                     
                     
                     
-                    self.data['mast_dircomp'] = self.di.mastu_comp_dic()
-                    mast_basedir, Attempt_dic, shift_value = self.ldm.mastu_base_dir()
+                    self.data['mastu_dircomp'] = self.di.mastu_comp_dic()
+                    mastu_basedir, Attempt_dic = self.ldm.mastu_base_dir()
+                    self.data['mastu_dirdata'] = mastu_basedir
+                    self.data['mastu_dircomp']['Attempt'] = Attempt_dic
+                    
+                    self.data['mast_dircomp'] = self.di.mast_comp_dic()
+                    mast_basedir, Attempt_dic, shift_value = self.ldm.mast_base_dir()
                     self.data['mast_dirdata'] = mast_basedir
                     self.data['mast_dircomp']['Attempt'] = Attempt_dic
-                    self.data['mast_dircomp']['shift_value'] = shift_value
-                    
-                    self.data['mastu_dircomp'] = self.di.mast_comp_dic()
-                    mast_basedir, Attempt_dic, shift_value = self.ldm.mast_base_dir()
-                    self.data['mastu_dirdata'] = mast_basedir
-                    self.data['mastu_dircomp']['Attempt'] = Attempt_dic
-                    self.data['mastu_dircomp']['shift_value'] = shift_value
+                    self.data['mast_dircomp']['shift'] = shift_value
                     
                     
                     
@@ -74,10 +70,7 @@ class load_directory:
                     print('load_mastu_dir function is not there yet!')
     
     
-    
-    
-    
-   
+       
     
     def load_mastu_dir(self):
         if self.DF.DEV == 'mastu':
