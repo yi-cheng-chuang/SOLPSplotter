@@ -257,7 +257,8 @@ class transport_coefficient_alignment:
                     plt.yscale('log')
                 else:
                     pass
-                plt.figure(figsize=(7,7))
+                
+                plt.figure()
                 plt.plot(std_trans[k][0,:], std_trans[k][1,:], 'o-',color = 'blue', label ='orgin_case transport coefficient')
                 plt.plot(input_trans[k][0,:], input_trans[k][1,:], 'o-', color = 'orange', label ='{}_case transport coefficient'.format(itername))
                 plt.xlabel('Radial coordinate: $R- R_{sep}$')
