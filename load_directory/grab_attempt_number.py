@@ -21,9 +21,8 @@ class grab_aptn_method:
     def s_number(self, text):
         # sd = ss.Setting_dic()
         
-        
-        
-        if self.DF.DEV == 'mast':
+                
+        if self.DF.DEV == 'mast' or self.DF.Dnames == 'mastu_mast':
             
             if self.DF.withshift == False and self.DF.withseries == False:
                 name = text.split("/",-1)[-2]
@@ -86,7 +85,7 @@ class grab_aptn_method:
     def mastu_atp_number(self, text, usage):
         # sd = ss.Setting_dic()
         
-        if self.DF.DEV == 'mastu':
+        if self.DF.DEV == 'mastu' or self.DF.Dnames == 'mastu_mast':
             
             if self.DF.withshift == False and self.DF.withseries == False:
                 
@@ -94,7 +93,7 @@ class grab_aptn_method:
                     
                     name = text.split("/",-1)[-1]
                     
-                    # print(name)
+                    print(name)
                     
                     nu = int(name.split('_')[0])
                 
@@ -110,7 +109,7 @@ class grab_aptn_method:
                 print('mastu_atp_number function is not there yet!')
         
         else:
-            print('DEV setting is not MAST!')
+            print('DEV setting is not MASTU!')
             
         
         
