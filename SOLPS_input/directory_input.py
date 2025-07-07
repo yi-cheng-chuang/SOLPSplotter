@@ -50,9 +50,9 @@ class directory_input:
         a_shift = 'org'
         shift = 0
 
-        series = 'mastu39_CDN'
+        series = 'mastu_mast_49404'
         
-        filename = '39_49404_ba3a'
+        filename = '4_mastu_49404_mast_a'
         
         mastu_dircomp_dic = {'Shot': '49404', 'shift': shift, 
                         'series': series, 'filename': filename, 
