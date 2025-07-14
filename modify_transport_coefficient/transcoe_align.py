@@ -185,7 +185,7 @@ class transport_coefficient_alignment:
             for k in coe_label_dic.keys():
                 if log_flag:
                     plt.yscale('log')
-                plt.figure(figsize=(7,7))
+                plt.figure()
                 for ab in trans_dic.keys(): 
                     # plt.plot(trans_dic[ab][:, 0], trans_dic[ab][:, int(k)], 'o-', color= color_dic[ab],
                     #          label ='transport coefficient of modify {} m case'.format(self.data['dircomp']['shift_dic'][ab]))
