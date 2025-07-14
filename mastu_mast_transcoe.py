@@ -17,6 +17,7 @@ from set_plot.plot_format import plot_setting
 from modify_transport_coefficient.transport_coefficient_adjust_method import transcoe_method
 from modify_transport_coefficient.Transcoe_adj import transport_coefficient_adjustment
 from modify_transport_coefficient.transcoe_align import transport_coefficient_alignment
+from modify_transport_coefficient.CM_transcoe_align import CrossMachine_transcoe_align
 
 
 
@@ -58,6 +59,7 @@ class transcoe_mod_datapipline:
         xtm = transcoe_method(DF = self.DF, data = self.data, lcm = xlc)
         xtca = transport_coefficient_adjustment(DF = self.DF, data = self.data, gam = xga, tm= xtm)
         xtcal = transport_coefficient_alignment(DF = self.DF, data = self.data, gam = xga, geo = xlg, tm= xtm)
+        xcmta = CrossMachine_transcoe_align(DF = self.DF, data = self.data, gam = xga, geo = xlg, tm= xtm)
         
         
         if self.DF.DEV == 'cross_machine':
@@ -70,7 +72,7 @@ class transcoe_mod_datapipline:
                 # xps.set_plot()
                 
                 # xtcal.transport_coe_align_plot(plot_transcoe = True, paper_transcoe = True, save_eps = False)
-                xtcal.align_transco(plot_align = True, log_flag = False)
+                xcmta.CM_align_transco(plot_align = True, log_flag = False)
 
         
         # mod_detail = False
