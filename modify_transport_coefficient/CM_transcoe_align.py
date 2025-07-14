@@ -18,7 +18,7 @@ import numpy as np
 
 
 
-class CM_transcoe_align:
+class CrossMachine_transcoe_align:
     
     def __init__(self, DF, data, geo: load_geometry, gam: grab_aptn_method, tm: transcoe_method):
         
@@ -107,7 +107,7 @@ class CM_transcoe_align:
             inpfileloc = '{}/b2.transport.inputfile'.format(input_simudir)
             
             
-            self.align_transcoe_method(std_file_loc = stdfileloc, input_file_loc = inpfileloc,
+            self.CM_align_transcoe_method(std_file_loc = stdfileloc, input_file_loc = inpfileloc,
                             device = 'mastu', plot_align = plot_align, log_flag = log_flag)
                 
                     
