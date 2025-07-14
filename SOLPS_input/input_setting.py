@@ -22,7 +22,7 @@ def Setting_dic():
         def __init__(self):
             
             
-            self.DEV = 'cross_machine'
+            self.DEV = 'mastu'
             # self.cross_series = False
             self.withshift = False
             self.withseries = False
