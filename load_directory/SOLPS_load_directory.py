@@ -79,10 +79,9 @@ class load_directory:
                 
                 if self.DF.terminal == False:
                     self.data['dircomp'] = self.di.mastu_comp_dic()
-                    mast_basedir, Attempt_dic, shift_value = self.ldm.mastu_base_dir()
-                    self.data['dirdata'] = mast_basedir
+                    mastu_basedir, Attempt_dic = self.ldm.mastu_base_dir()
+                    self.data['dirdata'] = mastu_basedir
                     self.data['dircomp']['Attempt'] = Attempt_dic
-                    self.data['dircomp']['shift_value'] = shift_value
                 
                 elif self.DF.terminal == True:
                     
