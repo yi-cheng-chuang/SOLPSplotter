@@ -201,8 +201,8 @@ class preprocess_mastuTS:
         plt.scatter(radius_sort, ne_sort, label= 'ne_flatter')
 
         # Add labels and title
-        plt.xlabel("dlcfs (m)", fontsize=12)
-        plt.title("ne vs. dlcfs", fontsize=14)
+        plt.xlabel("dlcfs (m)", fontsize = 12)
+        plt.title("ne vs. dlcfs", fontsize = 14)
 
         # Add legend
         plt.legend()
