@@ -29,7 +29,6 @@ class load_dir_method:
 
     def mastu_base_dir(self):
         nd = self.di.mastu_comp_dic()
-        d = self.di.mast_comp_dic()
         basedrt, topdrt = self.di.set_wdir()
         
         if self.DF.DEV == 'cross_machine':
@@ -73,10 +72,10 @@ class load_dir_method:
         
         
         
-        mast_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
+        mastu_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
                         'gdir': gdir, 'simudir': newbase, 'simutop': tbase}
 
-        return mast_basedir, attempt
+        return mastu_basedir, attempt
     
     
     
