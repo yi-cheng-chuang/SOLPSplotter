@@ -80,6 +80,6 @@ class mastu_load_prepare_module:
             print('working on RRsep maxis now...')
             xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'maxis')
             xmrm.calc_minor_radius(plotRR= True)
-            xpm.load_mastu_TS(plot_OD = True, plot_P = False, writefile = False)
-            xlt.load_mastuTS_test(plot = True)
+            xpm.load_mastu_TS(plot_OD = False, plot_P = True, writefile = False)
+            # xlt.load_mastuTS_test(plot = True)
             
