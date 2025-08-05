@@ -48,7 +48,7 @@ class transport_coefficient_adjustment:
                 if j<= de_SOL:
                     mod_y[j] = cod[j,1]
                 else:
-                    mod_y[j] = 5.0
+                    mod_y[j] = 20.0
             cod[:,1] = mod_y
 
             mod_yki = np.zeros(m)
