@@ -65,7 +65,7 @@ class transcoe_mod_datapipline:
         xlg.calcpsi_avcr()
         xps.set_plot()
         
-        mod_detail = True
+        mod_detail = False
         
         if mod_detail:
             
@@ -81,7 +81,7 @@ class transcoe_mod_datapipline:
         else:
             
             xtca.mod_transco(withmod = True, de_SOL = 18, ki_SOL = 18, 
-                             ke_SOL = 21, log_flag = True, modnew = False)
+                             ke_SOL = 21, log_flag = True, modnew = True)
         
        
 
