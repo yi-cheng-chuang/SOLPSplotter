@@ -31,7 +31,7 @@ class load_B2simu_data:
         try:
             ncIn = Dataset(file_in)
         except:
-            print("Error: Could not open "+file_in)
+            print("Error: Could not open "+ file_in)
             exit(0)
             
         times = ncIn.variables['times'][:]
