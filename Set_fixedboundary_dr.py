@@ -71,7 +71,7 @@ class Setfixedboundary_datapipline:
         xps.opacity_study_unit()
         
         
-        xrp.calc_RRsep(plotRR= False, plot_psi_dsa_align= False, midplane_loc = 'maxis')
+        xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'maxis')
         fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
                                   'plot_exp_and_fit': True, 'plot_shift_compare': False,
                                   'data_print': True, 'piecewise': True}
