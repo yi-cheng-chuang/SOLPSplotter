@@ -84,25 +84,25 @@ class load_dir_method:
         basedrt, topdrt = self.di.set_wdir()
         
             
-        # if self.DF.Dnames == 'mastu_mast':
+        if self.DF.DEV == 'cross_machine':
             
-        #     gbase = '{}/{}/{}'.format(topdrt, 'mast', d['Shot'])
-        #     g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
-        #     print(g_path)
-        #     gdir = Path(g_path).as_posix()
+            gbase = '{}/{}/{}'.format(topdrt, 'mast', d['Shot'])
+            g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
+            print(g_path)
+            gdir = Path(g_path).as_posix()
             
-        # else:
+        else:
             
-        #      gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, d['Shot'])
-        #      g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
-        #      print(g_path)
-        #      gdir = Path(g_path).as_posix()
+              gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, d['Shot'])
+              g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
+              print(g_path)
+              gdir = Path(g_path).as_posix()
             
         
-        gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, d['Shot'])
-        g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
-        print(g_path)
-        gdir = Path(g_path).as_posix()
+        # gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, d['Shot'])
+        # g_path = glob.glob('{}/g{}*'.format(gbase, d['Shot']))[0]
+        # print(g_path)
+        # gdir = Path(g_path).as_posix()
             
             
         
