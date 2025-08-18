@@ -145,7 +145,7 @@ class transport_coefficient_adjustment:
                 elif j< de_ped:
                     
                     if D_ped_adj:
-                        mod_y[j] = 0.02
+                        mod_y[j] = 0.0262
                     
                     else:
                         mod_y[j] = cod[j,1]
