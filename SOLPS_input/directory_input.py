@@ -52,7 +52,7 @@ class directory_input:
 
         series = 'mastu_mast_49404'
         
-        filename = '6_alignb_mastu_49404_mast_a'
+        filename = '15_alignb_mastu_49404_mast_a'
         
         mastu_dircomp_dic = {'Shot': '49404', 'shift': shift, 
                         'series': series, 'filename': filename, 
