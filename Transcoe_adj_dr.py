@@ -69,10 +69,10 @@ class transcoe_mod_datapipline:
         
         if mod_detail:
             
-            ped_adj = [False, False, False]
-            de_cut = [7, 32]
-            ki_cut = [13, 18]
-            ke_cut = [13, 21]
+            ped_adj = [True, False, False]
+            de_cut = [18, 23]
+            ki_cut = [0, 23]
+            ke_cut = [0, 23]
             
             
             xtca.transco_mod_detail(withmod = True, de_cut = de_cut, ki_cut = ki_cut, 
@@ -80,8 +80,8 @@ class transcoe_mod_datapipline:
             
         else:
             
-            xtca.mod_transco(withmod = True, de_SOL = 18, ki_SOL = 18, 
-                             ke_SOL = 21, log_flag = True, modnew = True)
+            xtca.mod_transco(withmod = True, de_SOL = 23, ki_SOL = 23, 
+                             ke_SOL = 23, log_flag = True, modnew = True)
         
        
 
