@@ -96,7 +96,7 @@ class contour_datapipline:
             if withshift == False and withseries == True:
                 
                 
-                contour_theme = 'tw_eirene_contour'
+                contour_theme = 'twscan_rectangular_contour'
                 
                 if contour_theme == 'tw_eirene_contour':
                     
