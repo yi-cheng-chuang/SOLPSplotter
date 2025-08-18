@@ -156,6 +156,34 @@ class load_B2simu_data:
             
             return dat_dic
 
+    
+    def load_cross_machine_b2fstate(self):
+        
+        
+        if self.DF.DEV == 'cross_machine':
+            
+            if self.DF.Dnames == 'mastu_mast':
+                
+                #for mast
+                
+                dev_list = ['mast', 'mastu']
+                
+                for aa in dev_list:
+                    
+                    file_loc = '{}/{}'.format(self.data['{}_dirdata'.format(aa)]['simudir'], 'b2fstate')
+                    state, dim = read_b2fstate(b2fstateLoc = file_loc)
+                    state_dic = vars(state)
+                    dim_dic = {'nx': dim[0], 'ny': dim[1], 'ns': dim[2]}
+                    self.data['{}_b2fstate'.format(aa)] = state_dic
+                    self.data['{}_DefaultSettings'.format(aa)]['dims'] = dim_dic
+                    
+
+                
+
+        
+        
+
+
 
     
     
@@ -215,7 +243,40 @@ class load_B2simu_data:
         else:
             print('load_b2fstate function is not there yet!')
     
+    
+    
+    
+    def load_cross_mechine_b2wdat(self):
+        
+        
+        if self.DF.DEV == 'cross_machine':
+            
+            if self.DF.Dnames == 'mastu_mast':
+                
+                dev_list = ['mast', 'mastu']
+                
+                for aa in dev_list:
+                    
+                    file_loc = '{}/'.format(self.data['{}_dirdata'.format(aa)]['simudir'])
+                    na_dat = self.data['{}_b2fstate'.format(aa)]['na']
+                    
+                    
+                    b2wdat = read_b2wdat(b2wdatLoc = file_loc, 
+                                              nSpec = np.shape(na_dat)[2])
+                    b2wdat_dic = vars(b2wdat)
+                        
+                           
 
+                    self.data['{}_b2wdat'.format(aa)] = b2wdat_dic
+                    
+                
+                
+            
+
+           
+            
+    
+    
        
     
     def load_b2wdat(self):
@@ -225,6 +286,8 @@ class load_B2simu_data:
         withseries = self.DF.withseries
         
         if withshift == False and withseries == False:
+            
+
             
             file_loc = '{}/'.format(self.data['dirdata']['simudir'])
             na_dat = self.data['b2fstate']['na']
