@@ -47,7 +47,7 @@ class mastu_datapipline:
             xml.mastu_prepare_for_plots()
             
             
-            plot_theme = 'step_plan'
+            plot_theme = 'B2_boundary'
             
             if plot_theme == 'geo':
                 
