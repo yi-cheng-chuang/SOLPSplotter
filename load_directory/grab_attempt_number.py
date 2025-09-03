@@ -115,6 +115,41 @@ class grab_aptn_method:
         
 
         return [nu, name]
+    
+    
+    def mast_fluxstd_atp_number(self, text, usage):
+        # sd = ss.Setting_dic()
+        
+        if self.DF.DEV == 'mast' and self.DF.flux_std == True:
+            
+            if self.DF.withshift == False and self.DF.withseries == False:
+                
+                if usage == 'load_dir':
+                    
+                    name = text.split("/",-1)[-1]
+                    
+                    print(name)
+                    
+                    nu = int(name.split('_')[0])
+                
+                elif usage == 'transcoe':
+                    
+                    name = text.split("/",-1)[-2]
+                    
+                    # print(name)
+                    
+                    nu = int(name.split('_')[0])
+                
+            else:
+                print('mastu_atp_number function is not there yet!')
+        
+        else:
+            print('DEV setting is not MASTU!')
+            
+        
+        
+
+        return [nu, name]
 
 
 
