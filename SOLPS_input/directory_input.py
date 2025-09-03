@@ -52,7 +52,7 @@ class directory_input:
 
         series = 'mastu_mast_49404'
         
-        filename = '15_alignb_mastu_49404_mast_a'
+        filename = '12_alignb_mastu_49404_mast_a'
         
         mastu_dircomp_dic = {'Shot': '49404', 'shift': shift, 
                         'series': series, 'filename': filename, 
@@ -66,11 +66,11 @@ class directory_input:
         a_shift = 'org'
         shift = 0
 
-        series = 'org_cfluxb_std'
+        series = 'matachflux_mast'
         
-        filename = '80_newt15_a'
+        filename = '4_match_org'
         
-        mast_fluxstd_dircomp_dic = {'Shot': '27205', 'shift': shift, 
+        mast_fluxstd_dircomp_dic = {'Shot': '027205', 'shift': shift, 
                         'series': series, 'filename': filename, 
                         'a_shift': a_shift}
         
