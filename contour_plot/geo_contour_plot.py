@@ -140,4 +140,5 @@ class fluxexpansion_contour:
             print('calc_flux_expansion is not there yet, to be continue...')
             
         else:
+            
             print('There is a bug')
