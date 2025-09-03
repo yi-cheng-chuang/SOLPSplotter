@@ -79,6 +79,61 @@ class load_dir_method:
     
     
     
+    def mast_fluxstd_dir(self):
+        nd = self.di.mast_fluxstd_comp_dic()
+        basedrt, topdrt = self.di.set_wdir()
+        
+        if self.DF.DEV == 'cross_machine':
+            
+            gbase = '{}/{}/{}'.format(topdrt, 'mast', nd['Shot'])
+            g_path = glob.glob('{}/g{}*'.format(gbase))[0]
+            gdir = Path(g_path).as_posix()
+        
+        else:
+            
+            gbase = '{}/{}/{}'.format(topdrt, self.DF.DEV, nd['Shot'])
+            g_path = glob.glob('{}/g{}*'.format(gbase, nd['Shot']))[0]
+            print(g_path)
+            gdir = Path(g_path).as_posix()
+            
+        
+        
+        # all_list = glob.glob('{}/*'.format(gbase))
+        # print(all_list)
+        
+
+        series = nd['series']
+        filename = nd['filename']
+        
+        if self.DF.DEV == 'cross_machine':
+            
+            newbase = '{}/{}/{}/{}/{}'.format(basedrt, 'mast', 
+                                            nd['Shot'], series, filename)
+            tbase = '{}/{}/{}/{}'.format(basedrt, 'mastu', nd['Shot'], series)
+        
+        else:
+            newbase = '{}/{}/{}/{}/{}'.format(basedrt, self.DF.DEV, 
+                                            nd['Shot'], series, filename)
+            tbase = '{}/{}/{}/{}'.format(basedrt, self.DF.DEV, nd['Shot'], series)
+            
+        
+
+         
+        attempt = str(self.gam.mast_fluxstd_atp_number(newbase, usage = 'load_dir')[0])
+        
+        print('mastu attempt number is {}'.format(attempt))
+        
+        
+        
+        mast_fluxstd_basedir = {'basedrt': basedrt, 'topdrt': topdrt, 'gbase': gbase, 
+                        'gdir': gdir, 'simudir': newbase, 'simutop': tbase}
+
+        return mast_fluxstd_basedir, attempt
+    
+    
+    
+    
+    
     def mast_base_dir(self):
         d = self.di.mast_comp_dic()
         basedrt, topdrt = self.di.set_wdir()
