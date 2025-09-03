@@ -217,7 +217,7 @@ class load_expdata:
         
         self.fmc.lmfit_tanh(TS_data = TS_dic, psi = psi, plot = True)
             
-        x_model = np.linspace(min(psi), 1.21, n_tot)
+        x_model = np.linspace(min(psi), max(psi), n_tot)
         tanh_ne_fit = self.fmc.tanh(x_model, popt_ne[0], popt_ne[1], popt_ne[2], popt_ne[3], popt_ne[4])
         tanh_te_fit = self.fmc.tanh(x_model, popt_te[0], popt_te[1], popt_te[2], popt_te[3], popt_te[4])
         
