@@ -12,9 +12,6 @@ from module_load_for_plot.module_load import *
 
 
 
-
-
-
 class contour_datapipline:
     
        
@@ -62,11 +59,6 @@ class contour_datapipline:
             
             # else:
             #     pass
-            
-            
-
-            
-            
                        
             
             withshift = self.DF.withshift
@@ -76,11 +68,9 @@ class contour_datapipline:
             if withshift == False and withseries == True: 
                 
                 contour_theme = 'twscan_rectangular_contour'
-                
-               
-                    
-                    
-       
+
+        
+
             elif withshift == True and withseries == False:
                 
                 
@@ -94,18 +84,6 @@ class contour_datapipline:
                 else:
                     pass
                 
-               
-                
-                
-                
-                
-                
-            
-            
-                
-                
-            
-            
 
 
 if __name__ == "__main__":
