@@ -243,7 +243,18 @@ class load_geometry:
         if withshift == False and withseries == False:
             simudir = self.data['dirdata']['simudir']
             simutop = self.data['dirdata']['simutop']
-            shift = self.data['dircomp']['shift_value']
+            
+            if self.DF.flux_std:
+                
+                shift = self.data['dircomp']['shift']
+            
+            else:
+                
+                shift = self.data['dircomp']['shift_value']
+                
+                
+            
+
             
             b2mn, geo, gfilesum = self.loadgeo_method(attempt_loc = simudir, 
                     simufile_loc = simutop, g_data = gfile_data, shift_value = shift)
