@@ -22,7 +22,7 @@ def Setting_dic():
         def __init__(self):
             
             
-            self.DEV = 'mastu'
+            self.DEV = 'mast'
             # self.cross_series = False
             self.withshift = False
             self.withseries = False
@@ -72,7 +72,7 @@ def Setting_dic():
                 
 
             
-        
+            self.flux_std = False
             self.terminal = terminal
             self.series_compare = False
             self.plot_setting = 'mod_transcoe'
