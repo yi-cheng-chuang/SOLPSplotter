@@ -93,26 +93,45 @@ class load_directory:
         
         
         terminal = self.DF.terminal
+        flux_std = self.DF.flux_std
         
         if self.DF.DEV == 'mast':
             
             if self.DF.withshift == False and self.DF.withseries == False:
                 
-                
-                if terminal == False:
-                    self.data['dircomp'] = self.di.mast_comp_dic()
-                    mast_basedir, Attempt_dic, shift_value = self.ldm.mast_base_dir()
-                    self.data['dirdata'] = mast_basedir
-                    self.data['dircomp']['Attempt'] = Attempt_dic
-                    self.data['dircomp']['shift_value'] = shift_value
-                
-                elif terminal == True:
+                if flux_std:
                     
-                    self.data['dircomp'] = self.di.mast_comp_dic()
-                    mast_basedir, Attempt_dic, shift_value = self.ldm.terminal_single_dir()
-                    self.data['dirdata'] = mast_basedir
-                    self.data['dircomp']['Attempt'] = Attempt_dic
-                    self.data['dircomp']['shift_value'] = shift_value
+                    
+                    if terminal == False:
+                        self.data['dircomp'] = self.di.mast_fluxstd_comp_dic()
+                        mast_basedir, Attempt_dic = self.ldm.mast_fluxstd_dir()
+                        self.data['dirdata'] = mast_basedir
+                        self.data['dircomp']['Attempt'] = Attempt_dic
+                    
+                    elif terminal == True:
+                        
+                        print('terminal option for flux std needs to be updated, we left it for future user')
+                
+                elif flux_std == False:
+                    
+                    if terminal == False:
+                        self.data['dircomp'] = self.di.mast_comp_dic()
+                        mast_basedir, Attempt_dic, shift_value = self.ldm.mast_base_dir()
+                        self.data['dirdata'] = mast_basedir
+                        self.data['dircomp']['Attempt'] = Attempt_dic
+                        self.data['dircomp']['shift_value'] = shift_value
+                    
+                    elif terminal == True:
+                        
+                        self.data['dircomp'] = self.di.mast_comp_dic()
+                        mast_basedir, Attempt_dic, shift_value = self.ldm.terminal_single_dir()
+                        self.data['dirdata'] = mast_basedir
+                        self.data['dircomp']['Attempt'] = Attempt_dic
+                        self.data['dircomp']['shift_value'] = shift_value
+                    
+                    
+                
+
         
         
                 
