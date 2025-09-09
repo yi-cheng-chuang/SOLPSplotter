@@ -81,7 +81,7 @@ class radial_datapipline:
                     
                     
                     
-                    midprof = 'norm_nd'
+                    midprof = 'NT'
                     
                     if midprof == 'NT':
                         
