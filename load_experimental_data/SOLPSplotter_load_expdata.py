@@ -178,8 +178,8 @@ class load_expdata:
             
             else:
                 series_rap = list(self.data['dircomp']['Attempt'].keys())[0]
-                jxa = self.data['b2mn'][series_rap]['jxa']
-                psi_solps = self.data['psi']['psival'][series_rap][:, jxa]
+                jxa = self.data['b2mn']['jxa']
+                psi_solps = self.data['psi']['psival'][:, jxa]
                 
                 
 
