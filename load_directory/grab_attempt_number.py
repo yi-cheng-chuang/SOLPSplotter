@@ -36,8 +36,9 @@ class grab_aptn_method:
                 if series_flag == 'change_den':
                     name = text.split("\\",-1)[-1]
                     nu = re.findall('\d+\.\d+', name)
+                    print(nu)
                     nu.append(name.split('_')[0])
-                    # print(nu)
+                    
                 elif series_flag == 'eireneN':
                     name = text.split("\\",-1)[-1]
                     nu = re.findall('\d+', name)
