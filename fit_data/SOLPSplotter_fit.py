@@ -217,15 +217,17 @@ class profile_fit:
                 
                 series_flag = self.DF.series_flag
                 
+                nx = self.data['b2fgeo']['nx']
+                ny = self.data['b2fgeo']['ny']
+                dat_struc = {'nx': nx, 'ny': ny}
+                
                 
                 if series_flag == 'twin_scan':
                     
                     nf = aa[0]
                     tf = aa[1]
                     
-                    nx = self.data['b2fgeo']['nx']
-                    ny = self.data['b2fgeo']['ny']
-                    dat_struc = {'nx': nx, 'ny': ny}
+                    
 
 
                     
@@ -242,10 +244,10 @@ class profile_fit:
                     fstate = self.data['b2fstate'][nf][tf]
                 
                 else:
-                    self.load_output_data(param= 'NeuDen')
-                    Neuden_data = self.data['outputdata']['NeuDen'][aa]
-                    # data = self.data['ft44'][aa]['dab2']
-                    # Neuden_data = np.transpose(data[:, :, 0])
+                    # self.load_output_data(param= 'NeuDen')
+                    # Neuden_data = self.data['outputdata']['NeuDen'][aa]
+                    data = self.data['ft44'][aa]['dab2']
+                    Neuden_data = np.transpose(data[:, :, 0])
                     fstate = self.data['b2fstate'][aa]
                     
                 
@@ -415,15 +417,18 @@ class profile_fit:
                 
                 series_flag = self.DF.series_flag
                 
+                nx = self.data['b2fgeo']['nx']
+                ny = self.data['b2fgeo']['ny']
+                dat_struc = {'nx': nx, 'ny': ny}
+                
+                
                 if series_flag == 'twin_scan':
                     
                     nf = aa[0]
                     tf = aa[1]
                     
                     
-                    nx = self.data['b2fgeo']['nx']
-                    ny = self.data['b2fgeo']['ny']
-                    dat_struc = {'nx': nx, 'ny': ny}
+                    
                     
                     
                     
