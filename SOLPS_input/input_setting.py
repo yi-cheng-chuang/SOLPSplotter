@@ -26,13 +26,14 @@ def Setting_dic():
             # self.cross_series = False
             self.withshift = False
             self.withseries = False
-            if self.withseries:
-                self.series_flag = 'twin_scan'
+            self.series_flag = 'change_den'
+            
+            
+            if self.series_flag == 'twin_scan':
                 self.series_filename = 'org_new25scan_fast_save'
                 self.series_tail = 'fast_a'
-                
-            else:
-                print('withseries is false!')
+            elif self.series_flag == 'change_den':
+                pass
             
             
             if self.DEV == 'cross_machine':
