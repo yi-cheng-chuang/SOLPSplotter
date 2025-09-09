@@ -48,7 +48,8 @@ def read_ft44_field(fid,ver,fieldname,dims,intField=False):
         elif (numin!= np.prod(dims) and ('wldnek' in fieldname or 'wldnep' in fieldname)):
             dims = [numin]
         elif (numin!= np.prod(dims) and ('wldna' in fieldname or 'ewlda' in fieldname or 'wldnm' in fieldname or 'ewldm' in fieldname)):
-            dims[1] = int(numin/dims[0])
+            dims[1] = int((numin)/dims[0])
+        print(numin)
             
 
     # Read the data
@@ -63,7 +64,9 @@ def read_ft44_field(fid,ver,fieldname,dims,intField=False):
             if (intField): fieldVal.append(int(line.split()[i]))
             else: fieldVal.append(float(line.split()[i]))
     fieldVal=np.array(fieldVal)
+    
     if (np.size(dims) > 1 and 'wld' not in fieldname): fieldVal = fieldVal.reshape(dims,order='F').copy()
+    print(dims)
     if (np.size(dims) > 1 and 'wld' in fieldname): fieldVal = fieldVal.reshape(dims).copy() 
 
     return fieldVal
@@ -265,3 +268,70 @@ def read_ft46(fileName):
     fid.close()
     print('done reading ft46 file')
     return ft46
+
+
+
+
+
+"""
+
+Save for old version:
+
+
+
+
+def read_ft44_field(fid,ver,fieldname,dims,intField=False):
+    '''Auxiliary routine to read fields from fort.44 file
+    fid is the file object i.e fid = open(fileLocation)
+    Verion 20160829: field label and size are specified in fort.44
+    fieldname is the name of the variable to find
+    dims is the dimension of that variable the array will be shaped into
+    intField says whether to return the values as an integer or float'''
+#    Do consistency check on the data
+    if (ver >= 20160829):
+        # Search the file until identifier 'fieldname' is found
+        line = fid.readline().rstrip()
+        while fieldname not in line:
+            line = fid.readline().rstrip()
+            if len(line) == 0: print('read_ft44_field: EOF reached without finding '+str(fieldname))
+        # Consistency check: number of elements specified in the file should equal
+        # prod(dims)
+        for i in range(len(line.split())):
+            if is_number(line.split()[i]): numin = int(line.split()[i])
+	
+        if (numin != np.prod(dims) and 'wld' not in fieldname):
+            print('issue with field '+fieldname)
+            print("numin="+str(numin))
+            print("np.prod(dims)="+str(np.prod(dims)))
+            print('read_ft44_rfield: inconsistent number of input elements.')
+            print('if this is a wall paramter, could be fine, check it.')
+            print('number of walls is hardcoded in, need to fix')
+        elif (numin!= np.prod(dims) and ('wldnek' in fieldname or 'wldnep' in fieldname)):
+            dims = [numin]
+        elif (numin!= np.prod(dims) and ('wldna' in fieldname or 'ewlda' in fieldname or 'wldnm' in fieldname or 'ewldm' in fieldname)):
+            dims[1] = int(numin/dims[0])
+            
+
+    # Read the data
+    fieldVal=[]
+    # collect field values
+    while (len(fieldVal) != numin):
+        line = fid.readline().rstrip()
+        if ('wld' in fieldname) and len(fieldVal)>=numin-1: break
+        for i in range(len(line.split())):
+            if ('wlpump' in fieldname):
+                if not is_number(line.split()[i]): continue
+            if (intField): fieldVal.append(int(line.split()[i]))
+            else: fieldVal.append(float(line.split()[i]))
+    fieldVal=np.array(fieldVal)
+    if (np.size(dims) > 1 and 'wld' not in fieldname): fieldVal = fieldVal.reshape(dims,order='F').copy()
+    if (np.size(dims) > 1 and 'wld' in fieldname): fieldVal = fieldVal.reshape(dims).copy() 
+
+    return fieldVal
+
+
+"""
+
+
+
+
