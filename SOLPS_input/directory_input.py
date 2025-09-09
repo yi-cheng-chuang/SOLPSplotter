@@ -230,9 +230,9 @@ class directory_input:
     def mast_comp_dir_series(self):
         a_shift = 'org'
         shift = 0
-        tail = '_leakbsol_nts5_a'
+        tail = '_case'
         outputlist = ['Output', 'Output2', 'EirOutput']
-        shift_filename = 'org_denscan_fluxb_027205'
+        shift_filename = 'ion_CX_scan'
         mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
                         'tail': tail, 'a_shift': a_shift, 'Output': outputlist}
         
