@@ -369,14 +369,15 @@ class load_dir_method:
         new_dic = {}
         for i in newbase:
             if self.DF.series_flag == 'change_den':
-                attempt_dic[self.gam.s_number(i, self.DF.series_flag)[0][0]] = self.gam.s_number(i, self.DF.series_flag)[0][1]
-                new_dic[self.gam.s_number(i, self.DF.series_flag)[0][0]] = i
+                print(self.gam.s_number(i))
+                attempt_dic[self.gam.s_number(i)[0][0]] = self.gam.s_number(i)[0][1]
+                new_dic[self.gam.s_number(i)[0][0]] = i
             elif self.DF.series_flag == 'eireneN':
-                attempt_dic[self.gam.s_number(i, self.DF.series_flag)[0][1]] = self.gam.s_number(i, self.DF.series_flag)[0][0]
-                new_dic[self.gam.s_number(i, self.DF.series_flag)[0][1]] = i
+                attempt_dic[self.gam.s_number(i)[0][1]] = self.gam.s_number(i)[0][0]
+                new_dic[self.gam.s_number(i)[0][1]] = i
             elif self.DF.series_flag == 'change_temp':
-                attempt_dic[self.gam.s_number(i, self.DF.series_flag)[0][0]] = self.gam.s_number(i, self.DF.series_flag)[0][1]
-                new_dic[self.gam.s_number(i, self.DF.series_flag)[0][0]] = i
+                attempt_dic[self.gam.s_number(i)[0][0]] = self.gam.s_number(i)[0][1]
+                new_dic[self.gam.s_number(i)[0][0]] = i
         # print(attempt_list)
         
         adir = {}
