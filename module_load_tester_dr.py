@@ -14,6 +14,7 @@ from radial_plot.plot_ndmid import midnd_plot
 from radial_plot.SOLPSplotter_radial import radial_plot_opacity
 from radial_plot.twscan_rad import twscan_radial
 from radial_plot.twscan_target import twinscan_target_radial
+from contour_plot.psi_contour_plotter import psiN_plotContour
 
 
 
@@ -47,6 +48,8 @@ class module_load_tester_datapipline:
         xps = plot_setting(DF = self.DF, data = self.data)
         xtr = twscan_radial(DF = self.DF, data = self.data, twa = xta)
         xttr = twinscan_target_radial(DF = self.DF, data = self.data, twa = xta)
+        xppc = psiN_plotContour(DF = self.DF, data = self.data)
+        
         
         
         if self.DF.DEV == 'mast':
@@ -62,6 +65,7 @@ class module_load_tester_datapipline:
             if withshift == False and withseries == False:
                 
                 print('we come back to single case!')
+                xppc.psiN_populator()
             
             
             
