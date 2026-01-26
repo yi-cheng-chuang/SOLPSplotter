@@ -17,142 +17,153 @@ from poloidal_plot.SOLPSplotter_poloidal import poloidal_plot
 from poloidal_plot.grant_proposal_plot import result_explain
 from poloidal_plot.integrate_flux_plot import integrate_flux
 from poloidal_plot.show_flux import show_flow
-
-
-
-
-
+from poloidal_plot.triplot_poloidal import series_triplots
+from poloidal_plot.series_polfluxndS import series_polfluxndS_polplot
+from poloidal_plot.series_2para_poloidal import series_2para_polplot
+from midplane_data.cal_sep_length import seplength_calculator
+from poloidal_plot.series_1para_poloidal import series_1para_totargets_plot
+from poloidal_plot.series_2para_allsep_poloidal import series_2para_allsep_polplot
 
 
 class poloidal_datapipline:
-    
-       
+
     def __init__(self):
         # self.publish = 'b2plottersetting'
-        
+
         DefaultSettings = Setting_dic()
-        
+
         self.DF = DefaultSettings
-        
-        
+
         "Useful data"
-        self.data = {'dircomp':{}, 'grid':{}, 'dirdata':{}, 'ExpDict': {}, 'dsa':{},
-                     'gfile':{}, 'gridsettings': {}, 'psi':{}, 'DefaultSettings': {}, 
-                     'outputdata':{}, 'iout_data':{}}
-
-
+        self.data = {'dircomp': {}, 'grid': {}, 'dirdata': {}, 'ExpDict': {}, 'dsa': {},
+                     'gfile': {}, 'gridsettings': {}, 'psi': {}, 'DefaultSettings': {},
+                     'outputdata': {}, 'iout_data': {}}
 
     def run_poloidal_plot(self):
-        
-        xlp = load_prepare_module(DF = self.DF, data = self.data)
-        xta = twscan_assist(DF = self.DF, data = self.data)
-        xtp = twscan_polfluxndS_polplot(DF = self.DF, data = self.data, twa = xta)
-        xto = twscan_opacity_polplot(DF = self.DF, data = self.data, twa = xta)
-        xtbn = twscan_boundary_nendS_polplot(DF = self.DF, data = self.data, twa = xta)
-        xppp = paper_poloidal_plot(DF = self.DF, data = self.data)
-        xsf = show_flow(DF = self.DF, data = self.data)
-        xpp = poloidal_plot(DF = self.DF, data = self.data)
-        xre = result_explain(DF = self.DF, data = self.data)
+
+        xlp = load_prepare_module(DF=self.DF, data=self.data)
+        xta = twscan_assist(DF=self.DF, data=self.data)
+        xsc = seplength_calculator(DF=self.DF, data=self.data)
+        xtp = twscan_polfluxndS_polplot(DF=self.DF, data=self.data, twa=xta)
+        xto = twscan_opacity_polplot(DF=self.DF, data=self.data, twa=xta)
+        xtbn = twscan_boundary_nendS_polplot(
+            DF=self.DF, data=self.data, twa=xta)
+        xppp = paper_poloidal_plot(DF=self.DF, data=self.data)
+        xsf = show_flow(DF=self.DF, data=self.data)
+        xpp = poloidal_plot(DF=self.DF, data=self.data)
+        xre = result_explain(DF=self.DF, data=self.data)
+        xst = series_triplots(DF=self.DF, data=self.data)
+        xspp = series_polfluxndS_polplot(DF=self.DF, data=self.data)
         # xif = integrate_flux(DF = self.DF, data = self.data, sc = xsc)
-        
-        
-        
+        xs2p = series_2para_polplot(DF=self.DF, data=self.data, sc=xsc)
+        xs1tp = series_1para_totargets_plot(
+            DF=self.DF, data=self.data, sc=xsc)
+        xs2sp = series_2para_allsep_polplot(
+            DF=self.DF, data=self.data, sc=xsc)
+
         if self.DF.DEV == 'mast':
-            
-            
-            poloidal_loc_list = xlp.prepare_for_plots(plot_type = 'poloidal')
-            
-            
+
+            poloidal_loc_list = xlp.prepare_for_plots(plot_type='poloidal')
+
             """
             polplot_theme_list = ['opacity_study', 'polfluxndS']
             
             
             """
-            
+
             withshift = self.DF.withshift
             withseries = self.DF.withseries
-            
-            
+
             if withshift == False and withseries == True:
-                
-                
-                polplot_theme = 'opacity_study'
-                
+
+                polplot_theme = '2para_allsep'
+
                 if polplot_theme == 'polfluxndS':
-                    
-                    xtp.twpolfluxndS_plot(scan_style = 'denscan', pol_list = poloidal_loc_list, 
-                                          log_flag = True, rad_loc= 18)
-                
+                    xspp.srpolfluxndS_plot(
+                        pol_list=poloidal_loc_list, log_flag=True, rad_loc=18)
+                    # xtp.twpolfluxndS_plot(scan_style='denscan', pol_list=poloidal_loc_list,
+                    #                       log_flag=True, rad_loc=18)
+
                 elif polplot_theme == 'opacity_study':
-                    
-                    xto.twscan_opacity_polplot(scan_style = 'denscan', plot_option = 'opacity study poloidal plot', 
-                                               format_option = '3x1', space_option = 'psiN')
-                
+
+                    xpp.opacity_poloidal_plot(log_flag=False, save_pdf=False)
+
+                    # xto.twscan_opacity_polplot(scan_style='denscan', plot_option='opacity study poloidal plot',
+                    #                            format_option='3x1', space_option='psiN')
+
                 elif polplot_theme == 'nendS':
-                    
-                    xtbn.twpolfluxndS_plot(scan_style = 'denscan', pol_list = poloidal_loc_list, 
-                                          log_flag = True, rad_loc= -1)
-                
-                
-            
-            
+
+                    xtbn.twpolfluxndS_plot(scan_style='denscan', pol_list=poloidal_loc_list,
+                                           log_flag=True, rad_loc=-1)
+
+                elif polplot_theme == 'triplots':
+
+                    xst.tri_opacity_polplot(format_option='1x1',
+                                            space_option='real')
+
+                elif polplot_theme == '2para':
+
+                    xs2p.sr2para_polplot(
+                        pol_list=poloidal_loc_list, parameter='ppa', rad_loc=18)
+
+                elif polplot_theme == '1para':
+
+                    xs1tp.series_1para_totargets_polplot(
+                        pol_list=poloidal_loc_list, parameter='abspolflux', rad_loc=18)
+
+                elif polplot_theme == '2para_allsep':
+
+                    xs2sp.series_2para_allsepplot(
+                        pol_list=poloidal_loc_list, parameter='ndapf', rad_loc=18)
+
             elif withshift == True and withseries == False:
-                
-                
-                polplot_theme = 'PSIpaper'
-                
+
+                polplot_theme = 'poloidal'
+
                 if polplot_theme == 'PSIpaper':
-                    
-                    xppp.paper_poloidal_subplot(log_flag = False)
-                
-                
+
+                    xppp.paper_poloidal_subplot(log_flag=False)
+
                 elif polplot_theme == 'poloidal':
-                    
+
                     # xl.neuden_data_check(pol_list= poloidal_index_list)
 
-                    xpp.opacity_poloidal_plot(log_flag = False, save_pdf = False)
-                
-                
+                    xpp.opacity_poloidal_plot(log_flag=False, save_pdf=False)
+
                 elif polplot_theme == 'integrate_flux':
 
                     xif.allcover_three()
 
                     # xl.allcover_twosum()
-                
+
                 elif polplot_theme == 'grant':
 
                     xre.plot_addition_ndop()
-                    
+
                     xre.plot_addition_ndflux()
-                    
-                    xre.shape_plot_addition(pol_list = poloidal_loc_list)
-                
-                
+
+                    xre.shape_plot_addition(pol_list=poloidal_loc_list)
+
                 elif polplot_theme == 'showflux':
-                    
-                                       
+
                     xsf.totpolflux()
 
                     # xl.totpolfluxNR()
 
-
                     # xl.totsource()
                     # xl.totsourceNR()
-
 
                     # xl.totnd()
 
                     # xl.totndNR()
 
-
-                    xsf.totfluxes(pol_list = poloidal_loc_list)
+                    xsf.totfluxes(pol_list=poloidal_loc_list)
 
                     # xl.totfluxesNR(pol_list = poloidal_index_list)
 
                     # xl.totfluxesNG(pol_list = poloidal_index_list)
 
                     # xl.rebu_fluxesNG(pol_list = poloidal_index_list)
-
 
                     # xl.avgfluxesNG(pol_list = poloidal_index_list)
 
@@ -178,21 +189,6 @@ class poloidal_datapipline:
                     # xl.hflux_value_bar()
 
                     # xl.pflux_tot_bar()
-                
-
-                    
-                    
-                
-            
-            
-            
-            
-
-
-            
-            
-            
-            
 
 
 if __name__ == "__main__":
