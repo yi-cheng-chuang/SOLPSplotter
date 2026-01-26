@@ -27,123 +27,114 @@ from midplane_data.cal_sep_length import seplength_calculator
 from targets_data.target_fileload import target_dataload
 from data_organize_tool.loadfiles_tools import series_loadfiles
 from targets_data.target_savedata import target_radial
-
+from midplane_data.arclength_map_generator import arc_length_measure
+from load_simulation_data.load_matteo_ft44 import load_Matteo_pkl
+from midplane_data.poloidal_index_radial import poloidal_index_plotter
 
 
 class load_prepare_module:
-    
+
     def __init__(self, DF, data):
-        
+
         self.DF = DF
         self.data = data
-        
 
     def prepare_for_plots(self, plot_type):
-        
-        xdi = directory_input(DF = self.DF, data = self.data)
-        xga = grab_aptn_method(DF = self.DF, data = self.data)
-        xldm = load_dir_method(DF = self.DF, data = self.data, di= xdi, gam = xga)
-        xld = load_directory(DF = self.DF, data = self.data, di= xdi, ldm= xldm)
-        xlc = load_coordgeo_method(DF = self.DF, data = self.data)
-        xlg = load_geometry(DF = self.DF, data = self.data, lcm = xlc)
-        xps = plot_setting(DF = self.DF, data = self.data)
-        xfm = fit_method_collection(DF = self.DF, data = self.data)
-        xrp = RP_mapping(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
-        xpsc = poloidal_separatrix_calc(DF = self.DF, data = self.data, lcm = xlc, fmc= xfm)
-        xsc = seplength_calculator(DF = self.DF, data = self.data)
-        xre = read_expdata_method(DF = self.DF, data = self.data)
-        xle = load_expdata(DF = self.DF, data = self.data, fmc= xfm, rem = xre, lg= xlg)
-        xlb = load_B2simu_data(DF = self.DF, data = self.data, ldm= xldm)
-        xlf = load_ftfiles_data(DF = self.DF, data = self.data, ldm= xldm)
-        xpf = profile_fit(DF = self.DF, data = self.data, fmc = xfm, rp= xrp)
-        xmr = midplane_radial(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
-        xmc = midplane_ndsource_withcut(DF = self.DF, data = self.data, lbd = xlb, ldm = xldm)
-        xtd = target_dataload(DF = self.DF, data = self.data)
-        xsl = series_loadfiles(DF = self.DF, data = self.data, td = xtd, mr = xmr)
-        xtr = target_radial(DF = self.DF, data = self.data, td = xtd, sl = xsl, lbd = xlb, ldm = xldm)
-        
-        
-        
-        
-        
+
+        xdi = directory_input(DF=self.DF, data=self.data)
+        xga = grab_aptn_method(DF=self.DF, data=self.data)
+        xldm = load_dir_method(DF=self.DF, data=self.data, di=xdi, gam=xga)
+        xld = load_directory(DF=self.DF, data=self.data, di=xdi, ldm=xldm)
+        xlc = load_coordgeo_method(DF=self.DF, data=self.data)
+        xlg = load_geometry(DF=self.DF, data=self.data, lcm=xlc)
+        xps = plot_setting(DF=self.DF, data=self.data)
+        xfm = fit_method_collection(DF=self.DF, data=self.data)
+        xrp = RP_mapping(DF=self.DF, data=self.data, lcm=xlc, fmc=xfm)
+        xpsc = poloidal_separatrix_calc(
+            DF=self.DF, data=self.data, lcm=xlc, fmc=xfm)
+        xsc = seplength_calculator(DF=self.DF, data=self.data)
+        xre = read_expdata_method(DF=self.DF, data=self.data)
+        xle = load_expdata(DF=self.DF, data=self.data,
+                           fmc=xfm, rem=xre, lg=xlg)
+        xlb = load_B2simu_data(DF=self.DF, data=self.data, ldm=xldm)
+        xlf = load_ftfiles_data(DF=self.DF, data=self.data, ldm=xldm)
+        xpf = profile_fit(DF=self.DF, data=self.data, fmc=xfm, rp=xrp)
+        xmr = midplane_radial(DF=self.DF, data=self.data, lbd=xlb, ldm=xldm)
+        xmc = midplane_ndsource_withcut(
+            DF=self.DF, data=self.data, lbd=xlb, ldm=xldm)
+        xtd = target_dataload(DF=self.DF, data=self.data)
+        xsl = series_loadfiles(DF=self.DF, data=self.data, td=xtd, mr=xmr)
+        xtr = target_radial(DF=self.DF, data=self.data,
+                            td=xtd, sl=xsl, lbd=xlb, ldm=xldm)
+        xal = arc_length_measure(DF=self.DF, data=self.data, rp=xrp)
+        xlmp = load_Matteo_pkl(DF=self.DF, data=self.data)
+        xpir = poloidal_index_plotter(DF=self.DF, data=self.data)
+
         if self.DF.DEV == 'mast':
-            
+
             xld.load_mast_dir()
             xlg.load_solpsgeo()
             xlg.calcpsi_avcr()
             xlg.load_vessel()
             xps.set_plot()
             xps.opacity_study_unit()
-            
-            
-            xrp.calc_RRsep(plotRR= True, plot_psi_dsa_align= False, midplane_loc = 'maxis')
-            fitmastexp_setting_dic = {'writefile': True, 'plot_solps_fit': False, 
-                                      'plot_exp_and_fit': True, 'plot_shift_compare': False,
-                                      'data_print': True}
-            xle.fitmastexp(plot_setting_dic = fitmastexp_setting_dic)
+
+            xrp.calc_RRsep(plotRR=True, plot_psi_dsa_align=False,
+                           midplane_loc='maxis')
+            fitmastexp_setting_dic = {'writefile': False, 'plot_solps_fit': True,
+                                      'plot_exp_and_fit': True, 'plot_shift_compare': True,
+                                      'data_print': True, 'thesis_plot': True}
+            xle.fitmastexp(plot_setting_dic=fitmastexp_setting_dic)
             xlb.load_b2fstate()
             xlb.load_b2wdat()
             xlf.load_ft44()
+            # xlmp.load_ft44pkl()
             xrp.calc_sep_dsa()
-            
+            index_list = [35, 36, 37, 38, 39]
+            xpir.poloidal_index_plot(pol_list=index_list)
 
             poloidal_index_list = ['59']
-            xrp.calc_dsa(pol_loc= poloidal_index_list[0])
-            
-            
+            xrp.calc_dsa(pol_loc=poloidal_index_list[0])
+
             if plot_type == 'radial':
-                
-                xpf.radial_data_fit(pol_loc = poloidal_index_list[0], check_ne = False)
-                xpf.opacity_data_fit(pol_list = poloidal_index_list, check_ne = False)
-                
+
+                xpf.radial_data_fit(
+                    pol_loc=poloidal_index_list[0], check_ne=False)
+                xpf.opacity_data_fit(
+                    pol_list=poloidal_index_list, check_ne=False)
+
                 xmr.calc_midplane_profile()
                 xmc.calc_ndSmid_cut()
                 xtr.load_target_profile()
-                
-                
-                
+
                 return poloidal_index_list
-            
-            
+
             elif plot_type == 'poloidal':
-                
+
                 poloidal_loc_list = []
                 for i in range(44):
                     poloidal_loc_list.append('{}'.format(25 + i))
-                
-                xpf.opacity_data_fit(pol_list = poloidal_loc_list, check_ne = False)
-                xpsc.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
-                xtr.load_target_profile()
-                xsc.sep_length(direct = 'out_to_in')
-                
 
-            
+                xpf.opacity_data_fit(
+                    pol_list=poloidal_loc_list, check_ne=False)
+                xpsc.calc_pol_angle(
+                    pol_list=poloidal_loc_list, plot_angle=False)
+                xtr.load_target_profile()
+                xsc.sep_length(direct='in_to_out')
+                xal.arc_length_map(pol_list=poloidal_loc_list)
+
                 return poloidal_loc_list
-            
-            
+
             elif plot_type == 'contour':
-                
+
                 xlf.load_ft46()
-                
+
                 poloidal_loc_list = []
                 for i in range(40):
                     poloidal_loc_list.append('{}'.format(28 + i))
-                
-                xpsc.calc_pol_angle(pol_list = poloidal_loc_list, plot_angle= False)
-                
-                
-                return poloidal_loc_list
-                
-                
 
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+                xpsc.calc_pol_angle(
+                    pol_list=poloidal_loc_list, plot_angle=False)
+                xal.arc_length_map(pol_list=poloidal_loc_list)
+
+                return poloidal_loc_list
