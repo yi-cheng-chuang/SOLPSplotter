@@ -1,0 +1,59 @@
+Collecting FuzzyTM
+  Obtaining dependency information for FuzzyTM from https://files.pythonhosted.org/packages/2d/30/074bac7a25866a2807c1005c7852c0139ac22ba837871fc01f16df29b9dc/FuzzyTM-2.0.9-py3-none-any.whl.metadata
+  Downloading FuzzyTM-2.0.9-py3-none-any.whl.metadata (7.9 kB)
+Requirement already satisfied: numpy in c:\users\ychuang\anaconda3\lib\site-packages (from FuzzyTM) (2.2.3)
+Requirement already satisfied: pandas in c:\users\ychuang\anaconda3\lib\site-packages (from FuzzyTM) (2.0.3)
+Requirement already satisfied: scipy in c:\users\ychuang\anaconda3\lib\site-packages (from FuzzyTM) (1.16.3)
+Collecting pyfume (from FuzzyTM)
+  Obtaining dependency information for pyfume from https://files.pythonhosted.org/packages/ed/ea/a3b120e251145dcdb10777f2bc5f18b1496fd999d705a178c1b0ad947ce1/pyFUME-0.3.4-py3-none-any.whl.metadata
+  Downloading pyFUME-0.3.4-py3-none-any.whl.metadata (9.7 kB)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\ychuang\anaconda3\lib\site-packages (from pandas->FuzzyTM) (2.8.2)
+Requirement already satisfied: pytz>=2020.1 in c:\users\ychuang\anaconda3\lib\site-packages (from pandas->FuzzyTM) (2023.3.post1)
+Requirement already satisfied: tzdata>=2022.1 in c:\users\ychuang\anaconda3\lib\site-packages (from pandas->FuzzyTM) (2023.3)
+Collecting scipy (from FuzzyTM)
+  Obtaining dependency information for scipy from https://files.pythonhosted.org/packages/65/76/903324159e4a3566e518c558aeb21571d642f781d842d8dd0fd9c6b0645a/scipy-1.10.1-cp311-cp311-win_amd64.whl.metadata
+  Downloading scipy-1.10.1-cp311-cp311-win_amd64.whl.metadata (58 kB)
+     ---------------------------------------- 0.0/59.0 kB ? eta -:--:--     ---------------------------------------- 59.0/59.0 kB 1.5 MB/s eta 0:00:00
+Collecting numpy (from FuzzyTM)
+  Obtaining dependency information for numpy from https://files.pythonhosted.org/packages/d8/ec/ebef2f7d7c28503f958f0f8b992e7ce606fb74f9e891199329d5f5f87404/numpy-1.24.4-cp311-cp311-win_amd64.whl.metadata
+  Downloading numpy-1.24.4-cp311-cp311-win_amd64.whl.metadata (5.6 kB)
+Collecting simpful==2.12.0 (from pyfume->FuzzyTM)
+  Obtaining dependency information for simpful==2.12.0 from https://files.pythonhosted.org/packages/9d/0e/aebc2fb0b0f481994179b2ee2b8e6bbf0894d971594688c018375e7076ea/simpful-2.12.0-py3-none-any.whl.metadata
+  Downloading simpful-2.12.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting fst-pso==1.8.1 (from pyfume->FuzzyTM)
+  Downloading fst-pso-1.8.1.tar.gz (18 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting pandas (from FuzzyTM)
+  Obtaining dependency information for pandas from https://files.pythonhosted.org/packages/da/6d/1235da14daddaa6e47f74ba0c255358f0ce7a6ee05da8bf8eb49161aa6b5/pandas-1.5.3-cp311-cp311-win_amd64.whl.metadata
+  Downloading pandas-1.5.3-cp311-cp311-win_amd64.whl.metadata (12 kB)
+Collecting miniful (from fst-pso==1.8.1->pyfume->FuzzyTM)
+  Downloading miniful-0.0.6.tar.gz (2.8 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: six>=1.5 in c:\users\ychuang\anaconda3\lib\site-packages (from python-dateutil>=2.8.2->pandas->FuzzyTM) (1.16.0)
+Downloading FuzzyTM-2.0.9-py3-none-any.whl (31 kB)
+Downloading pyFUME-0.3.4-py3-none-any.whl (60 kB)
+   ---------------------------------------- 0.0/60.3 kB ? eta -:--:--   ---------------------------------------- 60.3/60.3 kB ? eta 0:00:00
+Downloading numpy-1.24.4-cp311-cp311-win_amd64.whl (14.8 MB)
+   ---------------------------------------- 0.0/14.8 MB ? eta -:--:--   - -------------------------------------- 0.5/14.8 MB 9.4 MB/s eta 0:00:02   ---- ----------------------------------- 1.5/14.8 MB 19.3 MB/s eta 0:00:01   -------- ------------------------------- 3.1/14.8 MB 22.2 MB/s eta 0:00:01   ----------- ---------------------------- 4.1/14.8 MB 22.0 MB/s eta 0:00:01   ------------ --------------------------- 4.8/14.8 MB 20.5 MB/s eta 0:00:01   ---------------- ----------------------- 6.0/14.8 MB 21.2 MB/s eta 0:00:01   -------------------- ------------------- 7.6/14.8 MB 23.1 MB/s eta 0:00:01   ----------------------- ---------------- 8.7/14.8 MB 25.3 MB/s eta 0:00:01   ---------------------------- ----------- 10.5/14.8 MB 26.2 MB/s eta 0:00:01   ---------------------------------- ----- 12.7/14.8 MB 31.2 MB/s eta 0:00:01   ---------------------------------------  14.7/14.8 MB 34.4 MB/s eta 0:00:01   ---------------------------------------- 14.8/14.8 MB 29.7 MB/s eta 0:00:00
+Downloading pandas-1.5.3-cp311-cp311-win_amd64.whl (10.3 MB)
+   ---------------------------------------- 0.0/10.3 MB ? eta -:--:--   ------- -------------------------------- 1.9/10.3 MB 60.8 MB/s eta 0:00:01   --------------- ------------------------ 4.0/10.3 MB 50.7 MB/s eta 0:00:01   ----------------------- ---------------- 5.9/10.3 MB 47.3 MB/s eta 0:00:01   ------------------------------ --------- 8.0/10.3 MB 46.3 MB/s eta 0:00:01   -------------------------------------- - 10.0/10.3 MB 45.6 MB/s eta 0:00:01   ---------------------------------------- 10.3/10.3 MB 40.9 MB/s eta 0:00:00
+Downloading scipy-1.10.1-cp311-cp311-win_amd64.whl (42.2 MB)
+   ---------------------------------------- 0.0/42.2 MB ? eta -:--:--   - -------------------------------------- 2.1/42.2 MB 44.2 MB/s eta 0:00:01   ---- ----------------------------------- 4.2/42.2 MB 45.1 MB/s eta 0:00:01   ----- ---------------------------------- 6.3/42.2 MB 44.5 MB/s eta 0:00:01   ------- -------------------------------- 8.3/42.2 MB 44.3 MB/s eta 0:00:01   --------- ------------------------------ 9.8/42.2 MB 44.7 MB/s eta 0:00:01   ---------- ----------------------------- 11.4/42.2 MB 40.9 MB/s eta 0:00:01   ------------ --------------------------- 13.2/42.2 MB 40.9 MB/s eta 0:00:01   -------------- ------------------------- 15.5/42.2 MB 40.9 MB/s eta 0:00:01   ---------------- ----------------------- 17.6/42.2 MB 40.9 MB/s eta 0:00:01   ----------------- ---------------------- 18.8/42.2 MB 38.6 MB/s eta 0:00:01   ------------------- -------------------- 20.8/42.2 MB 40.9 MB/s eta 0:00:01   --------------------- ------------------ 23.0/42.2 MB 40.9 MB/s eta 0:00:01   ----------------------- ---------------- 25.1/42.2 MB 40.9 MB/s eta 0:00:01   ------------------------- -------------- 27.1/42.2 MB 40.9 MB/s eta 0:00:01   --------------------------- ------------ 29.3/42.2 MB 43.5 MB/s eta 0:00:01   ----------------------------- ---------- 31.3/42.2 MB 43.7 MB/s eta 0:00:01   ------------------------------- -------- 33.4/42.2 MB 43.7 MB/s eta 0:00:01   --------------------------------- ------ 35.2/42.2 MB 43.7 MB/s eta 0:00:01   ----------------------------------- ---- 37.4/42.2 MB 46.9 MB/s eta 0:00:01   ------------------------------------- -- 39.4/42.2 MB 46.9 MB/s eta 0:00:01   ---------------------------------------  41.2/42.2 MB 43.7 MB/s eta 0:00:01   ---------------------------------------  42.2/42.2 MB 43.7 MB/s eta 0:00:01   ---------------------------------------  42.2/42.2 MB 43.7 MB/s eta 0:00:01   ---------------------------------------- 42.2/42.2 MB 31.2 MB/s eta 0:00:00
+Downloading simpful-2.12.0-py3-none-any.whl (24 kB)
+Building wheels for collected packages: fst-pso, miniful
+  Building wheel for fst-pso (setup.py): started
+  Building wheel for fst-pso (setup.py): finished with status 'done'
+  Created wheel for fst-pso: filename=fst_pso-1.8.1-py3-none-any.whl size=20448 sha256=b921bfc514ede01f6837676495fdc569a5d0e779da65738055ffeb12242b7154
+  Stored in directory: c:\users\ychuang\appdata\local\pip\cache\wheels\69\f5\e5\18ad53fe1ed6b2af9fad05ec052e4acbac8e92441df44bad2e
+  Building wheel for miniful (setup.py): started
+  Building wheel for miniful (setup.py): finished with status 'done'
+  Created wheel for miniful: filename=miniful-0.0.6-py3-none-any.whl size=3522 sha256=e0057d5d9588d2d3e06f6c83504c692ccd5c6a9ab496ef78f8342c86e68df12b
+  Stored in directory: c:\users\ychuang\appdata\local\pip\cache\wheels\9d\ff\2f\afe4cd56f47de147407705626517d68bea0f3b74eb1fb168e6
+Successfully built fst-pso miniful
+Installing collected packages: numpy, scipy, pandas, simpful, miniful, fst-pso, pyfume, FuzzyTM
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.2.3
+    Uninstalling numpy-2.2.3:
+      Successfully uninstalled numpy-2.2.3
