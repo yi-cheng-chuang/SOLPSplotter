@@ -7,94 +7,82 @@ Created on Thu Jul 13 12:38:48 2023
 
 import os
 
+
 def Setting_dic():
-    
+
     if os.environ['OS'] == 'Windows_NT':
         terminal = False
     elif os.environ['OS'] == '5.14.0-362.24.1.el9_3.0.1.x86_64':
         terminal = True
     else:
         print('there is a bug at Setting_dic function or unrecognized operating system')
-    
-    
+
     class DefaultSettings:
-        
+
         def __init__(self):
-            
-            
+
             self.DEV = 'mast'
             # self.cross_series = False
             self.withshift = False
-            self.withseries = False
-            self.series_flag = 'change_den'
-            
-            
+            self.withseries = True
+            self.series_flag = 'ionCX_scan'
+
             if self.series_flag == 'twin_scan':
                 self.series_filename = 'org_new25scan_fast_save'
                 self.series_tail = 'fast_a'
             elif self.series_flag == 'change_den':
                 pass
-            
-            
+
             if self.DEV == 'cross_machine':
-                
+
                 self.Dnames = 'mastu_mast'
-            
+
             else:
-                
+
                 print('we left it for the future contributors')
-            
-            
-            
+
             if self.DEV == 'mast' or self.DEV == 'mastu':
-                
+
                 if self.withseries:
-                    
+
                     if self.series_flag == 'minor_rad_scan':
-                        
+
                         print('It will be define in each dir comp')
-                    
+
                     else:
                         self.a = 0.5
-                
+
                 else:
-                    
+
                     self.a = 0.5
-            
+
             elif self.DEV == 'cross_machine' and self.Dnames == 'mastu_mast':
-                
+
                 self.a = 0.5
-                
 
             else:
                 print('we left other minor radius values to other contributors')
-                
-            
-                
 
-            
             self.flux_std = False
             self.terminal = terminal
             self.series_compare = False
             self.plot_setting = 'mod_transcoe'
             self.data_size = 'small'
-        
-        
+
         @classmethod
         def add_class_attribute(cls, name, value):
-            
+
             setattr(cls, name, value)
-            
-        
-    
+
     DF = DefaultSettings()
-    
+
     # set_dic = {'DEV': 'mastu', 'minor_rad': 0.5, 'withshift': False, 'withseries': False,
     #             'Parameters': P, 'series_flag': 'twin_scan', 'series_compare': False,
     # 'series_filename': 'org_new25scan_fast_save', 'series_tail': '_fast_a',
     #                 'terminal': terminal}
-    
+
     return DF
+
 
 """
 series_flag = ['eireneN','change_den','change_temp', 'two_compare', 'twin_scan']
@@ -109,37 +97,35 @@ For now, the device type I have are: mast, mastu, cross_machine
 """
 
 
-def set_figdir(): #Function to set correct Working Directory Path depending on which machine is in use
+def set_figdir():  # Function to set correct Working Directory Path depending on which machine is in use
     if os.environ['OS'] == 'Windows_NT':
-            
+
         if os.environ['USERNAME'] == 'ychuang':
-            
+
             fig_dir = r"C:\Users\ychuang\Documents\SOLPS_data\simulation_data\mast\027205\dataplot_fig"
-    
+
     return fig_dir
-    
-    
 
 
 def loadDS_dic(DEV):
     "New DefaultSettings for loading experimental data"
-    
-    bload = {'TimeRange' : [1.10,1.30], 'AVG': False, 'ROOTSHOT': ''}
-    
+
+    bload = {'TimeRange': [1.10, 1.30], 'AVG': False, 'ROOTSHOT': ''}
+
     # bload = {'TimeRange' : [1.10,1.30], 'AVG': False, 'multishift': False,
     #          'EXP': False, 'fit': True, 'ROOTSHOT': ''}
     if DEV == 'mast':
-        fndic = {'expfilename': 'yag_27205_275.dat', 'fitfname': 'fit_027205_275.dat'}
+        fndic = {'expfilename': 'yag_27205_275.dat',
+                 'fitfname': 'fit_027205_275.dat'}
         loadDS = {**bload, **fndic}
-        
-        
+
     else:
         print('please add the experimental file name')
-        loadDS = {'Notice': 'loadDS dic is empty, please add the experimental file name.'}
-    
-    
-    
+        loadDS = {
+            'Notice': 'loadDS dic is empty, please add the experimental file name.'}
+
     return loadDS
+
 
 """
 REQUIRED:
@@ -206,37 +192,36 @@ OPTIONAL:
 """
 
 
-
-DP_backup = {'LOG10' : 0,
-        'GRAD' : False,
-        'ELEV' : 75,
-        'AZIM' : 270,
-        'JXI' : 37,
-        'JXA' : 57,
-        'SEP' : 20,
-        'XDIM' : 98,
-        'YDIM' : 38,
-        'CoreBound' : [24,71],
-        'Publish' : [],
-        'Markers' : True,
-        'PlotScheme' : [],
-        'PsinOffset' : 0,
-        'RadOffset' : 0,
-        'RADC' : 'psin',
-        'POLC' : 'dXP',
-        'RadSlc' : None,
-        'PolSlc' : None,
-        'SURF' : 20,
-        'GEO' : True,
-        'LVN' : 100,
-        'DIVREG' : True,
-        'SAVE' : False,
-        'SUBTRACT' : False,
-        'AVG' : False,
-        'TC_Flux' : [], 
-        'TC_Psin' : [],
-        'GRID': False,
-        'AX' : None} #1160718
+DP_backup = {'LOG10': 0,
+             'GRAD': False,
+             'ELEV': 75,
+             'AZIM': 270,
+             'JXI': 37,
+             'JXA': 57,
+             'SEP': 20,
+             'XDIM': 98,
+             'YDIM': 38,
+             'CoreBound': [24, 71],
+             'Publish': [],
+             'Markers': True,
+             'PlotScheme': [],
+             'PsinOffset': 0,
+             'RadOffset': 0,
+             'RADC': 'psin',
+             'POLC': 'dXP',
+             'RadSlc': None,
+             'PolSlc': None,
+             'SURF': 20,
+             'GEO': True,
+             'LVN': 100,
+             'DIVREG': True,
+             'SAVE': False,
+             'SUBTRACT': False,
+             'AVG': False,
+             'TC_Flux': [],
+             'TC_Psin': [],
+             'GRID': False,
+             'AX': None}  # 1160718
 
 # for key, value in DP.items():
 #     print(key)
