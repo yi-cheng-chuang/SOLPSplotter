@@ -18,7 +18,7 @@ class poloidal_plot:
         self.DF = DF
         self.data = data
 
-    def opacity_poloidal_plot_method(self, item, pol_angle, result_dic, color_code, lins_marker,
+    def opacity_poloidal_plot_method(self, item, pol_angle, result_dic, color_code,
                                      A_value, unit_dic):
 
         if self.DF.withshift == False and self.DF.withseries == True:
@@ -41,7 +41,7 @@ class poloidal_plot:
                 # plt.errorbar(pol_loc[aa], np.round_(result_dic[i][aa], 2), yerr= np.std(result_dic[i][aa]), fmt= 'o',
                 #               label= '{}'.format(i))
                 plt.plot(pol_angle, np.round_(
-                    result_dic[item], 2), lins_marker + '-', lw=1.5, color=color_code, label='ti{}'.format(A_value))
+                    result_dic[item], 2), lw=1.5, color=color_code, label='ti{}'.format(A_value))
                 plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[item],
                                                                                   max(pol_angle), min(pol_angle)))
                 plt.xlabel('poloidal angle')
@@ -49,7 +49,7 @@ class poloidal_plot:
 
             elif item == 'pedestal_width' or item == 'efold_length':
                 new_r = result_dic[item]*1000
-                plt.plot(pol_angle, new_r, lins_marker + '-', lw=1.5, color=color_code,
+                plt.plot(pol_angle, new_r, lw=1.5, color=color_code,
                          label='ti{}'.format(A_value))
                 plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[item],
                                                                                   max(pol_angle), min(pol_angle)))
@@ -58,7 +58,7 @@ class poloidal_plot:
 
             else:
                 plt.plot(
-                    pol_angle, result_dic[item], lins_marker + '-', lw=1.5, color=color_code, label='ti{}'.format(A_value))
+                    pol_angle, result_dic[item], lw=1.5, color=color_code, label='ti{}'.format(A_value))
                 # plt.plot(pol_loc[aa], result_dic[i][aa], '-', color= color_dic[aa])
                 plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(item,
                                                                                   max(pol_angle), min(pol_angle)))
@@ -84,7 +84,7 @@ class poloidal_plot:
                 #              label= 'modified {} m case'.format(change_ver_dic[aa]))
                 # plt.errorbar(pol_loc[aa], np.round_(result_dic[i][aa], 2), yerr= np.std(result_dic[i][aa]), fmt= 'o',
                 #               label= '{}'.format(i))
-                plt.plot(pol_angle, np.round_(result_dic[item], 2), lins_marker + '-', lw=1.5, color=color_code,
+                plt.plot(pol_angle, np.round_(result_dic[item], 2), lw=1.5, color=color_code,
                          label='aspect ratio = {}'.format(A_value))
                 plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[item],
                                                                                   max(pol_angle), min(pol_angle)))
@@ -93,7 +93,7 @@ class poloidal_plot:
 
             elif item == 'pedestal_width' or item == 'efold_length':
                 new_r = result_dic[item]*1000
-                plt.plot(pol_angle, new_r, lins_marker + '-', lw=1.5, color=color_code,
+                plt.plot(pol_angle, new_r, lw=1.5, color=color_code,
                          label='aspect ratio = {}'.format(A_value))
                 plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(unit_dic[item],
                                                                                   max(pol_angle), min(pol_angle)))
@@ -101,7 +101,7 @@ class poloidal_plot:
                 plt.legend()
 
             else:
-                plt.plot(pol_angle, result_dic[item], lins_marker + '-', lw=1.5, color=color_code,
+                plt.plot(pol_angle, result_dic[item], lw=1.5, color=color_code,
                          label='aspect ratio = {}'.format(A_value))
                 # plt.plot(pol_loc[aa], result_dic[i][aa], '-', color= color_dic[aa])
                 plt.title('{} verses poloidal angle from {:.2f} to {:.2f}'.format(item,
@@ -269,9 +269,13 @@ class poloidal_plot:
                     A_val = A_dic[a_shift]
                     color = color_dic[a_shift]
 
+                    # self.opacity_poloidal_plot_method(item=i, pol_angle=pol_loc,
+                    #                                   result_dic=result, color_code=color_map[aa], A_value=aa,
+                    #                                   unit_dic=unit, lins_marker=lins_map[aa])
+
                     self.opacity_poloidal_plot_method(item=i, pol_angle=pol_loc,
                                                       result_dic=result, color_code=color_map[aa], A_value=aa,
-                                                      unit_dic=unit, lins_marker=lins_map[aa])
+                                                      unit_dic=unit)
 
                 self.poloidal_label(angle_fix=pol_loc,
                                     item=i, xpoint_fix=xpoint)
