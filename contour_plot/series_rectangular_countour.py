@@ -86,6 +86,13 @@ class series_Rectangular_contour:
                 ev = 1.6021766339999999 * pow(10, -19)
                 te_dat = Te_J / ev
 
+                fnax = self.data['b2wdat'][aa]['b2npc_fnaxs'][0][1:97, 1:37]
+                hz = self.data['b2wdat'][aa]['hz'][1:nx+1, 1:ny+1]
+                hy = self.data['b2wdat'][aa]['hy'][1:nx+1, 1:ny+1]
+                tor_area = np.multiply(hz, hy)
+                fnaxs = np.divide(fnax, tor_area)
+                abs_fnaxs = abs(fnaxs)
+
                 source = self.data['b2wdat'][aa]['b2npc_sna'][0][1:nx+1, 1:ny+1]
                 vol = self.data['b2wdat'][aa]['vol'][1:nx+1, 1:ny+1]
                 sx = np.divide(source, vol)
@@ -125,6 +132,14 @@ class series_Rectangular_contour:
                     vmin_0 = 1E+20
                     vmax_0 = 2E+23
 
+                elif plot_name == 'polflux':
+
+                    datname = 'polflux'
+                    title_name = 'poloidal particle flux [$m^{-2} s^{-1}$]'
+                    dat = abs_fnaxs
+                    vmin_0 = 1E+20
+                    vmax_0 = 2E+23
+
                 elif plot_name == 'neuden':
 
                     datname = 'Atomic neutral density'
@@ -148,6 +163,14 @@ class series_Rectangular_contour:
                     dat = ne_dat
                     vmin_0 = 1E+18
                     vmax_0 = 8E+19
+
+                elif plot_name == 'te':
+
+                    datname = 'Electron temperature'
+                    title_name = 'Electron temperature'
+                    dat = te_dat
+                    vmin_0 = 1
+                    vmax_0 = 500
 
                 elif plot_name == 'molsource':
 
