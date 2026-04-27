@@ -90,8 +90,8 @@ class load_prepare_module:
             xlf.load_ft44()
             # xlmp.load_ft44pkl()
             xrp.calc_sep_dsa()
-            index_list = [35, 36, 37, 38, 39]
-            xpir.poloidal_index_plot(pol_list=index_list)
+            # index_list = [35, 36, 37, 38, 39]
+            # xpir.poloidal_index_plot(pol_list=index_list)
 
             poloidal_index_list = ['59']
             xrp.calc_dsa(pol_loc=poloidal_index_list[0])
