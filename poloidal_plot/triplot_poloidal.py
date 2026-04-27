@@ -69,7 +69,7 @@ class series_triplots:
 
             if format_option == '3x1':
 
-                axs[0].set_title('opacity triplot')
+                # axs[0].set_title('opacity triplot')
 
                 if space_option == 'psiN':
                     axs[0].plot(ang_list, width_psiN, lins_map[aa] + '-', color=cl_dic[aa], lw=1.5,
@@ -145,7 +145,8 @@ class series_triplots:
 
         elif format_option == '1x1':
 
-            # axs.add_artist(anchored_text_4)
+            axs.add_artist(anchored_text_2)
+            # axs.add_artist(anchored_text_2)
             axs.axvline(x=0, color='black', lw=3, ls='-', label='LFS')
             axs.axvline(x=180, color='brown', lw=3, ls='-', label='HFS')
             axs.legend(loc='best')
