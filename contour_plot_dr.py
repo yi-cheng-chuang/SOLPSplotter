@@ -22,6 +22,7 @@ from contour_plot.plot_plasma_region import plasma_region_contour
 from contour_plot.eirene_contourplot_save import series_Eirene_contour
 from contour_plot.series_rectangular_countour import series_Rectangular_contour
 from contour_plot.HLcomparison import series_1para_HLcompare
+from contour_plot.Ashift_rectangular_contour import Ashift_Rectangular_contour
 
 
 class contour_datapipline:
@@ -63,6 +64,8 @@ class contour_datapipline:
         xsrc = series_Rectangular_contour(
             DF=self.DF, data=self.data, cpmc=xcpm)
         xhlc = series_1para_HLcompare(DF=self.DF, data=self.data)
+        xarc = Ashift_Rectangular_contour(
+            DF=self.DF, data=self.data, cpmc=xcpm)
 
         if self.DF.DEV == 'mast':
 
@@ -133,9 +136,11 @@ class contour_datapipline:
 
                 elif contour_theme == 'series_rectangular_contour':
 
-                    xsrc.series_rectangular_contourplot(plot_name='ion_source_change', norm_type='naturalset',
+                    xsrc.series_rectangular_contourplot(plot_name='sx', norm_type='fixlognorm',
                                                         label_type='angle', pol_loc_list=poloidal_loc_list,
-                                                        sted_index_list=[8, 30])
+                                                        sted_index_list=[8, 34])
+
+                    # rrsep range: [8, 30]
 
                 elif contour_theme == 'HLcomparison':
 
@@ -155,7 +160,7 @@ class contour_datapipline:
                 else:
                     pass
 
-                contour_theme = 'eirene_contour'
+                contour_theme = 'series_rectangular_contour'
 
                 if contour_theme == 'iout_paper':
 
@@ -170,6 +175,17 @@ class contour_datapipline:
                     xaec.Ashift_limit_eirene_contourplot()
 
                     xaec.Ashift_eirene_contourplot()
+
+                elif contour_theme == 'series_rectangular_contour':
+
+                    xarc.Ashift_rectangular_contourplot(plot_name='sx', norm_type='fixlognorm',
+                                                        label_type='angle', pol_loc_list=poloidal_loc_list,
+                                                        sted_index_list=[10, 28])
+
+                elif contour_theme == 'series_Eirene_contour':
+
+                    xsec.eirene_contour_plot(
+                        plot_type='contour', eirene_param='pdena')
 
 
 if __name__ == "__main__":
