@@ -23,6 +23,7 @@ from poloidal_plot.series_2para_poloidal import series_2para_polplot
 from midplane_data.cal_sep_length import seplength_calculator
 from poloidal_plot.series_1para_poloidal import series_1para_totargets_plot
 from poloidal_plot.series_2para_allsep_poloidal import series_2para_allsep_polplot
+from poloidal_plot.Ashift_2para_poloidal import Ashift_2para_polplot
 
 
 class poloidal_datapipline:
@@ -54,11 +55,13 @@ class poloidal_datapipline:
         xre = result_explain(DF=self.DF, data=self.data)
         xst = series_triplots(DF=self.DF, data=self.data)
         xspp = series_polfluxndS_polplot(DF=self.DF, data=self.data)
-        # xif = integrate_flux(DF = self.DF, data = self.data, sc = xsc)
+        xif = integrate_flux(DF=self.DF, data=self.data, sc=xsc)
         xs2p = series_2para_polplot(DF=self.DF, data=self.data, sc=xsc)
         xs1tp = series_1para_totargets_plot(
             DF=self.DF, data=self.data, sc=xsc)
         xs2sp = series_2para_allsep_polplot(
+            DF=self.DF, data=self.data, sc=xsc)
+        xAs2p = Ashift_2para_polplot(
             DF=self.DF, data=self.data, sc=xsc)
 
         if self.DF.DEV == 'mast':
@@ -76,7 +79,7 @@ class poloidal_datapipline:
 
             if withshift == False and withseries == True:
 
-                polplot_theme = '2para_allsep'
+                polplot_theme = 'triplots'
 
                 if polplot_theme == 'polfluxndS':
                     xspp.srpolfluxndS_plot(
@@ -98,18 +101,18 @@ class poloidal_datapipline:
 
                 elif polplot_theme == 'triplots':
 
-                    xst.tri_opacity_polplot(format_option='1x1',
+                    xst.tri_opacity_polplot(format_option='2x1',
                                             space_option='real')
 
                 elif polplot_theme == '2para':
 
                     xs2p.sr2para_polplot(
-                        pol_list=poloidal_loc_list, parameter='ppa', rad_loc=18)
+                        pol_list=poloidal_loc_list, parameter='ndapf', rad_loc=18)
 
                 elif polplot_theme == '1para':
 
                     xs1tp.series_1para_totargets_polplot(
-                        pol_list=poloidal_loc_list, parameter='abspolflux', rad_loc=18)
+                        pol_list=poloidal_loc_list, parameter='nd', rad_loc=18)
 
                 elif polplot_theme == '2para_allsep':
 
@@ -143,6 +146,11 @@ class poloidal_datapipline:
                     xre.plot_addition_ndflux()
 
                     xre.shape_plot_addition(pol_list=poloidal_loc_list)
+
+                elif polplot_theme == '2para':
+
+                    xAs2p.As2para_polplot(
+                        pol_list=poloidal_loc_list, parameter='ndapf', rad_loc=18)
 
                 elif polplot_theme == 'showflux':
 
