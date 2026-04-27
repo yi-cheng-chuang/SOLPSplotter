@@ -225,6 +225,28 @@ class series_Eirene_contour:
                                                    cbar_label="[%]",
                                                    shading="flat")
 
+        elif withshift == True and withseries == False:
+
+            if plot_type == 'contour':
+
+                for aa in self.data['dircomp']['Attempt'].keys():
+
+                    simu_dir = self.data['dirdata']['simudir'][aa]
+                    dat = self.data['ft46'][aa][eirene_param][:, 0]
+                    # abs_dat = np.absolute(dat)
+                    eirene_dic = self.Eirene_name_dic()
+
+                    self.eirene_percent_tripcolor_tool(simudir=simu_dir, percent_data=dat,
+                                                       lognorm=True,
+                                                       plot33=False,
+                                                       vmin=1E+11, vmax=2E+19, nlevels=30,
+                                                       cmap='jet', center_zero=True,
+                                                       title="{}".format(
+                                                           eirene_dic[eirene_param]),
+                                                       ylim=(-2, 0.5), xlim=None,
+                                                       cbar_label="[$m^{-3}$]",
+                                                       shading="flat")
+
         else:
             print('eirene_contour_plot function needs to be checked!')
 
