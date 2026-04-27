@@ -210,7 +210,7 @@ class directory_input:
         a_shift = 'org'
         shift = 0
         tail = '_msb'
-        shift_filename = 'org_ionization_scan'
+        shift_filename = 'org_Denscan'
         # shift_filename = 'CX_scan_org'
         mast_series_dir_dic = {'Shot': '027205', 'shift': shift_filename, 'shift_value': shift,
                                'tail': tail, 'a_shift': a_shift}
