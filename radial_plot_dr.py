@@ -16,6 +16,8 @@ from radial_plot.twscan_rad import twscan_radial
 from radial_plot.twscan_target import twinscan_target_radial
 from radial_plot.series_Smid import series_midS
 from radial_plot.series_targets_radial import srtarget_radial
+from fit_data.fitting_method import fit_method_collection
+from radial_plot.Ashift_radial_single import Ashift_midsingle
 
 
 class radial_datapipline:
@@ -35,6 +37,7 @@ class radial_datapipline:
     def run_radial_plot(self):
 
         xta = twscan_assist(DF=self.DF, data=self.data)
+        xfm = fit_method_collection(DF=self.DF, data=self.data)
         xnt = NT_plot(DF=self.DF, data=self.data, twa=xta)
         xmp = midnd_plot(DF=self.DF, data=self.data, twa=xta)
         xns = neuden_scan(DF=self.DF, data=self.data, twa=xta)
@@ -43,8 +46,9 @@ class radial_datapipline:
         xps = plot_setting(DF=self.DF, data=self.data)
         xtr = twscan_radial(DF=self.DF, data=self.data, twa=xta)
         xttr = twinscan_target_radial(DF=self.DF, data=self.data, twa=xta)
-        xsm = series_midS(DF=self.DF, data=self.data)
+        xsm = series_midS(DF=self.DF, data=self.data, fmc=xfm, ntp=xnt)
         xstr = srtarget_radial(DF=self.DF, data=self.data)
+        xams = Ashift_midsingle(DF=self.DF, data=self.data, fmc=xfm)
 
         if self.DF.DEV == 'mast':
 
@@ -125,7 +129,12 @@ class radial_datapipline:
 
                 xps.radial_import_Plabel()
 
-                xrpo.Opacity_study_radial_plot(pol_loc=poloidal_index_list)
+                print("print index list")
+                print(poloidal_index_list)
+
+                # xrpo.Opacity_study_radial_plot(pol_loc=poloidal_index_list)
+
+                xams.Ashiftmid_plot(xcoord_type='rrsep')
 
                 # xl.plot_all_radial(separate = False)
 
