@@ -27,6 +27,7 @@ class series_2para_polplot:
             "teti": {"te": [], "ti": []},
             "ndS":  {"nd": [], "s":  []},
             "ndnm": {"nd": [], "nm": []},
+            "ndapf": {"nd": [], "abs_fnaxs": []},
             "rpa": {"rfluxa": [], "pfluxa": []},
             "rpm": {"rfluxm": [], "pfluxm": []},
             "pam": {"pfluxa": [], "pfluxm": []},
@@ -48,6 +49,7 @@ class series_2para_polplot:
             "teti": (("te", "ti"), ("te_pro", "ti_pro")),
             "ndS":  (("nd", "s"),  ("neuden", "source")),
             "ndnm": (("nd", "nm"), ("neuden", "molden")),
+            "ndapf": (("nd", "abs_fnaxs"), ("neuden", "abs_fnaxs")),
             "rpa": (("rfluxa", "pfluxa"), ("rfluxa", "pfluxa")),
             "rpm": (("rfluxm", "pfluxm"), ("rfluxm", "pfluxm")),
             "pam": (("pfluxa", "pfluxm"), ("pfluxa", "pfluxm")),
@@ -85,6 +87,9 @@ class series_2para_polplot:
             },
             "ndnm": {
                 "series": [("nd", 0, r"$n_D$"), ("nm", 1, r"$n_m$")],
+            },
+            "ndapf": {
+                "series": [("nd", 0, r"$n_D$"), ("abs_fnaxs", 1, r"$\Gamma_\theta$")],
             },
             "rpa": {
                 "series": [("rfluxa", 0, r"$\Gamma_{r, n_D}$"), ("pfluxa", 1, r"$\Gamma_{p, n_D}$")],
@@ -153,6 +158,7 @@ class series_2para_polplot:
             hy = self.data['b2wdat'][aa]['hy'][1:nx+1, 1:ny+1]
             tor_area = np.multiply(hz, hy)
             fnaxs = np.divide(fnax, tor_area)
+            abs_fnaxs = abs(fnaxs)
 
             s_term = self.data['b2wdat'][aa]['b2npc_sna'][0][1:nx+1, 1:ny+1]
             vol = self.data['b2wdat'][aa]['vol'][1:nx+1, 1:ny+1]
@@ -167,7 +173,7 @@ class series_2para_polplot:
 
             data = dict(ne_dat=ne_dat, te_pro=te_pro, ti_pro=ti_pro, neuden=neuden,
                         source=source, molden=molden, rfluxa=rfluxa, rfluxm=rfluxm, pfluxa=pfluxa,
-                        pfluxm=pfluxm, fnaxs=fnaxs)
+                        pfluxm=pfluxm, fnaxs=fnaxs, abs_fnaxs=abs_fnaxs)
 
             if plot_section == 'core':
                 lists = self.init_param_lists(parameter)
