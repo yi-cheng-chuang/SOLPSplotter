@@ -80,7 +80,15 @@ class plasma_region_contour:
             if k >= 8 and k <= 18:
                 ax.plot(X[k, 25: 73], Y[k, 25: 73], 'cyan', linewidth=1)
             elif k > 18:
-                ax.plot(X[k, :], Y[k, :], 'b', linewidth=1)
+                ax.plot(X[k, :], Y[k, :], 'yellow', linewidth=1)
+
+        # for k in range(X.shape[0]):  # horizontal lines
+        #     if k <= 18:
+        #         ax.plot(X[k, : 24], Y[k, : 24], 'g', linewidth=1)
+        #         ax.plot(X[k, 73:], Y[k, 73:], 'g', linewidth=1)
+
+        #     if k > 18:
+        #         ax.plot(X[k, :], Y[k, :], 'pink', linewidth=1)
 
         # for k in range(X.shape[1]):  # vertical lines
 
