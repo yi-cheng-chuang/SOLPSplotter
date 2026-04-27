@@ -61,6 +61,13 @@ class series_1para_HLcompare:
 
                 return norm_inc_dat
 
+            b2fstate = self.data['b2fstate'][aa]
+            ne_dat = b2fstate['ne'][1:nx+1, 1:ny+1]
+            Te_J = b2fstate['te'][1:nx+1, 1:ny+1]
+
+            ev = 1.6021766339999999 * pow(10, -19)
+            te_dat = Te_J / ev
+
             fnay = self.data['b2wdat'][aa]['b2npc_fnays'][0][1:97, 1:37]
             hz = self.data['b2wdat'][aa]['hz'][1:nx+1, 1:ny+1]
             hy = self.data['b2wdat'][aa]['hy'][1:nx+1, 1:ny+1]
@@ -86,8 +93,8 @@ class series_1para_HLcompare:
             xcoord_high = arc_map[8, :]
             xcoord_low = arc_map[30, :]
 
-            dat_name = 'source'
-            dat = source
+            dat_name = 'ne'
+            dat = ne_dat
 
             dat_high = dat[int(pol_list[8]), :]
             dat_low = dat[int(pol_list[30]), :]
@@ -104,6 +111,12 @@ class series_1para_HLcompare:
 
             axs.set_xlim(-0.02, 0.01)
             axs.set_yscale("log")
+            # axs.set_ylim(4E+21, 3E+23)
+
+        elif dat_name == 'ne':
+
+            axs.set_xlim(-0.02, 0.01)
+            # axs.set_yscale("log")
             # axs.set_ylim(4E+21, 3E+23)
 
         axs.grid(True)
